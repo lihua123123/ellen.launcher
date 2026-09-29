@@ -466,3 +466,8 @@ _miyoushe/_rescue_bak/
 _miyoushe/__pycache__/
 .venv/
 publish/
+
+# 校准批裁图（可由 _miyoushe/vlm_transcribe.py --dry-run 再生，勿入库）
+# 保留同目录的 sample.json / cal_gold.json（后者是人工精读的金标准）
+_design/enemy-archive/cal/*.png
+_design/enemy-archive/*.png

@@ -464,6 +464,8 @@ _miyoushe/_gen2/
 _miyoushe/_rescue/
 _miyoushe/_rescue_bak/
 _miyoushe/__pycache__/
+# VLM 密钥（单行纯文本）。**唯一**允许放 key 的地方；环境变量优先于它。
+_miyoushe/.vlm_key
 .venv/
 publish/
 

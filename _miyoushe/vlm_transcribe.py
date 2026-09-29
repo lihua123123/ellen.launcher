@@ -12,10 +12,13 @@
   - **13 篇额外一致性校验**（见 check13）：行数、5 的倍数、瘫痪行必须不高于本体行、
     IMM 必须落在该怪物自身元素列。
 
-密钥绝不写在代码里，只从环境变量读：
-    set VLM_API_KEY=sk-xxxx
-    set VLM_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1   (默认)
-    set VLM_MODEL=qwen-vl-max-latest                                     (默认)
+密钥绝不写在代码里。两种给法，**都不过对话记录**：
+  1) 环境变量：
+       set VLM_API_KEY=sk-xxxx
+       set VLM_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1   (默认)
+       set VLM_MODEL=qwen-vl-max-latest                                     (默认)
+  2) 放进 `_miyoushe/.vlm_key`（单行纯文本，已 gitignore）——
+     推荐：**在编辑器里写**，不必贴到聊天、也不必在命令行里传。
 
 用法：
     python vlm_transcribe.py --dry-run              # 不联网，打印将发送的裁图清单与体积
@@ -123,22 +126,29 @@ def row_crops(tag, idx):
 CROP_BOTTOM_DEFAULT = 320
 CROP_BOTTOM_13 = 430
 
-# 行中心相对 yb 的偏移与行距（按篇不同）。据此可以算出「一张裁图最多容纳几行」，
-# 这是**从几何算出来的测量值**，不是「报 4 行就可疑」这种经验猜测。
-ROW_GRID_DEFAULT = (107, 60)
-ROW_GRID_13 = (138, 60)
-ROW_HALF = 16   # 行高的一半：要求整行都落在裁图内，才算「容得下」
+# 行网格：`(首行墨迹带上沿, 行距, 墨迹带高)`，单位 px，相对 yb —— **全部实测**。
+# 量法：对裁图逐扫描线统计「亮于本行中位数 +45」的像素数，取连续墨迹带。
+#   非 13 篇（`06/041` 实测）：带上沿 +79  带高 56  行距 60 → 行心 ≈ +107
+#   13 篇（`13/003` 实测）：  带上沿 +116 带高 56  行距 60 → 行心 ≈ +144
+#
+# ⚠️ 这里存的是「墨迹带」而不是「行心 ± 半高」：带是**量出来的**，半高曾经是拍的。
+#    曾拍 `ROW_HALF = 16`，与实测带高 56（半高 28）矛盾，而且写成 `+ROW_HALF`
+#    还把容量**多算一行**（12/013 算成 3、13 篇算成 6，实测分别是 2、5）。
+ROW_GRID_13 = (116, 60, 56)
+ROW_GRID_DEFAULT = (79, 60, 56)
 
 
 def max_rows_in(crop_height, tag):
-    """给定裁图高度（未放大前的像素），算出它能容纳的最多行数。
+    """给定裁图高度（未放大前的像素），算出**能完整容纳**的最多行数。
 
-    裁图是 `(yb-70) ~ (yb+bottom)`，所以 `bottom - yb = crop_height - 70`，
-    于是不需要 yb 本身就能推算可容行数。
+    裁图是 `(yb-70) ~ (yb+bottom)` → `bottom - yb = crop_height - 70`。
+    第 k 行墨迹带下沿 = `top + ink + step*k`，要求 ≤ `bottom - yb`，
+    即 `k <= (span - top - ink) / step`。
+    ⚠️ 别改回「行心 + 半高」的写法 —— 那会把容量多算一行（见上面注释）。
     """
-    dy, step = ROW_GRID_13 if tag == "13" else ROW_GRID_DEFAULT
+    top, step, ink = ROW_GRID_13 if tag == "13" else ROW_GRID_DEFAULT
     span = crop_height - 70
-    return max(0, (span - dy + ROW_HALF) // step + 1)
+    return max(0, (span - top - ink) // step + 1)
 
 
 def table_crop(tag, idx):
@@ -180,6 +190,25 @@ def est_tokens(w, h):
 
 
 # ---------------------------------------------------------------- 调用
+
+def read_key():
+    """读密钥：环境变量优先，其次 `_miyoushe/.vlm_key`（单行纯文本）。
+
+    加文件兜底是为了**让密钥不经过对话记录 / 命令行**：
+    在编辑器里把 key 写进 `_miyoushe/.vlm_key` 即可。
+    ⚠️ 该文件必须保持 gitignore；**绝不要**把 key 写进本脚本或任何入库文件。
+    """
+    key = os.environ.get("VLM_API_KEY", "").strip()
+    if key:
+        return key
+    f = HERE / ".vlm_key"
+    if f.exists():
+        for line in f.read_text(encoding="utf-8-sig").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#"):
+                return line
+    return ""
+
 
 def call_vlm(png, model, base, key, timeout=120):
     payload = {
@@ -590,15 +619,23 @@ def run(targets, dry, model, base, key, upscale, vlm_dir):
                 doc = {"rows": rows}
                 # 只标记、不自动复看：行数顶到该裁图的容纳上限时，**可能**被切。
                 # 这是测量（按几何算出上限），不是猜测（不假定「达到上限就一定有错」）。
-                # 实测：8 张顶到边界的卡里只有 1 张（06/041）真的被切。
+                # 实测：8 张顶到边界的卡里只有 1 张（06/041）真的被切 ->
+                #   ⚠️ 过报率很高（6/7）。所以标记的语义是「**读数可能不完整**」，
+                #     不是「读数错了」；看到它**仍要逐张看图**，不能当结论用。
+                # 两个数都写进文件，人工扫的时候一眼能分辨：
+                #   rows_observed == rows_fit -> 顶到天花板，可疑
+                #   rows_observed <  rows_fit -> 明显没顶到，可以直接放过
                 rows_fit = max_rows_in(img.height, label.split("/")[0])
-                if rows_fit and len(rows) >= rows_fit:
-                    doc["possibly_truncated"] = True
+                doc["rows_observed"] = len(rows)
+                if rows_fit > 0:
                     doc["rows_fit"] = rows_fit
+                    if len(rows) >= rows_fit:
+                        doc["possibly_truncated"] = True
                 (vlm_dir / name).write_text(
                     json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
                 nok = sum(1 for r in rows if r.get("verified"))
-                flag = "  [possibly_truncated]" if doc.get("possibly_truncated") else ""
+                flag = ("  [possibly_truncated %d/%d]" % (len(rows), doc["rows_fit"])
+                        if doc.get("possibly_truncated") else "")
                 print("  %-22s rows=%d verified=%d%s"
                       % (label + ("/" + sub if sub else ""), len(rows), nok, flag))
             except Exception as e:
@@ -636,7 +673,7 @@ def main():
         score(vlm_dir)
         return
 
-    key = os.environ.get("VLM_API_KEY", "")
+    key = read_key()
     model = os.environ.get("VLM_MODEL", "qwen-vl-max-latest")
     base = os.environ.get("VLM_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
 
@@ -647,7 +684,8 @@ def main():
         probe_matrix(key, base)
         return 0
     if not a.dry_run and not key:
-        print("缺少 VLM_API_KEY（请自行设置环境变量，不要写进代码）")
+        print("缺少 VLM_API_KEY：设置环境变量 VLM_API_KEY，"
+              "或把密钥写进 %s（单行，已 gitignore）" % (HERE / ".vlm_key"))
         return 1
 
     ocr_pool.refresh()

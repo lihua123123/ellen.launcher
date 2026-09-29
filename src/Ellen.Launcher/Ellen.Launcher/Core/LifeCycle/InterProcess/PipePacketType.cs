@@ -1,0 +1,12 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+namespace Ellen.Launcher.Core.LifeCycle.InterProcess;
+
+public enum PipePacketType : byte
+{
+    None = 0,
+    Request = 1,
+    Response = 2,
+    SessionTermination = 3,
+}

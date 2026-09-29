@@ -1,0 +1,16 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using CommunityToolkit.WinUI;
+using CommunityToolkit.WinUI.Behaviors;
+using Microsoft.UI.Xaml.Controls;
+
+namespace Ellen.Launcher.UI.Xaml.Behavior;
+
+public sealed class ToggleSwitchHeaderHitTestVisibleBehavior : BehaviorBase<ToggleSwitch>
+{
+    protected override void OnAssociatedObjectLoaded()
+    {
+        AssociatedObject.FindDescendant("HeaderContentPresenter")!.IsHitTestVisible = true;
+    }
+}

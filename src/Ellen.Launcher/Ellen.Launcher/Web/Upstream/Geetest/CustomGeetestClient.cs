@@ -1,0 +1,83 @@
+﻿// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using Ellen.Launcher.Core.DependencyInjection.Annotation.HttpClient;
+using Ellen.Launcher.Service;
+using Ellen.Launcher.Web.Request.Builder;
+using Ellen.Launcher.Web.Request.Builder.Abstraction;
+using System.Collections.Frozen;
+using System.Globalization;
+using System.Net.Http;
+using System.Text;
+
+namespace Ellen.Launcher.Web.Upstream.Geetest;
+
+[HttpClient(HttpClientConfiguration.Default)]
+public sealed partial class CustomGeetestClient
+{
+    private static readonly FrozenSet<string> ImpossibleHosts =
+    [
+        "webstatic.mihoyo.com",
+        "www.miyoushe.com",
+    ];
+
+    private readonly IHttpRequestMessageBuilderFactory httpRequestMessageBuilderFactory;
+    private readonly ITaskContext taskContext;
+    private readonly AppOptions appOptions;
+    private readonly HttpClient httpClient;
+
+    [GeneratedConstructor]
+    public partial CustomGeetestClient(IServiceProvider serviceProvider, HttpClient httpClient);
+
+    public async ValueTask<GeetestResponse> VerifyAsync(string gt, string challenge, CancellationToken token)
+    {
+        string template = appOptions.GeetestCustomCompositeUrl.Value;
+
+        try
+        {
+            UriBuilder uriBuilder = new(template);
+            if (ImpossibleHosts.Contains(uriBuilder.Host))
+            {
+                await taskContext.SwitchToMainThreadAsync();
+                appOptions.GeetestCustomCompositeUrl.Value = string.Empty;
+                return GeetestResponse.publicFailure;
+            }
+        }
+        catch
+        {
+            return GeetestResponse.publicFailure;
+        }
+
+        string url;
+        try
+        {
+            CompositeFormat format = CompositeFormat.Parse(template);
+            if (format.MinimumArgumentCount < 2)
+            {
+                // If there are less than 2 arguments, we cannot format the string correctly.
+                return GeetestResponse.publicFailure;
+            }
+
+            url = string.Format(CultureInfo.CurrentCulture, format.Format, gt, challenge);
+        }
+        catch (FormatException)
+        {
+            return GeetestResponse.publicFailure;
+        }
+
+        if (string.IsNullOrEmpty(template) || !Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
+        {
+            return GeetestResponse.publicFailure;
+        }
+
+        HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()
+            .SetRequestUri(uri)
+            .Get();
+
+        GeetestResponse? resp = await builder
+            .SendAsync<GeetestResponse>(httpClient, false, token)
+            .ConfigureAwait(false);
+
+        return resp ?? GeetestResponse.publicFailure;
+    }
+}

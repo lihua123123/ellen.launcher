@@ -1,0 +1,21 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using Ellen.Launcher.Model.Primitive;
+
+namespace Ellen.Launcher.Web.Hoyolab.Takumi.GameRecord.SpiralAbyss;
+
+public sealed class SpiralAbyssAvatar
+{
+    [JsonPropertyName("id")]
+    public required AvatarId Id { get; init; }
+
+    [JsonPropertyName("icon")]
+    public required string Icon { get; init; }
+
+    [JsonPropertyName("level")]
+    public required int Level { get; init; }
+
+    [JsonPropertyName("rarity")]
+    public required int Rarity { get; init; }
+}

@@ -1,0 +1,52 @@
+﻿// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using Ellen.Launcher.Core.Abstraction;
+using Ellen.Launcher.Core.ExceptionService;
+using Ellen.Launcher.Service.Game.FileSystem;
+using Ellen.Launcher.Service.Game.Scheme;
+using Ellen.Launcher.Web.Hoyolab.Downloader;
+
+namespace Ellen.Launcher.Service.Game.Package.Advanced;
+
+public sealed class GameInstallOptions : IDeconstruct<IGameFileSystem, LaunchScheme>, IDeconstruct<IGameFileSystem, LaunchScheme, SophonBuild>
+{
+    private readonly IGameFileSystem gameFileSystem;
+    private readonly LaunchScheme launchScheme;
+    private readonly SophonBuild? betaBuild;
+
+    public GameInstallOptions(IGameFileSystem gameFileSystem, LaunchScheme launchScheme)
+    {
+        IsBeta = false;
+        this.gameFileSystem = gameFileSystem;
+        this.launchScheme = launchScheme;
+
+        betaBuild = default!;
+    }
+
+    public GameInstallOptions(IGameFileSystem gameFileSystem, LaunchScheme launchScheme, SophonBuild betaBuild)
+    {
+        IsBeta = true;
+        this.gameFileSystem = gameFileSystem;
+        this.launchScheme = launchScheme;
+
+        this.betaBuild = betaBuild;
+    }
+
+    [MemberNotNullWhen(true, nameof(betaBuild))]
+    public bool IsBeta { get; }
+
+    public void Deconstruct(out IGameFileSystem gameFileSystem, out LaunchScheme launchScheme)
+    {
+        gameFileSystem = this.gameFileSystem;
+        launchScheme = this.launchScheme;
+    }
+
+    public void Deconstruct(out IGameFileSystem gameFileSystem, out LaunchScheme launchScheme, out SophonBuild betaBuild)
+    {
+        gameFileSystem = this.gameFileSystem;
+        launchScheme = this.launchScheme;
+        EllenException.ThrowIfNot(IsBeta, "Deconstruct to beta build when not a beta install");
+        betaBuild = this.betaBuild;
+    }
+}

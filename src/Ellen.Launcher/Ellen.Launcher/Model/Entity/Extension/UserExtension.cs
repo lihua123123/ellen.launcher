@@ -1,0 +1,22 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+namespace Ellen.Launcher.Model.Entity.Extension;
+
+public static class UserExtension
+{
+    extension(User user)
+    {
+        public bool TryUpdateFingerprint(string? deviceFp)
+        {
+            if (string.IsNullOrEmpty(deviceFp))
+            {
+                return false;
+            }
+
+            user.Fingerprint = deviceFp;
+            user.FingerprintLastUpdateTime = DateTimeOffset.UtcNow;
+            return true;
+        }
+    }
+}

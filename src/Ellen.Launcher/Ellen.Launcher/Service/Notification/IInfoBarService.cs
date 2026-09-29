@@ -1,0 +1,11 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using System.Collections.ObjectModel;
+
+namespace Ellen.Launcher.Service.Notification;
+
+public interface IInfoBarService
+{
+    ObservableCollection<InfoBarOptions> Collection { get; }
+}

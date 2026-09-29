@@ -1,0 +1,14 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+namespace Ellen.Launcher.ViewModel.Guide;
+
+[ExtendedEnum]
+public enum StaticResourceArchive
+{
+    [LocalizationKey(nameof(SH.ViewGuideStepStaticResourceSettingMinimumOff))]
+    Full,
+
+    [LocalizationKey(nameof(SH.ViewGuideStepStaticResourceSettingMinimumOn))]
+    Minimum,
+}

@@ -1,0 +1,21 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using Microsoft.UI.Xaml.Controls;
+using Ellen.Launcher.Service.GachaLog;
+
+namespace Ellen.Launcher.UI.Xaml.View.Dialog;
+
+[DependencyProperty<GachaLogFetchStatus>("Status")]
+public sealed partial class GachaLogRefreshProgressDialog : ContentDialog
+{
+    public GachaLogRefreshProgressDialog()
+    {
+        InitializeComponent();
+    }
+
+    public void OnReport(GachaLogFetchStatus status)
+    {
+        Status = status;
+    }
+}

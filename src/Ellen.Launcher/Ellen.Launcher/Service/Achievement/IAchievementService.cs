@@ -1,0 +1,28 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using Ellen.Launcher.Core.Database;
+using Ellen.Launcher.Model.InterChange.Achievement;
+using Ellen.Launcher.UI.Xaml.Data;
+using Ellen.Launcher.ViewModel.Achievement;
+using System.Collections.Immutable;
+using EntityArchive = Ellen.Launcher.Model.Entity.AchievementArchive;
+
+namespace Ellen.Launcher.Service.Achievement;
+
+public interface IAchievementService
+{
+    ValueTask<IAdvancedDbCollectionView<EntityArchive>> GetArchiveCollectionAsync(CancellationToken token = default);
+
+    ValueTask<UIAF> ExportToUIAFAsync(EntityArchive archive);
+
+    IAdvancedCollectionView<AchievementView> GetAchievementViewCollection(EntityArchive archive, AchievementServiceMetadataContext context);
+
+    ValueTask<ImportResult> ImportFromUIAFAsync(EntityArchive archive, ImmutableArray<UIAFItem> array, ImportStrategyKind strategy);
+
+    ValueTask RemoveArchiveAsync(EntityArchive archive);
+
+    void SaveAchievement(AchievementView achievement);
+
+    ValueTask<ArchiveAddResultKind> AddArchiveAsync(EntityArchive newArchive);
+}

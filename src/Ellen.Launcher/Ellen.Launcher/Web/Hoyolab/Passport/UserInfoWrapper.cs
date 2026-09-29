@@ -1,0 +1,10 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+namespace Ellen.Launcher.Web.Hoyolab.Passport;
+
+public sealed class UserInfoWrapper
+{
+    [JsonPropertyName("user_info")]
+    public UserInformation UserInfo { get; set; } = default!;
+}

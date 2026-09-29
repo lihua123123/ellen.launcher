@@ -1,0 +1,21 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using Ellen.Launcher.Web.Request.Builder.Abstraction;
+
+namespace Ellen.Launcher.Web.Request.Builder;
+
+[Service(ServiceLifetime.Singleton, typeof(IHttpRequestMessageBuilderFactory))]
+public sealed partial class HttpRequestMessageBuilderFactory : IHttpRequestMessageBuilderFactory
+{
+    private readonly JsonHttpContentSerializer jsonHttpContentSerializer;
+    private readonly IServiceProvider serviceProvider;
+
+    [GeneratedConstructor]
+    public partial HttpRequestMessageBuilderFactory(IServiceProvider serviceProvider);
+
+    public HttpRequestMessageBuilder Create()
+    {
+        return new(serviceProvider, jsonHttpContentSerializer);
+    }
+}

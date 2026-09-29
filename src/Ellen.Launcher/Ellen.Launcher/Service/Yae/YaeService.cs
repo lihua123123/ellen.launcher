@@ -1,0 +1,332 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using Google.Protobuf;
+using Microsoft.UI.Xaml.Controls;
+using Ellen.Launcher.Core.LifeCycle.InterProcess.Yae;
+using Ellen.Launcher.Factory.ContentDialog;
+using Ellen.Launcher.Model.InterChange.Achievement;
+using Ellen.Launcher.Model.InterChange.Inventory;
+using Ellen.Launcher.Service.Feature;
+using Ellen.Launcher.Service.Game;
+using Ellen.Launcher.Service.Game.FileSystem;
+using Ellen.Launcher.Service.Game.Launching;
+using Ellen.Launcher.Service.Game.Launching.Context;
+using Ellen.Launcher.Service.Game.Launching.Invoker;
+using Ellen.Launcher.Service.Notification;
+using Ellen.Launcher.Service.User;
+using Ellen.Launcher.Service.Yae.Achievement;
+using Ellen.Launcher.Service.Yae.PlayerStore;
+using Ellen.Launcher.ViewModel.Game;
+using Ellen.Launcher.ViewModel.User;
+using System.Diagnostics;
+
+namespace Ellen.Launcher.Service.Yae;
+
+[Service(ServiceLifetime.Singleton, typeof(IYaeService))]
+public sealed partial class YaeService : IYaeService
+{
+    private readonly IContentDialogFactory contentDialogFactory;
+    private readonly IServiceProvider serviceProvider;
+    private readonly IFeatureService featureService;
+    private readonly IUserService userService;
+    private readonly ITaskContext taskContext;
+    private readonly IMessenger messenger;
+
+    [GeneratedConstructor]
+    public partial YaeService(IServiceProvider serviceProvider);
+
+    public async ValueTask<UIAF?> GetAchievementAsync(IViewModelSupportLaunchExecution viewModel)
+    {
+        ContentDialog dialog = await contentDialogFactory
+            .CreateForIndeterminateProgressAsync(SH.ServiceYaeWaitForGameResponseMessage)
+            .ConfigureAwait(false);
+
+        using (await contentDialogFactory.BlockAsync(dialog).ConfigureAwait(false))
+        {
+            await taskContext.SwitchToBackgroundAsync();
+            using (YaeDataArrayReceiver receiver = new())
+            {
+                try
+                {
+                    UserAndUid? userAndUid = await userService.GetCurrentUserAndUidAsync().ConfigureAwait(false);
+                    LaunchExecutionInvocationContext context = new()
+                    {
+                        ViewModel = viewModel,
+                        ServiceProvider = serviceProvider,
+                        LaunchOptions = serviceProvider.GetRequiredService<LaunchOptions>(),
+                        Identity = GameIdentity.Create(userAndUid, viewModel.GameAccount),
+                    };
+
+                    if (!TryGetGameVersion(context, out string? version, out bool isOversea))
+                    {
+                        return default;
+                    }
+
+                    AchievementFieldId? fieldId = await featureService.GetAchievementFieldIdAsync(version).ConfigureAwait(false);
+                    ArgumentNullException.ThrowIfNull(fieldId);
+
+                    TargetNativeConfiguration config = TargetNativeConfiguration.Create(fieldId.NativeConfig, isOversea);
+                    await new YaeLaunchExecutionInvoker(config, receiver).InvokeAsync(context).ConfigureAwait(false);
+
+                    UIAF? uiaf = default;
+                    foreach (YaeData data in receiver.Array)
+                    {
+                        using (data)
+                        {
+                            if (data.Kind is YaeCommandKind.ResponseAchievement)
+                            {
+                                Debug.Assert(uiaf is null);
+                                uiaf = AchievementParser.Parse(data.Bytes, fieldId);
+                            }
+                        }
+                    }
+
+                    return uiaf;
+                }
+                catch (Exception ex)
+                {
+                    messenger.Send(InfoBarMessage.Error(ex));
+                    return default;
+                }
+            }
+        }
+    }
+
+    public async ValueTask<UIIF?> GetInventoryAsync(IViewModelSupportLaunchExecution viewModel)
+    {
+        ContentDialog dialog = await contentDialogFactory
+            .CreateForIndeterminateProgressAsync(SH.ServiceYaeWaitForGameResponseMessage)
+            .ConfigureAwait(false);
+
+        using (await contentDialogFactory.BlockAsync(dialog).ConfigureAwait(false))
+        {
+            await taskContext.SwitchToBackgroundAsync();
+            UIIF? uiif = default;
+            Dictionary<InterestedPropType, double> propMap = [];
+            using (YaeDataArrayReceiver receiver = new())
+            {
+                try
+                {
+                    UserAndUid? userAndUid = await userService.GetCurrentUserAndUidAsync().ConfigureAwait(false);
+                    LaunchExecutionInvocationContext context = new()
+                    {
+                        ViewModel = viewModel,
+                        ServiceProvider = serviceProvider,
+                        LaunchOptions = serviceProvider.GetRequiredService<LaunchOptions>(),
+                        Identity = GameIdentity.Create(userAndUid, viewModel.GameAccount),
+                    };
+
+                    if (!TryGetGameVersion(context, out string? version, out bool isOversea))
+                    {
+                        return default;
+                    }
+
+                    AchievementFieldId? fieldId = await featureService.GetAchievementFieldIdAsync(version).ConfigureAwait(false);
+                    ArgumentNullException.ThrowIfNull(fieldId);
+
+                    TargetNativeConfiguration config = TargetNativeConfiguration.Create(fieldId.NativeConfig, isOversea);
+                    await new YaeLaunchExecutionInvoker(config, receiver).InvokeAsync(context).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    messenger.Send(InfoBarMessage.Error(ex));
+                    return default;
+                }
+
+                foreach (YaeData data in receiver.Array)
+                {
+                    using (data)
+                    {
+                        switch (data.Kind)
+                        {
+                            case YaeCommandKind.ResponsePlayerStore:
+                                Debug.Assert(uiif is null);
+                                uiif = PlayerStoreParser.Parse(data.Bytes);
+                                break;
+                            case YaeCommandKind.ResponsePlayerProp:
+                                {
+                                    ref readonly YaePropertyTypeValue typeValue = ref data.PropertyTypeValue;
+                                    propMap.Add(typeValue.Type, typeValue.Value);
+                                    break;
+                                }
+                        }
+                    }
+                }
+            }
+
+            if (uiif is null)
+            {
+                return default;
+            }
+
+            // Unfortunately, we store data in uint rather than double, so we have to truncate the value.
+            double count = propMap.GetValueOrDefault(InterestedPropType.PlayerSCoin) - propMap.GetValueOrDefault(InterestedPropType.PlayerWaitSubSCoin);
+            UIIFItem mora = UIIFItem.From(202U, (uint)Math.Clamp(count, uint.MinValue, uint.MaxValue));
+
+            return uiif.WithList([mora, .. uiif.List]);
+        }
+    }
+
+    public async ValueTask<ByteString?> GetPlayerStoreBytesAsync(IViewModelSupportLaunchExecution viewModel)
+    {
+        ContentDialog dialog = await contentDialogFactory
+            .CreateForIndeterminateProgressAsync(SH.ServiceYaeWaitForGameResponseMessage)
+            .ConfigureAwait(false);
+
+        using (await contentDialogFactory.BlockAsync(dialog).ConfigureAwait(false))
+        {
+            await taskContext.SwitchToBackgroundAsync();
+            ByteString? storeBytes = default;
+            using (YaeDataArrayReceiver receiver = new())
+            {
+                try
+                {
+                    UserAndUid? userAndUid = await userService.GetCurrentUserAndUidAsync().ConfigureAwait(false);
+                    LaunchExecutionInvocationContext context = new()
+                    {
+                        ViewModel = viewModel,
+                        ServiceProvider = serviceProvider,
+                        LaunchOptions = serviceProvider.GetRequiredService<LaunchOptions>(),
+                        Identity = GameIdentity.Create(userAndUid, viewModel.GameAccount),
+                    };
+
+                    if (!TryGetGameVersion(context, out string? version, out bool isOversea))
+                    {
+                        return default;
+                    }
+
+                    AchievementFieldId? fieldId = await featureService.GetAchievementFieldIdAsync(version).ConfigureAwait(false);
+                    ArgumentNullException.ThrowIfNull(fieldId);
+
+                    TargetNativeConfiguration config = TargetNativeConfiguration.Create(fieldId.NativeConfig, isOversea);
+                    await new YaeLaunchExecutionInvoker(config, receiver).InvokeAsync(context).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    messenger.Send(InfoBarMessage.Error(ex));
+                    return default;
+                }
+
+                foreach (YaeData data in receiver.Array)
+                {
+                    using (data)
+                    {
+                        if (data.Kind is YaeCommandKind.ResponsePlayerStore)
+                        {
+                            storeBytes = data.Bytes;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return storeBytes;
+        }
+    }
+
+    public async ValueTask<PlayerStoreResult?> GetPlayerStoreResultAsync(IViewModelSupportLaunchExecution viewModel)
+    {
+        ContentDialog dialog = await contentDialogFactory
+            .CreateForIndeterminateProgressAsync(SH.ServiceYaeWaitForGameResponseMessage)
+            .ConfigureAwait(false);
+
+        using (await contentDialogFactory.BlockAsync(dialog).ConfigureAwait(false))
+        {
+            await taskContext.SwitchToBackgroundAsync();
+            ByteString? storeBytes = default;
+            Dictionary<InterestedPropType, double> propMap = [];
+            using (YaeDataArrayReceiver receiver = new())
+            {
+                try
+                {
+                    UserAndUid? userAndUid = await userService.GetCurrentUserAndUidAsync().ConfigureAwait(false);
+                    LaunchExecutionInvocationContext context = new()
+                    {
+                        ViewModel = viewModel,
+                        ServiceProvider = serviceProvider,
+                        LaunchOptions = serviceProvider.GetRequiredService<LaunchOptions>(),
+                        Identity = GameIdentity.Create(userAndUid, viewModel.GameAccount),
+                    };
+
+                    if (!TryGetGameVersion(context, out string? version, out bool isOversea))
+                    {
+                        return default;
+                    }
+
+                    AchievementFieldId? fieldId = await featureService.GetAchievementFieldIdAsync(version).ConfigureAwait(false);
+                    ArgumentNullException.ThrowIfNull(fieldId);
+
+                    TargetNativeConfiguration config = TargetNativeConfiguration.Create(fieldId.NativeConfig, isOversea);
+                    await new YaeLaunchExecutionInvoker(config, receiver).InvokeAsync(context).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    messenger.Send(InfoBarMessage.Error(ex));
+                    return default;
+                }
+
+                foreach (YaeData data in receiver.Array)
+                {
+                    using (data)
+                    {
+                        switch (data.Kind)
+                        {
+                            case YaeCommandKind.ResponsePlayerStore:
+                                storeBytes = data.Bytes;
+                                break;
+                            case YaeCommandKind.ResponsePlayerProp:
+                                {
+                                    ref readonly YaePropertyTypeValue typeValue = ref data.PropertyTypeValue;
+                                    propMap.Add(typeValue.Type, typeValue.Value);
+                                    break;
+                                }
+                        }
+                    }
+                }
+            }
+
+            if (storeBytes is null)
+            {
+                return default;
+            }
+
+            return new()
+            {
+                StoreBytes = storeBytes,
+                PropMap = propMap,
+            };
+        }
+    }
+
+    private bool TryGetGameVersion(LaunchExecutionInvocationContext context, [NotNullWhen(true)] out string? version, out bool isOversea)
+    {
+        const string LockTrace = $"{nameof(YaeService)}.{nameof(TryGetGameVersion)}";
+
+        if (context.LaunchOptions.TryGetGameFileSystem(LockTrace, out IGameFileSystem? gameFileSystem) is not GameFileSystemErrorKind.None)
+        {
+            context.ServiceProvider.GetRequiredService<IMessenger>().Send(InfoBarMessage.Error(SH.ServiceYaeGetGameVersionFailed));
+        }
+
+        if (gameFileSystem is null)
+        {
+            version = default;
+            isOversea = false;
+            return false;
+        }
+
+        using (gameFileSystem)
+        {
+            if (!gameFileSystem.TryGetGameVersion(out version) || string.IsNullOrEmpty(version))
+            {
+                messenger.Send(InfoBarMessage.Error(SH.ServiceYaeGetGameVersionFailed));
+                isOversea = false;
+                return false;
+            }
+
+            isOversea = gameFileSystem.IsExecutableOversea;
+        }
+
+        return true;
+    }
+}

@@ -1,0 +1,14 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+namespace Ellen.Launcher.Core.LifeCycle.InterProcess.BetterGenshinImpact;
+
+public enum PipeResponseKind
+{
+    None,
+    Object = 1,
+    Array = 2,
+    String = 3,
+    Number = 4,
+    Boolean = 5,
+}

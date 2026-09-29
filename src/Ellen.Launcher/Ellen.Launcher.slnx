@@ -1,0 +1,14 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".vsconfig" />
+  </Folder>
+  <Project Path="../SourceGeneration/SourceGeneration.csproj" />
+  <Project Path="Ellen.Launcher.Test/Ellen.Launcher.Test.csproj" />
+  <Project Path="Ellen.Launcher/Ellen.Launcher.csproj">
+    <Platform Project="x64" />
+  </Project>
+</Solution>

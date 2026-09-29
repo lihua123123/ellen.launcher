@@ -1,0 +1,20 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using Ellen.Launcher.Service.Game.Account;
+using Ellen.Launcher.Service.Game.Launching.Context;
+
+namespace Ellen.Launcher.Service.Game.Launching.Handler;
+
+public sealed class LaunchExecutionWindowsHDRHandler : AbstractLaunchExecutionHandler
+{
+    public override ValueTask BeforeAsync(BeforeLaunchExecutionContext context)
+    {
+        if (context.LaunchOptions.IsWindowsHDREnabled.Value)
+        {
+            RegistryInterop.SetWindowsHDR(context.TargetScheme.IsOversea);
+        }
+
+        return ValueTask.CompletedTask;
+    }
+}

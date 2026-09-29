@@ -1,0 +1,31 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using Ellen.Launcher.Model.Entity;
+using System.Collections.Immutable;
+
+namespace Ellen.Launcher.Service.GachaLog.Factory;
+
+public readonly struct GachaStatisticsFactoryContext
+{
+    public readonly IServiceProvider ServiceProvider;
+    public readonly ImmutableArray<GachaItem> Items;
+    public readonly ImmutableArray<BeyondGachaItem> BeyondItems;
+    public readonly ImmutableArray<HistoryWishBuilder> HistoryWishBuilders;
+    public readonly GachaLogServiceMetadataContext Metadata;
+    private readonly AppOptions appOptions;
+
+    public GachaStatisticsFactoryContext(IServiceProvider serviceProvider, ImmutableArray<GachaItem> items, ImmutableArray<BeyondGachaItem> beyondItems, ImmutableArray<HistoryWishBuilder> historyWishBuilders, GachaLogServiceMetadataContext metadata)
+    {
+        ServiceProvider = serviceProvider;
+        Items = items;
+        BeyondItems = beyondItems;
+        HistoryWishBuilders = historyWishBuilders;
+        Metadata = metadata;
+        appOptions = serviceProvider.GetRequiredService<AppOptions>();
+    }
+
+    public bool IsUnobtainedWishItemVisible { get => appOptions.IsUnobtainedWishItemVisible.Value; }
+
+    public bool IsEmptyHistoryWishVisible { get => appOptions.IsEmptyHistoryWishVisible.Value; }
+}

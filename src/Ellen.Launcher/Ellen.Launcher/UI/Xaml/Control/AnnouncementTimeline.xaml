@@ -1,0 +1,163 @@
+<UserControl
+    x:Class="Ellen.Launcher.UI.Xaml.Control.AnnouncementTimeline"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cw="using:CommunityToolkit.WinUI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mxi="using:Microsoft.Xaml.Interactivity"
+    xmlns:shuxba="using:Ellen.Launcher.UI.Xaml.Behavior.Action"
+    xmlns:shuxci="using:Ellen.Launcher.UI.Xaml.Control.Image"
+    xmlns:shuxm="using:Ellen.Launcher.UI.Xaml.Markup"
+    xmlns:shuxvww="using:Ellen.Launcher.UI.Xaml.View.Window.WebView2"
+    xmlns:shwhhca="using:Ellen.Launcher.Web.Hoyolab.Hk4e.Common.Announcement"
+    d:DesignHeight="260"
+    d:DesignWidth="900"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <!--
+            时间轴上的一条公告：缩略图 + 标题 + 剩余时间，
+            点击后仍然打开原来的公告详情窗口。
+        -->
+        <DataTemplate x:Key="AnnouncementTimelineBarTemplate" x:DataType="shwhhca:Announcement">
+            <ItemContainer
+                cw:Effects.Shadow="{ThemeResource CompatCardShadow}"
+                SizeChanged="OnBarSizeChanged"
+                ToolTipService.ToolTip="{Binding TimeFormatted}">
+                <Border Background="{ThemeResource SystemControlAcrylicElementMediumHighBrush}" CornerRadius="{ThemeResource ControlCornerRadius}">
+                    <Grid
+                        Padding="4,0,8,0"
+                        ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <shuxci:CachedImage
+                            Grid.Column="0"
+                            Width="78"
+                            Height="42"
+                            VerticalAlignment="Center"
+                            PlaceholderSource="{StaticResource UI_EmotionIcon271}"
+                            Source="{Binding Banner}"
+                            Stretch="UniformToFill"/>
+
+                        <!--
+                            标题特意用「按文字宽度」的左对齐：
+                            这样它的 ActualWidth 就是文字本身宽度，code-behind 才能在列内
+                            把它左右滑动去贴近视口中轴（滑到头就停在列边，不越出卡片边框）。
+                        -->
+                        <TextBlock
+                            x:Name="TitleText"
+                            Grid.Column="1"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Text="{Binding Subtitle}"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="NoWrap">
+                            <TextBlock.RenderTransform>
+                                <TranslateTransform/>
+                            </TextBlock.RenderTransform>
+                        </TextBlock>
+
+                        <TextBlock
+                            Grid.Column="2"
+                            VerticalAlignment="Center"
+                            Opacity="0.7"
+                            Style="{ThemeResource CaptionTextBlockStyle}"
+                            Text="{Binding TimeDescription}"
+                            Visibility="{Binding ShouldShowTimeDescription, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    </Grid>
+                </Border>
+
+                <mxi:Interaction.Behaviors>
+                    <mxi:EventTriggerBehavior EventName="Tapped">
+                        <shuxba:ShowWebView2WindowAction>
+                            <shuxba:ShowWebView2WindowAction.ContentProvider>
+                                <shuxvww:AnnouncementWebView2ContentProvider Announcement="{Binding}"/>
+                            </shuxba:ShowWebView2WindowAction.ContentProvider>
+                        </shuxba:ShowWebView2WindowAction>
+                    </mxi:EventTriggerBehavior>
+                </mxi:Interaction.Behaviors>
+            </ItemContainer>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid RowSpacing="6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!--  今天 / 日期范围 / 刻度放缩  -->
+        <Grid Grid.Row="0" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock
+                x:Name="TodayText"
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                Style="{ThemeResource CaptionTextBlockStyle}"/>
+
+            <TextBlock
+                x:Name="RangeText"
+                Grid.Column="1"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Opacity="0.7"
+                Style="{ThemeResource CaptionTextBlockStyle}"/>
+
+            <StackPanel
+                Grid.Column="2"
+                Orientation="Horizontal"
+                Spacing="4">
+                <Button
+                    Padding="10,2"
+                    Click="OnZoomOutClick"
+                    Content="－"
+                    ToolTipService.ToolTip="{shuxm:ResourceString Name=ViewPageHomeTimelineZoomOut}"/>
+                <Button
+                    Padding="10,2"
+                    Click="OnZoomInClick"
+                    Content="＋"
+                    ToolTipService.ToolTip="{shuxm:ResourceString Name=ViewPageHomeTimelineZoomIn}"/>
+            </StackPanel>
+        </Grid>
+
+        <!--
+            这里刻意不使用 ScrollViewer：内层滚动容器会把滚轮吃掉，
+            导致页面往下滚之后回不去。横向位移由 code-behind 的 TranslateTransform 控制，
+            普通滚轮完全交给页面纵向滚动，Shift + 滚轮才横向移动时间轴。
+        -->
+        <Grid
+            x:Name="Viewport"
+            Grid.Row="1"
+            cw:UIElementExtensions.ClipToBounds="True"
+            SizeChanged="OnViewportSizeChanged">
+            <StackPanel HorizontalAlignment="Left">
+                <StackPanel.RenderTransform>
+                    <TranslateTransform x:Name="HorizontalOffsetTransform"/>
+                </StackPanel.RenderTransform>
+
+                <Canvas x:Name="ScaleLayer" Height="38"/>
+                <Grid>
+                    <Canvas x:Name="TodayLayer" IsHitTestVisible="False">
+                        <Border
+                            x:Name="TodayLine"
+                            Width="2"
+                            Background="{ThemeResource AccentFillColorDefaultBrush}"
+                            CornerRadius="1"/>
+                    </Canvas>
+                    <Canvas x:Name="BarLayer"/>
+                </Grid>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

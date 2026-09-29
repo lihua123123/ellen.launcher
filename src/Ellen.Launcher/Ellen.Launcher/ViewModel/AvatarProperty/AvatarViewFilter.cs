@@ -1,0 +1,64 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using Ellen.Launcher.Model.Intrinsic.Frozen;
+using Ellen.Launcher.UI.Xaml.Control.AutoSuggestBox;
+using System.Collections.ObjectModel;
+using System.Globalization;
+
+namespace Ellen.Launcher.ViewModel.AvatarProperty;
+
+public static class AvatarViewFilter
+{
+    public static Predicate<AvatarView>? Compile(SearchData? searchData)
+    {
+        return searchData is { FilterTokens.Count: > 0 } ? Compile(searchData.FilterTokens) : default;
+    }
+
+    public static Predicate<AvatarView> Compile(ObservableCollection<SearchToken> input)
+    {
+        return avatar => DoFilter(input, avatar);
+    }
+
+    private static bool DoFilter(ObservableCollection<SearchToken> input, AvatarView avatarView)
+    {
+        List<bool> matches = [];
+
+        foreach ((SearchTokenKind kind, IEnumerable<string> tokens) in input.GroupBy(token => token.Kind, token => token.Value))
+        {
+            switch (kind)
+            {
+                case SearchTokenKind.ElementName:
+                    if (IntrinsicFrozen.ElementNames.Overlaps(tokens))
+                    {
+                        matches.Add(tokens.Contains(avatarView.Element.GetLocalizedDescriptionOrDefault(SH.ResourceManager, CultureInfo.CurrentCulture)));
+                    }
+
+                    break;
+                case SearchTokenKind.WeaponType:
+                    if (IntrinsicFrozen.WeaponTypes.Overlaps(tokens))
+                    {
+                        ArgumentNullException.ThrowIfNull(avatarView.Weapon);
+                        matches.Add(tokens.Contains(avatarView.Weapon.WeaponType.GetLocalizedDescriptionOrDefault(SH.ResourceManager, CultureInfo.CurrentCulture)));
+                    }
+
+                    break;
+                case SearchTokenKind.ItemQuality:
+                    if (IntrinsicFrozen.ItemQualities.Overlaps(tokens))
+                    {
+                        matches.Add(tokens.Contains(avatarView.Quality.GetLocalizedDescriptionOrDefault(SH.ResourceManager)));
+                    }
+
+                    break;
+                case SearchTokenKind.None:
+                    matches.Add(tokens.Any(token => avatarView.Name.Contains(token, StringComparison.OrdinalIgnoreCase)));
+                    break;
+                default:
+                    matches.Add(false);
+                    break;
+            }
+        }
+
+        return matches.Count > 0 && matches.Aggregate((a, b) => a && b);
+    }
+}

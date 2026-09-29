@@ -1,0 +1,112 @@
+﻿// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using JetBrains.Annotations;
+using Ellen.Launcher.Core.ExceptionService;
+using Ellen.Launcher.Model.Metadata.Item;
+
+namespace Ellen.Launcher.ViewModel.Cultivation;
+
+public sealed class ResinStatisticsItem
+{
+    private readonly ResinStatisticsItemKind kind;
+
+    public ResinStatisticsItem(string title, ResinStatisticsItemKind kind, int resinPerBlossom)
+    {
+        this.kind = kind;
+        Title = title;
+        ResinPerBlossom = resinPerBlossom;
+        SelectedDropDistribution = MaterialDropDistribution.Nine;
+    }
+
+    public string Title { get; }
+
+    public int ResinPerBlossom { get; }
+
+    [AllowNull]
+    public MaterialDropDistribution SelectedDropDistribution
+    {
+        get;
+        set
+        {
+            if (value is not null)
+            {
+                field = value;
+            }
+        }
+    }
+
+    public double RawItemCount { get; set; }
+
+    [UsedImplicitly]
+    public bool HasData
+    {
+        get => ItemCount > 0D;
+    }
+
+    public int TotalResin
+    {
+        get => RawTimes * ResinPerBlossom;
+    }
+
+    public int FragileResin
+    {
+        get => (int)Math.Ceiling(TotalResin / 60D);
+    }
+
+    public string Days
+    {
+        get => SH.FormatViewModelCultivationResinStatisticsItemRemainDays((int)Math.Ceiling(TotalResin / (1440D / 8)));
+    }
+
+    /// <summary>
+    /// ONLY BlossomOfWealth has value.
+    /// </summary>
+    public double MiscMoraEarned { get; set; }
+
+    public int RawTimes
+    {
+        get
+        {
+            double expectation = kind switch
+            {
+                ResinStatisticsItemKind.BlossomOfWealth => SelectedDropDistribution.BlossomOfWealth,
+                ResinStatisticsItemKind.BlossomOfRevelation => SelectedDropDistribution.BlossomOfRevelation,
+                ResinStatisticsItemKind.TalentAscension => SelectedDropDistribution.TalentBooks,
+                ResinStatisticsItemKind.WeaponAscension => SelectedDropDistribution.WeaponAscension,
+                ResinStatisticsItemKind.NormalBoss => SelectedDropDistribution.NormalBoss,
+                ResinStatisticsItemKind.WeeklyBoss => SelectedDropDistribution.WeeklyBoss,
+                _ => throw EllenException.NotSupported(),
+            };
+
+            return (int)Math.Ceiling(ItemCount / expectation);
+        }
+    }
+
+    public double Mora
+    {
+        get
+        {
+            if (kind is ResinStatisticsItemKind.BlossomOfWealth)
+            {
+                throw EllenException.NotSupported();
+            }
+
+            double expectation = kind switch
+            {
+                ResinStatisticsItemKind.TalentAscension => SelectedDropDistribution.TalentBooksMora,
+                ResinStatisticsItemKind.WeaponAscension => SelectedDropDistribution.WeaponAscensionMora,
+                ResinStatisticsItemKind.NormalBoss => SelectedDropDistribution.NormalBossMora,
+                ResinStatisticsItemKind.WeeklyBoss => SelectedDropDistribution.WeeklyBossMora,
+                _ => 0D,
+            };
+
+            return (RawTimes * expectation) + (TotalResin * MaterialDropDistribution.MoraPerResin);
+        }
+    }
+
+    public double ItemCount
+    {
+        get => RawItemCount - MiscMoraEarned;
+    }
+}

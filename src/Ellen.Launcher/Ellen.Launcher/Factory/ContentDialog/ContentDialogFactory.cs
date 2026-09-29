@@ -1,0 +1,95 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Ellen.Launcher.Core.LifeCycle;
+
+namespace Ellen.Launcher.Factory.ContentDialog;
+
+// It's a view factory
+[Service(ServiceLifetime.Singleton, typeof(IContentDialogFactory))]
+public sealed partial class ContentDialogFactory : IContentDialogFactory
+{
+    private readonly ICurrentXamlWindowReference currentWindowReference;
+    private readonly IContentDialogQueue contentDialogQueue;
+
+    [GeneratedConstructor]
+    public partial ContentDialogFactory(IServiceProvider serviceProvider);
+
+    public bool IsDialogShowing { get => contentDialogQueue.IsDialogShowing; }
+
+    public partial ITaskContext TaskContext { get; }
+
+    public async ValueTask<ContentDialogResult> CreateForConfirmAsync(string title, string content)
+    {
+        await TaskContext.SwitchToMainThreadAsync();
+
+        Microsoft.UI.Xaml.Controls.ContentDialog dialog = new()
+        {
+            XamlRoot = currentWindowReference.XamlRoot,
+            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+            Title = title,
+            Content = content,
+            DefaultButton = ContentDialogButton.Primary,
+            PrimaryButtonText = SH.ContentDialogConfirmPrimaryButtonText,
+            RequestedTheme = currentWindowReference.RequestedTheme,
+        };
+
+        return await EnqueueAndShowAsync(dialog).ShowTask.ConfigureAwait(false);
+    }
+
+    public async ValueTask<ContentDialogResult> CreateForConfirmCancelAsync(string title, string content, ContentDialogButton defaultButton = ContentDialogButton.Close, bool isPrimaryButtonEnabled = true)
+    {
+        await TaskContext.SwitchToMainThreadAsync();
+
+        Microsoft.UI.Xaml.Controls.ContentDialog dialog = new()
+        {
+            XamlRoot = currentWindowReference.XamlRoot,
+            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+            Title = title,
+            Content = content,
+            DefaultButton = defaultButton,
+            PrimaryButtonText = SH.ContentDialogConfirmPrimaryButtonText,
+            CloseButtonText = SH.ContentDialogCancelCloseButtonText,
+            IsPrimaryButtonEnabled = isPrimaryButtonEnabled,
+            RequestedTheme = currentWindowReference.RequestedTheme,
+        };
+
+        return await EnqueueAndShowAsync(dialog).ShowTask.ConfigureAwait(false);
+    }
+
+    public async ValueTask<Microsoft.UI.Xaml.Controls.ContentDialog> CreateForIndeterminateProgressAsync(string title)
+    {
+        await TaskContext.SwitchToMainThreadAsync();
+
+        Microsoft.UI.Xaml.Controls.ContentDialog dialog = new()
+        {
+            XamlRoot = currentWindowReference.XamlRoot,
+            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+            Title = title,
+            Content = new ProgressBar { IsIndeterminate = true },
+            RequestedTheme = currentWindowReference.RequestedTheme,
+        };
+
+        return dialog;
+    }
+
+    public async ValueTask<TContentDialog> CreateInstanceAsync<TContentDialog>(IServiceProvider serviceProvider, params object[] parameters)
+        where TContentDialog : Microsoft.UI.Xaml.Controls.ContentDialog
+    {
+        await TaskContext.SwitchToMainThreadAsync();
+
+        TContentDialog contentDialog = ActivatorUtilities.CreateInstance<TContentDialog>(serviceProvider, parameters);
+        contentDialog.XamlRoot = currentWindowReference.XamlRoot;
+        contentDialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
+        contentDialog.RequestedTheme = currentWindowReference.RequestedTheme;
+
+        return contentDialog;
+    }
+
+    public ValueContentDialogTask EnqueueAndShowAsync(Microsoft.UI.Xaml.Controls.ContentDialog contentDialog)
+    {
+        return contentDialogQueue.EnqueueAndShowAsync(contentDialog);
+    }
+}

@@ -1,0 +1,507 @@
+<shuxc:ScopedPage
+    x:Class="Ellen.Launcher.UI.Xaml.View.Page.WikiMonsterPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:clw="using:CommunityToolkit.Labs.WinUI"
+    xmlns:cw="using:CommunityToolkit.WinUI"
+    xmlns:cwc="using:CommunityToolkit.WinUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mxi="using:Microsoft.Xaml.Interactivity"
+    xmlns:shm="using:Ellen.Launcher.Model"
+    xmlns:shma="using:Ellen.Launcher.Model.EnemyArchive"
+    xmlns:shmmi="using:Ellen.Launcher.Model.Metadata.Item"
+    xmlns:shmmm="using:Ellen.Launcher.Model.Metadata.Monster"
+    xmlns:shuxb="using:Ellen.Launcher.UI.Xaml.Behavior"
+    xmlns:shuxc="using:Ellen.Launcher.UI.Xaml.Control"
+    xmlns:shuxca="using:Ellen.Launcher.UI.Xaml.Control.AutoSuggestBox"
+    xmlns:shuxcc="using:Ellen.Launcher.UI.Xaml.Control.Card"
+    xmlns:shuxci="using:Ellen.Launcher.UI.Xaml.Control.Image"
+    xmlns:shuxct="using:Ellen.Launcher.UI.Xaml.Control.TextBlock"
+    xmlns:shuxm="using:Ellen.Launcher.UI.Xaml.Markup"
+    xmlns:shuxvs="using:Ellen.Launcher.UI.Xaml.View.Specialized"
+    xmlns:shvw="using:Ellen.Launcher.ViewModel.Wiki"
+    d:DataContext="{d:DesignInstance Type=shvw:WikiMonsterViewModel}"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    mc:Ignorable="d">
+    <mxi:Interaction.Behaviors>
+        <shuxb:InvokeCommandOnLoadedBehavior Command="{Binding LoadCommand}"/>
+    </mxi:Interaction.Behaviors>
+
+    <Page.Resources>
+        <DataTemplate x:Key="TokenTemplate" x:DataType="shuxca:SearchToken">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <shuxci:CachedImage
+                    Grid.Column="0"
+                    Width="22"
+                    Height="22"
+                    Margin="0,0,8,0"
+                    Source="{Binding SideIconUri, Mode=OneWay}"/>
+                <TextBlock
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Text="{Binding Value}"/>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="MonsterListTemplate" x:DataType="shmmm:Monster">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <shuxci:CachedImage
+                    Grid.Column="0"
+                    Width="48"
+                    Height="48"
+                    Margin="0,6,12,6"
+                    Source="{Binding Icon, Converter={StaticResource MonsterIconConverter}, Mode=OneWay}"/>
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="12,0,0,0"
+                    VerticalAlignment="Center"
+                    Text="{Binding Name}"/>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="MonsterBaseValueTemplate" x:DataType="shm:NameStringValue">
+            <cwc:SettingsCard
+                MinHeight="40"
+                Padding="0,0,16,0"
+                Background="{ThemeResource ControlAltFillColorSecondaryBrush}"
+                BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}">
+                <cwc:SettingsCard.Resources>
+                    <!--  ReSharper disable Xaml.RedundantResource  -->
+                    <x:Double x:Key="SettingsCardLeftIndention">16</x:Double>
+                    <x:Double x:Key="SettingsCardWrapThreshold">0</x:Double>
+                    <x:Double x:Key="SettingsCardWrapNoIconThreshold">0</x:Double>
+                    <!--  ReSharper restore Xaml.RedundantResource  -->
+                </cwc:SettingsCard.Resources>
+                <cwc:SettingsCard.Header>
+                    <TextBlock Text="{Binding Name}" TextWrapping="NoWrap"/>
+                </cwc:SettingsCard.Header>
+                <TextBlock Text="{Binding Value}"/>
+            </cwc:SettingsCard>
+        </DataTemplate>
+
+        <DataTemplate x:Key="MonsterDropTemplate" x:DataType="shmmi:DisplayItem">
+            <shuxcc:HorizontalCard>
+                <shuxcc:HorizontalCard.Left>
+                    <shuxc:ItemIcon
+                        Width="40"
+                        Height="40"
+                        Icon="{Binding Icon, Converter={StaticResource ItemIconConverter}}"
+                        Quality="{Binding RankLevel}"/>
+                </shuxcc:HorizontalCard.Left>
+                <shuxcc:HorizontalCard.Right>
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Text="{Binding Name}"/>
+                </shuxcc:HorizontalCard.Right>
+            </shuxcc:HorizontalCard>
+        </DataTemplate>
+
+        <DataTemplate x:Key="MonsterGridTemplate" x:DataType="shmmm:Monster">
+            <shuxcc:VerticalCard Width="82">
+                <shuxcc:VerticalCard.Top>
+                    <shuxc:ItemIcon Icon="{Binding Icon, Converter={StaticResource MonsterIconConverter}, Mode=OneWay}" Quality="QUALITY_NONE"/>
+                </shuxcc:VerticalCard.Top>
+                <shuxcc:VerticalCard.Bottom>
+                    <TextBlock
+                        Margin="2,0"
+                        Text="{Binding Name}"
+                        TextTrimming="CharacterEllipsis"/>
+                </shuxcc:VerticalCard.Bottom>
+            </shuxcc:VerticalCard>
+        </DataTemplate>
+
+        <!--  档案：抗性单元格（已展开好，界面不做条件判断）  -->
+        <DataTemplate x:Key="MonsterArchiveResistanceTemplate" x:DataType="shma:EnemyArchiveResistanceCell">
+            <Border
+                Padding="10,7"
+                Background="{ThemeResource ControlAltFillColorSecondaryBrush}"
+                BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="{ThemeResource ControlCornerRadius}">
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Grid.Column="0"
+                        shuxc:GuideRichText.AutoElementColor="True"
+                        shuxc:GuideRichText.Source="{Binding Label}"
+                        TextWrapping="NoWrap"/>
+                    <TextBlock
+                        Grid.Column="1"
+                        FontWeight="SemiBold"
+                        Foreground="#FFFF99A4"
+                        Text="{Binding ValueText}"
+                        Visibility="{Binding IsImmune, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    <TextBlock
+                        Grid.Column="1"
+                        FontWeight="SemiBold"
+                        Text="{Binding ValueText}"
+                        Visibility="{Binding IsImmune, Converter={StaticResource BoolToVisibilityRevertConverter}}"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <!--  档案：产球行（血量左对齐 / 微粒居中 / 晶球右对齐；掉落数字按元素上色，无掉落留空）  -->
+        <DataTemplate x:Key="MonsterArchiveEnergyRowTemplate" x:DataType="shma:EnemyArchiveEnergyCell">
+            <Grid Padding="0,4" ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Grid.Column="0"
+                    Text="{Binding HpText}"
+                    TextAlignment="Left"/>
+                <TextBlock
+                    Grid.Column="1"
+                    Foreground="{Binding ParticleElementKey, Converter={StaticResource ElementKeyToBrushConverter}}"
+                    Text="{Binding ParticleText}"
+                    TextAlignment="Center"/>
+                <TextBlock
+                    Grid.Column="2"
+                    Foreground="{Binding OrbElementKey, Converter={StaticResource ElementKeyToBrushConverter}}"
+                    Text="{Binding OrbText}"
+                    TextAlignment="Right"/>
+            </Grid>
+        </DataTemplate>
+
+        <!--  档案：特殊机制  -->
+        <DataTemplate x:Key="MonsterArchiveMechanicTemplate" x:DataType="shma:EnemyArchiveMechanic">
+            <StackPanel Margin="0,0,0,10">
+                <TextBlock
+                    FontWeight="SemiBold"
+                    Text="{Binding Title}"
+                    Visibility="{Binding HasTitle, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <TextBlock
+                    shuxc:GuideRichText.AutoElementColor="True"
+                    shuxc:GuideRichText.Source="{Binding Text}"
+                    TextWrapping="Wrap"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <!--  档案：技能（每条一张卡片，避免纯文本糊成一片）  -->
+        <DataTemplate x:Key="MonsterArchiveSkillTemplate" x:DataType="shma:EnemyArchiveSkill">
+            <Border
+                Margin="0,0,0,8"
+                Padding="14,12"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <StackPanel Spacing="6">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Text="{Binding Name}"/>
+                        <Border
+                            Padding="6,1"
+                            VerticalAlignment="Center"
+                            Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                            CornerRadius="4"
+                            Visibility="{Binding HasTag, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBlock
+                                FontSize="11"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Text="{Binding Tag}"/>
+                        </Border>
+                    </StackPanel>
+                    <TextBlock
+                        shuxc:GuideRichText.AutoElementColor="True"
+                        shuxc:GuideRichText.Source="{Binding Description}"
+                        TextWrapping="Wrap"/>
+                    <TextBlock
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Text="{Binding Tips}"
+                        TextWrapping="Wrap"
+                        Visibility="{Binding HasTips, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        Spacing="4"
+                        Visibility="{Binding HasCombo, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{shuxm:ResourceString Name=ViewPageWikiMonsterArchiveSkillCombo}"/>
+                        <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding ComboText}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+    </Page.Resources>
+
+    <shuxc:StandardView ShowCondition="{Binding Monsters, Converter={StaticResource EmptyObjectToBoolConverter}}">
+        <shuxc:StandardView.EmptyContent>
+            <shuxc:Loading IsLoading="{Binding Monsters, Converter={StaticResource EmptyObjectToBoolRevertConverter}}" Style="{ThemeResource DefaultLoadingViewStyle}"/>
+        </shuxc:StandardView.EmptyContent>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Border Margin="16" cw:Effects.Shadow="{ThemeResource CompatCardShadow}">
+                <Border Style="{ThemeResource AcrylicSecondaryBorderCardStyle}">
+                    <CommandBar
+                        BorderBrush="{x:Null}"
+                        BorderThickness="0"
+                        DefaultLabelPosition="Right">
+                        <CommandBar.Content>
+                            <shuxc:LayoutSwitch
+                                x:Name="ItemsPanelSelector"
+                                Margin="6,8,0,0"
+                                LocalSettingKeySuffixForCurrent="WikiMonsterPage.Monsters"/>
+                        </CommandBar.Content>
+                        <AppBarElementContainer>
+                            <shuxca:AutoSuggestTokenBox
+                                Width="600"
+                                Height="44"
+                                Margin="6,-2,6,6"
+                                HorizontalAlignment="Right"
+                                VerticalContentAlignment="Center"
+                                AvailableTokens="{Binding SearchData.AvailableTokens}"
+                                FilterCommand="{Binding FilterCommand}"
+                                ItemsSource="{Binding SearchData.FilterTokens, Mode=TwoWay}"
+                                MaximumTokens="5"
+                                PlaceholderText="{shuxm:ResourceString Name=ViewPageWiKiMonsterAutoSuggestBoxPlaceHolder}"
+                                QueryIcon="{cw:FontIconSource Glyph=&#xE721;}"
+                                Style="{StaticResource DefaultAutoSuggestTokenBoxStyle}"
+                                SuggestedItemTemplate="{StaticResource TokenTemplate}"
+                                SuggestedItemsSource="{Binding SearchData.AvailableTokens.Values}"
+                                Text="{Binding SearchData.FilterToken, Mode=TwoWay}"
+                                TokenItemTemplate="{StaticResource TokenTemplate}"/>
+                        </AppBarElementContainer>
+                    </CommandBar>
+                </Border>
+            </Border>
+
+            <cwc:SwitchPresenter
+                Grid.Row="1"
+                ContentTransitions="{ThemeResource EntranceThemeTransitions}"
+                Value="{Binding ElementName=ItemsPanelSelector, Path=Current}">
+                <cwc:Case Value="List">
+                    <Border Margin="16,0,16,16" cw:Effects.Shadow="{ThemeResource CompatCardShadow}">
+                        <Border Style="{ThemeResource AcrylicBorderCardStyle}">
+                            <SplitView
+                                DisplayMode="Inline"
+                                IsPaneOpen="True"
+                                OpenPaneLength="{StaticResource CompatSplitViewOpenPaneLength2}"
+                                PaneBackground="{ThemeResource CardBackgroundFillColorSecondaryBrush}">
+                                <SplitView.Pane>
+                                    <ListView
+                                        Grid.Row="1"
+                                        Padding="{ThemeResource ListViewInSplitPanePadding}"
+                                        ItemTemplate="{StaticResource MonsterListTemplate}"
+                                        ItemsSource="{Binding Monsters}"
+                                        SelectedItem="{Binding Monsters.CurrentItem, Mode=TwoWay}"
+                                        SelectionMode="Single">
+                                        <mxi:Interaction.Behaviors>
+                                            <shuxb:SelectedItemInViewBehavior/>
+                                        </mxi:Interaction.Behaviors>
+                                    </ListView>
+                                </SplitView.Pane>
+                                <SplitView.Content>
+                                    <ScrollViewer shuxc:ScrollViewerHelper.ScrollToTopAssociatedObject="{Binding Monsters.CurrentItem}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition MaxWidth="800"/>
+                                                <ColumnDefinition Width="auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Padding="16" Spacing="16">
+                                                <StackPanel.ChildrenTransitions>
+                                                    <EntranceThemeTransition FromVerticalOffset="50"/>
+                                                    <RepositionThemeTransition IsStaggeringEnabled="False"/>
+                                                </StackPanel.ChildrenTransitions>
+                                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                                    <TextBlock
+                                                        Margin="1,0,0,0"
+                                                        VerticalAlignment="Center"
+                                                        Style="{StaticResource SubtitleTextBlockStyle}"
+                                                        Text="{Binding Monsters.CurrentItem.Title}"/>
+                                                    <!--  补全过档案的敌人：标注数据来源（图鉴卡制图 @Csxylic）  -->
+                                                    <HyperlinkButton
+                                                        Padding="2,0"
+                                                        VerticalAlignment="Center"
+                                                        Content="{shuxm:ResourceString Name=ViewPageWikiMonsterArchiveSource}"
+                                                        NavigateUri="https://www.miyoushe.com/ys/accountCenter/collectionList?id=258229537"
+                                                        Visibility="{Binding Monsters.CurrentItem.Archive, Converter={StaticResource EmptyObjectToVisibilityConverter}}"/>
+                                                </StackPanel>
+                                                <shuxct:DescriptionTextBlock
+                                                    Margin="1,0,0,0"
+                                                    HorizontalAlignment="Stretch"
+                                                    VerticalAlignment="Center"
+                                                    Description="{Binding Monsters.CurrentItem.Description}"
+                                                    Opacity="0.7"
+                                                    TextStyle="{StaticResource CaptionTextBlockStyle}"/>
+                                                <clw:TokenView ItemsSource="{Binding Monsters.CurrentItem.Affixes}" SelectionMode="None"/>
+                                                <shuxvs:BaseValueSlider
+                                                    HorizontalAlignment="Stretch"
+                                                    HorizontalContentAlignment="Stretch"
+                                                    BaseValueInfo="{Binding BaseValueInfo, Mode=OneWay}"
+                                                    IsPromoteVisible="False"/>
+                                                <ItemsControl
+                                                    ItemTemplate="{StaticResource MonsterBaseValueTemplate}"
+                                                    ItemsPanel="{StaticResource UniformGridColumns2Spacing4Template}"
+                                                    ItemsSource="{Binding Monsters.CurrentItem.BaseValue.SubHurts}"
+                                                    Visibility="{Binding Monsters.CurrentItem.HasArchiveResistances, Converter={StaticResource BoolToVisibilityRevertConverter}}">
+                                                    <ItemsControl.Resources>
+                                                        <!--  ReSharper disable Xaml.RedundantResource  -->
+                                                        <x:Double x:Key="SettingsCardMinHeight">0</x:Double>
+                                                        <x:Double x:Key="SettingsCardWrapThreshold">0</x:Double>
+                                                        <x:Double x:Key="SettingsCardWrapNoIconThreshold">0</x:Double>
+                                                        <!--  ReSharper restore Xaml.RedundantResource  -->
+                                                    </ItemsControl.Resources>
+                                                </ItemsControl>
+                                                <!--  档案：抗性（含机制状态）/ 机制 / 产球 / 技能  -->
+                                                <Border
+                                                    Padding="16"
+                                                    Style="{ThemeResource BorderShimmerStyle}"
+                                                    Visibility="{Binding Monsters.CurrentItem.Archive.HasResistances, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    <StackPanel Spacing="12">
+                                                        <TextBlock
+                                                            Style="{StaticResource BaseTextBlockStyle}"
+                                                            Text="{shuxm:ResourceString Name=ViewPageWikiMonsterArchiveResistances}"/>
+                                                        <!--
+                                                            TODO(后续优化): 多状态敌人变多后，把这里的 ComboBox 换成
+                                                            cwc:Segmented 胶囊 Tab（先在 _design/enemy-archive/index.html
+                                                            里调好样式，并确认 Segmented 支持 ItemsSource + 选中项绑定再切）。
+                                                            现在保留 ComboBox：数据链路已验证，换控件是纯视觉改动，收益小于崩一次的风险。
+                                                        -->
+                                                        <ComboBox
+                                                            HorizontalAlignment="Left"
+                                                            DisplayMemberPath="Name"
+                                                            ItemsSource="{Binding ResistanceStates}"
+                                                            SelectedIndex="{Binding SelectedResistanceStateIndex, Mode=TwoWay}"
+                                                            Visibility="{Binding Monsters.CurrentItem.Archive.Resistances.HasStates, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                        <ItemsControl
+                                                            ItemTemplate="{StaticResource MonsterArchiveResistanceTemplate}"
+                                                            ItemsPanel="{StaticResource UniformGridColumns2Spacing4Template}"
+                                                            ItemsSource="{Binding ResistanceCells, Mode=OneWay}"/>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <Border
+                                                    Padding="16"
+                                                    Style="{ThemeResource BorderShimmerStyle}"
+                                                    Visibility="{Binding Monsters.CurrentItem.Archive.HasMechanics, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    <StackPanel Spacing="12">
+                                                        <TextBlock
+                                                            Style="{StaticResource BaseTextBlockStyle}"
+                                                            Text="{shuxm:ResourceString Name=ViewPageWikiMonsterArchiveMechanics}"/>
+                                                        <ItemsControl
+                                                            ItemTemplate="{StaticResource MonsterArchiveMechanicTemplate}"
+                                                            ItemsSource="{Binding Monsters.CurrentItem.Archive.Mechanics}"/>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <Border
+                                                    Padding="16"
+                                                    Style="{ThemeResource BorderShimmerStyle}"
+                                                    Visibility="{Binding Monsters.CurrentItem.Archive.HasEnergy, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    <StackPanel Spacing="12">
+                                                        <TextBlock
+                                                            Style="{StaticResource BaseTextBlockStyle}"
+                                                            Text="{shuxm:ResourceString Name=ViewPageWikiMonsterArchiveEnergy}"/>
+                                                        <Grid ColumnSpacing="8">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock
+                                                                Grid.Column="0"
+                                                                Opacity="0.7"
+                                                                Text="{shuxm:ResourceString Name=ViewPageWikiMonsterArchiveEnergyHp}"
+                                                                TextAlignment="Left"/>
+                                                            <TextBlock
+                                                                Grid.Column="1"
+                                                                Opacity="0.7"
+                                                                Text="{shuxm:ResourceString Name=ViewPageWikiMonsterArchiveEnergyParticle}"
+                                                                TextAlignment="Center"/>
+                                                            <TextBlock
+                                                                Grid.Column="2"
+                                                                Opacity="0.7"
+                                                                Text="{shuxm:ResourceString Name=ViewPageWikiMonsterArchiveEnergyOrb}"
+                                                                TextAlignment="Right"/>
+                                                        </Grid>
+                                                        <ItemsControl
+                                                            ItemTemplate="{StaticResource MonsterArchiveEnergyRowTemplate}"
+                                                            ItemsSource="{Binding Monsters.CurrentItem.Archive.Energy.Cells}"/>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <Border
+                                                    Padding="16"
+                                                    Style="{ThemeResource BorderShimmerStyle}"
+                                                    Visibility="{Binding Monsters.CurrentItem.Archive.HasSkills, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    <StackPanel Spacing="12">
+                                                        <TextBlock
+                                                            Style="{StaticResource BaseTextBlockStyle}"
+                                                            Text="{shuxm:ResourceString Name=ViewPageWikiMonsterArchiveSkills}"/>
+                                                        <ItemsControl
+                                                            ItemTemplate="{StaticResource MonsterArchiveSkillTemplate}"
+                                                            ItemsSource="{Binding Monsters.CurrentItem.Archive.Skills}"/>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <Border Padding="16" Style="{ThemeResource BorderShimmerStyle}">
+                                                    <StackPanel Spacing="16">
+                                                        <TextBlock
+                                                            Style="{StaticResource BaseTextBlockStyle}"
+                                                            Text="{shuxm:ResourceString Name=ViewPageWikiMonsterDropItems}"
+                                                            Visibility="{Binding Monsters.CurrentItem.DropsView, Converter={StaticResource EmptyObjectToVisibilityConverter}}"/>
+                                                        <ItemsControl
+                                                            ItemTemplate="{StaticResource MonsterDropTemplate}"
+                                                            ItemsSource="{Binding Monsters.CurrentItem.DropsView}"
+                                                            Visibility="{Binding Monsters.CurrentItem.DropsView, Converter={StaticResource EmptyObjectToVisibilityConverter}}">
+                                                            <ItemsControl.ItemsPanel>
+                                                                <ItemsPanelTemplate>
+                                                                    <cwc:UniformGrid
+                                                                        ColumnSpacing="8"
+                                                                        Columns="3"
+                                                                        RowSpacing="8"/>
+                                                                </ItemsPanelTemplate>
+                                                            </ItemsControl.ItemsPanel>
+                                                        </ItemsControl>
+                                                    </StackPanel>
+                                                </Border>
+                                            </StackPanel>
+                                        </Grid>
+                                    </ScrollViewer>
+                                </SplitView.Content>
+                            </SplitView>
+                        </Border>
+                    </Border>
+                </cwc:Case>
+                <cwc:Case Value="Grid">
+                    <Border Margin="16,0,16,16" cw:Effects.Shadow="{ThemeResource CompatCardShadow}">
+                        <Border Style="{ThemeResource AcrylicBorderCardStyle}">
+                            <GridView
+                                Padding="16,16,4,4"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                ItemContainerStyle="{StaticResource LargeGridViewItemStyle}"
+                                ItemTemplate="{StaticResource MonsterGridTemplate}"
+                                ItemsSource="{Binding Monsters}"
+                                SelectedItem="{Binding Monsters.CurrentItem, Mode=TwoWay}"
+                                SelectionMode="Single">
+                                <mxi:Interaction.Behaviors>
+                                    <shuxb:SelectedItemInViewBehavior/>
+                                </mxi:Interaction.Behaviors>
+                            </GridView>
+                        </Border>
+                    </Border>
+                </cwc:Case>
+            </cwc:SwitchPresenter>
+        </Grid>
+    </shuxc:StandardView>
+</shuxc:ScopedPage>

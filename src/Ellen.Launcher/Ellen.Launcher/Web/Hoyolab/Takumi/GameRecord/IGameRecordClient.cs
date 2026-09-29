@@ -1,0 +1,33 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using Ellen.Launcher.Model.Primitive;
+using Ellen.Launcher.ViewModel.User;
+using Ellen.Launcher.Web.Hoyolab.Takumi.GameRecord.Avatar;
+using Ellen.Launcher.Web.Response;
+using System.Collections.Immutable;
+
+namespace Ellen.Launcher.Web.Hoyolab.Takumi.GameRecord;
+
+public interface IGameRecordClient
+{
+    ValueTask<Response<ListWrapper<Character>>> GetCharacterListAsync(UserAndUid userAndUid, CancellationToken token = default);
+
+    ValueTask<Response<DailyNote.DailyNote>> GetDailyNoteAsync(UserAndUid userAndUid, CancellationToken token = default);
+
+    ValueTask<Response<Ledger.Ledger>> GetLedgerAsync(UserAndUid userAndUid, int month, CancellationToken token = default);
+
+    ValueTask<Response<PlayerInfo>> GetPlayerInfoAsync(UserAndUid userAndUid, CancellationToken token = default);
+
+    ValueTask<Response<SpiralAbyss.SpiralAbyss>> GetSpiralAbyssAsync(UserAndUid userAndUid, ScheduleType schedule, CancellationToken token = default);
+
+    ValueTask<Response<RoleCombat.RoleCombat>> GetRoleCombatAsync(UserAndUid userAndUid, CancellationToken token = default);
+
+    ValueTask<Response<HardChallenge.HardChallenge>> GetHardChallengeAsync(UserAndUid userAndUid, CancellationToken token = default);
+
+    ValueTask<Response<HardChallenge.HardChallengePopularity>> GetHardChallengePopularityAsync(UserAndUid userAndUid, CancellationToken token = default);
+
+    ValueTask<Response<ListWrapper<DetailedCharacter>>> GetCharacterDetailAsync(UserAndUid userAndUid, ImmutableArray<AvatarId> characterIds, CancellationToken token = default);
+
+    ValueTask<Response<ActCalendar.ActCalendar>> GetActCalendarAsync(UserAndUid userAndUid, CancellationToken token = default);
+}

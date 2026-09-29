@@ -1,0 +1,13 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+namespace Ellen.Launcher.Web.Hoyolab.Takumi.GameRecord.HardChallenge;
+
+public sealed class HardChallengeMonsterTag
+{
+    [JsonPropertyName("type")]
+    public required int Type { get; init; }
+
+    [JsonPropertyName("desc")]
+    public required string Description { get; init; }
+}

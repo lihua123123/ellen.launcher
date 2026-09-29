@@ -1,0 +1,27 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using Ellen.Launcher.Web.Hoyolab.Takumi.GameRecord.RoleCombat;
+
+namespace Ellen.Launcher.ViewModel.RoleCombat;
+
+public sealed class BuffView
+{
+    private BuffView(RoleCombatBuff roleCombatBuff)
+    {
+        Icon = roleCombatBuff.Icon.ToUri();
+        Name = roleCombatBuff.Name;
+        Description = roleCombatBuff.Description.Replace("\\n", "\n", StringComparison.OrdinalIgnoreCase);
+    }
+
+    public Uri Icon { get; }
+
+    public string Name { get; }
+
+    public string Description { get; }
+
+    public static BuffView Create(RoleCombatBuff roleCombatBuff)
+    {
+        return new(roleCombatBuff);
+    }
+}

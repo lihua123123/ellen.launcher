@@ -1,0 +1,12 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using System.Net.Http;
+using System.Text;
+
+namespace Ellen.Launcher.Web.Request.Builder.Abstraction;
+
+public interface IHttpContentSerializer
+{
+    HttpContent? Serialize(object? content, Type contentType, Encoding? encoding);
+}

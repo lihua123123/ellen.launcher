@@ -1,0 +1,16 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+namespace Ellen.Launcher.Web.Hoyolab.Bbs.Home;
+
+public sealed class GameReception
+{
+    [JsonPropertyName("position")]
+    public required int Position { get; init; }
+
+    [JsonPropertyName("data")]
+    public required GameReceptionData Data { get; init; }
+
+    [JsonPropertyName("expose_ticket")]
+    public required string ExposeTicket { get; init; }
+}

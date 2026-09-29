@@ -1,0 +1,24 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using Ellen.Launcher.Model.Primitive;
+using System.Collections.Immutable;
+
+namespace Ellen.Launcher.Model.Metadata.Reliquary;
+
+public sealed class ReliquarySet
+{
+    public required ReliquarySetId SetId { get; init; }
+
+    public required EquipAffixId EquipAffixId { get; init; }
+
+    public required ImmutableHashSet<ExtendedEquipAffixId> EquipAffixIds { get; init; }
+
+    public required string Name { get; init; }
+
+    public required string Icon { get; init; }
+
+    public required ImmutableArray<int> NeedNumber { get; init; }
+
+    public required ImmutableArray<string> Descriptions { get; init; }
+}

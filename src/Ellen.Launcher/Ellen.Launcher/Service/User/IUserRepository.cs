@@ -1,0 +1,18 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using Ellen.Launcher.Service.Abstraction;
+using System.Collections.Immutable;
+
+namespace Ellen.Launcher.Service.User;
+
+public interface IUserRepository : IRepository<Model.Entity.User>
+{
+    void DeleteUserById(Guid id);
+
+    ImmutableArray<Model.Entity.User> GetUserImmutableArray();
+
+    void UpdateUser(Model.Entity.User user);
+
+    void ClearUserSelection();
+}

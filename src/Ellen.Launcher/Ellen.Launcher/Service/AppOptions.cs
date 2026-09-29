@@ -1,0 +1,158 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+// Copyright (c) Millennium-Science-Technology-R-D-Inst. All rights reserved.
+// Licensed under the MIT license.
+
+using Microsoft.UI.Xaml;
+using Ellen.Launcher.Core.Property;
+using Ellen.Launcher.Core.Setting;
+using Ellen.Launcher.Model;
+using Ellen.Launcher.Service.Abstraction;
+using Ellen.Launcher.Service.BackgroundImage;
+using Ellen.Launcher.Service.BackgroundMediaPlayer;
+using Ellen.Launcher.UI.Xaml.Media.Backdrop;
+using Ellen.Launcher.Web.Bridge;
+using Ellen.Launcher.Web;
+using Ellen.Launcher.Web.Hoyolab;
+using System.Collections.Immutable;
+using System.Diagnostics;
+using System.Globalization;
+
+namespace Ellen.Launcher.Service;
+
+[Service(ServiceLifetime.Singleton)]
+public sealed partial class AppOptions : DbStoreOptions
+{
+    [GeneratedConstructor(CallBaseConstructor = true)]
+    public partial AppOptions(IServiceProvider serviceProvider);
+
+    public Lazy<ImmutableArray<NameValue<ElementTheme>>> LazyElementThemes { get; } = new(static () =>
+    [
+        new(SH.CoreWindowThemeLight, Microsoft.UI.Xaml.ElementTheme.Light),
+        new(SH.CoreWindowThemeDark, Microsoft.UI.Xaml.ElementTheme.Dark),
+        new(SH.CoreWindowThemeSystem, Microsoft.UI.Xaml.ElementTheme.Default),
+    ]);
+
+    public Lazy<ImmutableArray<NameValue<Region>>> LazyRegions { get; } = new(static () =>
+    {
+        Debug.Assert(XamlApplicationLifetime.CultureInfoInitialized);
+        return KnownRegions.Value;
+    });
+
+    public Lazy<ImmutableArray<NameValue<TimeSpan>>> LazyCalendarServerTimeZoneOffsets { get; } = new(static () =>
+    {
+        Debug.Assert(XamlApplicationLifetime.CultureInfoInitialized);
+        return KnownServerRegionTimeZones.Value;
+    });
+
+    public ImmutableArray<NameValue<BackdropType>> BackdropTypes { get; } = ImmutableCollectionsNameValue.FromEnum<BackdropType>(type => type >= 0);
+
+    public ImmutableArray<NameValue<BackgroundImageType>> BackgroundImageTypes { get; } = ImmutableCollectionsNameValue.FromEnum<BackgroundImageType>(type => type.GetLocalizedDescription(SH.ResourceManager, CultureInfo.CurrentCulture) ?? string.Empty);
+
+    public ImmutableArray<NameValue<BackgroundMediaType>> BackgroundMediaTypes { get; } = ImmutableCollectionsNameValue.FromEnum<BackgroundMediaType>(type =>
+        type switch
+        {
+            BackgroundMediaPlayer.BackgroundMediaType.None => SH.ViewPageSettingBackgroundMediaNone,
+            BackgroundMediaPlayer.BackgroundMediaType.LocalFolder => SH.ViewPageSettingBackgroundMediaLocalFolder,
+            BackgroundMediaPlayer.BackgroundMediaType.OfficialLauncher => SH.ViewPageSettingBackgroundMediaOfficialLauncherVideo,
+            _ => string.Empty
+        });
+
+    public ImmutableArray<NameValue<BridgeShareSaveType>> BridgeShareSaveTypes { get; } = ImmutableCollectionsNameValue.FromEnum<BridgeShareSaveType>(type => type.GetLocalizedDescription(SH.ResourceManager, CultureInfo.CurrentCulture) ?? string.Empty);
+
+    public ImmutableArray<NameValue<ServerDomainMode>> ServerDomainModes { get; } = ImmutableCollectionsNameValue.FromEnum<ServerDomainMode>(mode => mode.GetLocalizedDescription(SH.ResourceManager, CultureInfo.CurrentCulture) ?? string.Empty);
+
+    [field: MaybeNull]
+    public IObservableProperty<bool> IsEmptyOverviewVisible { get => field ??= CreateProperty(SettingKeys.IsEmptyOverviewVisible, false); }
+
+    [field: MaybeNull]
+    public IObservableProperty<bool> IsEmptyHistoryWishVisible { get => field ??= CreateProperty(SettingKeys.IsEmptyHistoryWishVisible, false); }
+
+    [field: MaybeNull]
+    public IObservableProperty<bool> IsUnobtainedWishItemVisible { get => field ??= CreateProperty(SettingKeys.IsUnobtainedWishItemVisible, false); }
+
+    [field: MaybeNull]
+    public IObservableProperty<BackdropType> BackdropType { get => field ??= CreateProperty(SettingKeys.SystemBackdropType, UI.Xaml.Media.Backdrop.BackdropType.Mica); }
+
+    [field: MaybeNull]
+    public IObservableProperty<ElementTheme> ElementTheme { get => field ??= CreateProperty(SettingKeys.ElementTheme, Microsoft.UI.Xaml.ElementTheme.Default); }
+
+    [field: MaybeNull]
+    public IObservableProperty<BackgroundImageType> BackgroundImageType { get => field ??= CreateProperty(SettingKeys.BackgroundImageType, BackgroundImage.BackgroundImageType.None); }
+
+    [field: MaybeNull]
+    public IObservableProperty<string> BackgroundImagePath { get => field ??= CreateProperty(SettingKeys.BackgroundImagePath, string.Empty); }
+
+    [field: MaybeNull]
+    public IObservableProperty<BackgroundMediaType> BackgroundMediaType { get => field ??= CreateProperty(SettingKeys.BackgroundMediaType, BackgroundMediaPlayer.BackgroundMediaType.None); }
+
+    [field: MaybeNull]
+    public IObservableProperty<string> BackgroundMediaPath { get => field ??= CreateProperty(SettingKeys.BackgroundMediaPath, string.Empty); }
+
+    [field: MaybeNull]
+    public IObservableProperty<bool> IsBackgroundMediaMuted { get => field ??= CreateProperty(SettingKeys.IsBackgroundMediaMuted, true); }
+
+    [field: MaybeNull]
+    public IObservableProperty<bool> IsBackgroundMediaLooping { get => field ??= CreateProperty(SettingKeys.IsBackgroundMediaLooping, true); }
+
+    [field: MaybeNull]
+    public IObservableProperty<Region> Region { get => field ??= CreatePropertyForStructUsingCustom(SettingKeys.AnnouncementRegion, Web.Hoyolab.Region.CNGF01, Web.Hoyolab.Region.FromRegionString, Web.Hoyolab.Region.ToRegionString); }
+
+    [field: MaybeNull]
+    public IObservableProperty<string> GeetestCustomCompositeUrl { get => field ??= CreateProperty(SettingKeys.GeetestCustomCompositeUrl, string.Empty); }
+
+    [field: MaybeNull]
+    public IObservableProperty<int> DownloadSpeedLimitPerSecondInKiloByte { get => field ??= CreateProperty(SettingKeys.DownloadSpeedLimitPerSecondInKiloByte, 0); }
+
+    [field: MaybeNull]
+    public IObservableProperty<BridgeShareSaveType> BridgeShareSaveType { get => field ??= CreateProperty(SettingKeys.BridgeShareSaveType, Web.Bridge.BridgeShareSaveType.CopyToClipboard); }
+
+    [field: MaybeNull]
+    public IObservableProperty<ServerDomainMode> ServerDomainMode
+    {
+        get
+        {
+            if (field is null)
+            {
+                ServerDomainMode initial = UnsafeLocalSetting.Get(SettingKeys.ServerDomainMode, Web.ServerDomainMode.Primary);
+                field = new ObservablePropertyValueChangedCallbackWrapper<ServerDomainMode>(new ObservableProperty<ServerDomainMode>(initial), OnServerDomainModeChanged);
+                ServerDomain.SetMode(initial);
+            }
+
+            return field;
+        }
+    }
+
+    private static void OnServerDomainModeChanged(ServerDomainMode mode)
+    {
+        ServerDomain.SetMode(mode);
+        UnsafeLocalSetting.Set(SettingKeys.ServerDomainMode, mode);
+    }
+
+    [field: MaybeNull]
+    public IObservableProperty<TimeSpan> CalendarServerTimeZoneOffset { get => field ??= CreatePropertyForStructUsingCustom(SettingKeys.CalendarServerTimeZoneOffset, ServerRegionTimeZone.CommonOffset, TimeSpan.Parse, static v => v.ToString()); }
+
+    [field: MaybeNull]
+    public IObservableProperty<bool> AutoRestartAsAdmin { get => field ??= CreateProperty(SettingKeys.AutoRestartAsAdmin, false).WithValueChangedCallback(OnAutoRestartAsAdminChanged, this); }
+
+    [field: MaybeNull]
+    public IObservableProperty<bool> IsStartupEnabled { get => field ??= CreateProperty(SettingKeys.StartupEnabled, false); }
+
+    [field: MaybeNull]
+    public IObservableProperty<bool> IsStartupAsAdminEnabled { get => field ??= CreateProperty(SettingKeys.StartupAsAdminEnabled, false); }
+
+    private static void OnAutoRestartAsAdminChanged(bool isAdminRestart, AppOptions appOptions)
+    {
+        // When AutoRestartAsAdmin is set to True, automatically set IsStartupAsAdminEnabled to True
+        if (isAdminRestart && !appOptions.IsStartupAsAdminEnabled.Value)
+        {
+            appOptions.IsStartupAsAdminEnabled.Value = true;
+        }
+        // When AutoRestartAsAdmin is set to False, do NOT automatically change IsStartupAsAdminEnabled
+
+        // Sync to LocalSetting so Bootstrap.ShouldRestartAsAdmin() can read it on next startup.
+        // Bootstrap runs before DI/SQLite is initialized, so it can only read from LocalSetting (file/registry).
+        LocalSetting.Set(SettingKeys.AutoRestartAsAdmin, isAdminRestart);
+    }
+
+}

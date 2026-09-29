@@ -1,0 +1,13 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+namespace Ellen.Launcher.Web.Hoyolab.Bbs.Home;
+
+public sealed class Background
+{
+    [JsonPropertyName("image")]
+    public required string Image { get; init; }
+
+    [JsonPropertyName("color")]
+    public required string Color { get; init; }
+}

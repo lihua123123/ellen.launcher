@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "Ellen.Launcher": {
+      "commandName": "MsixPackage",
+      "nativeDebugging": false,
+      "doNotLaunchApp": false,
+      "allowLocalNetworkLoopbackProperty": true,
+      "alwaysReinstallApp": false
+    },
+    "[Unpackaged] Ellen.Launcher": {
+      "commandName": "Project"
+    }
+  }
+}

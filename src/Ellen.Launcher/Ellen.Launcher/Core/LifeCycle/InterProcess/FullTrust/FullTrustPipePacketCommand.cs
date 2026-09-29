@@ -1,0 +1,13 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+namespace Ellen.Launcher.Core.LifeCycle.InterProcess.FullTrust;
+
+public enum FullTrustPipePacketCommand : byte
+{
+    None = 0,
+    Create = 1,
+    StartProcess = 2,
+    LoadLibrary = 3,
+    ResumeMainThread = 4,
+}

@@ -1,0 +1,18 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using Ellen.Launcher.ViewModel.Wiki;
+using System.Collections.Immutable;
+
+namespace Ellen.Launcher.Model.Metadata.Weapon;
+
+public static class WeaponTypeValueCollectionExtension
+{
+    extension(WeaponTypeValueCollection collection)
+    {
+        public ImmutableArray<PropertyCurveValue> ToPropertyCurveValues()
+        {
+            return collection.Array.SelectAsArray(static curve => new PropertyCurveValue(curve.Type, curve.Value, curve.InitValue));
+        }
+    }
+}

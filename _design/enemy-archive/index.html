@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>敌人图鉴 · 档案扩展 UI 原型</title>
+<style>
+  /* ============================================================
+     设计令牌（对齐 Ellen.Launcher 的 WinUI 3 深色主题）
+     - 卡片/圆角参考 UI/Xaml/Control/Theme/Card.xaml
+     - 元素色参考 UI/Xaml/Control/GuideRichText.cs（ellen-wiki colors.json）
+     ============================================================ */
+  :root{
+    --bg:#1c1c1c;
+    --mica:#202020;
+    --layer:#272727;
+    --card:#2b2b2b;
+    --card-2:#323232;
+    --stroke:rgba(255,255,255,.09);
+    --stroke-2:rgba(255,255,255,.055);
+    --txt:#ffffff;
+    --txt-2:rgba(255,255,255,.78);
+    --txt-3:rgba(255,255,255,.52);
+    --accent:#4cc2ff;
+    --accent-soft:rgba(76,194,255,.14);
+    --ok:#6ccb5f;
+    --warn:#fce100;
+    --danger:#ff99a4;
+
+    --pyro:#ee0000; --hydro:#0066cc; --dendro:#4ade80; --electro:#7950f2;
+    --anemo:#34d399; --cryo:#22d3ee; --geo:#eab308; --physical:#b8b8b8;
+
+    --r:8px; --r-sm:4px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--mica);color:var(--txt);
+    font-family:"Segoe UI Variable Text","Segoe UI","Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;
+    font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;
+  }
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+  /* ---------- 顶栏 ---------- */
+  .topbar{
+    display:flex;align-items:center;gap:12px;padding:10px 16px;
+    background:var(--layer);border-bottom:1px solid var(--stroke);
+  }
+  .topbar h1{font-size:14px;font-weight:600;margin:0}
+  .topbar .spacer{flex:1}
+  .toggle{
+    display:flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;
+    border:1px solid var(--stroke);color:var(--txt-2);font-size:12.5px;
+  }
+  .toggle.on{background:var(--accent-soft);border-color:rgba(76,194,255,.45);color:#cdeeff}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--txt-3)}
+  .toggle.on .dot{background:var(--accent)}
+
+  /* ---------- 布局（SplitView：左列表 / 右详情） ---------- */
+  .shell{display:grid;grid-template-columns:264px 1fr;height:calc(100vh - 45px)}
+  .pane{background:#242424;border-right:1px solid var(--stroke);overflow:auto;padding:8px}
+  .list-item{
+    display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:var(--r-sm);
+    border:1px solid transparent;
+  }
+  .list-item:hover{background:rgba(255,255,255,.045)}
+  .list-item.active{background:rgba(255,255,255,.07);border-color:var(--stroke)}
+  .ava{
+    width:40px;height:40px;flex:none;border-radius:50%;display:grid;place-items:center;
+    font-size:18px;background:var(--card-2);border:1px solid var(--stroke);
+  }
+  .list-item .nm{font-size:13.5px}
+  .list-item .sub{font-size:11.5px;color:var(--txt-3)}
+
+  .detail{overflow:auto;padding:16px}
+  .detail-inner{max-width:860px;display:flex;flex-direction:column;gap:16px}
+
+  /* ---------- 卡片 ---------- */
+  .card{
+    background:var(--card);border:1px solid var(--stroke);border-radius:var(--r);
+    padding:16px;
+  }
+  .card.quiet{background:rgba(255,255,255,.028);border-color:var(--stroke-2)}
+  .card > h2{
+    margin:0 0 12px;font-size:13px;font-weight:600;letter-spacing:.02em;
+    color:var(--txt-2);display:flex;align-items:center;gap:8px;
+  }
+  .card > h2 .count{font-weight:400;color:var(--txt-3);font-size:12px}
+
+  /* ---------- 头部信息 ---------- */
+  .hero{display:flex;gap:16px;align-items:flex-start}
+  .hero .portrait{
+    width:76px;height:76px;flex:none;border-radius:var(--r);display:grid;place-items:center;
+    font-size:34px;background:var(--card-2);border:1px solid var(--stroke);
+  }
+  .hero h3{margin:0 0 2px;font-size:19px;font-weight:600}
+  .hero .en{color:var(--txt-3);font-size:12.5px;margin-bottom:6px}
+  .hero p{margin:0;color:var(--txt-2);font-size:13px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .chip{
+    padding:2px 9px;border-radius:999px;font-size:11.5px;
+    background:rgba(255,255,255,.07);border:1px solid var(--stroke);color:var(--txt-2);
+  }
+  .chip.sample{background:rgba(252,225,0,.12);border-color:rgba(252,225,0,.35);color:#f7e57a}
+
+  /* ---------- 数值 ---------- */
+  .level-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .level-row .lv{font-weight:600;font-size:15px;min-width:74px}
+  .range{flex:1;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:rgba(255,255,255,.16)}
+  .range::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);border:3px solid #2b2b2b;box-shadow:0 0 0 1px var(--accent)}
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .stat{
+    background:rgba(255,255,255,.04);border:1px solid var(--stroke-2);border-radius:var(--r-sm);
+    padding:8px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;
+  }
+  .stat .k{color:var(--txt-3);font-size:12.5px}
+  .stat .v{font-variant-numeric:tabular-nums}
+
+  /* ---------- 抗性 ---------- */
+  .state-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .state-tab{
+    padding:4px 12px;border-radius:999px;font-size:12.5px;color:var(--txt-2);
+    border:1px solid var(--stroke);background:rgba(255,255,255,.03);
+  }
+  .state-tab.on{background:var(--accent-soft);border-color:rgba(76,194,255,.5);color:#cdeeff}
+  .res-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  @media (max-width:900px){.res-grid{grid-template-columns:repeat(2,1fr)}}
+  .res{
+    display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r-sm);
+    background:rgba(255,255,255,.035);border:1px solid var(--stroke-2);
+  }
+  .eres{
+    width:22px;height:22px;flex:none;border-radius:50%;display:grid;place-items:center;
+    font-size:11px;font-weight:600;color:#12161a;
+  }
+  .res .nm{font-size:12.5px;color:var(--txt-2);flex:1}
+  .res .val{font-variant-numeric:tabular-nums;font-weight:600}
+  .res .val.imm{color:var(--danger)}
+  .res .val.zero{color:var(--txt-3);font-weight:400}
+  .res .val.high{color:var(--warn)}
+  .res.immune{background:rgba(255,153,164,.08);border-color:rgba(255,153,164,.28)}
+
+  /* ---------- 产球 ---------- */
+  .parts{width:100%;border-collapse:collapse;font-size:13px}
+  .parts th,.parts td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--stroke-2)}
+  .parts th{color:var(--txt-3);font-weight:500;font-size:12px}
+  .parts td{font-variant-numeric:tabular-nums}
+  .parts tr:last-child td{border-bottom:0}
+  /* ---------- 富文本行内标记 ---------- */
+  code.k{
+    font-family:Consolas,"Cascadia Mono",monospace;font-size:12px;
+    background:rgba(255,255,255,.07);border:1px solid var(--stroke-2);
+    padding:1px 6px;border-radius:var(--r-sm);
+  }
+
+  /* ---------- 机制 ---------- */
+  .mech{padding:10px 0;border-bottom:1px solid var(--stroke-2)}
+  .mech:last-child{border-bottom:0;padding-bottom:0}
+  .mech .t{font-weight:600;font-size:13px;margin-bottom:2px}
+  .mech .d{color:var(--txt-2);font-size:13px}
+
+  /* ---------- 技能 ---------- */
+  .skill{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--stroke-2)}
+  .skill:last-child{border-bottom:0;padding-bottom:0}
+  .skill .body{flex:1;min-width:0}
+  .skill .head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .skill .head .nm{font-weight:600;font-size:13.5px}
+  .skill .head .tag{
+    font-size:10.5px;padding:1px 7px;border-radius:999px;
+    background:rgba(255,255,255,.08);border:1px solid var(--stroke);color:var(--txt-2);
+  }
+  .tag.dps{background:rgba(255,107,71,.14);border-color:rgba(255,107,71,.4);color:#ffb59c}
+  .tag.control{background:rgba(34,211,238,.13);border-color:rgba(34,211,238,.38);color:#a5e9f7}
+  .tag.summon{background:rgba(160,120,255,.16);border-color:rgba(160,120,255,.42);color:#cbb8ff}
+  .tag.passive{background:rgba(255,200,80,.13);border-color:rgba(255,200,80,.38);color:#f2d79a}
+  .tag.defense{background:rgba(108,203,95,.14);border-color:rgba(108,203,95,.4);color:#bfe8b6}
+  .skill .desc{color:var(--txt-2);font-size:13px;margin-top:4px}
+  .skill .desc b{color:#ff9c9c;font-weight:600}
+  .skill .tips{
+    margin-top:8px;padding:6px 10px;border-radius:var(--r-sm);
+    background:rgba(255,255,255,.035);border:1px dashed var(--stroke);
+    color:var(--txt-3);font-size:12px;display:flex;gap:8px;
+  }
+  .stars{letter-spacing:1px;color:var(--geo);font-size:12px}
+  .stars .off{color:rgba(255,255,255,.18)}
+  .meta-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;color:var(--txt-3);font-size:12px}
+  .meta-row b{color:var(--txt-2);font-weight:500}
+
+  /* ---------- 掉落 ---------- */
+  .drops{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .drop{
+    display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-sm);
+    background:rgba(255,255,255,.035);border:1px solid var(--stroke-2);
+  }
+  .drop .sq{width:34px;height:34px;flex:none;border-radius:var(--r-sm);background:var(--card-2);border:1px solid var(--stroke)}
+  .drop .nm{font-size:12.5px;color:var(--txt-2)}
+
+  /* ---------- 标注模式 ---------- */
+  body.annotate .is-new{outline:1.5px dashed rgba(76,194,255,.6);outline-offset:-2px;border-radius:var(--r)}
+  .ann{display:none;font-size:10.5px;padding:0 6px;border-radius:999px;vertical-align:middle}
+  body.annotate .ann.new{display:inline-block;background:var(--accent-soft);color:#cdeeff;border:1px solid rgba(76,194,255,.45)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>敌人图鉴 · 档案（抗性 / 技能）UI 原型</h1>
+  <span class="spacer"></span>
+  <button class="toggle" id="annotToggle" title="高亮“新增区块”与“预留槽位”">
+    <span class="dot"></span><span>标注模式</span>
+  </button>
+</div>
+
+<div class="shell">
+  <aside class="pane" id="list"></aside>
+  <main class="detail"><div class="detail-inner" id="detail"></div></main>
+</div>
+
+<script>
+/* ================================================================
+   ① 元素配色 —— 与 GuideRichText.cs 的 ElementBrushes 一致
+   ================================================================ */
+const EL = {
+  pyro:      {name:'火', label:'火元素抗性', color:'#ee0000'},
+  hydro:     {name:'水', label:'水元素抗性', color:'#0066cc'},
+  dendro:    {name:'草', label:'草元素抗性', color:'#4ade80'},
+  electro:   {name:'雷', label:'雷元素抗性', color:'#7950f2'},
+  anemo:     {name:'风', label:'风元素抗性', color:'#34d399'},
+  cryo:      {name:'冰', label:'冰元素抗性', color:'#22d3ee'},
+  geo:       {name:'岩', label:'岩元素抗性', color:'#eab308'},
+  physical:  {name:'物', label:'物理抗性',   color:'#b8b8b8'},
+};
+
+/* ================================================================
+   ② 拟定数据模型（对应 Resource/EnemyArchives/EnemyArchives.json）
+   匹配键：monsterName（= Monster.json 的 MonsterName）优先，回落 name/title/aliases
+   ================================================================ */
+const MONSTERS = [
+{
+  key:'slime_fire',
+  name:'火史莱姆', title:'火史莱姆', en:'Pyro Slime', icon:'🟠',
+  type:'普通', arkhe:null,
+  desc:'逸散在自然之中的火元素沉积形成的小小魔物。具有非常基础的智能水平，但似乎具有很广泛的用途。对丘丘人而言。',
+  affixes:['火元素生命'],
+  sample:false,
+
+  // —— 既有（元数据）——
+  level:110, hp:'42802', atk:'1742', def:'1050',
+  drops:['摩拉','史莱姆原浆','史莱姆清','史莱姆凝液'],
+
+  // —— 新增：产球（元素能量）——
+  energy:{ raw:'PP[60,0]', rows:[ {hp:'60%', particle:0, orb:1}, {hp:'0%', particle:0, orb:1} ] },
+
+  // —— 新增：抗性（支持多状态）——
+  resistances:{
+    values:{ pyro:'IMM', hydro:10, dendro:10, electro:10, anemo:10, cryo:10, geo:10, physical:10 },
+    states:[]   // 空 = 无状态切换，UI 自动隐藏 Tab 行
+  },
+
+  // —— 新增：特殊机制 ——
+  mechanics:[
+    { t:'火息', d:'2 火盾，浇熄后转为熄灭状态，一段时间后恢复。' },
+  ],
+
+  // —— 新增：技能 ——
+  skills:[
+    { name:'高温撞击', tag:'输出', cls:'dps', icon:'➜',
+      desc:'火史莱姆撞击玩家，造成 **100%** 伤害；熄灭状态下撞击则造成 **100%** 伤害。' },
+    { name:'过热涌泄', tag:'亡语', cls:'passive', icon:'✸',
+      desc:'燃烧状态的火史莱姆死亡时爆炸，造成 **200%** 伤害。' },
+    { name:'星萤之火', tag:'天赋', cls:'passive', icon:'✧',
+      desc:'火史莱姆常驻「火息」，耗尽后会转为熄灭状态；一段时间或受到任意火元素伤害后（可无元素附着），当无元素附着时会尝试复燃。' },
+  ],
+},
+{
+  key:'qiu_lin',
+  name:'丘林', title:'地方传奇', en:'Churin', icon:'🟣',
+  type:'BOSS', arkhe:'芒',
+  desc:'（示例条目，用于验证“复杂敌人”时的 UI 承载能力；数值与技能来自项目既有档案，抗性为该机制下的示意占位。）',
+  affixes:['地方传奇','冰元素生命'],
+  sample:true,
+
+  level:103, hp:'6,337,251', atk:'31329', def:'—',
+  variants:[
+    { name:'地方传奇', level:103, hp:'6,337,251', atk:'31329' },
+    { name:'历经百战', level:100, hp:'1,395,818', atk:'17728' },
+  ],
+  weight:'150/210',
+  drops:['摩拉','祭品残片','元素晶石'],
+
+  energy:{ raw:'OO[75,0]', rows:[ {hp:'75%', particle:2, orb:0}, {hp:'0%', particle:2, orb:0} ] },
+
+  resistances:{
+    values:{ pyro:10, hydro:10, dendro:30, electro:10, anemo:30, cryo:10, geo:10, physical:10 },
+    states:[
+      { name:'冰盾·巨口雷鳍', condition:'护盾存在期间（120 点，40 秒后自行消散）',
+        values:{ pyro:10, hydro:10, dendro:30, electro:10, anemo:30, cryo:50, geo:10, physical:10 } },
+      { name:'冰盾·小动物', condition:'护盾存在期间（3 点，12 秒后自行消散）',
+        values:{ pyro:10, hydro:10, dendro:30, electro:10, anemo:30, cryo:50, geo:10, physical:10 } },
+    ]
+  },
+
+  mechanics:[
+    { t:'冰盾', d:'存在两种冰盾：`巨口雷鳍`（120 点，40 秒自行消散）与 `小动物`（3 点，12 秒自行消散）。击破前获得额外抗性。' },
+    { t:'区域压制', d:'场地内会持续生成压制区域，需优先处理召唤物。' },
+    { t:'阶段转换', d:'血量降至 60% 后进入第二阶段，技能组合发生变化。' },
+  ],
+
+  skills:[
+    { name:'碎裂寒芒', tag:'定位', cls:'control', icon:'◎', damage:3, dodge:2,
+      desc:'向玩家所在位置投射寒芒，命中后生成持续减速区域。',
+      tips:'横向跑动即可脱离，不要原地闪避。' },
+    { name:'风绯雪絮', tag:'控制', cls:'control', icon:'❄', damage:2, dodge:4,
+      desc:'制造持续吸附的风场，被卷入后受到多次冰元素伤害。',
+      tips:'远离中心，被吸入后优先向风口切线方向移动。' },
+    { name:'晶芽溟花', tag:'远程', cls:'dps', icon:'✧', damage:4, dodge:3,
+      desc:'召唤冰晶晶芽，延时后向玩家方向发射三连射。',
+      combo:['碎裂寒芒'],
+      desc2:'' },
+    { name:'冰素白霜', tag:'输出', cls:'dps', icon:'➜', damage:5, dodge:4,
+      desc:'蓄力后横扫，造成大范围冰元素伤害。',
+      tips:'蓄力动作明显，向背后绕后。' },
+    { name:'精雕细裁', tag:'召唤', cls:'summon', icon:'✦',
+      desc:'召唤小动物协同作战，需优先清理。' },
+  ],
+},
+];
+
+/* ================================================================
+   ③ 渲染
+   ================================================================ */
+const $list = document.getElementById('list');
+const $detail = document.getElementById('detail');
+let current = 0;
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* 迷你富文本：对齐 GuideRichText 的标记约定
+   **加粗** / `专有名词` / <span class="pyro">元素配色</span> */
+function rich(text){
+  if (!text) return '';
+  let s = esc(text);
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  s = s.replace(/`([^`]+)`/g, '<code class="k">$1</code>');
+  s = s.replace(/&lt;span class="([a-z-]+)"&gt;(.*?)&lt;\/span&gt;/g,
+        (_, cls, inner) => `<span style="color:${(EL[cls]||{}).color||'inherit'}">${inner}</span>`);
+  return s;
+}
+
+function resValueClass(v){
+  if (v === 'IMM' || v === '免疫') return 'imm';
+  const n = parseFloat(v);
+  if (n === 0) return 'zero';
+  if (n >= 50) return 'high';
+  return '';
+}
+function resCell(key, v){
+  const e = EL[key];
+  const cls = resValueClass(v);
+  const isImm = cls === 'imm';
+  const text = isImm ? 'IMM' : (String(v) + (typeof v === 'number' ? '%' : ''));
+  return `<div class="res ${isImm ? 'immune' : ''}">
+      <span class="eres" style="background:${e.color}">${e.name}</span>
+      <span class="nm">${e.label}</span>
+      <span class="val ${cls}">${text}</span>
+    </div>`;
+}
+function resGrid(values){
+  return `<div class="res-grid">${Object.keys(EL).map(k => resCell(k, values[k] ?? 0)).join('')}</div>`;
+}
+function stars(n, max=5){
+  if (!n) return '';
+  let s = '';
+  for (let i=1;i<=max;i++) s += i <= n ? '★' : '<span class="off">★</span>';
+  return `<span class="stars">${s}</span>`;
+}
+
+/* —— 抗性卡片：状态 Tab 只渲染当前态，避免一次性铺开所有状态 —— */
+let activeState = {};   // key -> 状态索引
+function renderResist(m){
+  const key = m.key;
+  const st = activeState[key] ?? 0;
+  const states = m.resistances.states;
+  const cur = st === 0 ? { values: m.resistances.values } : states[st - 1];
+
+  const tabs = states.length
+    ? `<div class="state-tabs is-new">
+         <button class="state-tab ${st===0?'on':''}" data-state="0">常态</button>
+         ${states.map((s,i)=>`<button class="state-tab ${st===i+1?'on':''}" data-state="${i+1}" title="${esc(s.condition||'')}">${esc(s.name)}</button>`).join('')}
+       </div>`
+    : '';
+
+  return `<section class="card is-new">
+      <h2>抗性数据<span class="ann new">新增</span></h2>
+      ${tabs}${resGrid(cur.values)}
+    </section>`;
+}
+
+function renderSkill(s){
+  const tag = s.tag ? `<span class="tag ${s.cls||''}">${esc(s.tag)}</span>` : '';
+  const tips = s.tips ? `<div class="tips"><span>⌁</span><span><b>应对</b>：${rich(s.tips)}</span></div>` : '';
+  const combo = s.combo?.length ? `<div class="meta-row"><span>相关连招：<b>${s.combo.map(esc).join(' → ')}</b></span></div>` : '';
+  const rated = (s.damage || s.dodge)
+    ? `<div class="meta-row">
+         ${s.damage ? `<span>伤害 ${stars(s.damage)}</span>` : ''}
+         ${s.dodge ? `<span>躲避 ${stars(s.dodge)}</span>` : ''}
+       </div>` : '';
+  return `<div class="skill">
+      <div class="body">
+        <div class="head"><span class="nm">${esc(s.name)}</span>${tag}</div>
+        <div class="desc">${rich(s.desc)}</div>
+        ${rated}${tips}${combo}
+      </div>
+    </div>`;
+}
+
+function renderDetail(){
+  const m = MONSTERS[current];
+  const variantSwitcher = m.variants?.length
+    ? `<div class="chips" style="margin-top:12px">
+         ${m.variants.map((v)=>`<span class="chip">${esc(v.name)} · Lv.${v.level}</span>`).join('')}
+       </div>` : '';
+
+  $detail.innerHTML = `
+    <!-- ① 既有：名称 / 描述 / 词缀 -->
+    <section class="card">
+      <div class="hero">
+        <div class="portrait">${m.icon}</div>
+        <div style="flex:1">
+          <h3>${esc(m.name)}</h3>
+          <div class="en">${esc(m.en||'')}</div>
+          <p>${esc(m.desc)}</p>
+          <div class="chips">
+            <span class="chip">${esc(m.type)}</span>
+            ${m.arkhe?`<span class="chip">${esc(m.arkhe)}</span>`:''}
+            ${(m.affixes||[]).map(a=>`<span class="chip">${esc(a)}</span>`).join('')}
+            ${m.sample?`<span class="chip sample">示例数据</span>`:''}
+          </div>
+          ${variantSwitcher}
+        </div>
+      </div>
+    </section>
+
+    <!-- ② 既有：等级 / 三维 -->
+    <section class="card">
+      <h2>基础数值</h2>
+      <div class="level-row">
+        <span class="lv">Lv. ${m.level}</span>
+        <input class="range" type="range" min="1" max="110" value="${m.level}">
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><span class="k">基础生命值</span><span class="v">${esc(m.hp)}</span></div>
+        <div class="stat"><span class="k">基础攻击力</span><span class="v">${esc(m.atk)}</span></div>
+        <div class="stat"><span class="k">基础防御力</span><span class="v">${esc(m.def)}</span></div>
+      </div>
+      ${m.weight?`<div class="meta-row"><span>重量 / 韧性：<b>${esc(m.weight)}</b></span></div>`:''}
+    </section>
+
+    <!-- ③ 新增：抗性（含多状态） -->
+    ${renderResist(m)}
+
+    <!-- ④ 新增：产球 -->
+    <section class="card is-new">
+      <h2>元素能量（产球）<span class="ann new">新增</span></h2>
+      <table class="parts">
+        <thead><tr><th>血量阈值</th><th>元素微粒</th><th>元素晶球</th></tr></thead>
+        <tbody>
+          ${m.energy.rows.map(r=>`<tr>
+              <td>${esc(r.hp)}</td>
+              <td>${r.particle || '—'}</td>
+              <td>${r.orb || '—'}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ⑤ 新增：特殊机制 -->
+    <section class="card is-new">
+      <h2>特殊机制<span class="ann new">新增</span></h2>
+      ${m.mechanics.map(x=>`<div class="mech"><div class="t">${esc(x.t)}</div><div class="d">${rich(x.d)}</div></div>`).join('')}
+    </section>
+
+    <!-- ⑥ 新增：技能 -->
+    <section class="card is-new">
+      <h2>技能<span class="ann new">新增</span></h2>
+      ${m.skills.map(renderSkill).join('')}
+    </section>
+
+    <!-- ⑦ 既有：掉落 -->
+    <section class="card">
+      <h2>掉落物品</h2>
+      <div class="drops">
+        ${m.drops.map(d=>`<div class="drop"><span class="sq"></span><span class="nm">${esc(d)}</span></div>`).join('')}
+      </div>
+    </section>
+  `;
+
+  // 状态 Tab 事件（只重绘抗性区，避免整页重排）
+  $detail.querySelectorAll('.state-tab').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      activeState[m.key] = Number(btn.dataset.state);
+      renderDetail();
+    });
+  });
+}
+
+function renderList(){
+  $list.innerHTML = MONSTERS.map((m,i)=>`
+    <div class="list-item ${i===current?'active':''}" data-i="${i}">
+      <div class="ava">${m.icon}</div>
+      <div>
+        <div class="nm">${esc(m.name)}</div>
+        <div class="sub">${esc(m.title)} · ${esc(m.type)}</div>
+      </div>
+    </div>`).join('');
+  $list.querySelectorAll('.list-item').forEach(el=>{
+    el.addEventListener('click', ()=>{ current = Number(el.dataset.i); renderList(); renderDetail(); });
+  });
+}
+
+document.getElementById('annotToggle').addEventListener('click', (e)=>{
+  document.body.classList.toggle('annotate');
+  e.currentTarget.classList.toggle('on');
+});
+
+renderList();
+renderDetail();
+</script>
+</body>
+</html>

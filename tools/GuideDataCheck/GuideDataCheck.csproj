@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>preview</LangVersion>
+    <AssemblyName>GuideDataCheck</AssemblyName>
+    <RootNamespace>GuideDataCheck</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <!--
+    开发期校验工具：直接复用启动器的幽境攻略模型，验证
+    Resource/Endgame/HardChallengeBosses.json 能被正确解析。
+    不参与启动器构建，也不引用 WinUI。
+  -->
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="..\..\src\Ellen.Launcher\Ellen.Launcher\Model\Endgame\HardChallengeBossGuide.cs" />
+  </ItemGroup>
+
+</Project>

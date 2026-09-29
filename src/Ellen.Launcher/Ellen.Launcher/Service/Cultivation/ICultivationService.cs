@@ -1,0 +1,33 @@
+// Copyright (c) DGP Studio. All rights reserved.
+// Licensed under the MIT license.
+
+using Ellen.Launcher.Core.Database;
+using Ellen.Launcher.Model.Entity;
+using Ellen.Launcher.Service.Cultivation.Consumption;
+using Ellen.Launcher.ViewModel.Cultivation;
+using System.Collections.ObjectModel;
+
+namespace Ellen.Launcher.Service.Cultivation;
+
+public interface ICultivationService
+{
+    ValueTask<IAdvancedDbCollectionView<CultivateProject>> GetProjectCollectionAsync();
+
+    ValueTask<bool> EnsureCurrentProjectAsync(IAdvancedDbCollectionView<CultivateProject> projects);
+
+    ValueTask<ObservableCollection<CultivateEntryView>> GetCultivateEntryCollectionAsync(CultivateProject cultivateProject, ICultivationMetadataContext context);
+
+    ValueTask<StatisticsCultivateItemCollection> GetStatisticsCultivateItemCollectionAsync(CultivateProject cultivateProject, ICultivationMetadataContext context, CancellationToken token);
+
+    ValueTask<ResinStatistics> GetResinStatisticsAsync(StatisticsCultivateItemCollection statisticsCultivateItems, CancellationToken token);
+
+    ValueTask RemoveCultivateEntryAsync(Guid entryId);
+
+    ValueTask RemoveProjectAsync(CultivateProject project);
+
+    ValueTask<ConsumptionSaveResultKind> SaveConsumptionAsync(InputConsumption inputConsumption);
+
+    void SaveCultivateItem(CultivateItemView item);
+
+    ValueTask<ProjectAddResultKind> TryAddProjectAsync(CultivateProject project);
+}

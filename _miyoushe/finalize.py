@@ -1,0 +1,63 @@
+# -*- coding: utf-8 -*-
+"""收尾：回退档案到基线 → 出复核表 → 按「高置信 + diff + 取值合理」入库 → 汇总。
+
+用法：python finalize.py
+"""
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).parent
+ROOT = Path(r"D:\艾莲的数据库\workspace\ellen-launcher")
+ARCH = ROOT / "src/Ellen.Launcher/Ellen.Launcher/Resource/EnemyArchives/EnemyArchives.json"
+GEN = HERE / "_gen2"
+PY = sys.executable
+
+
+def restore_baseline():
+    """把上一轮 merge 加进去的条目摘掉，恢复到基线（避免重复累计）。"""
+    names = set(json.loads((GEN / "added_names.json").read_text(encoding="utf-8")))
+    arch = json.loads(ARCH.read_text(encoding="utf-8"))
+    kept = [e for e in arch if e.get("name") not in names]
+    removed = len(arch) - len(kept)
+    ARCH.write_text(json.dumps(kept, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return len(arch), len(kept), removed
+
+
+def run(script, *args):
+    r = subprocess.run([PY, "-u", "-X", "utf8", str(HERE / script), *args],
+                       capture_output=True, text=True, errors="replace",
+                       cwd=str(HERE), timeout=1800)
+    return r.returncode, r.stdout, r.stderr
+
+
+def main():
+    a = lambda s: str(s).encode("ascii", "replace").decode()
+    before, kept, removed = restore_baseline()
+    print(f"档案回退: {before} -> {kept} (移除 {removed})")
+
+    tags = [f"{i:02d}" for i in range(1, 20) if i != "13"]
+    rc, out, err = run("table_all.py", *tags)
+    print("table_all exit", rc, a(err[-150:]).strip())
+    rc2, out2, _ = run("health.py", *tags)
+    print("health exit", rc2)
+
+    diffs = json.loads((GEN / "diffs_all.json").read_text(encoding="utf-8"))
+    conf = [d for d in diffs if d.get("confident")]
+    print(f"diff 行 {len(diffs)}，其中高置信 {len(conf)}，低置信 {len(diffs) - len(conf)}")
+
+    rc3, out3, err3 = run("merge_all.py")
+    print("merge_all exit", rc3, a(out3[-200:]).strip(), a(err3[-200:]).strip())
+
+    report = (GEN / "merge_all.txt").read_text(encoding="utf-8").splitlines()
+    review = next((i for i, l in enumerate(report) if l.startswith("=== 被守卫丢弃")), None)
+    n_drop = len(report) - review - 1 if review is not None else 0
+    print("被守卫丢弃行数:", n_drop)
+    if review is not None:
+        for l in report[review + 1:]:
+            print("   " + a(l))
+
+
+if __name__ == "__main__":
+    main()

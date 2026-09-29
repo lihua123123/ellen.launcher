@@ -55,7 +55,8 @@ GEN2 = HERE / "_gen2"
 
 # ---------------------------------------------------------------- 人眼真值
 # 来源（都写清楚，将来可复查）：
-#   - 13 篇 18 张：26/9/30 逐张看图数出（`_gen2/crop13/_核对表.md` 同批）
+#   - 13 篇 18 张：26/9/30 逐张看图数出
+#     （裁图可由 `make_13_checklist.py` 重新生成到 `_gen2/crop13/`；原始核对表已随本轮草稿清理）
 #   - 非 13 篇 7 张：26/9/30 审计 `n_card=4` 的卡时逐张看图数出
 #     （其中 06/041 是 5 行 —— 就是被 yb+320 切掉一行的那张）
 # ⚠️ 这些是**人眼**数出来的，不是几何公式推出来的。改这张表必须重新看图。
@@ -296,6 +297,13 @@ def main():
            "**不来自 `max_rows_in` 自己**。", ""]
     ok = check_structure(log)
     if not a.structure_only:
+        # 2026-09-30 收尾清理删掉了源图目录；A/B 层必须从原图量墨迹带。
+        if not R.ROOT.is_dir():
+            print("⚠️ A/B 层需要源图目录 `%s`（已随 2026-09-30 收尾清理删除）。" % R.ROOT.name)
+            print("   重跑前置： python miyoushe_download.py 重下 600 张")
+            print("   或只跑不依赖图片的 C 层： python check_geom.py --structure-only")
+            print("   历史自证结论已归档： _provenance/reports/geom_report.md")
+            return 1
         ok = check_images(log) and ok
 
     GEN2.mkdir(exist_ok=True)

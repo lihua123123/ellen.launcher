@@ -1,0 +1,11 @@
+# VLM 第二通道密钥模板（复制为 `.vlm_key` 后填真值；`.vlm_key` 已被 gitignore）
+#
+# 读取优先级：环境变量 > 本文件（见 vlm_transcribe.py 的 load_config()）
+#   VLM_API_KEY / VLM_MODEL / VLM_BASE_URL 三个环境变量会覆盖本文件同名项
+
+VLM_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+VLM_MODEL=qwen-vl-max
+VLM_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+
+# 实测可用（2026-09-30，国内站）：qwen-vl-max / qwen-vl-plus / qwen-turbo
+# qwen-vl-max-latest 与 qwen2.5-vl-7b-instruct 该账号 403；国际站端点全部 401

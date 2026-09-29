@@ -1,0 +1,20 @@
+gap_adopted 命中 @ [59] -> {"take": "06/041", "row": 2, "label": "荡除", "meta": "秘源机兵·统御械", "values": [210, 210, 210, 210, 210, 210, 210, 210], "mode": "label(label-sim(1.00))", "n_local": 3, "n_card": 4, "evidence": "2geo"}
+
+档案条目数 166，类型 list
+
+条目 name=秘源机兵·寻捕械 title=None
+  resistances.evidence=None
+  resistances.values={"pyro": "50%", "hydro": "50%", "anemo": "50%", "electro": "50%", "dendro": "50%", "cryo": "50%", "geo": "50%", "physical": "50%"}
+  resistances.defaultNote="正常大招& 虚弱 50 10 50 10 50 10 50 10 50 10 50 10 50 10 50 10"
+
+条目 name=秘源机兵·构型械 title=None
+  resistances.evidence=None
+  resistances.values={"pyro": "60%", "hydro": "60%", "anemo": "60%", "electro": "60%", "dendro": "60%", "cryo": "60%", "geo": "60%", "physical": "60%"}
+  resistances.defaultNote="固态燃素：无法直接攀爬，仅上回声之子」成员可直接攀爬：高度接近岩卷，可使用万叶/钟离/玛拉妮/嘉明/绮良良等逃课。应战对策满后强"
+    state name=瘫痪             ev=2geo     values={"pyro": "-30%", "hydro": "-30%", "anemo": "-30%", "electro": "-30%", "dendro": "-30%", "cryo": "-30%", "geo": "-30%", "physical": "-30%"}
+
+条目 name=秘源机兵·统御械 title=None
+  resistances.evidence=2geo
+  resistances.values={"pyro": "210%", "hydro": "210%", "anemo": "210%", "electro": "210%", "dendro": "210%", "cryo": "210%", "geo": "210%", "physical": "210%"}
+  resistances.defaultNote="荡除凝滞夜魂 210 0 50 210 0 50 210 0 50 210 0 50 210 0 50 210-40 50 210 0 50 210 0 50"
+    state name=凝滞             ev=None     values={"pyro": "0%", "hydro": "0%", "anemo": "0%", "electro": "0%", "dendro": "0%", "cryo": "-40%", "geo": "0%", "physical": "0%"}

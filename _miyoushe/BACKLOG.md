@@ -75,7 +75,7 @@
 
 `17/012` 卡上标题是 `狼追猎者`，被 `lookup()` 用「共享后缀 `猎者`」误命中 `遗迹猎者`。
 - 已定位：`find_name_in_text` 正确返回 None，是 `resolve_name` 里的 `lookup(disp)` 干的
-- 调用点 2 处：`table_all.py:121`（活跃）、`merge_03.py:44`（**无 importer，一次性脚本，不在活跃路径**）
+- 调用点 2 处：`table_all.py:121`（活跃）、`merge_03.py:44`（该脚本 **2026-09-30 已删**，曾是一次性脚本，不在活跃路径）
 **下次入口**：收紧到「后缀 ≥3 字 + 前缀一致」之类；**必须用已知答案自证**：
 `狼追猎者 → None`，同时不能破坏 `lookup` 现有的「共后缀 + 幼前缀对齐」正确成果。
 
@@ -96,7 +96,36 @@
 - `04/009 深海龙蜥·原种` 的「成体」行**疑似错列**（值问题，属 54 行那批）
 - `defaultNote` 是死键（~120 个，C# 零消费者）→ 属 UI 迭代
 - 12 篇抽测已做（10 张：6 干净 / 4 `None`）→ **无假阴性**，但 `None` 证明匹配有漏
-- 密钥轮换：**用户自己做**（对话里出现过，视为已泄露）
+- 密钥：对话里出现过，视为已泄露 → **`.vlm_key` 已从磁盘删除**（2026-09-30），
+  需要时按 `_miyoushe/.vlm_key.example` 重建；**轮换由用户自己做**
+
+### 8. 收尾清理（2026-09-30）—— 及其代价：**管线不可重跑，除非先重下+重跑 OCR**
+
+| 已删 | 后果 |
+|---|---|
+| `miyoushe_3572896/`（602 张源图） | `check_geom.py` 的 A/B 层、一切量图工具不可跑 |
+| `_ocr/`（601 个整卡 OCR 文本） | `parse_cards2.py` **没有输入** → 文本通道整条断；`name_resolve.py` 自证 C/D/F 层不可跑 |
+| `_rescue/`、`_rescue_bak/`、`__pycache__/` | 可重跑再生成 |
+| `_gen2/` 草稿（`entries.json`/`table_*.txt`/`vlm/`/`crop13/`/截图/commit_msg） | 均为**每轮重建**；已保留 6 个冷启动输入 |
+| 10 个死脚本 | 已被取代（`pipeline`/`classify_cards`/`list_monsternames`/`table_01,03`/`merge_01,03`/`ocr_via_api`/`extract_states03`/`clean_conditions`）；需要时从 git 历史取回 |
+
+**未受影响**（已入库 + 已归档）：`EnemyArchives.json` 166 条、`_provenance/` 快照（340 个证据文件）、
+`_gen2/` 6 个冷启动输入、23 份自证报告已归档到 **`_provenance/reports/`**。
+
+**重跑管线的完整前置**（三步，都是真费用）：
+```
+python miyoushe_download.py      # ① 重下 600 张源图（网络）
+python ocr_pool.py               # ② 重跑整卡 OCR（Umi-OCR，慢）
+python finalize.py               # ③ 收全链路（会重建 diffs_all.json）
+```
+
+**已加的护栏**（避免只能看到 traceback）：
+- `check_geom.py` 无源图时给明提示，并建议 `--structure-only`（**C 层仍可跑，已实测 PASS**）
+- `name_resolve.py --selftest` 无 `_ocr/` 时给明提示
+- 两者都指向已归档的历史结论，不让「现在跑不了」被误读成「结论失效」
+
+**后果（下一轮必须先知道）**：BACKLOG 第 1 / 3 / 6 条的入口都依赖卡面文本或源图，
+都不能在删除后直接开工。若下一轮要做这些，**先做上面的 ① ②**。
 
 ---
 

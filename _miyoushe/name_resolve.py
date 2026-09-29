@@ -181,7 +181,8 @@ def match_title(text, main, alias):
 # ---------------------------------------------------------------- 自证
 
 # 已知答案（**单一期望**，不许写「或」—— 写「或」就没法判对错了）
-# 来源：卡面 OCR 标题区 + 元数据存在性实测（见 _gen2/name_testcases.md）
+# 来源：卡面 OCR 标题区 + 元数据存在性实测
+# （报告已归档：`_provenance/reports/name_testcases.md`）
 KNOWN = [
     # (take, 期望, 依据)
     ("12/047", "历经百战的虹彩史莱姆", "别名层：元数据只有带前缀的形态"),
@@ -244,6 +245,14 @@ def _ocr(take):
 
 
 def selftest(verbose=True):
+    # 2026-09-30 收尾清理删掉了 `_ocr/`（以及源图）。C/D/F 层要读卡面文本，
+    # 没有就明说怎么恢复，不要丢一个 FileNotFoundError 出去。
+    if not OCR.is_dir():
+        print("⚠️ 自证需要 `_ocr/`（整卡 OCR 文本），该目录已随 2026-09-30 收尾清理删除。")
+        print("   重跑前置： python miyoushe_download.py 重下源图 → 重跑 OCR → 再执行本自证")
+        print("   历史自证结论已归档： _provenance/reports/name_report.md")
+        return False
+
     names = load_meta_names()
     main, alias = build_index(names)
     GAIN.clear()

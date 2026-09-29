@@ -42,30 +42,35 @@ python miyoushe_download.py --post 72409634 72409897
 
 ## 目录
 
+> **2026-09-30 收尾清理已执行**：源图 / `_ocr/` / `_rescue/` / `_gen2` 草稿已删除（约 1.1 GB）。
+> **后果**：`miyoushe_download.py` 要重下源图、OCR 通道要重跑（`_ocr/` 是 `parse_cards2.py` 的输入）。
+> 已入库成果、`_provenance/` 快照、`_gen2` 冷启动输入**未受影响**。
+
 | 路径 | 说明 |
 |---|---|
-| `miyoushe_3572896/<NN>_<篇名>/<NNN>.png` | 源图（19 篇，600 张，1096 MB，**保留**） |
-| `_ocr/<NN>/<NNN>.txt` | 每张卡的整卡 OCR 文本（600 个，**保留**，重跑很贵） |
-| `_gen2/entries.json`、`report.txt` | `parse_cards2.py` 对全部卡片的文本解析产物 |
-| `_gen2/table_<NN>.txt` | 复核表（卡片 vs 元数据，**人工批的凭据**） |
-| `_gen2/merge_<NN>.txt`、`merge_<NN>.json` | 入库清单与待核对清单 |
-| `_rescue/<NN>.json` | 抗性裁图通道的结构化结果（PNG 复核图已清理，可重跑再生成） |
-| `_gen2/diffs_all.json` | 与元数据的 diff 清单（**每轮由 `table_all.py` 重建**，别手工改） |
-| `_gen2/vlm/` | VLM 第二通道读数（整表 `tag_idx.json` / 横条 `tag_idx_rK.json`） |
-| `_provenance/` | **随仓库版本控制的复现快照**（0.51 MB）：worklist + 校准卡清单 + `vlm/` + `rescue/` + `label_map.json` |
+| `miyoushe_3572896/<NN>_<篇名>/<NNN>.png` | 源图（19 篇，600 张）—— **本轮已删**，重跑前先 `python miyoushe_download.py` |
+| `_ocr/<NN>/<NNN>.txt` | 每张卡整卡 OCR 文本（`parse_cards2.py` 的输入）—— **本轮已删**，需重跑 OCR |
+| `_rescue/<NN>.json` | 抗性裁图通道的结构化结果 —— **本轮已删**，可重跑再生成 |
+| `_provenance/` | **随仓库版本控制的复现快照**（0.5 MB）：worklist + 校准卡清单 + `vlm/`（317 个读数）+ `rescue/` + `label_map.json` + `reports/` |
+| `_provenance/reports/` | **自证 / 审计报告归档**（23 份）：`geom_report.md`（几何自证 25/25）、`name_report.md`、`variant_scan.md`、`missing_rows_*.md`、`evidence_consistency.md` … |
+| `_gen2/` | **运行期目录（gitignore）**，只留冷启动输入：`added_names.json`（`finalize` 回退基线用）、`gap_adopted.json`、`gap_mapped.json`、`lowconf_worklist.json`、`cal_local.json`、`diffs_all.json`；其余产物（`table_<NN>.txt` / `entries.json` / `report.txt` / `vlm/` / `crop13/` …）**每轮自动重建**，已清空 |
 | `_design/enemy-archive/cal/` | 校准批产物：`cal_gold.json`（目视金标准，**必须保留**）、`vlm/`、`cal_score.txt` |
 
 ## 脚本
 
 | 脚本 | 作用 |
 |---|---|
+> **2026-09-30 清理**：`pipeline.py`、`classify_cards.py`、`list_monsternames.py`、`table_01.py`、
+> `table_03.py`、`merge_01.py`、`merge_03.py`、`ocr_via_api.py`、`extract_states03.py`、`clean_conditions.py`
+> 已删除（均被下表脚本取代；需要时从 git 历史取回）。
+
+| 脚本 | 作用 |
+|---|---|
 | `miyoushe_download.py` | 下载合集原图（`gids=2` + `getPostFullInCollection`） |
-| `ocr_via_api.py` | 走 Umi-OCR HTTP API 逐图 OCR（**必须先杀残留实例**） |
+| `ocr_pool.py` / `ocr_instances.py` | 「**多开实例**」OCR 池（单实例内部串行 ⇒ 必须多进程；取代原 `ocr_via_api.py`） |
 | `parse_cards2.py` | 整卡文本解析（名称/技能/机制/元素能量） |
 | `rescue_resist.py` | 01 式「单横条」抗性表：按标签块坐标裁横条 + 放大 3 倍重识别 |
-| `extract_states03.py` | 03 式「表格」抗性表：按列拼图识别（支持多状态行） |
-| `table_01.py` / `table_03.py` | 生成复核表并与 `Monster.json` 对比 |
-| `merge_01.py` / `merge_03.py` | 按 diff 门槛入库 |
+| `extract_all.py` / `extract_fast.py` | 整卡/窄条抗性表提取（`extract_fast` 是 4~5× 提速版） |
 | `table_all.py` | 全部篇的复核表（会**重建** `diffs_all.json`） |
 | `finalize.py` | 收尾全链路：回退基线 → `table_all` → `gap_override` → `health` → `merge_all`（可重复执行） |
 | `gap_override.py` | 把 VLM 补读的 gap 值（含 `evidence`）注入 `diffs_all.json`（**必须在 `table_all` 之后**） |
@@ -74,18 +79,20 @@ python miyoushe_download.py --post 72409634 72409897
 | `derive_evidence.py` | 推导每行 `evidence` 等级（`cal-gold`/`2geo`/`eyeball`/`single-read`） |
 | `vlm_transcribe.py` | VLM 第二通道（校准 / 判读 / 取缺口读值；默认整表几何，`--strip` 启用横条） |
 | `check_13.py` | 13 篇**只读**比对报告（可靠指标是**行数差**，label 无匹配会高估） |
-| `clean_conditions.py` | `condition` **存量修复工具**（规则已内建进 `merge_all`，此脚本仅用于修历史数据） |
-| `classify_cards.py`、`check_archive.py`、`list_monsternames.py`、`health.py` | 统计 / 校验 / 名称查询 / 健康度 |
+| `make_13_checklist.py` | 生成 13 篇人工核对表 + 修正裁图 `_gen2/crop13/`（13 篇尚未入库，见 BACKLOG） |
+| `check_archive.py`、`health.py` | 档案校验 / 健康度 |
+
+> `condition` 清洗的规则**已内建进 `merge_all.split_condition()`**（生成期清洗）；
+> 原先手工跑的 `clean_conditions.py` 已删除 —— ⚠️ 对档案的「跑完再改」一定会被下一轮 `finalize` 冲掉。
 
 ## 单篇流程
 
-1. `python ocr_via_api.py`（需先起 Umi-OCR，跑完 `taskkill` 清残留）→ `_ocr/<NN>/`
+1. `python ocr_pool.py`（多开 Umi-OCR 实例，见「提速」节）→ `_ocr/<NN>/`
 2. **探形态**：先拿 1~2 张的 dict 识别看抗性表布局（单横条？表格？几行状态？列坐标是否右移？）
-3. 按形态选 `rescue_resist.py` 或 `extract_states03.py`，**改标签/列坐标偏移**后先试点 3~5 张再全量
-4. `python table_<NN>.py` 出复核表 → 人工扫一眼
-5. `python merge_<NN>.py` 只收与元数据有差异的条目 → 追加进
-   `src/Ellen.Launcher/Ellen.Launcher/Resource/EnemyArchives/EnemyArchives.json`
-6. `dotnet build Ellen.Launcher.slnx -c Release -p:Platform=x64` + 启动存活校验
+3. 按形态选 `rescue_resist.py` 或 `extract_fast.py`，**改标签/列坐标偏移**后先试点 3~5 张再全量
+4. `python finalize.py` —— **一条命令收完全链路**：
+   回退基线 → `table_all` → `gap_override` → `health` → `merge_all`（可重复执行）
+5. `dotnet build Ellen.Launcher.slnx -c Release -p:Platform=x64` + 启动存活校验
 
 ## 进度存档（2026-09-30 大规模入库完成）
 
@@ -101,7 +108,7 @@ python miyoushe_download.py --post 72409634 72409897
 > ⚠️ 口径更正：此前记的「129 行低置信」是**误读**。`merge_all.txt` 的
 > `=== 被守卫丢弃（129）===` 是**丢弃总数**，拆开是
 > **99 行低置信 + 28 条「排除篇 13」 + 2 条「取值不合理」**。
-> 真正的入库缺口是 **99 行 / 79 张卡**；精确工单见 `_gen2/lowconf_worklist.json`。
+> 真正的入库缺口是 **99 行 / 79 张卡**；精确工单见 `_provenance/lowconf_worklist.json`。
 
 - 成因：小横条把整行读成**粘连串**时只能靠「逐格裁切」补读，而**粘连串可能被截断**
   → 列距被低估 → 整行错列（都还是像模像样的数字，自动校验抓不到）
@@ -116,10 +123,10 @@ python miyoushe_download.py --post 72409634 72409897
 
 用户指定的校准协议落地结果（金标准 = agent 视觉逐张精读）：
 
-- 样本：`_gen2/lowconf_worklist.json` 抽 10 张 + 13 篇 3 张 = 13 张
+- 样本：`_provenance/lowconf_worklist.json` 抽 10 张 + 13 篇 3 张 = 13 张
 - 裁图包：`_design/enemy-archive/cal/*.png`（agent 精读用）+ `sheet1~7.png`（2 张/页）
 - 金标准：`_design/enemy-archive/cal/cal_gold.json`——13 张 / 28 行 / 224 格，自检 0 异常
-- 本地通道读数：`_gen2/cal_local.json`
+- 本地通道读数：`_provenance/cal_local.json`
 
 **逐格比对（本地 OCR vs 金标准）：**
 
@@ -135,8 +142,12 @@ python miyoushe_download.py --post 72409634 72409897
 
 ### VLM 第二通道（`vlm_transcribe.py`）
 
-- 密钥只从环境变量读（`VLM_API_KEY` / `VLM_MODEL` / `VLM_BASE_URL`），**绝不写入代码**
-  推荐从 Qwen-VL 试起；DashScope 的 OpenAI 兼容端点已设为默认
+**密钥（已从磁盘移除，需要时按模板重建）**
+
+- `load_config()` 顺序：**环境变量 > `_miyoushe/.vlm_key`**（该文件已 gitignore，**2026-09-30 已删**）
+- 重建：`Copy-Item _miyoushe\.vlm_key.example _miyoushe\.vlm_key` 后填真值
+- 为什么不再写进代码：密钥曾在收尾中暴露，**轮换由用户执行**；模板 `.vlm_key.example` 只含占位符
+- ⚠️ `.vlm_key.example` 内的 `VLM_API_KEY=sk-xxxx…` 是**占位符**，小心别把真值填进去提交
 - **只发裁图不发全卡**：全卡 1920×1280 里抗性表只占约 1/8，全卡既贵又引入说明行/水印噪声
   - 实测单行横条 **23~82 KB**；整篇 19 篇全跑约 60 MB
   - `--worklist --scope gap` 只跑缺口：99 行/79 卡 → **235 张 / 10.1 MB**

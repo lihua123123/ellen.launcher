@@ -50,7 +50,9 @@ GEN2 = HERE / "_gen2"
 VLM_DIR = GEN2 / "vlm"
 CAL = ROOT / "_design" / "enemy-archive" / "cal"
 ELEMS = ["\u706b", "\u6c34", "\u98ce", "\u96f7", "\u8349", "\u51b0", "\u5ca9", "\u7269"]
-LOW, HIGH = -100, 500
+# 取值合理区间。⚠️ 实测卡面有 -140（11/017 核心）与 9.9k=9900/9950（14/014 辅助），
+# 故下限 -200、上限 10000；不要把区间收窄成 [-100,500]，那会把真实值判成异常。
+LOW, HIGH = -200, 10000
 
 # 控制台编码兜底：部分终端是 GBK，打印 ✓ / ⚠ / → 会抛 UnicodeEncodeError 直接中断脚本。
 # 只放宽 errors（不改 encoding），这样支持 UTF-8 的终端照常显示，GBK 终端退化为 ? 而不是崩溃。

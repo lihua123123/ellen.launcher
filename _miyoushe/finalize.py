@@ -40,6 +40,12 @@ def main():
     tags = [f"{i:02d}" for i in range(1, 20) if i != "13"]
     rc, out, err = run("table_all.py", *tags)
     print("table_all exit", rc, a(err[-150:]).strip())
+
+    # ⚠️ 必须在 table_all 之后：table_all 会**重建** diffs_all.json，
+    # 先注入会被覆盖。gap_override 用 VLM 补读值覆盖低置信行。
+    rc_o, out_o, err_o = run("gap_override.py")
+    print("gap_override exit", rc_o, a(out_o.strip()).replace("\n", " | "))
+
     rc2, out2, _ = run("health.py", *tags)
     print("health exit", rc2)
 

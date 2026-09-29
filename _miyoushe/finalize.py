@@ -45,6 +45,17 @@ def main():
     # 先注入会被覆盖。gap_override 用 VLM 补读值覆盖低置信行。
     rc_o, out_o, err_o = run("gap_override.py")
     print("gap_override exit", rc_o, a(out_o.strip()).replace("\n", " | "))
+    # ⚠️ gap_override 非零退出 = 有采纳行**没能注入**（工单行与 diffs 行对不上）。
+    # 此时那几行会带着**本地未验证值**进入档案 —— 这是数据错误，必须停，不能继续。
+    # 实测触发场景：改了名字解析器（`table_all.find_name_in_text` 换成 name_resolve 后
+    # 卡片的 `meta` 会变，而 gap_override 按老键找不到行）→ 2026-09-30 实测 exit 1、
+    # 5 行未注入、evidence 99→94。当时是**回退档案**收场的，见 BACKLOG.md。
+    if rc_o != 0:
+        print()
+        print("!! 中止：gap_override 失败（%d）。继续跑 merge_all 会产出带"
+              "「本地未验证值」的档案。" % rc_o)
+        print("!! 见 _miyoushe/BACKLOG.md 的「名字解析迁移」一条。")
+        return 1
 
     rc2, out2, _ = run("health.py", *tags)
     print("health exit", rc2)
@@ -66,4 +77,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # 必须把返回值变成退出码：否则 main() 里的 `return 1`（gap_override 护栏）
+    # 不会体现在 EXIT 上，调用方看不见失败。
+    sys.exit(main())

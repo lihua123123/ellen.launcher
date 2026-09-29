@@ -276,8 +276,9 @@ PROBE_ENDPOINTS = [
     ("国内站", "https://dashscope.aliyuncs.com/compatible-mode/v1"),
     ("国际站", "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"),
 ]
-PROBE_TEXT_MODELS = ["qwen-turbo", "qwen-plus"]
-PROBE_VL_MODELS = ["qwen-vl-max-latest", "qwen-vl-plus"]
+PROBE_TEXT_MODELS = ["qwen-turbo"]
+PROBE_VL_MODELS = ["qwen-vl-max-latest", "qwen-vl-max", "qwen-vl-plus",
+                   "qwen2.5-vl-7b-instruct"]
 
 
 def _http_call(payload, base, key, timeout=45):
@@ -350,13 +351,14 @@ def probe_matrix(key, base):
             print("    → 文本模型可用、视觉模型不可用：**该账号未开通 qwen-vl 系列**\n"
                   "      （百炼控制台 → 模型广场 → 开通）")
     elif all(str(st) == "403" for _, _, st, _ in rows):
-        print("    ✗ 全部 403 access_denied（key 被识别但无权）——按可能性排查：\n"
-              "      1) 百炼（Model Studio）**未开通模型服务 / 账号未实名认证**\n"
-              "      2) **免费额度用尽或账号欠费**\n"
-              "      3) key 属**国际站**却打国内端点（反之亦然）\n"
-              "      4) RAM 子账号缺授权（如 AliyunBailianFullAccess），或 key 设了 IP 白名单\n"
-              "      5) 这个 key 不是百炼 API-KEY（比如是其他阿里云服务/网页版的）\n"
-              "      ⚠️ 先去百炼控制台 → API-KEY 管理，确认「区域 + 归属产品」与「模型已开通」")
+        print("    ✗ 全部 403 access_denied（key 被识别但无权）——按官方错误码文档，\n"
+              "      该报文（type/code = access_denied，message = Access denied.）对应：\n"
+              "      1) **该账号无权访问此模型**——需在模型广场申请，或免费额度已耗尽且不支持付费\n"
+              "      2) 模型已下线（对照「模型下线机制说明」换用替代模型）\n"
+              "      3) 若用通用 sk- key 调 Token Plan / Coding Plan 专属模型 → 必须用 sk-sp- 专属 key\n"
+              "         + 专属 Base URL，两者不可混用\n"
+              "      ⚠️ 先去百炼控制台 → 模型广场，看目标模型卡片是否需要「开通 / 立即申请」；\n"
+              "      另试 qwen-vl-plus / qwen2.5-vl-* 等其它视觉模型（见上表状态）")
     elif all(str(st) == "401" for _, _, st, _ in rows):
         print("    ✗ 全部 401：key 本身无效 / 已吊销 / 复制不全 → 重新生成一个")
     else:
@@ -514,7 +516,8 @@ def run(targets, dry, model, base, key, upscale, vlm_dir):
                 nok = sum(1 for r in rows if r.get("verified"))
                 print("  %-22s rows=%d verified=%d" % (label + ("/" + sub if sub else ""), len(rows), nok))
             except Exception as e:
-                print("  %-22s ERROR %s: %s" % (label, type(e).__name__, str(e)[:90]))
+                print("  %-22s ERROR %s: %s"
+                      % (label + ("/" + sub if sub else ""), type(e).__name__, str(e)[:110]))
             time.sleep(0.3)
     if dry:
         print("dry-run total: %.1f MB / \u7ea6 %d \u4e2a\u89c6\u89c9 token\uff08\u7c97\u4f30\uff0c\u4e0d\u542b\u6587\u5b57\u4e0e\u6a21\u677f\u5f00\u9500\uff09"

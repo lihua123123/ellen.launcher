@@ -32,8 +32,12 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
     /// <para>⚠️ 刷子键必须用**仓库里已在用的主题资源**：引用不存在的键会在渲染期抛
     /// <c>XamlParseException</c> 导致崩溃，而且编译期与 XamlStyleAudit 都查不出来。</para>
     /// <para>文案与配色的分工：「双读一致」是正常基线所以用中性色；两头的极端才用彩色 ——
-    /// <c>cal-gold</c>（最强，人眼复核过）用绿、<c>single-read</c>（最弱，只读过一遍）用红。
-    /// 红绿必须分开，否则将来真出现 <c>single-read</c> 时会与 <c>2geo</c> 混在一起被忽略。</para>
+    /// <c>cal-gold</c>（最强，人眼复核过）用绿、<c>single-read</c>（最弱，没走过第二通道）用红。
+    /// 红绿必须分开，否则 <c>single-read</c> 会与 <c>2geo</c> 混在一起被忽略。</para>
+    /// <para>⚠️ <c>single-read</c> 的文案是「<b>未双读</b>」而不是「单读」：这一档的成因是
+    /// <b>通道能力边界</b>而非值可疑 —— 卡片第 4 行以后没有对应的单行横条
+    /// （<c>extract_fast.MAX_ROWS = 3</c>），所以拿不到第二读。
+    /// 文案必须让人一眼看出「这是没比过」，而不是「这行有问题」。</para>
     /// </summary>
     private static readonly Dictionary<string, (string Text, string Background, string Foreground)> EvidenceStyles = new()
     {
@@ -43,9 +47,9 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
         ["2geo"] = ("双读一致", "SubtleFillColorSecondaryBrush", "TextFillColorSecondaryBrush"),
         // 两几何分歧，目视裁决
         ["eyeball"] = ("目视裁决", "SystemFillColorCautionBrush", "TextOnAccentFillColorPrimaryBrush"),
-        // 只有一套几何读到 —— **最该警示的一档**，用红而不是「浅一点的中性色」。
-        // （当前 0 行，配色未经目视验证；13 篇入库后可能大量出现）
-        ["single-read"] = ("单读", "SystemFillColorCriticalBrush", "TextOnAccentFillColorPrimaryBrush"),
+        // 没走过第二通道（**不是**「值有问题」）—— 用红而不是浅一点的中性色。
+        // 已知成因：① 卡上行位 >= 4，没有对应横条；② 两几何分歧但未目视裁决。
+        ["single-read"] = ("未双读", "SystemFillColorCriticalBrush", "TextOnAccentFillColorPrimaryBrush"),
     };
 
     [GeneratedConstructor]

@@ -79,8 +79,32 @@ NORM_INDEX = sorted(((norm_key(n), n) for n in meta_by_name if len(norm_key(n)) 
                     key=lambda t: -len(t[0]))
 
 
+# 第 0a 步：名称解析改为委托 `name_resolve`。导入失败时回退旧行为（避免整个管线起不来）。
+try:
+    import name_resolve  # noqa: E402
+
+    _MAIN, _ALIAS = name_resolve.build_index(list(meta_by_name))
+except Exception:  # pragma: no cover
+    name_resolve = None
+    _MAIN = _ALIAS = {}
+
+
 def find_name_in_text(text):
-    """在整卡 OCR 全文里找出现的元数据名（归一化 + 最长优先）。"""
+    """在整卡 OCR 文本里找元数据名。
+
+    ⚠️ 已改为委托 `name_resolve.match_title`（第 0a 步）。旧实现是「**全文**最长子串」，
+    有两个实测反例：
+      - `12/047`（卡是「虹彩史莱姆」）从**注释**里捞到 `草史莱姆`（出现位置 1282）
+      - `05/030`（卡是「深邃墓结株」）捞到 `贪食匿叶龙山王`（位置 1147）
+    新实现：① 只在**标题区**（`Data`/`HP:` 之前）匹配；② **位置优先**，其次最长
+    （旧实现按长度排序，等长时谁赢看字典序 → `04/010` 的 `吞雷`/`原种` 就是这么飘的）；
+    ③ 带前缀的元数据名（`历经百战的…`）作为**别名回退层**，不参与主索引排序。
+
+    自证：`python name_resolve.py --selftest`（已知答案 + 6 种索引顺序下确定性 + 碰撞守卫）。
+    """
+    if name_resolve is not None:
+        got, _src = name_resolve.match_title(text, _MAIN, _ALIAS)
+        return got
     nt = norm_key(text)
     for key, name in NORM_INDEX:
         if key in nt:

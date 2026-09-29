@@ -111,6 +111,36 @@ def row_crops(tag, idx):
     return out
 
 
+# 裁图底部相对 yb 的偏移。**两篇不同，且两个值都必须是被验证过的，不要随手改**：
+#   13 篇（2048x1080，表在卡片顶部，注释区在下方很远处）：yb+430。
+#       实测可容 5 行且不含注释（13 篇行数分布 1~5，最大 5 —— 逐张看过 18 张）。
+#       ⚠️ 旧值 yb+320 对 13 篇会**切掉第 4/5 行**；校准批那 3 张恰好 <=3 行所以从未暴露。
+#   其它篇：yb+320，**不要加大**。实测 yb+430 会把**紧随表后的注释段框进来**
+#       （已用 04/024 目视确认：注释「异海珍珠 / 共鸣珊瑚珠」进入画面），
+#       而注释正是 VLM「凭空编造合理行」的来源。
+#       非 13 篇行中心 = yb+107+60k → yb+320 最多容 4 行（第 4 行行底 ≈ yb+317）。
+#       代价：>=5 行的卡会被切 → 用下面的 TRUNCATION_SUSPECT_ROWS 标记去**发现**，不靠加高硬扛。
+CROP_BOTTOM_DEFAULT = 320
+CROP_BOTTOM_13 = 430
+
+# 行中心相对 yb 的偏移与行距（按篇不同）。据此可以算出「一张裁图最多容纳几行」，
+# 这是**从几何算出来的测量值**，不是「报 4 行就可疑」这种经验猜测。
+ROW_GRID_DEFAULT = (107, 60)
+ROW_GRID_13 = (138, 60)
+ROW_HALF = 16   # 行高的一半：要求整行都落在裁图内，才算「容得下」
+
+
+def max_rows_in(crop_height, tag):
+    """给定裁图高度（未放大前的像素），算出它能容纳的最多行数。
+
+    裁图是 `(yb-70) ~ (yb+bottom)`，所以 `bottom - yb = crop_height - 70`，
+    于是不需要 yb 本身就能推算可容行数。
+    """
+    dy, step = ROW_GRID_13 if tag == "13" else ROW_GRID_DEFAULT
+    span = crop_height - 70
+    return max(0, (span - dy + ROW_HALF) // step + 1)
+
+
 def table_crop(tag, idx):
     """「整张抗性表」裁图 —— **与校准批完全相同的几何**。
 
@@ -120,14 +150,18 @@ def table_crop(tag, idx):
          `[10,10,IMM,10,...]` 与 6 行副本，而该卡实际只有 1 行）—— validate() 抓不到；
       2) 一张卡裁多张横条时，行号与「第几行」的对应关系无法自证。
     整表裁图下，行按序返回且带 label，与金标准同构 —— 且正是校准 224/224 用过的几何。
+
+    ⚠️ 高度**按篇区分**，见 CROP_BOTTOM_* 的注释。此前的 yb+320 是拍的值，
+    对 13 篇会切行；而简单地把两边都改成 430 又会让非 13 篇把注释框进来。
     """
     src = next(R.ROOT.glob(f"{tag}_*/{idx}.png"))
     im = Image.open(src).convert("RGB")
     lx0, yb, _ = F.locate(im)
     if lx0 is None:
         return None
+    bottom = CROP_BOTTOM_13 if tag == "13" else CROP_BOTTOM_DEFAULT
     box = (0, max(0, int(yb - 70)), min(im.width, int(lx0 + 600)),
-           min(im.height, int(yb + 320)))
+           min(im.height, int(yb + bottom)))
     return im.crop(box)
 
 
@@ -553,10 +587,20 @@ def run(targets, dry, model, base, key, upscale, vlm_dir):
                     if extra:
                         for r in rows:
                             r.setdefault("problems", []).extend(extra)
+                doc = {"rows": rows}
+                # 只标记、不自动复看：行数顶到该裁图的容纳上限时，**可能**被切。
+                # 这是测量（按几何算出上限），不是猜测（不假定「达到上限就一定有错」）。
+                # 实测：8 张顶到边界的卡里只有 1 张（06/041）真的被切。
+                rows_fit = max_rows_in(img.height, label.split("/")[0])
+                if rows_fit and len(rows) >= rows_fit:
+                    doc["possibly_truncated"] = True
+                    doc["rows_fit"] = rows_fit
                 (vlm_dir / name).write_text(
-                    json.dumps({"rows": rows}, ensure_ascii=False, indent=1), encoding="utf-8")
+                    json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
                 nok = sum(1 for r in rows if r.get("verified"))
-                print("  %-22s rows=%d verified=%d" % (label + ("/" + sub if sub else ""), len(rows), nok))
+                flag = "  [possibly_truncated]" if doc.get("possibly_truncated") else ""
+                print("  %-22s rows=%d verified=%d%s"
+                      % (label + ("/" + sub if sub else ""), len(rows), nok, flag))
             except Exception as e:
                 print("  %-22s ERROR %s: %s"
                       % (label + ("/" + sub if sub else ""), type(e).__name__, str(e)[:110]))

@@ -17,8 +17,9 @@
        set VLM_API_KEY=sk-xxxx
        set VLM_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1   (默认)
        set VLM_MODEL=qwen-vl-max-latest                                     (默认)
-  2) 放进 `_miyoushe/.vlm_key`（单行纯文本，已 gitignore）——
+  2) 放进 `_miyoushe/.vlm_key`（已 gitignore，仓库里有一个带说明的模板）——
      推荐：**在编辑器里写**，不必贴到聊天、也不必在命令行里传。
+     优先级：环境变量 > 该文件。
 
 用法：
     python vlm_transcribe.py --dry-run              # 不联网，打印将发送的裁图清单与体积
@@ -126,6 +127,10 @@ def row_crops(tag, idx):
 CROP_BOTTOM_DEFAULT = 320
 CROP_BOTTOM_13 = 430
 
+# `--bottom N` 用：临时覆盖上面两个值（**仅用于单卡实测**，不要写进常规流程）。
+# 典型用途：验证 `06/041` 被 yb+320 切掉的那一行 —— 用一个更高的裁图把它读回来。
+BOTTOM_OVERRIDE = None
+
 # 行网格：`(首行墨迹带上沿, 行距, 墨迹带高)`，单位 px，相对 yb —— **全部实测**。
 # 量法：对裁图逐扫描线统计「亮于本行中位数 +45」的像素数，取连续墨迹带。
 #   非 13 篇（`06/041` 实测）：带上沿 +79  带高 56  行距 60 → 行心 ≈ +107
@@ -169,7 +174,7 @@ def table_crop(tag, idx):
     lx0, yb, _ = F.locate(im)
     if lx0 is None:
         return None
-    bottom = CROP_BOTTOM_13 if tag == "13" else CROP_BOTTOM_DEFAULT
+    bottom = BOTTOM_OVERRIDE or (CROP_BOTTOM_13 if tag == "13" else CROP_BOTTOM_DEFAULT)
     box = (0, max(0, int(yb - 70)), min(im.width, int(lx0 + 600)),
            min(im.height, int(yb + bottom)))
     return im.crop(box)
@@ -191,23 +196,45 @@ def est_tokens(w, h):
 
 # ---------------------------------------------------------------- 调用
 
-def read_key():
-    """读密钥：环境变量优先，其次 `_miyoushe/.vlm_key`（单行纯文本）。
+CONF_FILE = HERE / ".vlm_key"
+
+
+def load_config():
+    """读 VLM 配置，返回 `{VLM_API_KEY, VLM_MODEL, VLM_BASE_URL, _src}`。
+
+    优先级：**环境变量 > `_miyoushe/.vlm_key`**（后者的值不能覆盖环境变量）。
+    文件格式（`#` 开头为注释行，会被跳过）：
+        sk-xxxxxxxxxxxxxxxx
+        VLM_API_KEY=sk-xxxxxxxxxxxxxxxx
+        VLM_MODEL=qwen-vl-max
+        VLM_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
 
     加文件兜底是为了**让密钥不经过对话记录 / 命令行**：
     在编辑器里把 key 写进 `_miyoushe/.vlm_key` 即可。
     ⚠️ 该文件必须保持 gitignore；**绝不要**把 key 写进本脚本或任何入库文件。
     """
-    key = os.environ.get("VLM_API_KEY", "").strip()
-    if key:
-        return key
-    f = HERE / ".vlm_key"
-    if f.exists():
-        for line in f.read_text(encoding="utf-8-sig").splitlines():
-            line = line.strip()
-            if line and not line.startswith("#"):
-                return line
-    return ""
+    conf = {}
+    if CONF_FILE.exists():
+        for raw in CONF_FILE.read_text(encoding="utf-8-sig").splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#"):
+                continue
+            if "=" in line:
+                k, v = line.split("=", 1)
+                k = k.strip().upper()
+                v = v.strip().strip("'\"")
+                if k in ("KEY", "API_KEY"):
+                    k = "VLM_API_KEY"
+                if k in ("VLM_API_KEY", "VLM_MODEL", "VLM_BASE_URL"):
+                    conf.setdefault(k, v)
+            else:
+                conf.setdefault("VLM_API_KEY", line.strip("'\""))
+    out = {}
+    for k in ("VLM_API_KEY", "VLM_MODEL", "VLM_BASE_URL"):
+        out[k] = (os.environ.get(k, "") or conf.get(k, "")).strip()
+    out["_src"] = ("环境变量" if os.environ.get("VLM_API_KEY", "").strip()
+                   else ("%s" % CONF_FILE.name if conf.get("VLM_API_KEY") else "未设置"))
+    return out
 
 
 def call_vlm(png, model, base, key, timeout=120):
@@ -653,6 +680,11 @@ def main():
     ap.add_argument("--tags", nargs="*", default=None, help="按篇全量（只发状态行裁图）")
     ap.add_argument("--worklist", action="store_true",
                     help="只跑 lowconf_worklist.json 里的低置信卡（默认 scope=gap，99 行/79 卡）")
+    ap.add_argument("--only", nargs="*", default=None,
+                    help="只跑指定的卡，如 `--only 06/041`（单卡实测用）")
+    ap.add_argument("--bottom", type=int, default=None,
+                    help="临时覆盖裁图下沿（相对 yb），**仅单卡实测用**；"
+                         "例 --bottom 430 可读回被 yb+320 切掉的那一行")
     ap.add_argument("--strip", action="store_true",
                     help="改用「单行横条」裁图（省 token，但会引入幻影行与行号歧义，非校准几何）")
     ap.add_argument("--probe", action="store_true",
@@ -673,20 +705,31 @@ def main():
         score(vlm_dir)
         return
 
-    key = read_key()
-    model = os.environ.get("VLM_MODEL", "qwen-vl-max-latest")
-    base = os.environ.get("VLM_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
+    cfg = load_config()
+    key = cfg["VLM_API_KEY"]
+    model = cfg["VLM_MODEL"] or "qwen-vl-max-latest"
+    base = cfg["VLM_BASE_URL"] or "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    print("\u5bc6\u94a5\u6765\u6e90: %s" % cfg["_src"])
 
     if a.probe:
         if not key:
-            print("缺少 VLM_API_KEY")
+            print("\u7f3a\u5c11 VLM_API_KEY")
             return 1
         probe_matrix(key, base)
         return 0
     if not a.dry_run and not key:
-        print("缺少 VLM_API_KEY：设置环境变量 VLM_API_KEY，"
-              "或把密钥写进 %s（单行，已 gitignore）" % (HERE / ".vlm_key"))
+        print("缺少 VLM_API_KEY："
+              "任一方式即可 ——\n"
+              "  1) 环境变量：$env:VLM_API_KEY = \"sk-...\"（只影响当前终端会话）\n"
+              "  2) %s（已 gitignore）：在编辑器里把 key 写进去，**不必经过对话**"
+              % CONF_FILE)
         return 1
+
+    # ⚠️ 必须在**任何** `table_crop()` 之前生效：--cal / --tags 分支也会裁图，
+    #    放在它们后面改就白改了（裁图已经用旧几何做完了）。
+    if a.bottom:
+        global BOTTOM_OVERRIDE
+        BOTTOM_OVERRIDE = a.bottom
 
     ocr_pool.refresh()
     targets = []
@@ -713,6 +756,26 @@ def main():
                         items.append((f.stem, im))
             if items:
                 targets.append((tag, items))
+
+    if a.only:
+        for take in a.only:
+            tag, idx = take.split("/")
+            items = []
+            if a.strip:
+                for ri, im in row_crops(tag, idx):
+                    items.append((f"{idx}_r{ri}" if ri else idx, im))
+            else:
+                im = table_crop(tag, idx)
+                if im is None:
+                    print("  \u26a0 locate \u5931\u8d25: %s" % take)
+                else:
+                    items.append((idx, im))
+            if items:
+                targets.append((tag, items))
+        print("only: %s / geometry=%s%s"
+              % (", ".join(a.only), "strip" if a.strip else "table",
+                 "" if not a.bottom else " / bottom=%d" % a.bottom))
+
     if a.worklist:
         # 只对工单里的卡发裁图（比整篇省 ~85% 流量）。
         # 默认用「整张抗性表」几何（= 校准批验证过的几何），行按序返回、带 label，

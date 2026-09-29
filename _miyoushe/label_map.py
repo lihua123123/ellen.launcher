@@ -263,6 +263,7 @@ def main():
         print("\n（_gen2/gap_adopted.json 不存在，跳过比对）")
 
     if args.write:
+        GEN.mkdir(parents=True, exist_ok=True)   # 冷启动时 _gen2/ 可能还不存在
         (PROV / "label_map.json").write_text(
             json.dumps({"adopted": adopted, "agreed_with_local": agreed_map},
                        ensure_ascii=False, indent=1), encoding="utf-8")

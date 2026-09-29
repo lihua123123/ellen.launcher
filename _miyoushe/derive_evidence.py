@@ -43,12 +43,12 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 GEN = HERE / "_gen2"
-VLM = GEN / "vlm"
-# 校准批次卡的清单：优先用随仓库版本控制的快照（`label_map.py --build-snapshot` 产出），
-# 这样全新克隆也能重算 evidence，不依赖被 gitignore 的 _gen2/。
+# 校准卡清单与 VLM 读数：优先用随仓库版本控制的快照（`label_map.py --build-snapshot` 产出），
+# 这样**全新克隆也能重算 evidence**，不依赖被 gitignore 的 _gen2/。
 PROV = HERE / "_provenance"
 CAL_CARDS = (PROV / "cal_local.json") if (PROV / "cal_local.json").exists() \
     else (GEN / "cal_local.json")
+VLM = (PROV / "vlm") if (PROV / "vlm").is_dir() else (GEN / "vlm")
 
 LEVELS = ("cal-gold", "2geo", "eyeball", "single-read")
 
@@ -123,7 +123,8 @@ def main():
     a_ = lambda s: str(s).encode("ascii", "replace").decode()
 
     adopted = json.loads((GEN / "gap_adopted.json").read_text(encoding="utf-8"))
-    print("校准卡清单来源: %s" % a_(str(CAL_CARDS.relative_to(HERE.parent))))
+    print("校准卡清单来源: %s | VLM 读数来源: %s"
+          % (a_(str(CAL_CARDS.relative_to(HERE.parent))), a_(str(VLM.relative_to(HERE.parent)))))
     cal_takes = set(json.loads(CAL_CARDS.read_text(encoding="utf-8")).keys())
     out, notes = derive(adopted, cal_takes)
 

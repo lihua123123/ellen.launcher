@@ -109,6 +109,26 @@ def row_crops(tag, idx):
     return out
 
 
+def table_crop(tag, idx):
+    """「整张抗性表」裁图 —— **与校准批完全相同的几何**。
+
+    ⚠️ 为什么不默认用单行横条：
+      1) 横条只有 60px 高，且对「该卡根本没有那么多行」的卡会裁到**说明文字区**，
+         VLM 会据此**凭空编造**出看起来合理的抗性行（实测 06/001 的 r2/r3 编出了
+         `[10,10,IMM,10,...]` 与 6 行副本，而该卡实际只有 1 行）—— validate() 抓不到；
+      2) 一张卡裁多张横条时，行号与「第几行」的对应关系无法自证。
+    整表裁图下，行按序返回且带 label，与金标准同构 —— 且正是校准 224/224 用过的几何。
+    """
+    src = next(R.ROOT.glob(f"{tag}_*/{idx}.png"))
+    im = Image.open(src).convert("RGB")
+    lx0, yb, _ = F.locate(im)
+    if lx0 is None:
+        return None
+    box = (0, max(0, int(yb - 70)), min(im.width, int(lx0 + 600)),
+           min(im.height, int(yb + 320)))
+    return im.crop(box)
+
+
 def png_bytes(img, upscale=1.5):
     if upscale != 1.0:
         img = img.resize((int(img.width * upscale), int(img.height * upscale)), Image.LANCZOS)
@@ -550,6 +570,8 @@ def main():
     ap.add_argument("--tags", nargs="*", default=None, help="按篇全量（只发状态行裁图）")
     ap.add_argument("--worklist", action="store_true",
                     help="只跑 lowconf_worklist.json 里的低置信卡（默认 scope=gap，99 行/79 卡）")
+    ap.add_argument("--strip", action="store_true",
+                    help="改用「单行横条」裁图（省 token，但会引入幻影行与行号歧义，非校准几何）")
     ap.add_argument("--probe", action="store_true",
                     help="诊断矩阵：跨国内/国际端点 × 文本/视觉模型试探，定位 403/401 属于哪一层")
     ap.add_argument("--scope", default="gap",
@@ -597,28 +619,45 @@ def main():
                 continue
             items = []
             for f in sorted(d.glob("*.txt")):
-                # 行号必须保留在文件名里，否则同一张卡的多行会互相覆盖
-                for ri, im in row_crops(tag, f.stem):
-                    items.append((f"{f.stem}_r{ri}" if ri else f.stem, im))
+                if a.strip:
+                    # 行号必须保留在文件名里，否则同一张卡的多行会互相覆盖
+                    for ri, im in row_crops(tag, f.stem):
+                        items.append((f"{f.stem}_r{ri}" if ri else f.stem, im))
+                else:
+                    im = table_crop(tag, f.stem)
+                    if im is not None:
+                        items.append((f.stem, im))
             if items:
                 targets.append((tag, items))
     if a.worklist:
-        # 只对工单里的卡发裁图（比整篇省 ~85% 流量）；行身份仍靠 label 事后匹配，
-        # 因为 diffs_all 不记录行号，少数行的 label 也与 extract 不一致。
+        # 只对工单里的卡发裁图（比整篇省 ~85% 流量）。
+        # 默认用「整张抗性表」几何（= 校准批验证过的几何），行按序返回、带 label，
+        # 事后按 label 匹配即可，不依赖行号；--strip 才退回单行横条。
         wl = json.loads((GEN2 / "lowconf_worklist.json").read_text(encoding="utf-8"))
         rows = [r for r in wl if r["scope"] == a.scope]
         takes = sorted({r["take"] for r in rows})
         by_tag = {}
         for t in takes:
             by_tag.setdefault(t[:2], []).append(t.split("/")[1])
+        skipped = []
         for tag, idxs in sorted(by_tag.items()):
             items = []
             for idx in idxs:
-                for ri, im in row_crops(tag, idx):
-                    items.append((f"{idx}_r{ri}" if ri else idx, im))
+                if a.strip:
+                    for ri, im in row_crops(tag, idx):
+                        items.append((f"{idx}_r{ri}" if ri else idx, im))
+                else:
+                    im = table_crop(tag, idx)
+                    if im is None:
+                        skipped.append(f"{tag}/{idx}")
+                    else:
+                        items.append((idx, im))
             if items:
                 targets.append((tag, items))
-        print("worklist scope=%s: %d rows / %d cards" % (a.scope, len(rows), len(takes)))
+        print("worklist scope=%s: %d rows / %d cards / geometry=%s"
+              % (a.scope, len(rows), len(takes), "strip" if a.strip else "table"))
+        if skipped:
+            print("  \u26a0 locate \u5931\u8d25\uff0c\u5df2\u8df3\u8fc7: %s" % ", ".join(skipped))
 
     if not targets:
         print("nothing to do (use --cal or --tags)")

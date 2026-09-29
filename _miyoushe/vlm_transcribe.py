@@ -272,6 +272,98 @@ def classify(g, v):
     return "其他数值"
 
 
+PROBE_ENDPOINTS = [
+    ("国内站", "https://dashscope.aliyuncs.com/compatible-mode/v1"),
+    ("国际站", "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"),
+]
+PROBE_TEXT_MODELS = ["qwen-turbo", "qwen-plus"]
+PROBE_VL_MODELS = ["qwen-vl-max-latest", "qwen-vl-plus"]
+
+
+def _http_call(payload, base, key, timeout=45):
+    """返回 (status, body_text)。status 是 int，或字符串 'ERR'。"""
+    req = urllib.request.Request(
+        base.rstrip("/") + "/chat/completions",
+        data=json.dumps(payload).encode(),
+        headers={"Content-Type": "application/json", "Authorization": "Bearer " + key})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return 200, r.read().decode("utf-8", "replace")
+    except urllib.error.HTTPError as e:
+        return e.code, e.read().decode("utf-8", "replace")
+    except Exception as e:
+        return "ERR", "%s: %s" % (type(e).__name__, e)
+
+
+def probe_matrix(key, base):
+    """把 端点 × 模型 试一遍，定位 403 到底是哪一层的问题。
+
+    关键区分：403 access_denied ≠ 401 InvalidApiKey。前者说明 key 被认出来了但没权限；
+    而且响应带 request_id → 请求已到 DashScope 网关 → **网络/代理不是原因**，
+    不要再折腾 NO_PROXY。
+    试「文本模型」是为了把「账号级」与「视觉模型级」分开：
+      文本也 403 → 账号/额度/区域/权限问题；仅视觉 403 → 该账号未开通 qwen-vl。
+    """
+    print("key = %s...%s (len=%d)" % (key[:6], key[-4:], len(key)))
+    px = Image.new("RGB", (2, 2), (255, 255, 255))
+    b = io.BytesIO()
+    px.save(b, format="PNG")
+    uri = "data:image/png;base64," + base64.b64encode(b.getvalue()).decode()
+    txt = [{"type": "text", "text": "reply with: ok"}]
+    vis = [{"type": "image_url", "image_url": {"url": uri}}] + txt
+
+    rows = []
+    print("\n  %-6s %-22s %-5s %s" % ("端点", "模型", "状态", "详情"))
+    for ename, ebase in PROBE_ENDPOINTS:
+        for m in PROBE_TEXT_MODELS + PROBE_VL_MODELS:
+            content = vis if "vl" in m else txt
+            st, body = _http_call(
+                {"model": m, "messages": [{"role": "user", "content": content}],
+                 "temperature": 0}, ebase, key)
+            if st == 200:
+                try:
+                    d = "OK -> " + str(json.loads(body)["choices"][0]["message"]["content"])[:40]
+                except Exception:
+                    d = "OK (响应未解析)"
+            else:
+                try:
+                    j = json.loads(body)["error"]
+                    d = "%s | %s" % (j.get("code"), str(j.get("message"))[:90])
+                except Exception:
+                    d = str(body)[:100]
+            rows.append((ename, m, st, d))
+            print("  %-6s %-22s %-5s %s" % (ename, m, st, d[:110]))
+
+    ok = [(e, m) for e, m, st, _ in rows if st == 200]
+    txt_ok = any("vl" not in m for _, m, st, _ in rows if st == 200)
+    vl_ok = any("vl" in m for _, m, st, _ in rows if st == 200)
+    dom_ok = any(e == "国内站" for e, _, st, _ in rows if st == 200)
+    intl_ok = any(e == "国际站" for e, _, st, _ in rows if st == 200)
+    print("\n  【归因】状态码集合 = %s"
+          % ", ".join(sorted({str(st) for _, _, st, _ in rows})))
+    if ok:
+        print("    ✓ 可用组合：%s" % ", ".join("%s/%s" % (e, m) for e, m in ok))
+        if intl_ok and not dom_ok:
+            print("    → key 属**国际站**：把 VLM_BASE_URL 设为\n"
+                  "      https://dashscope-intl.aliyuncs.com/compatible-mode/v1")
+        if txt_ok and not vl_ok:
+            print("    → 文本模型可用、视觉模型不可用：**该账号未开通 qwen-vl 系列**\n"
+                  "      （百炼控制台 → 模型广场 → 开通）")
+    elif all(str(st) == "403" for _, _, st, _ in rows):
+        print("    ✗ 全部 403 access_denied（key 被识别但无权）——按可能性排查：\n"
+              "      1) 百炼（Model Studio）**未开通模型服务 / 账号未实名认证**\n"
+              "      2) **免费额度用尽或账号欠费**\n"
+              "      3) key 属**国际站**却打国内端点（反之亦然）\n"
+              "      4) RAM 子账号缺授权（如 AliyunBailianFullAccess），或 key 设了 IP 白名单\n"
+              "      5) 这个 key 不是百炼 API-KEY（比如是其他阿里云服务/网页版的）\n"
+              "      ⚠️ 先去百炼控制台 → API-KEY 管理，确认「区域 + 归属产品」与「模型已开通」")
+    elif all(str(st) == "401" for _, _, st, _ in rows):
+        print("    ✗ 全部 401：key 本身无效 / 已吊销 / 复制不全 → 重新生成一个")
+    else:
+        print("    ✗ 没有可用的「端点+模型」组合，请对照上表错误码定位")
+    return rows
+
+
 def score(vlm_dir, show_detail=True):
     """与 cal_gold.json 逐格比对。除一致率外，**重点输出不一致格的位置分布**：
     单看一致率不够——若错格集中在同一列/同一类型，说明是系统性偏差，
@@ -436,7 +528,7 @@ def main():
     ap.add_argument("--worklist", action="store_true",
                     help="只跑 lowconf_worklist.json 里的低置信卡（默认 scope=gap，99 行/79 卡）")
     ap.add_argument("--probe", action="store_true",
-                    help="用 1x1 图发一次极小请求，校验 key / 模型名 / 端点是否可用")
+                    help="诊断矩阵：跨国内/国际端点 × 文本/视觉模型试探，定位 403/401 属于哪一层")
     ap.add_argument("--scope", default="gap",
                     choices=["gap", "verified-bypass", "excluded-13"],
                     help="gap=真正入库缺口 | verified-bypass=01/03 已豁免入库 | excluded-13=13 篇整篇")
@@ -461,20 +553,8 @@ def main():
         if not key:
             print("缺少 VLM_API_KEY")
             return 1
-        px = Image.new("RGB", (2, 2), (255, 255, 255))
-        b = io.BytesIO()
-        px.save(b, format="PNG")
-        print("endpoint = %s" % base)
-        print("model    = %s" % model)
-        print("key      = %s...%s (len=%d)" % (key[:6], key[-4:], len(key)))
-        try:
-            out = call_vlm(b.getvalue(), model, base, key, timeout=60)
-            print("OK, model replied: %s" % out.strip()[:120].encode(
-                "ascii", "replace").decode())
-            return 0
-        except Exception as e:
-            print("FAILED %s: %s" % (type(e).__name__, str(e)[:400]))
-            return 1
+        probe_matrix(key, base)
+        return 0
     if not a.dry_run and not key:
         print("缺少 VLM_API_KEY（请自行设置环境变量，不要写进代码）")
         return 1

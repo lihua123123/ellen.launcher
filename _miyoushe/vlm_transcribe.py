@@ -102,8 +102,13 @@ def row_crops(tag, idx):
         return []
     out = []
     if tag == "13":
+        # ⚠️ 下沿必须与 `table_crop()` 用**同一个来源**。
+        #    这里曾经自己硬编码 `yb + 320` —— 正是「table_crop 改了、row_crops 没改」
+        #    让两个几何悄悄分叉（= 最初那个「yb+320 切行」bug 的成因）。
+        #    另：x 用 lx0+700（13 篇的行标签是**怪物名**，比其它篇的「正常/瘫痪」长），
+        #    与 table_crop 的 lx0+600 有意不同 —— 这个差别是布局差异，不是笔误。
         box = (0, max(0, int(yb - 70)), min(im.width, int(lx0 + 700)),
-               min(im.height, int(yb + 320)))
+               min(im.height, int(yb + bottom_for(tag))))
         out.append(("", im.crop(box)))
         return out
     for k in range(F.MAX_ROWS):
@@ -130,6 +135,16 @@ CROP_BOTTOM_13 = 430
 # `--bottom N` 用：临时覆盖上面两个值（**仅用于单卡实测**，不要写进常规流程）。
 # 典型用途：验证 `06/041` 被 yb+320 切掉的那一行 —— 用一个更高的裁图把它读回来。
 BOTTOM_OVERRIDE = None
+
+
+def bottom_for(tag):
+    """该篇的裁图下沿（相对 yb）。`--bottom` 覆盖优先。
+
+    **所有**裁图路径都必须走这个函数，不要在任何地方再写死 320/430 ——
+    之前 `table_crop()` 与 `row_crops()` 各自硬编码同一个数，
+    改了一处没改另一处，就直接产出了「同一张卡两个几何」这种隐性分叉。
+    """
+    return BOTTOM_OVERRIDE or (CROP_BOTTOM_13 if tag == "13" else CROP_BOTTOM_DEFAULT)
 
 # 行网格：`(首行墨迹带上沿, 行距, 墨迹带高)`，单位 px，相对 yb —— **全部实测**。
 # 量法：对裁图逐扫描线统计「亮于本行中位数 +45」的像素数，取连续墨迹带。
@@ -174,7 +189,7 @@ def table_crop(tag, idx):
     lx0, yb, _ = F.locate(im)
     if lx0 is None:
         return None
-    bottom = BOTTOM_OVERRIDE or (CROP_BOTTOM_13 if tag == "13" else CROP_BOTTOM_DEFAULT)
+    bottom = bottom_for(tag)
     box = (0, max(0, int(yb - 70)), min(im.width, int(lx0 + 600)),
            min(im.height, int(yb + bottom)))
     return im.crop(box)

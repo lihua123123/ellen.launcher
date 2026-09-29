@@ -32,6 +32,7 @@ import os
 import re
 import sys
 import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -123,8 +124,17 @@ def call_vlm(png, model, base, key, timeout=120):
         base.rstrip("/") + "/chat/completions",
         data=json.dumps(payload).encode(),
         headers={"Content-Type": "application/json", "Authorization": "Bearer " + key})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        body = json.loads(r.read().decode())
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            body = json.loads(r.read().decode())
+    except urllib.error.HTTPError as e:
+        # 响应体里才有真正的原因（InvalidApiKey / Model not exist / quota 等）
+        raise RuntimeError("HTTP %s %s | %s" % (
+            e.code, e.reason, e.read().decode("utf-8", "replace")[:400]))
+    except urllib.error.URLError as e:
+        raise RuntimeError("URLError %s（网络/代理不通？）" % e.reason)
+    if "choices" not in body:
+        raise RuntimeError("unexpected body: %s" % json.dumps(body, ensure_ascii=False)[:300])
     return body["choices"][0]["message"]["content"]
 
 
@@ -313,6 +323,8 @@ def main():
     ap.add_argument("--tags", nargs="*", default=None, help="按篇全量（只发状态行裁图）")
     ap.add_argument("--worklist", action="store_true",
                     help="只跑 lowconf_worklist.json 里的低置信卡（默认 scope=gap，99 行/79 卡）")
+    ap.add_argument("--probe", action="store_true",
+                    help="用 1x1 图发一次极小请求，校验 key / 模型名 / 端点是否可用")
     ap.add_argument("--scope", default="gap",
                     choices=["gap", "verified-bypass", "excluded-13"],
                     help="gap=真正入库缺口 | verified-bypass=01/03 已豁免入库 | excluded-13=13 篇整篇")
@@ -329,6 +341,25 @@ def main():
     key = os.environ.get("VLM_API_KEY", "")
     model = os.environ.get("VLM_MODEL", "qwen-vl-max-latest")
     base = os.environ.get("VLM_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
+
+    if a.probe:
+        if not key:
+            print("缺少 VLM_API_KEY")
+            return 1
+        px = Image.new("RGB", (2, 2), (255, 255, 255))
+        b = io.BytesIO()
+        px.save(b, format="PNG")
+        print("endpoint = %s" % base)
+        print("model    = %s" % model)
+        print("key      = %s...%s (len=%d)" % (key[:6], key[-4:], len(key)))
+        try:
+            out = call_vlm(b.getvalue(), model, base, key, timeout=60)
+            print("OK, model replied: %s" % out.strip()[:120].encode(
+                "ascii", "replace").decode())
+            return 0
+        except Exception as e:
+            print("FAILED %s: %s" % (type(e).__name__, str(e)[:400]))
+            return 1
     if not a.dry_run and not key:
         print("缺少 VLM_API_KEY（请自行设置环境变量，不要写进代码）")
         return 1

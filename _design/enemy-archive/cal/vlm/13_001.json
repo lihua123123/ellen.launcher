@@ -1,0 +1,49 @@
+{
+ "rows": [
+  {
+   "label": "岩石",
+   "values": [
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200
+   ],
+   "verified": true,
+   "problems": []
+  },
+  {
+   "label": "熔焰",
+   "values": [
+    200,
+    45,
+    45,
+    45,
+    45,
+    45,
+    45,
+    45
+   ],
+   "verified": true,
+   "problems": []
+  },
+  {
+   "label": "瘫痪",
+   "values": [
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10
+   ],
+   "verified": true,
+   "problems": []
+  }
+ ]
+}

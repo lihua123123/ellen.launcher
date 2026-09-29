@@ -62,6 +62,50 @@ PREFIXES = ("历经百战的",)
 
 MIN_KEY = 3          # 归一化后短于这个长度的名字不进索引（2 字名太容易误命中）
 TITLE_END = re.compile(r"\bData\b|HP\s*:")
+# 「同 token 内的分隔符」：卡上写变体名时用 `·`（OCR 有时读成 `：`）。
+# 判定「匹配名只是更长真名的子串」时，这些字符不算 token 边界。
+IN_TOKEN = "\u00b7-\uff0d\u2014\u30fb\uff1a:"
+
+
+def _norm_with_map(s):
+    """归一化，并记录每个归一化字符对应的**原串下标**（用于查邻接字符）。"""
+    out, mp = [], []
+    for i, ch in enumerate(s):
+        if re.match(r"[\u4e00-\u9fffA-Za-z0-9]", ch):
+            out.append(ch)
+            mp.append(i)
+    return "".join(out), mp
+
+
+def longer_name_suspect(text, name):
+    """匹配名是否只是标题里某个**更长 CJK 串**的子串（= 卡上真名比匹配名长）。
+
+    为什么需要它：元数据里**没有**变体全名时，解析会退化到基名，而基名
+    确实是标题的一部分（如 `焚天爆炎树` 里的 `爆炎树`）→ 该卡会被合并进基名条目。
+    这是「7 个错误合并」的**同族问题**，但**不是多卡撞名**，单卡就会发生。
+
+    两类 modifier 都要覆盖：
+      - 前缀型：`焚天爆炎树`（命中 `爆炎树`）· `重武装兆载永劫龙兽`（命中 `兆载永劫龙兽`）
+      - 后缀型：`古岩龙蜥·溟冬` · `魔像督军·协律师`（`·` 算同 token 内分隔符）
+
+    自证（见 selftest 层 F）：全 79 张 gap 卡里标出 11 张，人眼逐张对 OCR 里的**英文名**核实，
+    11/11 为真（卡上确实印了更长的变体名），0 漏 0 误报。
+    """
+    if not name:
+        return False
+    raw = title_region(text)
+    nt, mp = _norm_with_map(raw)
+    k = norm_key(name)
+    p = nt.find(k)
+    if p < 0:
+        return False
+    b, e = mp[p], mp[p + len(k) - 1]
+    if b > 0 and re.match(r"[\u4e00-\u9fff]", raw[b - 1]):
+        return True                      # 左侧还粘着 CJK → 前缀型 modifier
+    j = e + 1
+    while j < len(raw) and raw[j] in IN_TOKEN:
+        j += 1
+    return j < len(raw) and bool(re.match(r"[\u4e00-\u9fff]", raw[j]))   # 右侧 → 后缀型
 
 
 def norm_key(s):
@@ -160,6 +204,23 @@ AMBIGUOUS = {
     "12/013": ("赤璋岳巡府君·移即", "赤璋巡岳府君·天虞"),
 }
 
+# 层 F：疑似「卡上真名比匹配名长」（= 变体全名不在元数据）
+# 来源：全 79 张扫出 11 张，逐张对着 OCR 里的**英文名**核实 → 11/11 为真。
+# 英语名是独立于中文解析的旁证（"HeavyAssault" / "Anomalous Model" / "- Phantom" …）。
+SUSPECT_LONGER = {
+    "02/009": ("无相之风", "Storm Butterfly Intermezzo"),
+    "02/012": ("无相之火", "Ternary of the Blazing Hearth"),
+    "02/014": ("无相之草", "Rondo of the Forest Corral"),
+    "02/020": ("水形幻人", "Flashflood"),
+    "04/003": ("爆炎树", "Sky-Searing"),
+    "04/008": ("古岩龙蜥", "Wintry"),
+    "04/015": ("翠翎恐蕈", "Metastable"),
+    "04/030": ("魔像督军", "Harmonizer"),
+    "06/004": ("遗迹重机", "Anomalous Model"),
+    "06/018": ("兆载永劫龙兽", "HeavyAssault Pack"),
+    "11/021": ("吞星之鲸", "- Phantom"),
+}
+
 GAIN, BAD = [], []
 
 
@@ -229,6 +290,28 @@ def selftest(verbose=True):
             % (take, pair[0], pair[1], got))
 
     say("")
+    say("=== F. 疑似「卡上真名比匹配名长」（= 变体全名不在元数据）===")
+    say("  预期 %d 张，逐张对着 OCR 里的英文名核实" % len(SUSPECT_LONGER))
+    got_sus = set()
+    for t in takes:
+        nm, _ = match_title(_ocr(t), main, alias)
+        if longer_name_suspect(_ocr(t), nm):
+            got_sus.add(t)
+    want_sus = set(SUSPECT_LONGER)
+    miss, extra = sorted(want_sus - got_sus), sorted(got_sus - want_sus)
+    for t in sorted(want_sus | got_sus):
+        tag = "OK  " if t in want_sus and t in got_sus else ("MISS" if t in want_sus else "EXTRA")
+        nm, _ = match_title(_ocr(t), main, alias)
+        ev = SUSPECT_LONGER.get(t, ("", ""))[1]
+        say("  %s %-9s 匹配=%-22s 英文旁证: %s" % (tag, t, nm, ev or "(未登记，需人眼核)"))
+    if miss:
+        BAD.append("层 F 漏报：%s" % miss)
+    if extra:
+        BAD.append("层 F 多报（需人眼核并登进 SUSPECT_LONGER）：%s" % extra)
+    say("  命中 %d/%d，多报 %s，漏报 %s"
+        % (len(want_sus & got_sus), len(want_sus), extra or "无", miss or "无"))
+
+    say("")
     okall = not BAD
     say("=== 结论：%s ===" % ("PASS" if okall else "FAIL"))
     for b in BAD:
@@ -250,10 +333,15 @@ def report():
     for r in rows:
         cur[r["take"]] = r["meta"]
     out = ["# 第 0b 步（只读）：79 张 gap 卡的名称解析结果", "",
-           "| take | 当前条目 | 新规则结果 | 变化 | 来源 | 备注 |", "|---|---|---|---|---|---|"]
+           "⚠️ **「不变」不等于「正确」**：最后一列标出「卡上真名比匹配名长」的卡 ——",
+           "它们会被合并进**基名**条目（变体全名不在元数据里）。", "",
+           "| take | 当前条目 | 新规则结果 | 变化 | 来源 | 疑似变体全名（需建条目） | 备注 |",
+           "|---|---|---|---|---|---|---|"]
     stat = {"改名": [], "None": [], "不变": []}
+    sus = []
     for take in sorted(cur):
         got, src = match_title(_ocr(take), main, alias)
+        look = longer_name_suspect(_ocr(take), got)
         if got is None:
             ch = "**None**"; note = "需人眼分类（别名可救/OCR漏字/真名缺元数据/fuzzy误匹配）"
             stat["None"].append(take)
@@ -262,12 +350,21 @@ def report():
             stat["改名"].append((take, cur[take], got))
         else:
             ch = ""; note = ""; stat["不变"].append(take)
+        if look:
+            sus.append((take, got))
+            note = (note + " " if note else "") + "⚠️ **卡上真名更长**"
         if take in AMBIGUOUS:
             note = (note + " " if note else "") + "**一张卡两种怪**"
-        out.append("| `%s` | %s | %s | %s | %s | %s |"
-                   % (take, cur[take], got or "None", ch, src or "-", note))
-    out += ["", "- 改名 **%d** / None **%d** / 不变 **%d**" % (len(stat["改名"]), len(stat["None"]), len(stat["不变"])), ""]
-    out += ["## 改名明细", "", "| take | 当前 | 新 |", "|---|---|---|"]
+        out.append("| `%s` | %s | %s | %s | %s | %s | %s |"
+                   % (take, cur[take], got or "None", ch, src or "-",
+                      "⚠️" if look else "", note))
+    out += ["", "- 改名 **%d** / None **%d** / 不变 **%d**"
+            % (len(stat["改名"]), len(stat["None"]), len(stat["不变"])),
+            "- ⚠️ **疑似变体全名（卡上真名更长）%d 张** —— 这 %d 张会被挂到基名条目上"
+            % (len(sus), len(sus)), ""]
+    out += ["## 疑似变体全名的卡（A1 决策的真正输入）", "", "| take | 被匹配到（基名） |", "|---|---|"]
+    out += ["| `%s` | %s |" % s for s in sus]
+    out += ["", "## 改名明细", "", "| take | 当前 | 新 |", "|---|---|---|"]
     out += ["| `%s` | %s | %s |" % d for d in stat["改名"]]
     out += ["", "## None 明细", ""] + ["- `%s`" % t for t in stat["None"]]
     (GEN / "name_report.md").write_text("\n".join(out), encoding="utf-8")

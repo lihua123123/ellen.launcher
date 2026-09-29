@@ -11,6 +11,8 @@ using Ellen.Launcher.Service.Metadata;
 using Ellen.Launcher.Service.Metadata.ContextAbstraction;
 using Ellen.Launcher.UI.Xaml.Control.AutoSuggestBox;
 using Ellen.Launcher.UI.Xaml.Data;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using System.Collections.Immutable;
 
 namespace Ellen.Launcher.ViewModel.Wiki;
@@ -24,6 +26,23 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
     private readonly ITaskContext taskContext;
 
     private WikiMonsterMetadataContext? metadataContext;
+
+    /// <summary>
+    /// 证据等级（<c>EnemyArchives.json</c> 的 <c>evidence</c> 值）→ 胶囊的文案 / 底色 / 字色。
+    /// <para>⚠️ 刷子键必须用**仓库里已在用的主题资源**：引用不存在的键会在渲染期抛
+    /// <c>XamlParseException</c> 导致崩溃，而且编译期与 XamlStyleAudit 都查不出来。</para>
+    /// </summary>
+    private static readonly Dictionary<string, (string Text, string Background, string Foreground)> EvidenceStyles = new()
+    {
+        // 那卡经过人眼读图复核
+        ["cal-gold"] = ("已复核", "SystemFillColorSuccessBrush", "TextOnAccentFillColorPrimaryBrush"),
+        // 两套裁图几何各读一次且逐格一致；这是「正常基线」，所以用中性色
+        ["2geo"] = ("双读一致", "SubtleFillColorSecondaryBrush", "TextFillColorSecondaryBrush"),
+        // 两几何分歧，目视裁决
+        ["eyeball"] = ("目视裁决", "SystemFillColorCautionBrush", "TextOnAccentFillColorPrimaryBrush"),
+        // 只有一套几何读到（当前 0 行，配色未经目视验证）
+        ["single-read"] = ("单读", "SubtleFillColorTertiaryBrush", "TextFillColorSecondaryBrush"),
+    };
 
     [GeneratedConstructor]
     public partial WikiMonsterViewModel(IServiceProvider serviceProvider);
@@ -71,6 +90,21 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
     /// </summary>
     [ObservableProperty]
     public partial ImmutableArray<EnemyArchiveResistanceCell> ResistanceCells { get; set; }
+
+    /// <summary>
+    /// 当前选中抗性行的读值证据等级**文案**（如「已复核」）；<see langword="null"/> = 未评级，
+    /// 界面据此隐藏胶囊（基线数据没有等级）。
+    /// </summary>
+    [ObservableProperty]
+    public partial string? ResistanceEvidenceText { get; set; }
+
+    /// <summary>胶囊底色；由 <see cref="EvidenceStyles"/> 映射而来，取不到时为 <see langword="null"/>。</summary>
+    [ObservableProperty]
+    public partial Brush? ResistanceEvidenceBackground { get; set; }
+
+    /// <summary>胶囊字色；与底色成对，避免出现低对比度组合。</summary>
+    [ObservableProperty]
+    public partial Brush? ResistanceEvidenceForeground { get; set; }
 
     protected override async ValueTask<bool> LoadOverrideAsync(CancellationToken token)
     {
@@ -150,16 +184,47 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
         if (resistances?.Values is null)
         {
             ResistanceCells = [];
+            UpdateResistanceEvidence(null);
             return;
         }
 
         EnemyArchiveResistanceValues values = resistances.Values;
+        string? evidence = resistances.Evidence;
         if (SelectedResistanceStateIndex > 0 && SelectedResistanceStateIndex <= resistances.States.Length)
         {
-            values = resistances.States[SelectedResistanceStateIndex - 1].Values ?? values;
+            EnemyArchiveResistanceState state = resistances.States[SelectedResistanceStateIndex - 1];
+            values = state.Values ?? values;
+            evidence = state.Evidence;
         }
 
         ResistanceCells = values.ToCells();
+        UpdateResistanceEvidence(evidence);
+    }
+
+    /// <summary>
+    /// 把证据等级展开成胶囊的三项展示数据（文案 + 底色 + 字色）；未评级时三项置空。
+    /// 跟 <see cref="UpdateResistanceCells"/> 同步（含常态行与各状态行），
+    /// 所以切换状态时胶囊会跟着换。
+    /// </summary>
+    private void UpdateResistanceEvidence(string? level)
+    {
+        if (level is null || !EvidenceStyles.TryGetValue(level, out (string Text, string Background, string Foreground) style))
+        {
+            ResistanceEvidenceText = null;
+            ResistanceEvidenceBackground = null;
+            ResistanceEvidenceForeground = null;
+            return;
+        }
+
+        ResistanceEvidenceText = style.Text;
+        ResistanceEvidenceBackground = ThemeBrush(style.Background);
+        ResistanceEvidenceForeground = ThemeBrush(style.Foreground);
+    }
+
+    /// <summary>取主题刷子；键不存在时返回 <see langword="null"/>（宁可不显色，也不因缺键崩溃）。</summary>
+    private static Brush? ThemeBrush(string key)
+    {
+        return Application.Current.Resources.TryGetValue(key, out object? value) ? value as Brush : null;
     }
 
     [Command("FilterCommand")]

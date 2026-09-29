@@ -367,21 +367,41 @@
                                                     Style="{ThemeResource BorderShimmerStyle}"
                                                     Visibility="{Binding Monsters.CurrentItem.Archive.HasResistances, Converter={StaticResource BoolToVisibilityConverter}}">
                                                     <StackPanel Spacing="12">
-                                                        <TextBlock
-                                                            Style="{StaticResource BaseTextBlockStyle}"
-                                                            Text="{shuxm:ResourceString Name=ViewPageWikiMonsterArchiveResistances}"/>
+                                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                                            <TextBlock
+                                                                VerticalAlignment="Center"
+                                                                Style="{StaticResource BaseTextBlockStyle}"
+                                                                Text="{shuxm:ResourceString Name=ViewPageWikiMonsterArchiveResistances}"/>
+                                                            <!--  当前选中行的读值证据等级；未评级时不显示（空对象→Collapsed）  -->
+                                                            <Border
+                                                                Padding="6,1"
+                                                                VerticalAlignment="Center"
+                                                                Background="{Binding ResistanceEvidenceBackground}"
+                                                                CornerRadius="4"
+                                                                Visibility="{Binding ResistanceEvidenceText, Converter={StaticResource EmptyObjectToVisibilityConverter}}">
+                                                                <TextBlock
+                                                                    FontSize="11"
+                                                                    Foreground="{Binding ResistanceEvidenceForeground}"
+                                                                    Text="{Binding ResistanceEvidenceText}"/>
+                                                            </Border>
+                                                        </StackPanel>
                                                         <!--
-                                                            TODO(后续优化): 多状态敌人变多后，把这里的 ComboBox 换成
-                                                            cwc:Segmented 胶囊 Tab（先在 _design/enemy-archive/index.html
-                                                            里调好样式，并确认 Segmented 支持 ItemsSource + 选中项绑定再切）。
-                                                            现在保留 ComboBox：数据链路已验证，换控件是纯视觉改动，收益小于崩一次的风险。
+                                                            多状态敌人变多后，把 ComboBox 换成 Segmented 胶囊 Tab。
+                                                            ⚠️ 绑的是 Segmented 自己声明的 SelectedIndex（VM 已有的 int）。
+                                                            用 {Binding} 绑不存在的属性**不会崩、只会静默失效**，
+                                                            所以改完必须实际切换一次状态，确认抗性数值跟着变。
                                                         -->
-                                                        <ComboBox
+                                                        <cwc:Segmented
                                                             HorizontalAlignment="Left"
-                                                            DisplayMemberPath="Name"
                                                             ItemsSource="{Binding ResistanceStates}"
                                                             SelectedIndex="{Binding SelectedResistanceStateIndex, Mode=TwoWay}"
-                                                            Visibility="{Binding Monsters.CurrentItem.Archive.Resistances.HasStates, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                            Visibility="{Binding Monsters.CurrentItem.Archive.Resistances.HasStates, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                            <cwc:Segmented.ItemTemplate>
+                                                                <DataTemplate x:DataType="shma:EnemyArchiveResistanceState">
+                                                                    <TextBlock Text="{Binding Name}"/>
+                                                                </DataTemplate>
+                                                            </cwc:Segmented.ItemTemplate>
+                                                        </cwc:Segmented>
                                                         <ItemsControl
                                                             ItemTemplate="{StaticResource MonsterArchiveResistanceTemplate}"
                                                             ItemsPanel="{StaticResource UniformGridColumns2Spacing4Template}"

@@ -204,22 +204,36 @@ AMBIGUOUS = {
     "12/013": ("赤璋岳巡府君·移即", "赤璋巡岳府君·天虞"),
 }
 
-# 层 F：疑似「卡上真名比匹配名长」（= 变体全名不在元数据）
-# 来源：全 79 张扫出 11 张，逐张对着 OCR 里的**英文名**核实 → 11/11 为真。
-# 英语名是独立于中文解析的旁证（"HeavyAssault" / "Anomalous Model" / "- Phantom" …）。
-SUSPECT_LONGER = {
-    "02/009": ("无相之风", "Storm Butterfly Intermezzo"),
-    "02/012": ("无相之火", "Ternary of the Blazing Hearth"),
-    "02/014": ("无相之草", "Rondo of the Forest Corral"),
-    "02/020": ("水形幻人", "Flashflood"),
-    "04/003": ("爆炎树", "Sky-Searing"),
-    "04/008": ("古岩龙蜥", "Wintry"),
-    "04/015": ("翠翎恐蕈", "Metastable"),
-    "04/030": ("魔像督军", "Harmonizer"),
-    "06/004": ("遗迹重机", "Anomalous Model"),
-    "06/018": ("兆载永劫龙兽", "HeavyAssault Pack"),
-    "11/021": ("吞星之鲸", "- Phantom"),
-}
+def scan_suspects(main, alias):
+    """返回「卡上真名比匹配名长」的 take 集合。**全 `_ocr` 张**，不只 gap 子集。
+
+    ⚠️ 已知盲区：`match_title` 返回 None 时，`longer_name_suspect` 按定义不可能命中
+    （没有基名就无从谈「比基名长」）。所以「未被标记」的卡里混着**没匹配上的卡**，
+    不等于「干净」。`scan_all` 会把 None 数单独报出来。
+    """
+    out = set()
+    for p in OCR.glob("*/*.txt"):
+        txt = p.read_text(encoding="utf-8", errors="replace")
+        nm, _ = match_title(txt, main, alias)
+        if nm and longer_name_suspect(txt, nm):
+            out.add("%s/%s" % (p.parent.name, p.stem))
+    return out
+
+
+# 层 F 的真值来源：`_provenance/variant_registry.json`（随仓库版本控制）。
+# 它是一张**逐张人眼核对过的**登记表（cn_mod ↔ en_mod 语义是否一一对应）。
+# ⚠️ 「登记」不等于「把扫描结果抄一遍」—— 每条都写过中英对照的证据，且分 verdict。
+PROV = HERE / "_provenance"
+REGISTRY = PROV / "variant_registry.json"
+
+
+def load_registry():
+    """返回 `{take: row}`；缺失或为空时返回 `{}`（层 F 会据此报告失败）。"""
+    if not REGISTRY.exists():
+        return {}
+    doc = json.loads(REGISTRY.read_text(encoding="utf-8"))
+    return {r["take"]: r for r in doc.get("rows", [])}
+
 
 GAIN, BAD = [], []
 
@@ -290,26 +304,34 @@ def selftest(verbose=True):
             % (take, pair[0], pair[1], got))
 
     say("")
-    say("=== F. 疑似「卡上真名比匹配名长」（= 变体全名不在元数据）===")
-    say("  预期 %d 张，逐张对着 OCR 里的英文名核实" % len(SUSPECT_LONGER))
-    got_sus = set()
-    for t in takes:
-        nm, _ = match_title(_ocr(t), main, alias)
-        if longer_name_suspect(_ocr(t), nm):
-            got_sus.add(t)
-    want_sus = set(SUSPECT_LONGER)
+    say("=== F. 疑似「卡上真名比匹配名长」（= 变体名比元数据细）===")
+    reg = load_registry()
+    if not reg:
+        BAD.append("登记表读不到：%s" % REGISTRY)
+    got_sus = scan_suspects(main, alias)
+    want_sus = set(reg)
     miss, extra = sorted(want_sus - got_sus), sorted(got_sus - want_sus)
-    for t in sorted(want_sus | got_sus):
+    for t in sorted(want_sus & got_sus)[:6] + miss + extra:
         tag = "OK  " if t in want_sus and t in got_sus else ("MISS" if t in want_sus else "EXTRA")
         nm, _ = match_title(_ocr(t), main, alias)
-        ev = SUSPECT_LONGER.get(t, ("", ""))[1]
-        say("  %s %-9s 匹配=%-22s 英文旁证: %s" % (tag, t, nm, ev or "(未登记，需人眼核)"))
+        say("  %s %-9s 匹配=%-22s %s" % (tag, t, nm, (reg.get(t) or {}).get("cn_mod", "-")))
     if miss:
         BAD.append("层 F 漏报：%s" % miss)
     if extra:
-        BAD.append("层 F 多报（需人眼核并登进 SUSPECT_LONGER）：%s" % extra)
-    say("  命中 %d/%d，多报 %s，漏报 %s"
-        % (len(want_sus & got_sus), len(want_sus), extra or "无", miss or "无"))
+        BAD.append("层 F 多报（须先人眼核并登进 variant_registry.json）：%s" % extra)
+    vc = {"confirmed": 0, "suspect": 0, "unclear": 0}
+    for r in reg.values():
+        vc[r.get("verdict", "unclear")] = vc.get(r.get("verdict", "unclear"), 0) + 1
+    for r in reg.values():
+        if r.get("verdict") == "confirmed" and not r.get("en_mod"):
+            BAD.append("%s 标 confirmed 但无英文修饰证据" % r.get("take"))
+    say("  扫描 %d 张 → 嫌疑 %d，登记表 %d 张；多报 %s，漏报 %s"
+        % (len(list(OCR.glob('*/*.txt'))), len(got_sus), len(want_sus), extra or "无", miss or "无"))
+    say("  verdict：confirmed %d / suspect %d / unclear %d"
+        % (vc.get("confirmed", 0), vc.get("suspect", 0), vc.get("unclear", 0)))
+    for r in sorted(reg.values(), key=lambda x: x["take"]):
+        if r.get("verdict") != "confirmed":
+            say("    ⚠️ %s = %s：%s" % (r["take"], r.get("verdict"), r.get("evidence")))
 
     say("")
     okall = not BAD
@@ -444,6 +466,7 @@ def scan_all():
     ocr_files = sorted(OCR.glob("*/*.txt"))
     gap = {r["take"] for r in _gap_rows()}
     rows, per_tag, per_tag_all = [], {}, {}
+    reg = load_registry()
     for p in ocr_files:
         take = "%s/%s" % (p.parent.name, p.stem)
         tag = p.parent.name
@@ -457,16 +480,21 @@ def scan_all():
         en = english_name(txt)
         per_tag[tag] = per_tag.get(tag, 0) + 1
         rows.append((take, tag, nm or "(None)", side_cn, en, take in gap,
-                     "已核实" if take in SUSPECT_LONGER else "待核"))
+                     (reg.get(take) or {}).get("verdict", "**未登记**")))
 
     in_gap = sum(1 for r in rows if r[5])
+    none_cnt = sum(1 for p in ocr_files
+                   if match_title(p.read_text(encoding="utf-8", errors="replace"), main, alias)[0] is None)
     out = ["# 全量扫描（只读）：变体嫌疑卡 + 存量缺失条目", "",
            "扫描 `_ocr/**/*.txt` 全部 **%d** 张卡。" % len(ocr_files), "",
            "## 节 0：概览", "",
            "- 变体嫌疑（卡上真名比匹配名长）：**%d** 张（%.1f%%）" % (len(rows), 100.0 * len(rows) / max(1, len(ocr_files))),
            "- 其中在 gap 工单（低置信度）里的：**%d** 张；不在的：**%d** 张" % (in_gap, len(rows) - in_gap),
            "- 参照：gap 工单共 %d 张 / 全 %d 张 = %.1f%%" % (len(gap), len(ocr_files), 100.0 * len(gap) / max(1, len(ocr_files))),
-           "- → 若嫌疑率在 gap 里明显更高，则「11/79」是**选择偏差**，不能外推全量", "",
+           "- ⚠️ **盲区**：`match_title` 返回 `None` 的卡 **%d** 张（%.1f%%）——" % (none_cnt, 100.0 * none_cnt / max(1, len(ocr_files))),
+           "  没有基名就无从谈「比基名长」，所以这些卡**不可能**被标记。"
+           "「某篇 = 0」只能读成「未测」，不能读成「干净」。",
+           "- 登记表 `_provenance/variant_registry.json`：**%d** 张" % len(reg), "",
            "### 按篇", "", "| 篇 | 卡片数 | 嫌疑数 | 嫌疑率 |", "|---|---|---|---|"]
     for t in sorted(per_tag_all):
         n = per_tag.get(t, 0)
@@ -480,16 +508,22 @@ def scan_all():
                                     "是" if (e.get("resistances") or {}).get("values") else "否") for e in miss]
     out += ["", "## 节 2：增量 —— 卡上有变体名、元数据只有基名", "",
             "⚠️ 这类卡会被**挂到基名条目**上，变体的行变成基名的「状态」。",
-            "`中modifier`/`英位置` 不一致时，「变体名」这个描述就不一定准确，需人眼核。", "",
-            "| take | 篇 | 匹配到基名 | 中modifier | 卡上英文名（旁证） | 在gap工单 | 核实状态 |",
+            "`verdict` 来自登记表（**逐张人眼核对中英修饰语义**，不是抄扫描结果）：",
+            "`confirmed` = 中英语义一一对应；`suspect` = 只是子串但非变体；`unclear` = OCR 读不清。", "",
+            "| take | 篇 | 匹配到基名 | 中文修饰 | 卡上英文名（旁证） | verdict | 在gap |",
             "|---|---|---|---|---|---|---|"]
     for take, tag, nm, side, en, g, st in rows:
-        side_cn = {"left": "前缀", "right": "后缀", "both": "两侧", "none": "—"}[side]
+        r = reg.get(take) or {}
         out.append("| `%s` | %s | %s | %s | %s | %s | %s |"
-                   % (take, tag, nm, side_cn, en or "—", "是" if g else "", st))
-    out += ["", "## 待核卡的标题区原文（看中英版式）", ""]
+                   % (take, tag, nm, r.get("cn_mod", "—"), en or "—",
+                      r.get("verdict", "**未登记**"), "是" if g else ""))
+    out += ["", "## 登记表里的 non-confirmed（A1 决策时需区别对待）", ""]
+    for r in sorted(reg.values(), key=lambda x: x["take"]):
+        if r.get("verdict") != "confirmed":
+            out.append("- `%s` = **%s**：%s" % (r["take"], r.get("verdict"), r.get("evidence")))
+    out += ["", "## 非 confirmed 卡的标题区原文（看中英版式）", ""]
     for take, tag, nm, side, en, g, st in rows:
-        if st == "已核实":
+        if st == "confirmed":
             continue
         p = OCR / take.split("/")[0] / (take.split("/")[1] + ".txt")
         lines = [ln.strip() for ln in title_region(p.read_text(encoding="utf-8", errors="replace")).splitlines() if ln.strip()]

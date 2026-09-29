@@ -1,0 +1,278 @@
+{
+ "note": "卡上真名比元数据细（修饰在名字行内）的登记表。**登记 = 逐张人眼核对中英修饰语义**，不是抄扫描结果。",
+ "how": "cn_mod 与 en_mod 语义一一对应则 confirmed；只是子串但非变体（如训练桩）则 suspect；OCR 读不清则 unclear。",
+ "scanned": "全 600 张（_ocr/**/*.txt），检出嫌疑 38 张，全部登记在此",
+ "counts": {
+  "confirmed": 37,
+  "suspect": 1,
+  "unclear": 0
+ },
+ "rows": [
+  {
+   "take": "02/008",
+   "verdict": "confirmed",
+   "cn_mod": "·协奏曲紫电之光",
+   "en_mod": "Violet Lightning Concerto",
+   "evidence": "协奏曲=Concerto / 紫电之光=Violet Lightning"
+  },
+  {
+   "take": "02/009",
+   "verdict": "confirmed",
+   "cn_mod": "·间奏曲暴风之蝶",
+   "en_mod": "Storm Butterfly Intermezzo",
+   "evidence": "间奏曲=Intermezzo / 暴风之蝶=Storm Butterfly"
+  },
+  {
+   "take": "02/010",
+   "verdict": "confirmed",
+   "cn_mod": "·奏鸣曲磐石之心",
+   "en_mod": "Stone Heart Sonata",
+   "evidence": "奏鸣曲=Sonata / 磐石之心=Stone Heart"
+  },
+  {
+   "take": "02/011",
+   "verdict": "confirmed",
+   "cn_mod": "·奏鸣曲霜锐之阵",
+   "en_mod": "Sonata of the Snowy Path",
+   "evidence": "奏鸣曲=Sonata / 霜=Snowy"
+  },
+  {
+   "take": "02/012",
+   "verdict": "confirmed",
+   "cn_mod": "·三部曲",
+   "en_mod": "Ternary of the Blazing Hearth",
+   "evidence": "三部曲=Ternary（中文只印了前半）"
+  },
+  {
+   "take": "02/013",
+   "verdict": "confirmed",
+   "cn_mod": "·谐曲束浪之池",
+   "en_mod": "Scherzo of the Rippling Pool",
+   "evidence": "谐曲=Scherzo / 束浪之池=Rippling Pool"
+  },
+  {
+   "take": "02/014",
+   "verdict": "confirmed",
+   "cn_mod": "·回旋曲森郁之笼",
+   "en_mod": "Rondo of the Forest Corral",
+   "evidence": "回旋曲=Rondo / 森郁之笼=Forest Corral"
+  },
+  {
+   "take": "02/017",
+   "verdict": "confirmed",
+   "cn_mod": "·裂鸣",
+   "en_mod": "Cracking Thunder Manifestation",
+   "evidence": "裂鸣=Cracking；**中后英前**"
+  },
+  {
+   "take": "02/020",
+   "verdict": "confirmed",
+   "cn_mod": "：洪流",
+   "en_mod": "Hydro Tulpa: Flashflood",
+   "evidence": "洪流=Flashflood；OCR 把 · 读成 ："
+  },
+  {
+   "take": "04/003",
+   "verdict": "confirmed",
+   "cn_mod": "焚天",
+   "en_mod": "Sky-Searing Pyro Regisvine",
+   "evidence": "焚天=Sky-Searing；中前英前"
+  },
+  {
+   "take": "04/008",
+   "verdict": "confirmed",
+   "cn_mod": "·溟冬",
+   "en_mod": "Wintry Primo Geovishap",
+   "evidence": "溟冬=Wintry；**中后英前**"
+  },
+  {
+   "take": "04/015",
+   "verdict": "confirmed",
+   "cn_mod": "亚稳态",
+   "en_mod": "Metastable Jadeplume Terrorshroom",
+   "evidence": "亚稳态=Metastable；中前英前"
+  },
+  {
+   "take": "04/025",
+   "verdict": "confirmed",
+   "cn_mod": "·升怒",
+   "en_mod": "Enraged Millennial",
+   "evidence": "升怒=Enraged；**中后英前**"
+  },
+  {
+   "take": "04/030",
+   "verdict": "confirmed",
+   "cn_mod": "·协律师",
+   "en_mod": "Legatus Golem: Harmonizer",
+   "evidence": "协律师=Harmonizer"
+  },
+  {
+   "take": "06/004",
+   "verdict": "confirmed",
+   "cn_mod": "特异体",
+   "en_mod": "Anomalous Model Ruin Grader",
+   "evidence": "特异体=Anomalous Model"
+  },
+  {
+   "take": "06/018",
+   "verdict": "confirmed",
+   "cn_mod": "重武装",
+   "en_mod": "HeavyAssault Pack Aeonblight Drake",
+   "evidence": "重武装=HeavyAssault Pack"
+  },
+  {
+   "take": "10/029",
+   "verdict": "confirmed",
+   "cn_mod": "·追灵光",
+   "en_mod": "Tatankasaurus Warrior: Spiritlight Chaser",
+   "evidence": "武士=Warrior / 追灵光=Spiritlight Chaser"
+  },
+  {
+   "take": "11/021",
+   "verdict": "confirmed",
+   "cn_mod": "·幻影",
+   "en_mod": "All-Devouring Narwhal - Phantom",
+   "evidence": "幻影=Phantom"
+  },
+  {
+   "take": "13/001",
+   "verdict": "confirmed",
+   "cn_mod": "·炽烈流焰",
+   "en_mod": "Lava Dragon Statue: Blazing Flame",
+   "evidence": "炽烈流焰=Blazing Flame"
+  },
+  {
+   "take": "13/002",
+   "verdict": "confirmed",
+   "cn_mod": "·极旋流",
+   "en_mod": "Hydro Tulpa: Turbulent Vortex",
+   "evidence": "极旋流=Turbulent Vortex；⚠️ 抽取器抓到「厚度为」/IMM 行，已人工填正"
+  },
+  {
+   "take": "13/003",
+   "verdict": "confirmed",
+   "cn_mod": "·毁灭武装",
+   "en_mod": "Overseer Device - Obliterator",
+   "evidence": "毁灭武装=Obliterator；⚠️ OCR 丢 · → 抽取器给「—」"
+  },
+  {
+   "take": "13/006",
+   "verdict": "confirmed",
+   "cn_mod": "·百诈瞬变",
+   "en_mod": "Battle-Hardened Pipilpan Idol: Hundred Deceptions",
+   "evidence": "百诈瞬变=Hundred Deceptions；经**别名层**匹配"
+  },
+  {
+   "take": "13/007",
+   "verdict": "confirmed",
+   "cn_mod": "·歼灭构型",
+   "en_mod": "Aeonblight Drake: Annihilation Configuration",
+   "evidence": "歼灭构型=Annihilation Configuration"
+  },
+  {
+   "take": "13/008",
+   "verdict": "confirmed",
+   "cn_mod": "·百万爆轰",
+   "en_mod": "Battle-Scarred Rock Crab: One Million Blasts",
+   "evidence": "百万爆轰=One Million Blasts"
+  },
+  {
+   "take": "13/009",
+   "verdict": "confirmed",
+   "cn_mod": "·决死武装",
+   "en_mod": "Fireblade Shock Trooper: Forlorn Hope",
+   "evidence": "决死武装=Forlorn Hope"
+  },
+  {
+   "take": "13/010",
+   "verdict": "confirmed",
+   "cn_mod": "·惊恨憎愤",
+   "en_mod": "Frostnight Herra: Hatred and Rage",
+   "evidence": "惊恨憎愤=Hatred and Rage"
+  },
+  {
+   "take": "13/011",
+   "verdict": "confirmed",
+   "cn_mod": "·哀回响",
+   "en_mod": "Lightkeeper: Mourning Echoes",
+   "evidence": "哀回响=Mourning Echoes"
+  },
+  {
+   "take": "13/013",
+   "verdict": "confirmed",
+   "cn_mod": "·肃烈狂音",
+   "en_mod": "Iniquitous Baptist: Resonant Wrath",
+   "evidence": "肃烈狂音=Resonant Wrath"
+  },
+  {
+   "take": "13/015",
+   "verdict": "confirmed",
+   "cn_mod": "-·极端势能",
+   "en_mod": "Experimental Field Generator: Extreme Potential",
+   "evidence": "极端势能=Extreme Potential"
+  },
+  {
+   "take": "13/016",
+   "verdict": "confirmed",
+   "cn_mod": "·袭掠锋刃",
+   "en_mod": "Lord of the Hidden Depths: Ravager's Edge",
+   "evidence": "袭掠锋刃=Ravager's Edge；⚠️ 抽取器抓到散文片段，已人工填正"
+  },
+  {
+   "take": "13/017",
+   "verdict": "confirmed",
+   "cn_mod": "·敕命远征",
+   "en_mod": "Emperor of Fire and Iron: Ordained Conquest",
+   "evidence": "敕命远征=Ordained Conquest"
+  },
+  {
+   "take": "13/018",
+   "verdict": "confirmed",
+   "cn_mod": "·风滚狂蔓",
+   "en_mod": "Hexadecatonic Mandragora: Stormvine",
+   "evidence": "风滚狂蔓=Stormvine"
+  },
+  {
+   "take": "13/019",
+   "verdict": "confirmed",
+   "cn_mod": "·重甲武库",
+   "en_mod": "Kunckle Duckle: Armored Arsenal",
+   "evidence": "重甲武库=Armored Arsenal"
+  },
+  {
+   "take": "13/020",
+   "verdict": "confirmed",
+   "cn_mod": "·根牙磐错",
+   "en_mod": "Radiant Moongecko: Entangled Fangs",
+   "evidence": "根牙磐错=Entangled Fangs"
+  },
+  {
+   "take": "13/023",
+   "verdict": "confirmed",
+   "cn_mod": "之影·蜂巢意志",
+   "en_mod": "Control Array: Will of the Hive",
+   "evidence": "蜂巢意志=Will of the Hive；英文被换行截断"
+  },
+  {
+   "take": "13/024",
+   "verdict": "confirmed",
+   "cn_mod": "·裂解剪钳",
+   "en_mod": "Configuration Device - Lysis Shears",
+   "evidence": "裂解剪钳=Lysis Shears；⚠️ OCR 丢 · → 抽取器给「—」"
+  },
+  {
+   "take": "13/025",
+   "verdict": "confirmed",
+   "cn_mod": "·摧枯伟力",
+   "en_mod": "Chimeric Winged Lion: Power Overwhelming",
+   "evidence": "摧枯伟力=Power Overwhelming"
+  },
+  {
+   "take": "15/005",
+   "verdict": "suspect",
+   "cn_mod": "反‖训练器",
+   "en_mod": "Anti-RaidenShogun Trainer",
+   "evidence": "**不是变体**：卡是「反雷电将军训练器」（训练桩）= 另一个实体。下游因无抗性表被 diff 门排除 → 无害"
+  }
+ ]
+}

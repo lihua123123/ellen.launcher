@@ -109,6 +109,12 @@ def png_bytes(img, upscale=1.5):
     return buf.getvalue()
 
 
+def est_tokens(w, h):
+    """Qwen-VL 视觉 token 粗估：按 28x28 一个 patch 计。
+    只用于花钱前核对量级，不等于官方计费值（还有模板/文字开销）。"""
+    return ((w + 27) // 28) * ((h + 27) // 28)
+
+
 # ---------------------------------------------------------------- 调用
 
 def call_vlm(png, model, base, key, timeout=120):
@@ -384,14 +390,17 @@ def score(vlm_dir, show_detail=True):
 def run(targets, dry, model, base, key, upscale, vlm_dir):
     vlm_dir.mkdir(parents=True, exist_ok=True)
     total_bytes = 0
+    total_tokens = 0
     for label, items in targets:
         for sub, img in items:
             png = png_bytes(img, upscale)
             total_bytes += len(png)
+            tok = est_tokens(int(img.width * upscale), int(img.height * upscale))
+            total_tokens += tok
             name = "%s%s.json" % (label.replace("/", "_"), ("_" + sub) if sub else "")
             if dry:
-                print("  %-22s %5d KB  -> %s" % (label + ("/" + sub if sub else ""),
-                                                 len(png) // 1024, name))
+                print("  %-22s %5d KB  ~%4d tok  -> %s"
+                      % (label + ("/" + sub if sub else ""), len(png) // 1024, tok, name))
                 continue
             try:
                 txt = call_vlm(png, model, base, key)
@@ -416,7 +425,8 @@ def run(targets, dry, model, base, key, upscale, vlm_dir):
                 print("  %-22s ERROR %s: %s" % (label, type(e).__name__, str(e)[:90]))
             time.sleep(0.3)
     if dry:
-        print("dry-run total: %.1f MB" % (total_bytes / 1048576.0))
+        print("dry-run total: %.1f MB / \u7ea6 %d \u4e2a\u89c6\u89c9 token\uff08\u7c97\u4f30\uff0c\u4e0d\u542b\u6587\u5b57\u4e0e\u6a21\u677f\u5f00\u9500\uff09"
+              % (total_bytes / 1048576.0, total_tokens))
 
 
 def main():

@@ -324,6 +324,65 @@ def _gap_rows():
             if r.get("scope") == "gap" and r.get("meta")]
 
 
+def english_name(text):
+    """从标题区取卡片**印在卡上的英文名**（第一段像名字的拉丁串）。
+
+    这是**独立于中文匹配器的旁证**：中文匹配器可能错，但英文名是另一条印在卡上的信息，
+    OCR 没理由同时把中英文读到「能互相印证」的程度。
+
+    ⚠️ 两个实测坑（13 篇全部命中第一个）：
+      1. **水印行在标题区最前面**：13 篇的标题区第一行是 `制图@Csxylic米游社`，
+         直接取「第一段拉丁串」会拿到 `Csxylic`（作者水印），而不是怪物英文名。
+         → 跳过含 `@` / `米游社` 的行。
+      2. 英文名可能被 `:` / `-` 拆开（`Anemo Hypostasis:Storm Butterfly Intermezzo`、
+         `All-Devouring Narwhal- Phantom`）→ 字符类里要含 `:` 与 `-`。
+    另外要求 ≥2 个空白分隔词、总长 ≥8，用来排除 `HP` / `Lv.90` / 单词水印。
+    """
+    for ln in title_region(text).splitlines():
+        if "@" in ln or "米游社" in ln:
+            continue
+        for m in re.finditer(r"[A-Za-z][A-Za-z'\-: ]{6,}", ln):
+            s = re.sub(r"\s+", " ", m.group(0)).strip(" :-")
+            low = s.lower()
+            if low.startswith(("data", "hp", "lv")) or " lv" in low:
+                continue
+            if len(s) < 8 or len(s.split()) < 2:
+                continue
+            return s
+    return ""
+
+
+def _cjk_run_of(raw, name):
+    """返回标题区里包含匹配名的那段**连续 CJK 串**（含 `·` 等分隔符），用来判断 modifier 在左/右。"""
+    j = raw.find(name)
+    if j < 0:
+        return ""
+    a = j
+    while a > 0 and (re.match(r"[\u4e00-\u9fff]", raw[a - 1]) or raw[a - 1] in IN_TOKEN):
+        a -= 1
+    b = j + len(name)
+    while b < len(raw) and (re.match(r"[\u4e00-\u9fff]", raw[b]) or raw[b] in IN_TOKEN):
+        b += 1
+    return raw[a:b].strip()
+
+
+def modifier_side(raw, name):
+    """中文串里 modifier 在基名的哪一侧：`"left"` / `"right"` / `"none"`。"""
+    run = _cjk_run_of(raw, name)
+    if not run:
+        return "none"
+    k = run.find(name)
+    left = norm_key(run[:k])
+    right = norm_key(run[k + len(name):])
+    if left and right:
+        return "both"
+    if left:
+        return "left"
+    if right:
+        return "right"
+    return "none"
+
+
 def report():
     """第 0b 步：79 张 gap 卡的匹配结果（只读，不写任何数据）。"""
     names = load_meta_names()
@@ -372,15 +431,87 @@ def report():
           % (GEN / "name_report.md", len(stat["改名"]), len(stat["None"]), len(stat["不变"])))
 
 
+def scan_all():
+    """全量只读扫描：所有 `_ocr/**/*.txt` 里「卡上真名比匹配名长」的卡。
+
+    分两节，因为它们是**两个不同的问题**（解法不同，不能混在一起谈）：
+      节 1 存量：`JSON 有、元数据没有` → 档案条目已建但界面看不到（如 `丘林`）
+      节 2 增量：`卡上有变体名、元数据只有基名` → 解析退化成基名，变体的行被挂到基名条目
+    并统计**选择偏差**：嫌疑卡在 gap 工单（低置信度）里 vs 不在的比例。
+    """
+    names = load_meta_names()
+    main, alias = build_index(names)
+    ocr_files = sorted(OCR.glob("*/*.txt"))
+    gap = {r["take"] for r in _gap_rows()}
+    rows, per_tag, per_tag_all = [], {}, {}
+    for p in ocr_files:
+        take = "%s/%s" % (p.parent.name, p.stem)
+        tag = p.parent.name
+        per_tag_all[tag] = per_tag_all.get(tag, 0) + 1
+        txt = p.read_text(encoding="utf-8", errors="replace")
+        nm, _src = match_title(txt, main, alias)
+        if not longer_name_suspect(txt, nm):
+            continue
+        raw = title_region(txt)
+        side_cn = modifier_side(raw, nm) if nm else "none"
+        en = english_name(txt)
+        per_tag[tag] = per_tag.get(tag, 0) + 1
+        rows.append((take, tag, nm or "(None)", side_cn, en, take in gap,
+                     "已核实" if take in SUSPECT_LONGER else "待核"))
+
+    in_gap = sum(1 for r in rows if r[5])
+    out = ["# 全量扫描（只读）：变体嫌疑卡 + 存量缺失条目", "",
+           "扫描 `_ocr/**/*.txt` 全部 **%d** 张卡。" % len(ocr_files), "",
+           "## 节 0：概览", "",
+           "- 变体嫌疑（卡上真名比匹配名长）：**%d** 张（%.1f%%）" % (len(rows), 100.0 * len(rows) / max(1, len(ocr_files))),
+           "- 其中在 gap 工单（低置信度）里的：**%d** 张；不在的：**%d** 张" % (in_gap, len(rows) - in_gap),
+           "- 参照：gap 工单共 %d 张 / 全 %d 张 = %.1f%%" % (len(gap), len(ocr_files), 100.0 * len(gap) / max(1, len(ocr_files))),
+           "- → 若嫌疑率在 gap 里明显更高，则「11/79」是**选择偏差**，不能外推全量", "",
+           "### 按篇", "", "| 篇 | 卡片数 | 嫌疑数 | 嫌疑率 |", "|---|---|---|---|"]
+    for t in sorted(per_tag_all):
+        n = per_tag.get(t, 0)
+        out.append("| `%s` | %d | %d | %.0f%% |" % (t, per_tag_all[t], n, 100.0 * n / per_tag_all[t]))
+    out += ["", "## 节 1：存量 —— `JSON 有、元数据没有`（= 界面完全看不到的条目）", ""]
+    arc = json.loads((ROOT / "Resource/EnemyArchives/EnemyArchives.json").read_text(encoding="utf-8"))
+    miss = [e for e in arc if isinstance(e, dict) and e.get("name") not in names]
+    out.append("档案条目 %d 个，其中 %d 个不在元数据里：" % (len(arc), len(miss)))
+    out += ["", "| name | 状态数 | 有抗性值 |", "|---|---|---|"]
+    out += ["| `%s` | %d | %s |" % (e.get("name"), len((e.get("resistances") or {}).get("states") or []),
+                                    "是" if (e.get("resistances") or {}).get("values") else "否") for e in miss]
+    out += ["", "## 节 2：增量 —— 卡上有变体名、元数据只有基名", "",
+            "⚠️ 这类卡会被**挂到基名条目**上，变体的行变成基名的「状态」。",
+            "`中modifier`/`英位置` 不一致时，「变体名」这个描述就不一定准确，需人眼核。", "",
+            "| take | 篇 | 匹配到基名 | 中modifier | 卡上英文名（旁证） | 在gap工单 | 核实状态 |",
+            "|---|---|---|---|---|---|---|"]
+    for take, tag, nm, side, en, g, st in rows:
+        side_cn = {"left": "前缀", "right": "后缀", "both": "两侧", "none": "—"}[side]
+        out.append("| `%s` | %s | %s | %s | %s | %s | %s |"
+                   % (take, tag, nm, side_cn, en or "—", "是" if g else "", st))
+    out += ["", "## 待核卡的标题区原文（看中英版式）", ""]
+    for take, tag, nm, side, en, g, st in rows:
+        if st == "已核实":
+            continue
+        p = OCR / take.split("/")[0] / (take.split("/")[1] + ".txt")
+        lines = [ln.strip() for ln in title_region(p.read_text(encoding="utf-8", errors="replace")).splitlines() if ln.strip()]
+        out.append("- `%s` → 基名 `%s`：%s" % (take, nm, " ／ ".join(lines)))
+    (GEN / "variant_scan.md").write_text("\n".join(out), encoding="utf-8")
+    print("扫描 %d 张；嫌疑 %d 张（其中 gap 内 %d / 外 %d）\n报告 -> %s"
+          % (len(ocr_files), len(rows), in_gap, len(rows) - in_gap, GEN / "variant_scan.md"))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--selftest", action="store_true")
     ap.add_argument("--report", action="store_true")
+    ap.add_argument("--scan-all", action="store_true", help="全量只读扫描（变体嫌疑 + 存量缺失）")
     a = ap.parse_args()
     if a.selftest:
         return 0 if selftest() else 1
     if a.report:
         report()
+        return 0
+    if a.scan_all:
+        scan_all()
         return 0
     ap.print_help()
     return 0

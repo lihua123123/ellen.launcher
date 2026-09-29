@@ -372,7 +372,14 @@
                                                                 VerticalAlignment="Center"
                                                                 Style="{StaticResource BaseTextBlockStyle}"
                                                                 Text="{shuxm:ResourceString Name=ViewPageWikiMonsterArchiveResistances}"/>
-                                                            <!--  当前选中行的读值证据等级；未评级时不显示（空对象→Collapsed）  -->
+                                                            <!--
+                                                                读值证据等级胶囊。
+                                                                ⚠️ 语义：它描述的是**当前选中那一行**（常态行 / 当前状态行）的 evidence，
+                                                                随 SelectedResistanceStateIndex 切换而变 —— 不是整个条目的汇总。
+                                                                未评级（null）时不显示；「无胶囊」只表示这行未走 VLM 通道，不代表可疑。
+                                                                文案与配色在 VM 的 EvidenceStyles 里，落点选「抗性数据」标题行是因为它独占一行、
+                                                                不与下面的 Segmented 争宽（实测只占 124/768）。
+                                                            -->
                                                             <Border
                                                                 Padding="6,1"
                                                                 VerticalAlignment="Center"

@@ -31,17 +31,21 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
     /// 证据等级（<c>EnemyArchives.json</c> 的 <c>evidence</c> 值）→ 胶囊的文案 / 底色 / 字色。
     /// <para>⚠️ 刷子键必须用**仓库里已在用的主题资源**：引用不存在的键会在渲染期抛
     /// <c>XamlParseException</c> 导致崩溃，而且编译期与 XamlStyleAudit 都查不出来。</para>
+    /// <para>文案与配色的分工：「双读一致」是正常基线所以用中性色；两头的极端才用彩色 ——
+    /// <c>cal-gold</c>（最强，人眼复核过）用绿、<c>single-read</c>（最弱，只读过一遍）用红。
+    /// 红绿必须分开，否则将来真出现 <c>single-read</c> 时会与 <c>2geo</c> 混在一起被忽略。</para>
     /// </summary>
     private static readonly Dictionary<string, (string Text, string Background, string Foreground)> EvidenceStyles = new()
     {
-        // 那卡经过人眼读图复核
+        // 该卡经人眼读图复核
         ["cal-gold"] = ("已复核", "SystemFillColorSuccessBrush", "TextOnAccentFillColorPrimaryBrush"),
         // 两套裁图几何各读一次且逐格一致；这是「正常基线」，所以用中性色
         ["2geo"] = ("双读一致", "SubtleFillColorSecondaryBrush", "TextFillColorSecondaryBrush"),
         // 两几何分歧，目视裁决
         ["eyeball"] = ("目视裁决", "SystemFillColorCautionBrush", "TextOnAccentFillColorPrimaryBrush"),
-        // 只有一套几何读到（当前 0 行，配色未经目视验证）
-        ["single-read"] = ("单读", "SubtleFillColorTertiaryBrush", "TextFillColorSecondaryBrush"),
+        // 只有一套几何读到 —— **最该警示的一档**，用红而不是「浅一点的中性色」。
+        // （当前 0 行，配色未经目视验证；13 篇入库后可能大量出现）
+        ["single-read"] = ("单读", "SystemFillColorCriticalBrush", "TextOnAccentFillColorPrimaryBrush"),
     };
 
     [GeneratedConstructor]
@@ -93,7 +97,10 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
 
     /// <summary>
     /// 当前选中抗性行的读值证据等级**文案**（如「已复核」）；<see langword="null"/> = 未评级，
-    /// 界面据此隐藏胶囊（基线数据没有等级）。
+    /// 界面据此隐藏胶囊。
+    /// <para>⚠️ 「未评级」不等于「不可信」：它只表示这行**没走 VLM 第二通道**
+    /// （即来自本地通道的高置信行——校准批实测那批 48/48 = 100% 正确）。
+    /// 界面上「无胶囊」不应被理解为告警。</para>
     /// </summary>
     [ObservableProperty]
     public partial string? ResistanceEvidenceText { get; set; }

@@ -84,6 +84,49 @@ def valid_energy(e):
     return True
 
 
+# evidence 强度序（越大越强），去重时保留更强的一档
+EV_STRENGTH = {"cal-gold": 3, "2geo": 2, "eyeball": 1, "single-read": 0}
+
+
+def dedupe_states(states, src, review):
+    """同名 + 同 8 值 → 只留一条；同名不同值 → 全部保留并告警。返回去重后的列表。
+
+    ⚠️ 为什么需要：worklist / diffs_all 里存在**重复行**（实测 `04/030 r1` 的「带甲」出现两次），
+    而本函数上游是「一行建一个状态」→ 同一个抗性行被写成多个**完全相同**的状态
+    （实测 `魔像督军` 出现 3 个一模一样的「带甲」，全部 70%×8）。
+    重复行在界面上的代价是多一个无法区分的 Tab（换 Segmented 后尤其明显）。
+
+    ⚠️ 为什么**不能**按名字一刀切去重：`古岩龙蜥` 的「起身」×2、`深海龙蜥·原种` 的「幼体」×3
+    都是**合法的同名不同值**（卡面确实同名，但数值不同），必须保留。
+
+    保留更强的一档 evidence：同值行若一个走了 VLM 通道、另一个没走，应留下有等级的那个。
+    """
+    kept, index, dropped = [], {}, 0
+    for r in states:
+        key = (r["label"] or "状态", tuple(str(v) for v in r["values"]))
+        if key in index:
+            prev = kept[index[key]]
+            if EV_STRENGTH.get(r.get("evidence"), -1) > EV_STRENGTH.get(prev.get("evidence"), -1):
+                prev["evidence"] = r.get("evidence")
+            dropped += 1
+            continue
+        index[key] = len(kept)
+        kept.append(r)
+
+    if dropped:
+        review.append("%s 同名同值状态去重 %d 条（重复行）" % (src, dropped))
+
+    byname = {}
+    for r in kept:
+        byname.setdefault(r["label"] or "状态", []).append(r)
+    for name, group in byname.items():
+        if len(group) > 1:
+            vals = [" ".join(str(v) for v in r["values"]) for r in group]
+            review.append("⚠ %s 状态名「%s」出现 %d 次且数值不同（合法重名，已保留）：%s"
+                          % (src, name, len(group), vals))
+    return kept
+
+
 def split_condition(note):
     """把注释区串切成 (可用条件, OCR 原文)；判据同 clean_conditions.py。
 
@@ -178,6 +221,8 @@ def main():
         # 状态行必须同样合理，否则丢弃该状态
         states = [r for r in rows if r is not base and plausible(r["values"])
                   and (r.get("confident") or tag in VERIFIED_TAGS)]
+        # 同名同值去重（重复行）；同名不同值保留并告警
+        states = dedupe_states(states, base["src"], review)
         if not plausible(base["values"]):
             dropped.append(f"{base['src']} 常态行不合理")
             continue

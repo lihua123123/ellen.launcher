@@ -34,6 +34,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).parent
@@ -239,48 +240,149 @@ def dual_channel(vlm_rows, local_rows):
 
 # ---------------------------------------------------------------- 主流程
 
-def score_cal():
+def classify(g, v):
+    """给一处不一致分类——用来区分「系统性偏差」与「随机噪声」。"""
+    if v is None or v == "":
+        return "empty(未识别)"
+    gs, vs = str(g), str(v)
+    if g == "IMM" and vs != "IMM":
+        return "IMM误读为数值"
+    if g != "IMM" and vs == "IMM":
+        return "数值误读为IMM"
+    try:
+        gi, vi = int(gs), int(vs)
+    except (TypeError, ValueError):
+        return "非数值"
+    if len(str(gi)) > 1 and str(gi)[:-1] == str(vi):
+        return "数字截断(少一位)"
+    if str(gi) == str(vi)[:-1]:
+        return "多误一位"
+    if gi == -vi:
+        return "符号翻转"
+    if abs(gi - vi) == 5:
+        return "偏差5"
+    if abs(gi - vi) == 10:
+        return "偏差10"
+    return "其他数值"
+
+
+def score(vlm_dir, show_detail=True):
+    """与 cal_gold.json 逐格比对。除一致率外，**重点输出不一致格的位置分布**：
+    单看一致率不够——若错格集中在同一列/同一类型，说明是系统性偏差，
+    全量时会在同样位置重复翻车；分布分散才像随机认识噪声。
+    """
     gold = json.loads((CAL / "cal_gold.json").read_text(encoding="utf-8"))
-    tot = hit = 0
-    rowtot = rowhit = 0
-    bad = []
+    tot = hit = rowtot = rowhit = 0
+    miss_cards, miss_rows, mism = [], [], []
     for src in sorted(gold):
-        p = VLM_DIR / (src.replace("/", "_") + ".json")
-        if not p.exists():
-            bad.append("%s: no-vlm-output" % src)
-            continue
-        rows = json.loads(p.read_text(encoding="utf-8"))["rows"]
+        p = vlm_dir / (src.replace("/", "_") + ".json")
+        rows = None
+        if p.exists():
+            try:
+                doc = json.loads(p.read_text(encoding="utf-8"))
+                rows = doc.get("rows")
+                if rows is None:
+                    miss_cards.append("%s(bad-content:%s)" % (src, str(doc.get("error"))[:20]))
+            except Exception as e:
+                miss_cards.append("%s(bad-file:%s)" % (src, type(e).__name__))
+        else:
+            miss_cards.append(src)
         for ri, (_, gv) in enumerate(gold[src]):
             rowtot += 1
-            if ri >= len(rows):
+            if rows is None or ri >= len(rows):
+                miss_rows.append("%s r%d" % (src, ri + 1))
                 tot += 8
-                bad.append("%s r%d: missing" % (src, ri + 1))
                 continue
-            lv = rows[ri]["values"]
+            lv = rows[ri].get("values") or []
+            if len(lv) != 8:
+                miss_rows.append("%s r%d(len=%d)" % (src, ri + 1, len(lv)))
             ok = True
             for ci in range(8):
                 tot += 1
-                if len(lv) != 8:
-                    continue
-                good = (lv[ci] == "IMM") if gv[ci] == "IMM" else (str(lv[ci]) == str(gv[ci]))
+                v = lv[ci] if ci < len(lv) else None
+                good = (v == "IMM") if gv[ci] == "IMM" else (str(v) == str(gv[ci]))
                 if good:
                     hit += 1
                 else:
                     ok = False
-                    bad.append("%s r%d c%s gold=%s vlm=%s" % (src, ri + 1, ELEMS[ci], gv[ci], lv[ci]))
+                    mism.append((src, ri + 1, ci, gv[ci], v, classify(gv[ci], v)))
             if ok:
                 rowhit += 1
+
     pct = 100.0 * hit / tot if tot else 0.0
-    print("VLM vs GOLD  cells %d/%d = %.1f%%   rows %d/%d = %.1f%%" % (
-        hit, tot, pct, rowhit, rowtot, 100.0 * rowhit / rowtot if rowtot else 0.0))
-    print("gate: >=95%% 全量放行 | 90~95%% 全量跑但人工裁图 | <90%% 换模型/放弃")
-    for b in bad[:60]:
-        print("  " + b)
+    rpct = 100.0 * rowhit / rowtot if rowtot else 0.0
+    print("=" * 70)
+    print("VLM vs GOLD   cells %d/%d = %.2f%%   rows %d/%d = %.1f%%   不一致 %d 格"
+          % (hit, tot, pct, rowhit, rowtot, rpct, len(mism)))
+    if miss_cards:
+        print("\u26a0 无输出/不可用的卡 %d 张：%s" % (len(miss_cards), ", ".join(miss_cards)))
+    if miss_rows:
+        print("\u26a0 行缺失或长度异常：%s" % ", ".join(miss_rows[:12]))
+
+    if mism:
+        by_cls = Counter(m[5] for m in mism)
+        by_col = Counter(m[2] for m in mism)
+        by_row = Counter(m[1] for m in mism)
+        by_art = Counter(m[0][:2] for m in mism)
+        n = len(mism)
+        print("\n  \u3010\u7c7b\u578b\u3011")
+        for k, c in by_cls.most_common():
+            print("    %-16s %3d  %5.1f%%  %s" % (k, c, 100.0 * c / n, "#" * c))
+        print("  \u3010\u5217\u4f4d\u3011(0=\u706b ... 7=\u7269\u7406)")
+        for ci in range(8):
+            c = by_col.get(ci, 0)
+            print("    c%d %-3s %3d  %s" % (ci, ELEMS[ci], c, "#" * c))
+        print("  \u3010\u884c\u53f7\u3011" + "   ".join("r%d=%d" % (k, v) for k, v in sorted(by_row.items())))
+        print("  \u3010\u7bc7\u3011" + "   ".join("%s:%d" % (k, v) for k, v in sorted(by_art.items())))
+
+        print("\n  \u3010\u7cfb\u7edf\u6027\u5224\u65ad\u3011")
+        top_cls, n_cls = by_cls.most_common(1)[0]
+        top_col, n_col = by_col.most_common(1)[0]
+        flags = []
+        # 列位锁定才是「同样位置重复翻车」的真信号；类型集中要有更高占比才算强证据
+        if n >= 3 and n_col / n >= 0.5:
+            flags.append("列位高度集中：%.0f%% 落在第 %d 列（%s）"
+                         % (100.0 * n_col / n, top_col + 1, ELEMS[top_col]))
+        if n >= 3 and n_cls / n >= 0.75:
+            flags.append("类型高度集中：%.0f%% 都是「%s」" % (100.0 * n_cls / n, top_cls))
+        # 行号集中是弱信号（行数远少于格数，随机也会偏），只提示、不参与判定
+        top_row, n_row = by_row.most_common(1)[0]
+        weak = []
+        if n >= 3 and n_row / n >= 0.5:
+            weak.append("%.0f%% 落在 r%d（弱信号，随机也会偏，仅供参考）"
+                        % (100.0 * n_row / n, top_row))
+        if flags:
+            print("    \u26a0 \u7591\u4f3c\u7cfb\u7edf\u6027\u504f\u5dee \u2014\u2014 " + "\uff1b".join(flags))
+            print("      \u2192 \u5168\u91cf\u65f6\u4f1a\u5728\u540c\u6837\u4f4d\u7f6e\u91cd\u590d\u51fa\u9519\uff1a"
+                  "\u5148\u8c03\u63d0\u793a\u8bcd\uff08\u5f3a\u8c03\u5217\u5bf9\u9f50 / \u6570\u4f4d\u6570\uff09\u6216\u6362\u6a21\u578b\uff0c\u4e0d\u8981\u76f4\u63a5\u5168\u91cf\u653e\u884c")
+        else:
+            print("    \u2713 \u5206\u5e03\u5206\u6563\uff0c\u50cf\u968f\u673a\u8fa8\u8bc6\u566a\u58f0"
+                  "\uff08\u4e0d\u5b58\u5728\u5355\u4e00\u4e3b\u5bfc\u7c7b\u578b/\u5217\uff09\u2192 \u53ef\u6309\u4e0b\u9762\u6863\u4f4d\u5904\u7406")
+        for w in weak:
+            print("    \u00b7 " + w)
+
+    print("\n  \u3010\u95e8\u69db\u3011")
+    if pct >= 95:
+        rec = "\u2265 95%%  \u2192 \u5168\u91cf\u653e\u884c\uff0c\u4e0d\u4e00\u81f4\u9879\u8d70 --dual \u4eba\u5de5\u4e09\u5ba1"
+    elif pct >= 90:
+        rec = "90~95%% \u2192 \u53ef\u5168\u91cf\uff0c\u4f46\u4e0d\u4e00\u81f4\u9879\u5fc5\u987b\u4eba\u5de5\u88c1\u56fe\u540e\u624d\u5165\u5e93"
+    else:
+        rec = "< 90%%   \u2192 \u5148\u6362\u6a21\u578b / \u8c03\u63d0\u793a\u8bcd\uff0c\u6682\u4e0d\u5168\u91cf"
+    print("    %s" % rec)
+    print("=" * 70)
+
+    if show_detail and mism:
+        print("\n  \u3010\u9010\u683c\u660e\u7ec6\u3011")
+        for src, ri, ci, g, v, cls in mism[:60]:
+            print("    %-8s r%d c%d(%s) gold=%-5s vlm=%-5s %s"
+                  % (src, ri, ci, ELEMS[ci], g, v, cls))
+        if len(mism) > 60:
+            print("    ... \u53e6 %d \u683c" % (len(mism) - 60))
     return pct
 
 
-def run(targets, dry, model, base, key, upscale):
-    VLM_DIR.mkdir(parents=True, exist_ok=True)
+def run(targets, dry, model, base, key, upscale, vlm_dir):
+    vlm_dir.mkdir(parents=True, exist_ok=True)
     total_bytes = 0
     for label, items in targets:
         for sub, img in items:
@@ -295,7 +397,7 @@ def run(targets, dry, model, base, key, upscale):
                 txt = call_vlm(png, model, base, key)
                 data = parse_json(txt)
                 if data is None:
-                    (VLM_DIR / name).write_text(
+                    (vlm_dir / name).write_text(
                         json.dumps({"error": "unparseable", "raw": txt}, ensure_ascii=False, indent=1),
                         encoding="utf-8")
                     print("  %-22s UNPARSEABLE" % label)
@@ -306,7 +408,7 @@ def run(targets, dry, model, base, key, upscale):
                     if extra:
                         for r in rows:
                             r.setdefault("problems", []).extend(extra)
-                (VLM_DIR / name).write_text(
+                (vlm_dir / name).write_text(
                     json.dumps({"rows": rows}, ensure_ascii=False, indent=1), encoding="utf-8")
                 nok = sum(1 for r in rows if r.get("verified"))
                 print("  %-22s rows=%d verified=%d" % (label + ("/" + sub if sub else ""), len(rows), nok))
@@ -329,13 +431,16 @@ def main():
                     choices=["gap", "verified-bypass", "excluded-13"],
                     help="gap=真正入库缺口 | verified-bypass=01/03 已豁免入库 | excluded-13=13 篇整篇")
     ap.add_argument("--dry-run", action="store_true", help="不联网，只报裁图体积")
-    ap.add_argument("--score", action="store_true", help="与 cal_gold.json 算一致率")
+    ap.add_argument("--score", action="store_true",
+                    help="与 cal_gold.json 逐格比对，并输出不一致格的位置分布 + 系统性判定")
+    ap.add_argument("--vlm-dir", default=str(VLM_DIR), help="VLM 输出目录（默认 _gen2/vlm）")
     ap.add_argument("--dual", action="store_true", help="与本地通道逐格比对")
     ap.add_argument("--upscale", type=float, default=1.5)
     a = ap.parse_args()
 
+    vlm_dir = Path(a.vlm_dir)
     if a.score:
-        score_cal()
+        score(vlm_dir)
         return
 
     key = os.environ.get("VLM_API_KEY", "")
@@ -405,13 +510,13 @@ def main():
     if not targets:
         print("nothing to do (use --cal or --tags)")
         return 1
-    run(targets, a.dry_run, model, base, key, a.upscale)
+    run(targets, a.dry_run, model, base, key, a.upscale, vlm_dir)
 
     if a.dual:
         loc = json.loads((GEN2 / "cal_local.json").read_text(encoding="utf-8"))
         for tag, items in targets:
             for sub, _ in items:
-                p = VLM_DIR / ("%s_%s.json" % (tag, sub))
+                p = vlm_dir / ("%s_%s.json" % (tag, sub))
                 if not p.exists():
                     continue
                 vr = json.loads(p.read_text(encoding="utf-8"))["rows"]

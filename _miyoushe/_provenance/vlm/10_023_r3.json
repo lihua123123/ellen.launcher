@@ -1,0 +1,21 @@
+{
+ "rows": [
+  {
+   "label": "浮彩分身",
+   "values": [
+    8,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10
+   ],
+   "verified": false,
+   "problems": [
+    "c0-not-mult5(8)"
+   ]
+  }
+ ]
+}

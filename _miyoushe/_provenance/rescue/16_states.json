@@ -1,0 +1,802 @@
+[
+ {
+  "src": "16/001",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "0 0 0 0 0 0 0 0"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/002",
+  "size": [
+   1248,
+   1144
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "30",
+     "10",
+     "50"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "10 10 10 10 10 30 10 50"
+   }
+  ],
+  "notes": "PXUU多下落的雪球，造成",
+  "note_text": "PXUU多下落的雪球，造成"
+ },
+ {
+  "src": "16/003",
+  "size": [
+   1248,
+   1248
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "10 10 10 10 10 10 10 10"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/004",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "10 10 10 10 10 10 10 10"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/005",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "10 10 10 10 10 10 10 10"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/006",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "10 10 10 10 10 10 10 10"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/007",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "10 10 10 10 10 10 10 10"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/008",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "10 10 10 10 10 10 10 10"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/009",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "template",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1"
+    ],
+    "calib": "template",
+    "mode": "stitch",
+    "confident": false,
+    "raw": "1k 1k 1k 1k 1k1k 1k 1k"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/010",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "10 10 10 10 10 10 10 10"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/011",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "template",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1"
+    ],
+    "calib": "template",
+    "mode": "stitch",
+    "confident": false,
+    "raw": "1k 1k 1k"
+   }
+  ],
+  "notes": "清水玉：4岩盾，击破可获得相应特产。",
+  "note_text": "清水玉：4岩盾，击破可获得相应特产。"
+ },
+ {
+  "src": "16/012",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "template",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1"
+    ],
+    "calib": "template",
+    "mode": "stitch",
+    "confident": false,
+    "raw": "1k 1k 1k"
+   }
+  ],
+  "notes": "清水玉：4岩盾，击破可获得相应特产。",
+  "note_text": "清水玉：4岩盾，击破可获得相应特产。"
+ },
+ {
+  "src": "16/013",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "0 0 0 0 0 0 0 0"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/014",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "0 0 0 0 0 0 0 0"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/015",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "template",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1"
+    ],
+    "calib": "template",
+    "mode": "stitch",
+    "confident": false,
+    "raw": "1k 1k 1k 1k 1k 1k1k"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/016",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "0 0 0 0 0 0 0 0"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/017",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "10 10 10 10 10 10 10 10"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/018",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "10 10 10 10 10 10 10 10"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/019",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "0 0 0 0 0 0 0 0"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/020",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "template",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1"
+    ],
+    "calib": "template",
+    "mode": "stitch",
+    "confident": false,
+    "raw": "1k 1k 1k 1k 1k1k 1k 1k"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/021",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "template",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1",
+     "1"
+    ],
+    "calib": "template",
+    "mode": "stitch",
+    "confident": false,
+    "raw": "1k 1k 1k 1k 1k1k 1k 1k"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/022",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "0 0 0 0 0 0 0 0"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/023",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "10 10 10 10 10 10 10 10"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/024",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "0 0 0 0 0 0 0 0"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/025",
+  "size": [
+   1248,
+   960
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0",
+     "0"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "0 0 0 0 0 0 0 0"
+   }
+  ],
+  "notes": "",
+  "note_text": ""
+ },
+ {
+  "src": "16/026",
+  "size": [
+   1248,
+   1056
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "入战&",
+    "values": [
+     "310",
+     "310",
+     "310",
+     "310",
+     "310",
+     "310",
+     "310",
+     "310"
+    ],
+    "calib": "fit",
+    "mode": "per-cell",
+    "confident": false,
+    "raw": "次最高计入上限为80"
+   },
+   {
+    "label": "正常",
+    "values": [
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10"
+    ],
+    "calib": "fit",
+    "mode": "per-cell",
+    "confident": false,
+    "raw": "10 10 10 10 10 10 10 10 低10%便不再被此"
+   }
+  ],
+  "notes": "自带霸体。钝击：如大剑普战终、下落攻击、超载、炸药桶等。",
+  "note_text": "自带霸体。钝击：如大剑普战终、下落攻击、超载、炸药桶等。"
+ },
+ {
+  "src": "16/027",
+  "size": [
+   1248,
+   1056
+  ],
+  "calib": "fit",
+  "rows": [
+   {
+    "label": "",
+    "values": [
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10",
+     "10"
+    ],
+    "calib": "fit",
+    "mode": "band-dict",
+    "confident": true,
+    "raw": "10 10 10 10 10 10 10 10"
+   }
+  ],
+  "notes": "放置「风息花」后， 双出30",
+  "note_text": "放置「风息花」后， 双出30"
+ }
+]

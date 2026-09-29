@@ -50,6 +50,10 @@ python miyoushe_download.py --post 72409634 72409897
 | `_gen2/table_<NN>.txt` | 复核表（卡片 vs 元数据，**人工批的凭据**） |
 | `_gen2/merge_<NN>.txt`、`merge_<NN>.json` | 入库清单与待核对清单 |
 | `_rescue/<NN>.json` | 抗性裁图通道的结构化结果（PNG 复核图已清理，可重跑再生成） |
+| `_gen2/diffs_all.json` | 与元数据的 diff 清单（**每轮由 `table_all.py` 重建**，别手工改） |
+| `_gen2/vlm/` | VLM 第二通道读数（整表 `tag_idx.json` / 横条 `tag_idx_rK.json`） |
+| `_provenance/` | **随仓库版本控制的复现快照**（0.51 MB）：worklist + 校准卡清单 + `vlm/` + `rescue/` + `label_map.json` |
+| `_design/enemy-archive/cal/` | 校准批产物：`cal_gold.json`（目视金标准，**必须保留**）、`vlm/`、`cal_score.txt` |
 
 ## 脚本
 
@@ -62,7 +66,16 @@ python miyoushe_download.py --post 72409634 72409897
 | `extract_states03.py` | 03 式「表格」抗性表：按列拼图识别（支持多状态行） |
 | `table_01.py` / `table_03.py` | 生成复核表并与 `Monster.json` 对比 |
 | `merge_01.py` / `merge_03.py` | 按 diff 门槛入库 |
-| `classify_cards.py`、`check_archive.py`、`list_monsternames.py` | 统计 / 校验 / 名称查询 |
+| `table_all.py` | 全部篇的复核表（会**重建** `diffs_all.json`） |
+| `finalize.py` | 收尾全链路：回退基线 → `table_all` → `gap_override` → `health` → `merge_all`（可重复执行） |
+| `gap_override.py` | 把 VLM 补读的 gap 值（含 `evidence`）注入 `diffs_all.json`（**必须在 `table_all` 之后**） |
+| `merge_all.py` | 按「高置信 + diff + 取值合理」入库；并做 `condition` 生成期清洗 |
+| `label_map.py` | **固化行身份映射**（`--build-snapshot` / `--write`，见下节） |
+| `derive_evidence.py` | 推导每行 `evidence` 等级（`cal-gold`/`2geo`/`eyeball`/`single-read`） |
+| `vlm_transcribe.py` | VLM 第二通道（校准 / 判读 / 取缺口读值；默认整表几何，`--strip` 启用横条） |
+| `check_13.py` | 13 篇**只读**比对报告（可靠指标是**行数差**，label 无匹配会高估） |
+| `clean_conditions.py` | `condition` **存量修复工具**（规则已内建进 `merge_all`，此脚本仅用于修历史数据） |
+| `classify_cards.py`、`check_archive.py`、`list_monsternames.py`、`health.py` | 统计 / 校验 / 名称查询 / 健康度 |
 
 ## 单篇流程
 
@@ -188,14 +201,59 @@ python miyoushe_download.py --post 72409634 72409897
   - `EnemyArchiveService` 用 `DeserializeAsync<T>(stream)` **不传 options** → 默认
     `UnmappedMemberHandling = Skip`，故新增 `condition_ocr_raw` 安全。
     ⚠️ 服务层是**静默失败**的，所以这条**实测过**（build + 启动），没有只靠推断
-- 处理：`_miyoushe/clean_conditions.py`（**默认干跑**，`--write` 才生效）
+- 处理：判据现已**内建进 `merge_all.split_condition()`**（生成期清洗）
   - 命中判据「`\d-\d` 粘连 **或** 数字 ≥6 个」→ `condition_ocr_raw` ← 原值，`condition` ← `null`
   - 置空用 **`null`** 而非 `""`：字段是 `string?`，且项目
     `JsonOptions.DefaultIgnoreCondition = WhenWritingNull` 是既有约定；语义上「无条件」≠「空条件」
   - 结果：**74 清空 / 29 保留**。那 29 条是机制散文，**与基线一致 → 属既有行为**，非本轮引入
+- ⚠️⚠️ **踩过的坑：一次性补丁一定会被 `finalize` 冲掉**。
+  最初 `clean_conditions.py` 是**手工跑**的补丁，没接进链路。重跑 `finalize` 后 `merge_all`
+  把 **74 条 `condition` 又写回 OCR 原文**、并丢掉 `condition_ocr_raw`。
+  → 凡是对 `EnemyArchives.json` 的「跑完再改」都必须搬进 `merge_all`，否则下一轮必被覆盖。
+  `clean_conditions.py` 现在只作**存量修复工具**保留
+- ⚠️ **同类死键 `defaultNote`**：JSON 里 ~120 个，但 C# 搜 `DefaultNote|defaultNote` **零命中**
+  （模型里根本没这个属性）；大量值是 OCR 垃圾（如 `士气 70 70 70 70 70 70 70 60`）。
+  **本轮刻意未动**（避免扩大 diff），清理它应和 `condition` 用同一套规则单独一轮做
 - ⚠️ **遗留（属 ③ 的范围）**：`condition` 目前被本地流程喂的是**机制散文**而非「触发条件」
   （基线同样如此）。将来 UI 接上该字段时应**改名或改语义**，或用 VLM 单独跑一个
   `--conditions` 模式补读短条件（`condition_ocr_raw` 就是为它准备的输入）
+
+### 行身份映射已固化：`label_map.py` + `_provenance/`（26/9/30）
+
+**为什么必须固化**：`gap_adopted.json` / `gap_mapped.json` 原本是**一次性 snippet** 跑出来的，
+生成它的代码只存在于当时的对话里。后果：① 换台机器就无法重算已入库那 97 行 `evidence`；
+② 13 篇做不了可信比对（13 篇 label 本身是垃圾 OCR，只能退到行号，而它本地行号**恰恰不可信**）；
+③ `evidence` 分级只能声称「对当前这批数据有效」。
+
+```bash
+python label_map.py --build-snapshot   # 把 live 输入快照进 _provenance/（已随仓库版本控制）
+python label_map.py                    # 重算并与 _gen2/gap_adopted.json 逐字段比对
+python label_map.py --write            # 落盘 _provenance/label_map.json + _gen2/gap_adopted.json
+```
+
+- 输入：`lowconf_worklist.json` + `vlm/<tag>_<idx>[_rK].json` + `rescue/*_states.json`
+  → **合计仅 0.51 MB**（317 个 VLM 读数只要 0.09 MB）。
+  ⚠️ 「贵的部分（VLM 调用）已经付过了，输出本身极小」——这是快照可行的前提；不建快照就只能重跑 VLM（要花钱且不可复现）
+- 输出 `{(take,row) -> (mode, chosen_row)}`，`mode` ∈ `index(local==card)` / `index但两几何分歧`
+  / `label(label-sim(0.xx))` / `label(fallback)`
+- 人工覆盖写在 `OVERRIDES`（`14/014`：整表几何把 `9.9k` 误读成 `10`，横条几何正确），
+  并**在下标命中时断言确实被用到** —— 否则条目失效时会静默留在代码里
+- 另输出 `agreed_with_local`（VLM 采纳值 vs **本地同序号行**的逐格一致数）作身份自证，供 ② 复用
+
+**验收证据**：重算结果与既有产物 **99 条 / 0 处不匹配**；且从快照重跑
+`label_map.py --write` → `derive_evidence.py --write` → `finalize.py` 后，
+已提交的档案 **`git diff` 逐字节为空**（可复现 + 幂等）。
+
+**顺带用金标准裁决了 4 条 `index` 组内 agreed<8 的行**（即本地与 VLM 分歧处）——
+**4/4 都是本地错、VLM 对**：`04/003` r1/r3 本地把**行标题挤进数值列表**导致整行右移、
+末格丢空（VLM 与目视金标准 **8/8** 一致）；`12/013` r2 同样是错列；
+`09/039` r3 本地漏了**负号**（卡面实为 `-50,10×6,-20`，已裁图目视确认）。
+校准批次 10 张卡内 11 条采纳行 **11/11 与金标准 8/8 一致**。
+
+> ⚠️ **口径警示**：日报里曾写过「双几何互检 **89/99** 全同」，**该数复现不出来**。
+> 真实情况：只有 `mode=index(local==card)` 的 **74 行**可比（74/74 = 100%），
+> 另 **25 行身份不可比** —— 那是「**没测**」，不是「一致」。
+> 报一致性时必须说清**分母是可比子集还是全体**。
 
 ### 13 篇（26 张）：本地 OCR 确定性失败；VLM 已能读，但**先读数后入库**
 

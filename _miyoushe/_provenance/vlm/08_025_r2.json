@@ -1,0 +1,22 @@
+{
+ "rows": [
+  {
+   "label": "火附魔",
+   "values": [
+    2,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    1
+   ],
+   "verified": false,
+   "problems": [
+    "c0-not-mult5(2)",
+    "c7-not-mult5(1)"
+   ]
+  }
+ ]
+}

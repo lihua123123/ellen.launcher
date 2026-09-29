@@ -1,0 +1,27 @@
+{
+ "rows": [
+  {
+   "label": "核心",
+   "values": [
+    -140,
+    -140,
+    -140,
+    -80,
+    -140,
+    -140,
+    -140,
+    -140
+   ],
+   "verified": false,
+   "problems": [
+    "c0-out-of-range(-140)",
+    "c1-out-of-range(-140)",
+    "c2-out-of-range(-140)",
+    "c4-out-of-range(-140)",
+    "c5-out-of-range(-140)",
+    "c6-out-of-range(-140)",
+    "c7-out-of-range(-140)"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,94 @@
+{
+ "rows": [
+  {
+   "label": "正常",
+   "values": [
+    10,
+    10,
+    "IMM",
+    10,
+    10,
+    10,
+    10,
+    10
+   ],
+   "verified": true,
+   "problems": []
+  },
+  {
+   "label": "瘫痪",
+   "values": [
+    10,
+    10,
+    "IMM",
+    10,
+    10,
+    10,
+    10,
+    10
+   ],
+   "verified": true,
+   "problems": []
+  },
+  {
+   "label": "强化",
+   "values": [
+    10,
+    10,
+    "IMM",
+    10,
+    10,
+    10,
+    10,
+    10
+   ],
+   "verified": true,
+   "problems": []
+  },
+  {
+   "label": "嗜魔",
+   "values": [
+    10,
+    10,
+    "IMM",
+    10,
+    10,
+    10,
+    10,
+    10
+   ],
+   "verified": true,
+   "problems": []
+  },
+  {
+   "label": "本体",
+   "values": [
+    10,
+    10,
+    "IMM",
+    10,
+    10,
+    10,
+    10,
+    10
+   ],
+   "verified": true,
+   "problems": []
+  },
+  {
+   "label": "帽子",
+   "values": [
+    10,
+    10,
+    "IMM",
+    10,
+    10,
+    10,
+    10,
+    10
+   ],
+   "verified": true,
+   "problems": []
+  }
+ ]
+}

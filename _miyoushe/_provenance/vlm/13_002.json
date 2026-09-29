@@ -1,0 +1,49 @@
+{
+ "rows": [
+  {
+   "label": "正常",
+   "values": [
+    10,
+    "IMM",
+    10,
+    10,
+    10,
+    10,
+    10,
+    10
+   ],
+   "verified": true,
+   "problems": []
+  },
+  {
+   "label": "吸收(N5)",
+   "values": [
+    210,
+    "IMM",
+    210,
+    210,
+    210,
+    210,
+    210,
+    210
+   ],
+   "verified": true,
+   "problems": []
+  },
+  {
+   "label": "强化",
+   "values": [
+    55,
+    "IMM",
+    55,
+    55,
+    55,
+    55,
+    55,
+    55
+   ],
+   "verified": true,
+   "problems": []
+  }
+ ]
+}

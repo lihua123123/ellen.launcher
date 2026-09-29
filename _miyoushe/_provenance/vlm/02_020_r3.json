@@ -1,0 +1,39 @@
+{
+ "rows": [
+  {
+   "label": "半幻人",
+   "values": [
+    5,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "verified": true,
+   "problems": []
+  },
+  {
+   "label": "白盾",
+   "values": [
+    9,
+    12,
+    11,
+    15,
+    23,
+    0,
+    0,
+    0
+   ],
+   "verified": false,
+   "problems": [
+    "c0-not-mult5(9)",
+    "c1-not-mult5(12)",
+    "c2-not-mult5(11)",
+    "c4-not-mult5(23)"
+   ]
+  }
+ ]
+}

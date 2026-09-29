@@ -1,0 +1,64 @@
+{
+ "rows": [
+  {
+   "label": "王",
+   "values": [
+    70,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10
+   ],
+   "verified": true,
+   "problems": []
+  },
+  {
+   "label": "后",
+   "values": [
+    10,
+    70,
+    10,
+    70,
+    10,
+    10,
+    10,
+    10
+   ],
+   "verified": true,
+   "problems": []
+  },
+  {
+   "label": "王怒",
+   "values": [
+    -10,
+    -70,
+    -70,
+    -70,
+    -70,
+    -70,
+    -70,
+    -70
+   ],
+   "verified": true,
+   "problems": []
+  },
+  {
+   "label": "后怒",
+   "values": [
+    -70,
+    -10,
+    -70,
+    -10,
+    -70,
+    -70,
+    -70,
+    -70
+   ],
+   "verified": true,
+   "problems": []
+  }
+ ]
+}

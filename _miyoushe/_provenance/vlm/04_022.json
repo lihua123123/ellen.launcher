@@ -1,0 +1,49 @@
+{
+ "rows": [
+  {
+   "label": "正常",
+   "values": [
+    60,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10
+   ],
+   "verified": true,
+   "problems": []
+  },
+  {
+   "label": "带甲",
+   "values": [
+    120,
+    70,
+    70,
+    70,
+    70,
+    70,
+    70,
+    70
+   ],
+   "verified": true,
+   "problems": []
+  },
+  {
+   "label": "深渊带甲",
+   "values": [
+    140,
+    90,
+    90,
+    90,
+    90,
+    90,
+    90,
+    90
+   ],
+   "verified": true,
+   "problems": []
+  }
+ ]
+}

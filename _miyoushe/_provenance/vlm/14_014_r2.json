@@ -1,0 +1,28 @@
+{
+ "rows": [
+  {
+   "label": "辅助",
+   "values": [
+    9900,
+    9900,
+    9900,
+    9900,
+    9950,
+    9900,
+    9900,
+    9900
+   ],
+   "verified": false,
+   "problems": [
+    "c0-out-of-range(9900)",
+    "c1-out-of-range(9900)",
+    "c2-out-of-range(9900)",
+    "c3-out-of-range(9900)",
+    "c4-out-of-range(9950)",
+    "c5-out-of-range(9900)",
+    "c6-out-of-range(9900)",
+    "c7-out-of-range(9900)"
+   ]
+  }
+ ]
+}

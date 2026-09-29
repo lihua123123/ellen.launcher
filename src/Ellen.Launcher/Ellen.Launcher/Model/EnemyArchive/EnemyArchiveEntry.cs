@@ -268,6 +268,14 @@ public sealed class EnemyArchiveResistances
     [JsonPropertyName("states")]
     public ImmutableArray<EnemyArchiveResistanceState> States { get; set; } = [];
 
+    /// <summary>
+    /// 常态行读值的证据等级，<c>cal-gold</c> / <c>2geo</c> / <c>eyeball</c> /
+    /// <c>single-read</c>；<see langword="null"/> 表示未评级（基线数据来源不明，或本就行
+    /// 未经 VLM 通道）。仅供后续在界面上做展示分级，**不影响任何数值**。
+    /// </summary>
+    [JsonPropertyName("evidence")]
+    public string? Evidence { get; set; }
+
     public bool HasStates => !States.IsDefaultOrEmpty;
 }
 
@@ -277,7 +285,18 @@ public sealed class EnemyArchiveResistanceState
     [JsonPropertyName("name")]
     public string? Name { get; set; }
 
-    /// <summary>触发条件（作为状态切换的提示文本）。</summary>
+    /// <summary>
+    /// 该状态的读值证据等级（同 <see cref="EnemyArchiveResistances.Evidence"/>）。
+    /// </summary>
+    [JsonPropertyName("evidence")]
+    public string? Evidence { get; set; }
+
+    /// <summary>
+    /// 图鉴卡上注释区的原文（本地 OCR）。
+    /// ⚠️ 这里**不是**“状态触发条件”——实测绝大多数值是机制说明散文，
+    /// 而且当前**没有任何界面消费这个字段**（全仓仅有定义）。
+    /// 真正要用作状态切换提示时，得先解决字段语义问题，别直接拿去渲染。
+    /// </summary>
     [JsonPropertyName("condition")]
     public string? Condition { get; set; }
 

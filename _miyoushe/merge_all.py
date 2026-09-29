@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""通用入库：把 table_all.py 产出的 diff 清单落成档案条目。
+r"""通用入库：把 table_all.py 产出的 diff 清单落成档案条目。
 
 规则（与 01/03 一致）：
   - 只收「与元数据有差异」的抗性行（diff 门槛）；
@@ -7,6 +7,15 @@
   - 一卡多行 → values 取常态行，其余进 resistances.states；
   - 抗性来自裁图高精度通道；技能/机制/产球来自文本解析 → 标注「待核对」；
   - 已在档案里的名字直接跳过（保留既有质量更高的版本）。
+
+⚠️ `condition` 为什么在生成期就要清洗
+    状态行的 `condition` 取的是本地 OCR 抓的注释区文本，其中绝大多数是**表格碎片**
+    （形如 `10-40 70 20 10-40 ...`、`士气 70 70 70 ...`）。`EnemyArchiveResistanceState.Condition`
+    在全仓**没有任何消费者**（死字段），但把 OCR 碎片当成「触发条件」写进档案是错的。
+    清洗规则见 `split_condition()`，判据与 `clean_conditions.py` 一致：
+    命中「`\d-\d` 粘连」**或**「数字 ≥ 6 个」→ `condition` 置 `null`，原文转入 `condition_ocr_raw`。
+    它**必须在这里**做：`finalize.py` 每轮都会重建这些条目，做成一次性补丁会被冲掉
+    （踩过：`clean_conditions.py` 手工跑完，重跑 finalize 后 74 条 condition 全部变回 OCR 原文）。
 """
 import json
 import re
@@ -73,6 +82,20 @@ def valid_energy(e):
         if r.get("particle") not in (0, 1, 2, 3) or r.get("orb") not in (0, 1, 2, 3):
             return False
     return True
+
+
+def split_condition(note):
+    """把注释区串切成 (可用条件, OCR 原文)；判据同 clean_conditions.py。
+
+    返回 (None, note) 表示这是 OCR 碎片，只能进 condition_ocr_raw；
+    返回 (note, None) 表示这是干净的人话，可以直接做 condition。
+    """
+    if not note:
+        return None, None
+    s = str(note)
+    if re.search(r"\d+\s*-\s*\d+", s) or len(re.findall(r"\d", s)) >= 6:
+        return None, note
+    return note, None
 
 
 def to_values(vals):
@@ -167,12 +190,26 @@ def main():
 
         tag, idx = base["src"].split("/")
         skills, mechanics, energy, energy_raw = text_fields(tag, idx)
+        condition, condition_raw = split_condition(note)
+        # evidence：每一行（常态 + 每个状态）各自的读值证据等级。
+        # 由 derive_evidence.py 推导、gap_override.py 携带；缺省不写（如 01/03 篇的
+        # 豁免行、以及档案里 136 条来源不明的基线行）。
+        state_items = []
+        for s in states:
+            item = {"name": s["label"] or "状态",
+                    "condition": condition,
+                    "values": to_values(s["values"])}
+            if condition_raw:
+                item["condition_ocr_raw"] = condition_raw
+            if s.get("evidence"):
+                item["evidence"] = s["evidence"]
+            state_items.append(item)
         entry = {"name": meta_name, "aliases": sorted({meta_name} | {r["name"] for r in rows}),
                  "type": "普通",
                  "resistances": {"values": to_values(base["values"]),
-                                 "states": [{"name": s["label"] or "状态",
-                                             "condition": note,
-                                             "values": to_values(s["values"])} for s in states]}}
+                                 "states": state_items}}
+        if base.get("evidence"):
+            entry["resistances"]["evidence"] = base["evidence"]
         if note:
             entry["resistances"]["defaultNote"] = note
         if mechanics:

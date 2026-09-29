@@ -52,6 +52,14 @@ CAL = ROOT / "_design" / "enemy-archive" / "cal"
 ELEMS = ["\u706b", "\u6c34", "\u98ce", "\u96f7", "\u8349", "\u51b0", "\u5ca9", "\u7269"]
 LOW, HIGH = -100, 500
 
+# 控制台编码兜底：部分终端是 GBK，打印 ✓ / ⚠ / → 会抛 UnicodeEncodeError 直接中断脚本。
+# 只放宽 errors（不改 encoding），这样支持 UTF-8 的终端照常显示，GBK 终端退化为 ? 而不是崩溃。
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(errors="replace")
+    except Exception:
+        pass
+
 PROMPT = """这是一张游戏攻略图鉴卡上「抗性数据」表格的裁图。
 请**只**输出 JSON，不要任何解释、不要 markdown 代码块。
 表格：第一行是 8 个元素图标，元素列顺序固定为：火 水 风 雷 草 冰 岩 物理。
@@ -306,7 +314,10 @@ def probe_matrix(key, base):
       文本也 403 → 账号/额度/区域/权限问题；仅视觉 403 → 该账号未开通 qwen-vl。
     """
     print("key = %s...%s (len=%d)" % (key[:6], key[-4:], len(key)))
-    px = Image.new("RGB", (2, 2), (255, 255, 255))
+    # ⚠️ 测试图必须 >=10px（Qwen-VL 要求宽高各不小于 10 像素），否则视觉模型会回
+    # 400 invalid_parameter_error 「image length and width do not meet the restrictions」，
+    # 看上去像不可用，其实鉴权已经通过了
+    px = Image.new("RGB", (64, 64), (255, 255, 255))
     b = io.BytesIO()
     px.save(b, format="PNG")
     uri = "data:image/png;base64," + base64.b64encode(b.getvalue()).decode()
@@ -335,34 +346,43 @@ def probe_matrix(key, base):
             rows.append((ename, m, st, d))
             print("  %-6s %-22s %-5s %s" % (ename, m, st, d[:110]))
 
-    ok = [(e, m) for e, m, st, _ in rows if st == 200]
-    txt_ok = any("vl" not in m for _, m, st, _ in rows if st == 200)
-    vl_ok = any("vl" in m for _, m, st, _ in rows if st == 200)
-    dom_ok = any(e == "国内站" for e, _, st, _ in rows if st == 200)
-    intl_ok = any(e == "国际站" for e, _, st, _ in rows if st == 200)
+    # ⚠️ 关键：鉴权是否通过看的是「不是 401/403」，不是「是 200」。
+    # 400（参数/尺寸/额度外的请求级错误）说明请求已过鉴权 → 该模型对该账号是可用的。
+    auth_ok = [(e, m, st) for e, m, st, _ in rows if str(st) not in ("401", "403")]
+    d401 = [(e, m) for e, m, st, _ in rows if str(st) == "401"]
+    d403 = [(e, m) for e, m, st, _ in rows if str(st) == "403"]
+    dom_ok = any(e == "国内站" for e, _, _ in auth_ok)
+    intl_ok = any(e == "国际站" for e, _, _ in auth_ok)
     print("\n  【归因】状态码集合 = %s"
           % ", ".join(sorted({str(st) for _, _, st, _ in rows})))
-    if ok:
-        print("    ✓ 可用组合：%s" % ", ".join("%s/%s" % (e, m) for e, m in ok))
-        if intl_ok and not dom_ok:
-            print("    → key 属**国际站**：把 VLM_BASE_URL 设为\n"
-                  "      https://dashscope-intl.aliyuncs.com/compatible-mode/v1")
-        if txt_ok and not vl_ok:
-            print("    → 文本模型可用、视觉模型不可用：**该账号未开通 qwen-vl 系列**\n"
-                  "      （百炼控制台 → 模型广场 → 开通）")
-    elif all(str(st) == "403" for _, _, st, _ in rows):
-        print("    ✗ 全部 403 access_denied（key 被识别但无权）——按官方错误码文档，\n"
-              "      该报文（type/code = access_denied，message = Access denied.）对应：\n"
-              "      1) **该账号无权访问此模型**——需在模型广场申请，或免费额度已耗尽且不支持付费\n"
-              "      2) 模型已下线（对照「模型下线机制说明」换用替代模型）\n"
-              "      3) 若用通用 sk- key 调 Token Plan / Coding Plan 专属模型 → 必须用 sk-sp- 专属 key\n"
-              "         + 专属 Base URL，两者不可混用\n"
-              "      ⚠️ 先去百炼控制台 → 模型广场，看目标模型卡片是否需要「开通 / 立即申请」；\n"
-              "      另试 qwen-vl-plus / qwen2.5-vl-* 等其它视觉模型（见上表状态）")
-    elif all(str(st) == "401" for _, _, st, _ in rows):
-        print("    ✗ 全部 401：key 本身无效 / 已吊销 / 复制不全 → 重新生成一个")
+    print("    ✓ 鉴权通过（可用）：%s"
+          % (", ".join("%s/%s(%s)" % t for t in auth_ok) or "无"))
+    if d403:
+        print("    ✗ 403 access_denied：%s" % ", ".join("%s/%s" % t for t in d403))
+    if d401:
+        print("    ✗ 401 invalid_api_key：%s" % ", ".join("%s/%s" % t for t in d401))
+
+    PREF = ["qwen-vl-max", "qwen-vl-max-latest", "qwen-vl-plus",
+            "qwen2.5-vl-72b-instruct", "qwen2.5-vl-7b-instruct"]
+    usable_vl = [m for _, m in sorted(
+        (PREF.index(m) if m in PREF else 99, m)
+        for e, m, _ in auth_ok if "vl" in m and e == "国内站")]
+    if intl_ok and not dom_ok:
+        print("    → key 属**国际站**：把 VLM_BASE_URL 设为\n"
+              "      https://dashscope-intl.aliyuncs.com/compatible-mode/v1")
+    if usable_vl:
+        print("    \u2192 建议：$env:VLM_MODEL = \"%s\"   # 已授权%s"
+              % (usable_vl[0], "，能力最强" if usable_vl[0] == "qwen-vl-max" else ""))
+    elif auth_ok:
+        print("    ✗ 鉴权通过，但**没有任何可用的视觉模型（VL）**——本任务必须用视觉模型，\n"
+              "      去百炼控制台 → 模型广场开通任一 qwen-vl 系列后重试")
     else:
-        print("    ✗ 没有可用的「端点+模型」组合，请对照上表错误码定位")
+        print("    ✗ 没有任何「端点+模型」可用：key / 账号 / 账单需人工排查")
+    if d403 and usable_vl:
+        print("    注：403 的都是**未授权给该账号的模型名**（-latest 滚动标签、旧版 2.5 系列\n"
+              "      常需单独开通）。直接用上面建议的已授权模型名即可，不必等开通。")
+    if not d401 and not d403:
+        print("    ✓ 全部组合鉴权通过")
     return rows
 
 

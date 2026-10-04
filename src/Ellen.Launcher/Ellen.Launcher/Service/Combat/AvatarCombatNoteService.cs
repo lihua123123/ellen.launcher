@@ -27,7 +27,7 @@ public sealed partial class AvatarCombatNoteService : IAvatarCombatNoteService
     private const string ResourceRelativePath = "Resource/CombatNotes/AvatarCombatNotes.json";
 
     private readonly ILogger<AvatarCombatNoteService> logger;
-    private readonly EllenWikiDataService ellenWikiDataService;
+    private readonly IEllenWikiDataService ellenWikiDataService;
 
     private readonly Lock gate = new();
 

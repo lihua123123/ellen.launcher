@@ -16,10 +16,15 @@ namespace Ellen.Launcher.Service.EllenWiki;
 /// 随应用发布的快照，不影响既有功能。快照写入后触发 <see cref="AttachmentUpdated"/>，
 /// 订阅方据此丢弃已缓存的反序列化结果。
 /// </para>
+/// <para>
+/// 注册为单例并用 <see cref="IHttpClientFactory"/> 取具名客户端（与 <c>FeatureService</c> 一致）：
+/// 若按具体类型注入，会落到 <c>[HttpClient]</c> 生成的 typed client（瞬态）上，
+/// 导致初始化与事件订阅不是同一个实例。
+/// </para>
 /// </summary>
-[Service(ServiceLifetime.Singleton)]
+[Service(ServiceLifetime.Singleton, typeof(IEllenWikiDataService))]
 [HttpClient(HttpClientConfiguration.Default)]
-public sealed partial class EllenWikiDataService
+public sealed partial class EllenWikiDataService : IEllenWikiDataService
 {
     public const string BaseUrl = "https://ellen.wiki";
 
@@ -27,7 +32,7 @@ public sealed partial class EllenWikiDataService
     private const string AttachmentFileName = "attachment.json";
 
     private readonly ILogger<EllenWikiDataService> logger;
-    private readonly HttpClient httpClient;
+    private readonly IHttpClientFactory httpClientFactory;
 
     [GeneratedConstructor]
     public partial EllenWikiDataService(IServiceProvider serviceProvider);
@@ -60,6 +65,7 @@ public sealed partial class EllenWikiDataService
         try
         {
             string url = $"{BaseUrl}/{AttachmentApiPath}";
+            using HttpClient httpClient = httpClientFactory.CreateClient(nameof(EllenWikiDataService));
             string json = await httpClient.GetStringAsync(url, token).ConfigureAwait(false);
 
             // 只有能解析成数据集时才写入，避免坏响应污染缓存。

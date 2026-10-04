@@ -184,7 +184,7 @@ public sealed partial class AppActivation : IAppActivation
             await Task.WhenAll(
             [
                 serviceProvider.GetRequiredService<IMetadataService>().InitializepublicAsync().AsTask(),
-                serviceProvider.GetRequiredService<EllenWikiDataService>().InitializeAsync().AsTask(),
+                serviceProvider.GetRequiredService<IEllenWikiDataService>().InitializeAsync().AsTask(),
             ]).ConfigureAwait(false);
 
             SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateInfo("Background initialization completed", "Application"));

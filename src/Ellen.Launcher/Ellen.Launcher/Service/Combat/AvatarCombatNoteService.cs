@@ -90,6 +90,7 @@ public sealed partial class AvatarCombatNoteService : IAvatarCombatNoteService
             CombatNoteTarget.NormalAttack => depot.Skills.ElementAtOrDefault(0),
             CombatNoteTarget.ElementalSkill => depot.Skills.ElementAtOrDefault(1),
             CombatNoteTarget.ElementalBurst => depot.EnergySkill,
+            CombatNoteTarget.Sprint => depot.Skills.ElementAtOrDefault(2),
             CombatNoteTarget.Inherent1 => depot.Inherents.ElementAtOrDefault(0),
             CombatNoteTarget.Inherent2 => depot.Inherents.ElementAtOrDefault(1),
             CombatNoteTarget.Inherent3 => depot.Inherents.ElementAtOrDefault(2),

@@ -18,6 +18,13 @@ public enum CombatNoteTarget
     NormalAttack,
     ElementalSkill,
     ElementalBurst,
+
+    /// <summary>
+    /// 替代冲刺（如莫娜「虚实流动」、神里绫华「神里流·霰步」）。
+    /// 在 <c>SkillDepot.Skills</c> 里是第 3 个技能。
+    /// </summary>
+    Sprint,
+
     Inherent1,
     Inherent2,
     Inherent3,

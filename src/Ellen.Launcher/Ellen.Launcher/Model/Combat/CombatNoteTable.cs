@@ -13,19 +13,9 @@ public sealed class CombatNoteTable
 {
     public CombatNoteTable(ImmutableArray<CombatNoteRow> rows)
     {
-        // 只有一行时该行就是所在条目本身，不需要「技能」列来区分。
-        ShowSkillColumn = rows.Length > 1;
-
-        List<CombatNoteRowView> views = [];
-        foreach (CombatNoteRow row in rows)
-        {
-            views.Add(new CombatNoteRowView(ShowSkillColumn, row));
-        }
-
+        List<CombatNoteRowView> views = [.. rows.Select(static row => new CombatNoteRowView(row))];
         Rows = [.. views];
     }
 
     public ImmutableArray<CombatNoteRowView> Rows { get; }
-
-    public bool ShowSkillColumn { get; }
 }

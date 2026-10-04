@@ -12,5 +12,5 @@ public sealed record CombatNoteRow(
     [property: JsonPropertyName("elementAmount")] string? ElementAmount,
     [property: JsonPropertyName("attachment")] string? Attachment,
     [property: JsonPropertyName("particle")] string? Particle,
-    [property: JsonPropertyName("poise")] string? Poise,
-    [property: JsonPropertyName("remark")] string? Remark);
+    [property: JsonPropertyName("remark")] string? Remark,
+    [property: JsonPropertyName("poise")] string? Poise);

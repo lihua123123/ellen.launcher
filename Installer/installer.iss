@@ -13,7 +13,7 @@
 #define MyAppName "Ellen.Launcher"
 #define MyAppShortName "Ellen.Launcher"
 #ifndef MyAppVersion
-  #define MyAppVersion "1.0.0.6"
+  #define MyAppVersion "1.0.0.4"
 #endif
 #define MyAppPublisher "艾莲意为爱恋"
 #define MyAppURL "https://ellen.wiki"

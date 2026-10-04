@@ -3,6 +3,7 @@
 
 using Ellen.Launcher.Core;
 using Ellen.Launcher.Model.Combat;
+using Ellen.Launcher.Service.EllenWiki;
 using System.Collections.Frozen;
 using System.IO;
 using MetadataAvatar = Ellen.Launcher.Model.Metadata.Avatar.Avatar;
@@ -12,10 +13,12 @@ using MetadataSkillDepot = Ellen.Launcher.Model.Metadata.Avatar.SkillDepot;
 namespace Ellen.Launcher.Service.Combat;
 
 /// <summary>
-/// 从应用目录的 JSON 资源懒加载战斗备注。
+/// 「元素附着及产球」战斗备注的只读查询。
 /// <para>
-/// 该功能是纯附加信息：资源缺失或格式错误时只记录日志并返回空表，
-/// 不影响角色资料页的既有功能。
+/// 数据来自 ellen.wiki 的 <c>GET /api/attachment</c>：优先使用
+/// <see cref="EllenWikiDataService"/> 运行期同步的快照，缺失时回退到随应用发布的
+/// <c>Resource/CombatNotes/AvatarCombatNotes.json</c>。该功能是纯附加信息：资源缺失或
+/// 格式错误时只记录日志并返回空表，不影响角色资料页的既有功能。
 /// </para>
 /// </summary>
 [Service(ServiceLifetime.Singleton, typeof(IAvatarCombatNoteService))]
@@ -24,8 +27,11 @@ public sealed partial class AvatarCombatNoteService : IAvatarCombatNoteService
     private const string ResourceRelativePath = "Resource/CombatNotes/AvatarCombatNotes.json";
 
     private readonly ILogger<AvatarCombatNoteService> logger;
+    private readonly EllenWikiDataService ellenWikiDataService;
 
-    private Lazy<FrozenDictionary<string, AvatarCombatNote>>? notes;
+    private readonly Lock gate = new();
+
+    private FrozenDictionary<string, AvatarCombatNote>? notes;
 
     [GeneratedConstructor]
     public partial AvatarCombatNoteService(IServiceProvider serviceProvider);
@@ -46,6 +52,14 @@ public sealed partial class AvatarCombatNoteService : IAvatarCombatNoteService
         {
             ApplyEntry(avatar.SkillDepot, entry);
         }
+    }
+
+    /// <summary>
+    /// 运行期同步写入新快照后，丢弃已反序列化的结果，下次查询时重新加载。
+    /// </summary>
+    partial void PostConstruct(IServiceProvider serviceProvider)
+    {
+        ellenWikiDataService.AttachmentUpdated += OnAttachmentUpdated;
     }
 
     /// <summary>
@@ -96,33 +110,81 @@ public sealed partial class AvatarCombatNoteService : IAvatarCombatNoteService
         skill.CombatNoteTable = new([.. entry.Rows]);
     }
 
+    private void OnAttachmentUpdated(object? sender, EventArgs e)
+    {
+        Volatile.Write(ref notes, null);
+    }
+
     private FrozenDictionary<string, AvatarCombatNote> Notes
     {
-        get => (notes ??= new(LoadNotes)).Value;
+        get
+        {
+            FrozenDictionary<string, AvatarCombatNote>? current = Volatile.Read(ref notes);
+            if (current is not null)
+            {
+                return current;
+            }
+
+            lock (gate)
+            {
+                current = notes;
+                if (current is not null)
+                {
+                    return current;
+                }
+
+                current = LoadNotes();
+                Volatile.Write(ref notes, current);
+                return current;
+            }
+        }
     }
 
     private FrozenDictionary<string, AvatarCombatNote> LoadNotes()
     {
-        string path = InstalledLocation.GetAbsolutePath(ResourceRelativePath);
-        if (!File.Exists(path))
+        // 运行期同步的快照优先；缺失或损坏时回退到随包快照。
+        if (TryLoad(ellenWikiDataService.GetAttachmentSnapshotPath(), out FrozenDictionary<string, AvatarCombatNote> synced))
         {
-            logger.LogWarning("Combat notes file not found: {Path}", path);
-            return FrozenDictionary<string, AvatarCombatNote>.Empty;
+            return synced;
+        }
+
+        if (TryLoad(InstalledLocation.GetAbsolutePath(ResourceRelativePath), out FrozenDictionary<string, AvatarCombatNote> bundled))
+        {
+            return bundled;
+        }
+
+        return FrozenDictionary<string, AvatarCombatNote>.Empty;
+    }
+
+    private bool TryLoad(string? path, out FrozenDictionary<string, AvatarCombatNote> notes)
+    {
+        notes = FrozenDictionary<string, AvatarCombatNote>.Empty;
+
+        if (string.IsNullOrEmpty(path) || !File.Exists(path))
+        {
+            return false;
         }
 
         try
         {
             string json = File.ReadAllText(path);
-            AvatarCombatNote[] parsed = JsonSerializer.Deserialize(json, AvatarCombatNoteJsonContext.Default.AvatarCombatNoteArray) ?? [];
+            EllenWikiAttachmentDataset? dataset = JsonSerializer.Deserialize(json, AvatarCombatNoteJsonContext.Default.EllenWikiAttachmentDataset);
 
-            return parsed
+            if (dataset is null)
+            {
+                logger.LogWarning("Combat notes file is empty: {Path}", path);
+                return false;
+            }
+
+            notes = AvatarCombatNoteConverter.Convert(dataset)
                 .Where(static note => !string.IsNullOrEmpty(note.Name))
                 .ToFrozenDictionary(static note => note.Name);
+            return true;
         }
         catch (Exception ex) when (ex is JsonException or IOException or UnauthorizedAccessException)
         {
             logger.LogError(ex, "Failed to load combat notes from {Path}", path);
-            return FrozenDictionary<string, AvatarCombatNote>.Empty;
+            return false;
         }
     }
 }

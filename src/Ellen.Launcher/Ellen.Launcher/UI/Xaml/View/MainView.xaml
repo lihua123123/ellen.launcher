@@ -345,6 +345,11 @@
                         shuxc:NavigationViewItemHelper.NavigateTo="shuxvp:WikiMonsterPage"
                         Content="{shuxm:ResourceString Name=ViewWikiMonsterHeader}"
                         Icon="{shuxm:BitmapIcon Source=ms-appx:///Resource/Navigation/WikiMonster.png}"/>
+
+                    <NavigationViewItem
+                        shuxc:NavigationViewItemHelper.NavigateTo="shuxvp:FormulasPage"
+                        Content="{shuxm:ResourceString Name=ViewFormulasHeader}"
+                        Icon="{shuxm:BitmapIcon Source=ms-appx:///Resource/Navigation/Cultivation.png}"/>
                 </NavigationView.MenuItems>
 
                 <NavigationView.PaneFooter>

@@ -1,0 +1,3 @@
+# 缓存 ellen.wiki 原始响应，不纳入版本控制
+.cache/
+__pycache__/

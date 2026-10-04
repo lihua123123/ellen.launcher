@@ -13,7 +13,7 @@
 | 平台 | 仅 `x64`（解决方案只声明了 x64 平台） |
 | Inno Setup | 6.x，`ISCC.exe` 默认在 `%LOCALAPPDATA%\Programs\Inno Setup 6\`（不在 PATH） |
 | 打包依赖 | `Installer\VC_redist.x64.exe`（安装包会按需安装 VC++ 运行库） |
-| 可选 | Python 3（跑 `tools/GenAvatarCombatNotes.py`） |
+| 可选 | Python 3（跑 `tools/EllenWikiSync/sync.py`） |
 
 NuGet 源见根目录 `NuGet.Config`（nuget.org + Microsoft CsWin32 + CommunityToolkit Main/Labs）。
 
@@ -35,7 +35,8 @@ ellen-launcher/
 │  └─ Publish/                      ★ 打包暂存目录（由构建产物复制而来，勿手工改）
 ├─ publish/                         ★ 安装包输出目录（ISCC 产物）
 ├─ tools/                           开发期辅助工具（不参与主程序构建）
-│  ├─ GenAvatarCombatNotes.py       由 ellen-wiki 的 md 生成角色战斗备注 JSON
+│  ├─ EllenWikiSync/                由 ellen.wiki 公开数据 API 同步数据快照（Python）
+│  ├─ FormulasGen/                  由 ellen-wiki 的 formulas/*.md 生成计算公式 JSON + 公式位图（Node）
 │  ├─ XamlStyleAudit.ps1            静态检查 ThemeResource Style 的 TargetType 错配
 │  └─ GuideDataCheck/               幽境 Boss 攻略数据的解析校验控制台工具
 └─ src/
@@ -123,9 +124,26 @@ CSV 行格式：`"签名", CN 地址, Oversea 地址`。改域名、加接口、
 
 ### 3.4 其他数据
 
+**ellen.wiki 数据 API**：`https://ellen.wiki` 提供只读 JSON API（说明见 <https://ellen.wiki/#/developer>），
+`tools/EllenWikiSync/` 把其中的数据集同步成随应用发布、保持接口原始结构的快照：
+
+```powershell
+python tools\EllenWikiSync\sync.py            # 同步全部数据集
+python tools\EllenWikiSync\sync.py --check    # 只比对，不写文件
+python tools\EllenWikiSync\sync.py --list     # 列出数据集
+```
+
+新增数据集只需在 `tools/EllenWikiSync/ellenwiki/datasets.py` 的 `DATASETS` 里加一条
+（API 路径 → 仓库内目标文件）。同步后需重新构建。
+
+应用侧还会在启动时从同一 API 重新拉取「元素附着及产球」快照并缓存到数据目录
+（`Core/EllenRuntime.cs → GetDataEllenWikiDirectory()`），失败或离线时回退到随包快照；
+相关实现见 `Service/EllenWiki/EllenWikiDataService.cs`、`Model/Combat/AvatarCombatNoteConverter.cs`。
+
 | 数据 | 来源 | 生成方式 |
 | --- | --- | --- |
-| 角色「元素附着/产球」战斗备注 | `ellen-wiki` 仓库的 `content/attachment/元素附着及产球.md` | `python tools/GenAvatarCombatNotes.py` → `Resource/CombatNotes/AvatarCombatNotes.json` |
+| 角色「元素附着/产球」战斗备注 | ellen.wiki `GET /api/attachment` | `python tools/EllenWikiSync/sync.py attachment` → `Resource/CombatNotes/AvatarCombatNotes.json`（运行期由 `AvatarCombatNoteConverter` 转换） |
+| 伤害计算公式 | `ellen-wiki` 仓库的 `content/formulas/genshin.md` | `node tools/FormulasGen/gen.mjs` → `Resource/Formulas/GenshinFormulas.json` + `Resource/Formulas/Genshin/{light,dark}/*.png` |
 | 幽境 Boss 攻略 | 外部 JSON + 图片目录 | 用 `tools/GuideDataCheck` 校验 |
 | 标识类型（UID、Region、AvatarId…） | `IdentityStructs.json` | `SourceGeneration/Identity/IdentityGenerator.cs` |
 | 静态资源 / 公告 | 米游社官方 CDN + `static.snaphutaorp.org` | 运行期下载，缓存在数据目录 |
@@ -242,7 +260,8 @@ Copy-Item "$src\*" "Installer\Publish\" -Recurse -Force
 | 列表/图标滚动卡顿 | `UI/Xaml/Control/Image/CachedImage.cs` 的 `DecodeWidth`（只按宽度解码、另一轴按比例缩放，设 0 时按控件 `Width`/`Height`/`ActualWidth` 自动推断，避免按原图全尺寸解码）；图标控件见 `UI/Xaml/Control/ItemIcon.xaml` |
 | 数据库结构 | 改 `Model/Entity/**` → 手写 `Migrations/` → **同步更新 `Migrations/AppDbContextModelSnapshot.cs`** |
 | 本地化资源键 | `Resource/Localization/*.resx`（需 UTF-8，见「已知坑」） |
-| 角色战斗备注 | 改 `ellen-wiki` 的 md → `python tools/GenAvatarCombatNotes.py --report` |
+| 角色战斗备注 | 改 wiki 数据源 → `python tools\EllenWikiSync\sync.py attachment`（先 `--check` 看差异） |
+| 伤害计算公式 | 改 `ellen-wiki` 的 `content/formulas/genshin.md` → `node tools/FormulasGen/gen.mjs`（公式位图会一并重渲染） |
 | 元数据 | 改上游 `DGP-Studio/Snap.Metadata`，或替换 `Resource/Metadata/Genshin/CHS/**` 内置快照 |
 
 ### 代码约定
@@ -261,8 +280,13 @@ Copy-Item "$src\*" "Installer\Publish\" -Recurse -Force
 # 检查 XAML 中 ThemeResource Style 的 TargetType 错配（WinUI 只在运行期抛异常）
 powershell -File tools\XamlStyleAudit.ps1
 
-# 由 ellen-wiki 的「元素附着及产球.md」生成角色战斗备注
-python tools\GenAvatarCombatNotes.py --report
+# 由 ellen.wiki 数据 API 同步「元素附着及产球」等快照
+python tools\EllenWikiSync\sync.py --check
+
+# 由 ellen-wiki 的 formulas/genshin.md 生成计算公式数据与亮/暗两套公式位图
+# （首次需先在 tools\FormulasGen 执行 npm install）
+npm --prefix tools\FormulasGen install
+node tools\FormulasGen/gen.mjs
 
 # 校验幽境 Boss 攻略 JSON
 dotnet run --project tools\GuideDataCheck -- <HardChallengeBosses.json> <图片目录>

@@ -1,0 +1,11 @@
+{
+  "name": "ellen-formulas-gen",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "把 ellen-wiki 的 content/formulas/*.md 转成启动器用的结构化 JSON + 离线公式 SVG",
+  "dependencies": {
+    "mathjax-full": "^3.2.2",
+    "sharp": "^0.34.0"
+  }
+}

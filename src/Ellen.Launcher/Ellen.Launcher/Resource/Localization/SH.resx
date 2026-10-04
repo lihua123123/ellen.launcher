@@ -1423,7 +1423,10 @@
   <data name="ViewExceptionWindowStacktraceHeader" xml:space="preserve">
     <value>调用堆栈</value>
   </data>
-    <data name="ViewGachaLogHeader" xml:space="preserve">
+    <data name="ViewFormulasHeader" xml:space="preserve">
+    <value>计算公式</value>
+  </data>
+  <data name="ViewGachaLogHeader" xml:space="preserve">
     <value>祈愿记录</value>
   </data>
   <data name="ViewGuideStaticResourceDownloadSize" xml:space="preserve">
@@ -2301,6 +2304,15 @@
   </data>
         <data name="ViewPageFeedbackCurrentProxyNoProxyDescription" xml:space="preserve">
     <value>无代理</value>
+  </data>
+  <data name="ViewPageFormulasEmptyHint" xml:space="preserve">
+    <value>未找到计算公式数据，请确认已随应用发布 Resource/Formulas/GenshinFormulas.json</value>
+  </data>
+  <data name="ViewPageFormulasSubtitle" xml:space="preserve">
+    <value>伤害、反应、充能与破盾的完整计算公式，数据来自 ellen.wiki</value>
+  </data>
+  <data name="ViewPageFormulasTocHeader" xml:space="preserve">
+    <value>目录</value>
   </data>
                   <data name="ViewPageGachaLogAggressiveRefresh" xml:space="preserve">
     <value>全量刷新</value>

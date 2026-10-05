@@ -1,0 +1,16 @@
+{
+ "sourceType": "hand-curated",
+ "provenance": {
+  "origin": "作者依据公开战斗规则手工整理的原创档位常量表",
+  "notDerivedFrom": "Resource/EnemyArchives/EnemyArchives.json（米游社 UGC，未获授权，不得打包或回引）",
+  "note": "档位为约定常量，不是逐怪实测数值。引擎只接受档位常量作为入参，不在此表内做敌人查表；敌人归属由领域服务或用户选择提供（Q1 方案 a 起步、b 渐进）。"
+ },
+ "defaultTier": "universal",
+ "defaultRationale": "默认 10% 抗性使伤害被低估而非高估。低估是可用性问题，高估是信誉问题。",
+ "rows": [
+  { "tier": "universal", "value": 0.10, "label": "通用", "note": "绝大多数敌人" },
+  { "tier": "elemental-high", "value": 0.40, "label": "元素高抗", "note": "对自身元素高抗" },
+  { "tier": "immune", "value": 1.00, "label": "免疫", "note": "完全免疫该元素" },
+  { "tier": "negative", "value": -0.20, "label": "负抗特例", "note": "负抗特例，走 1 - r/2 分段" }
+ ]
+}

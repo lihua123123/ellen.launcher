@@ -1,0 +1,1954 @@
+{
+ "characters": {
+  "七七": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000035,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:命中治疗量",
+    "label:持续治疗量",
+    "label:治疗量"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "丝柯克": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000114,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": "ATK"
+  },
+  "丽莎": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000006,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "久岐忍": {
+   "atk_basis": "default_stat",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000065,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:越祓草轮治疗量"
+   ],
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": null
+  },
+  "九条裟罗": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000056,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "云堇": {
+   "atk_basis": "default_stat",
+   "base_stat": "DEF",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000064,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:护盾吸收量",
+    "panel",
+    "shield"
+   ],
+   "multi": null,
+   "scaling_source": "DEF",
+   "stat_priority": null
+  },
+  "五郎": {
+   "atk_basis": "default_stat",
+   "base_stat": "DEF",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000055,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "DEF",
+   "stat_priority": null
+  },
+  "伊安珊": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000110,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "伊法": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000113,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:秘药弹命中治疗量"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "伊涅芙": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "ATK"
+   ],
+   "id": 10000116,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:护盾吸收量",
+    "label:护盾持续时间",
+    "panel",
+    "shield"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": "ATK"
+  },
+  "优菈": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000051,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:冰元素抗性降低",
+    "label:抗性降低时间",
+    "label:物理抗性降低"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "克洛琳德": {
+   "atk_basis": "default_stat",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000098,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:贯夜治疗量"
+   ],
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": null
+  },
+  "八重神子": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000058,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "shred"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "兹白": {
+   "atk_basis": "default_stat",
+   "base_stat": "DEF",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "DEF"
+   ],
+   "id": 10000126,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "DEF",
+   "stat_priority": "DEF"
+  },
+  "凝光": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000027,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "凯亚": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000015,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "刻晴": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000042,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "北斗": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000024,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:护盾吸收量",
+    "shield"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "千织": {
+   "atk_basis": "explicit",
+   "base_stat": null,
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "DEF"
+   ],
+   "id": 10000094,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": [
+    "ATK",
+    "DEF"
+   ],
+   "scaling_source": null,
+   "stat_priority": null
+  },
+  "卡维": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000081,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "卡齐娜": {
+   "atk_basis": "default_stat",
+   "base_stat": "DEF",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000100,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "DEF",
+   "stat_priority": null
+  },
+  "可莉": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000029,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "shred"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "叶洛亚": {
+   "atk_basis": "default_stat",
+   "base_stat": "DEF",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "DEF"
+   ],
+   "id": 10000127,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "DEF",
+   "stat_priority": "DEF"
+  },
+  "哥伦比娅": {
+   "atk_basis": "default_stat",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "HP"
+   ],
+   "id": 10000125,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "panel",
+    "shield"
+   ],
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": "HP"
+  },
+  "嘉明": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000092,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:技能治疗量",
+    "label:消耗生命值"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "坎蒂丝": {
+   "atk_basis": "default_stat",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000072,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:护盾吸收量",
+    "panel",
+    "shield"
+   ],
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": null
+  },
+  "埃洛伊": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000062,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "基尼奇": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000101,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "塔利雅": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000115,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:圣眷护盾吸收量",
+    "panel",
+    "shield"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": "HP"
+  },
+  "夏沃蕾": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000090,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:持续治疗量",
+    "label:治疗持续时间",
+    "panel",
+    "shred"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "夏洛蒂": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000088,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:施放治疗量",
+    "label:相机持续治疗量",
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "多莉": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000068,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:元素能量恢复",
+    "label:持续治疗量"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "夜兰": {
+   "atk_basis": "default_stat",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000060,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": null
+  },
+  "奈芙尔": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000122,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": "ATK"
+  },
+  "奥黛塔": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000150,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": "ATK"
+  },
+  "妮露": {
+   "atk_basis": "default_stat",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000070,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": null
+  },
+  "娜维娅": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000091,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "安柏": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000021,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "宵宫": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000049,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "尼可": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "ATK"
+   ],
+   "id": 10000131,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:护盾吸收量",
+    "label:护盾持续时间",
+    "shield",
+    "shred"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": "ATK"
+  },
+  "布伦妮": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000132,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": "ATK"
+  },
+  "希格雯": {
+   "atk_basis": "default_stat",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000095,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:弹跳结束治疗量",
+    "label:激愈水球治疗量",
+    "panel",
+    "shield"
+   ],
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": null
+  },
+  "希诺宁": {
+   "atk_basis": "default_stat",
+   "base_stat": "DEF",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "DEF"
+   ],
+   "id": 10000103,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:元素抗性降低",
+    "label:持续治疗量",
+    "panel",
+    "shred"
+   ],
+   "multi": null,
+   "scaling_source": "DEF",
+   "stat_priority": null
+  },
+  "恰斯卡": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000104,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "托马": {
+   "atk_basis": "default_stat",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000050,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:护盾吸收量",
+    "label:护盾吸收量上限",
+    "label:护盾持续时间",
+    "shield"
+   ],
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": null
+  },
+  "提纳里": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000069,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "早柚": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000053,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:不倒貉貉治疗量",
+    "label:技能发动治疗量"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "杜林": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": "base 全 ATK；仅命座条件性按 ATK",
+   "conditional_scaling": [
+    "ATK"
+   ],
+   "id": 10000123,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:元素能量恢复",
+    "shred"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": "ATK"
+  },
+  "林尼": {
+   "atk_basis": "explicit",
+   "base_stat": null,
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000084,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:恢复生命值"
+   ],
+   "multi": [
+    "ATK",
+    "HP"
+   ],
+   "scaling_source": null,
+   "stat_priority": null
+  },
+  "枫原万叶": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000047,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "柯莱": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000067,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "桑多涅": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": "base 全 ATK；仅命座条件性按 ATK",
+   "conditional_scaling": [
+    "ATK"
+   ],
+   "id": 10000133,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": "ATK"
+  },
+  "梦见月瑞希": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000109,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:拾取点心回复生命值"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "欧洛伦": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000105,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "沃雅妮莎": {
+   "atk_basis": "default_stat",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000140,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:抗性降低持续时间",
+    "label:水元素/冰元素抗性降低",
+    "label:遥久之歌治疗量",
+    "label:遥久之歌治疗间隔",
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": "HP"
+  },
+  "法尔伽": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000128,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": "ATK"
+  },
+  "洛恩": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000129,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": "ATK"
+  },
+  "流浪者": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000075,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "温迪": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000022,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "shred"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "烟绯": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000048,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "爱可菲": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": "base 全 ATK；仅命座条件性按 ATK",
+   "conditional_scaling": [
+    "ATK"
+   ],
+   "id": 10000112,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:治疗量"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "爱诺": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000121,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": "ATK"
+  },
+  "玛拉妮": {
+   "atk_basis": "default_stat",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "HP"
+   ],
+   "id": 10000102,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": null
+  },
+  "玛薇卡": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "ATK"
+   ],
+   "id": 10000106,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel",
+    "shred"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "珊瑚宫心海": {
+   "atk_basis": "default_stat",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000054,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:命中治疗量",
+    "label:治疗量"
+   ],
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": null
+  },
+  "珐露珊": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000076,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:风元素抗性降低"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "班尼特": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000032,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:持续治疗"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "琳妮特": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000083,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:命中治疗量",
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "琴": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000003,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:持续治疗",
+    "label:领域发动治疗量"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "瑶瑶": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000077,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:桂子仙机白玉萝卜治疗量",
+    "label:白玉萝卜治疗量",
+    "label:草元素抗性提升"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "瓦雷莎": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": "base 全 ATK；仅命座条件性按 ATK",
+   "conditional_scaling": [
+    "ATK"
+   ],
+   "id": 10000111,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "甘雨": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000037,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "申鹤": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000063,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:抗性降低",
+    "shred"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "白术": {
+   "atk_basis": "default_stat",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "HP"
+   ],
+   "id": 10000082,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:无郤气护盾吸收量",
+    "label:无郤气护盾持续时间",
+    "label:无郤气护盾治疗量",
+    "label:治疗量"
+   ],
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": null
+  },
+  "砂糖": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000043,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "神里绫人": {
+   "atk_basis": "default_stat",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000066,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": null
+  },
+  "神里绫华": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000002,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "shred"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "米卡": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000080,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:施放治疗量",
+    "label:鹰翎治疗量",
+    "label:鹰翎治疗间隔"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "纳西妲": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000073,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "shred"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "绮良良": {
+   "atk_basis": "explicit",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "ATK"
+   ],
+   "id": 10000061,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:护盾吸收量",
+    "label:护盾吸收量上限",
+    "label:护盾持续时间",
+    "shield"
+   ],
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": null
+  },
+  "罗莎莉亚": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000045,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "shred"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "胡桃": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "HP"
+   ],
+   "id": 10000046,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "consumable",
+    "heal",
+    "label:低血量时技能治疗量",
+    "label:技能治疗量"
+   ],
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": null
+  },
+  "艾尔海森": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000078,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "艾梅莉埃": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "ATK"
+   ],
+   "id": 10000099,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "芙宁娜": {
+   "atk_basis": "default_stat",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "HP"
+   ],
+   "id": 10000089,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:乌瑟勋爵消耗生命值",
+    "label:众水的歌者治疗量",
+    "label:气氛值转化受治疗加成比例",
+    "label:海薇玛夫人消耗生命值",
+    "label:谢贝蕾妲小姐消耗生命值",
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": null
+  },
+  "芭芭拉": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000014,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:命中治疗量",
+    "label:持续治疗量",
+    "label:治疗量"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "茜特菈莉": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000107,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:护盾吸收量",
+    "label:护盾持续时间",
+    "shield"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "荒泷一斗": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000057,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel",
+    "shred"
+   ],
+   "multi": null,
+   "scaling_source": "DEF",
+   "stat_priority": null
+  },
+  "莉奈娅": {
+   "atk_basis": "default_stat",
+   "base_stat": "DEF",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "DEF"
+   ],
+   "id": 10000130,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:持续治疗量",
+    "label:治疗持续时间",
+    "label:首次治疗量",
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "DEF",
+   "stat_priority": "DEF"
+  },
+  "莫娜": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000041,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "莱依拉": {
+   "atk_basis": "default_stat",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "HP"
+   ],
+   "id": 10000074,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:护盾基础吸收量",
+    "label:护盾持续时间",
+    "shield"
+   ],
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": null
+  },
+  "莱欧斯利": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000086,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:消耗生命值",
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "菈乌玛": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000119,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:元素抗性降低",
+    "label:元素抗性降低持续时间"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": "ATK"
+  },
+  "菲林斯": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": "base 全 ATK；仅命座条件性按 ATK",
+   "conditional_scaling": [
+    "ATK"
+   ],
+   "id": 10000120,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": "ATK"
+  },
+  "菲米尼": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000085,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "菲谢尔": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000031,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "蓝砚": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000108,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:护盾吸收量",
+    "label:护盾持续时间",
+    "shield"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "薇斯纳": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000143,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": "ATK"
+  },
+  "行秋": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000025,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "诺艾尔": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000034,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:吸收量",
+    "label:治疗触发几率",
+    "label:治疗量",
+    "shield"
+   ],
+   "multi": null,
+   "scaling_source": "DEF",
+   "stat_priority": null
+  },
+  "赛索斯": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000097,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:恢复元素能量"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "赛诺": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000071,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "辛焱": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000044,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:一级护盾吸收量",
+    "label:三级护盾吸收量",
+    "label:二级护盾吸收量",
+    "label:护盾持续时间",
+    "shield",
+    "shred"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "达达利亚": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000033,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "迪卢克": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000016,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "迪奥娜": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000039,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:护盾基础吸收量",
+    "label:持续治疗量",
+    "shield"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "迪希雅": {
+   "atk_basis": "explicit",
+   "base_stat": null,
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "HP"
+   ],
+   "id": 10000079,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal"
+   ],
+   "multi": [
+    "ATK",
+    "HP"
+   ],
+   "scaling_source": null,
+   "stat_priority": null
+  },
+  "那维莱特": {
+   "atk_basis": "default_stat",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000087,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "cost",
+    "heal",
+    "label:恢复生命值"
+   ],
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": null
+  },
+  "重云": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000036,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "钟离": {
+   "atk_basis": "default_stat",
+   "base_stat": "HP",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000030,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:护盾基础吸收量",
+    "label:护盾持续时间",
+    "label:护盾附加吸收量",
+    "shield",
+    "shred"
+   ],
+   "multi": null,
+   "scaling_source": "HP",
+   "stat_priority": null
+  },
+  "闲云": {
+   "atk_basis": "explicit",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "ATK"
+   ],
+   "id": 10000093,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:持续治疗量",
+    "label:治疗量",
+    "panel"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "阿罗夏": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000148,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": "ATK"
+  },
+  "阿蕾奇诺": {
+   "atk_basis": "explicit",
+   "base_stat": null,
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": [
+    "ATK"
+   ],
+   "id": 10000096,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:回复量"
+   ],
+   "multi": [
+    "ATK",
+    "HP"
+   ],
+   "scaling_source": null,
+   "stat_priority": null
+  },
+  "阿贝多": {
+   "atk_basis": "default_stat",
+   "base_stat": "DEF",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000038,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "DEF",
+   "stat_priority": null
+  },
+  "雅珂达": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000124,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "heal",
+    "label:最低生命值角色额外治疗量",
+    "label:猫型家用互助协调器治疗量"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": "ATK"
+  },
+  "雷泽": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000020,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:雷之印吸收恢复能量",
+    "label:雷元素抗性提升",
+    "shred"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "雷电将军": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000052,
+   "is_default_atk": false,
+   "l0_excluded": [
+    "label:梦想一心能量恢复",
+    "panel",
+    "shred"
+   ],
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "香菱": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000023,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "魈": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000026,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  },
+  "鹿野院平藏": {
+   "atk_basis": "default_stat",
+   "base_stat": "ATK",
+   "base_stat_variants": null,
+   "conditional_note": null,
+   "conditional_scaling": null,
+   "id": 10000059,
+   "is_default_atk": false,
+   "l0_excluded": null,
+   "multi": null,
+   "scaling_source": "ATK",
+   "stat_priority": null
+  }
+ },
+ "divergences": [
+  "塔利雅"
+ ],
+ "fields": [
+  "base_stat",
+  "scaling_source",
+  "multi",
+  "conditional_scaling",
+  "stat_priority"
+ ],
+ "generator": "tools/ScalingStatGen/generate.py",
+ "inputSnapshot": "Resource/Metadata/Genshin/CHS/Avatar/*.json",
+ "reviewNote": "尚未经第二人复核。塔利雅一类分歧（权重表按护盾语境给 HP，伤害缩放为 ATK）属语义差异而非错误。",
+ "reviewStatus": "draft",
+ "sourceType": "derived-original",
+ "statPriorityIsNotScalingSource": true
+}

@@ -1,16 +1,64 @@
 {
- "sourceType": "hand-curated",
- "provenance": {
-  "origin": "作者依据公开战斗规则手工整理的原创档位常量表",
-  "notDerivedFrom": "Resource/EnemyArchives/EnemyArchives.json（米游社 UGC，未获授权，不得打包或回引）",
-  "note": "档位为约定常量，不是逐怪实测数值。引擎只接受档位常量作为入参，不在此表内做敌人查表；敌人归属由领域服务或用户选择提供（Q1 方案 a 起步、b 渐进）。"
+ "sourceType": "hand-curated-fallback",
+ "revision": 2,
+ "revisionNote": "v1 曾按『抗性在剔除 EnemyArchives 后无来源』设计为唯一来源；该前提已被证伪——主源是随包 MIT 元数据，本表降级为兜底。",
+ "primarySource": {
+  "path": "Resource/Metadata/Genshin/CHS/Monster.json -> BaseValue.{Fire,Grass,Water,Elec,Wind,Ice,Rock,Physical}SubHurt",
+  "coverage": "474/562",
+  "license": "MIT (DGP Studio / SnapHutaoRemasteringProject)",
+  "observedValues": [
+   -0.5,
+   -0.4,
+   -0.2,
+   0,
+   0.1,
+   0.15,
+   0.2,
+   0.25,
+   0.3,
+   0.4,
+   0.5,
+   0.6,
+   0.7,
+   0.9,
+   1.35,
+   2
+  ],
+  "evidence": "302/474 条存在非 0.1 取值，例：雷丘丘萨满 Elec=0.5、幻形豕兽·水 Fire=-0.4、岩盾丘丘暴徒 Physical=0.3、历经百战的十六倍曼陀草 Grass=1.35。故 Monster.cs 注释『元数据的 *SubHurt 只是通用占位』对这部分不成立。"
  },
+ "fallbackFor": {
+  "count": 88,
+  "composition": "机关/召唤物 24、测试条目 1、其他 63（含深罪浸礼者、霜夜巡天灵主等条件性抗性 boss，D18 已排除）",
+  "reason": "这 88 条无 BaseValue，且集中在多形态/条件性抗性，不适用逐怪规则表。"
+ },
+ "notDerivedFrom": "Resource/EnemyArchives/EnemyArchives.json（米游社 UGC，未获授权，不得打包或回引）",
+ "engineContract": "calc() 的 resistance 为入参，引擎不查表、不硬编码。来源优先级：用户选择 > 规则表 > 记忆 > 本表 defaultTier。禁止在任何计算路径出现抗性裸字面量。",
  "defaultTier": "universal",
- "defaultRationale": "默认 10% 抗性使伤害被低估而非高估。低估是可用性问题，高估是信誉问题。",
+ "defaultRationale": "默认 10% 使伤害被低估而非高估。低估是可用性问题，高估是信誉问题。",
  "rows": [
-  { "tier": "universal", "value": 0.10, "label": "通用", "note": "绝大多数敌人" },
-  { "tier": "elemental-high", "value": 0.40, "label": "元素高抗", "note": "对自身元素高抗" },
-  { "tier": "immune", "value": 1.00, "label": "免疫", "note": "完全免疫该元素" },
-  { "tier": "negative", "value": -0.20, "label": "负抗特例", "note": "负抗特例，走 1 - r/2 分段" }
+  {
+   "tier": "universal",
+   "value": 0.1,
+   "label": "通用",
+   "note": "绝大多数敌人，亦为缺数据时默认档"
+  },
+  {
+   "tier": "elemental-high",
+   "value": 0.4,
+   "label": "元素高抗",
+   "note": "对自身元素高抗；实测常见 0.5"
+  },
+  {
+   "tier": "immune",
+   "value": 1.0,
+   "label": "免疫",
+   "note": "完全免疫该元素；实测存在 1.35 / 2.0 的超免疫"
+  },
+  {
+   "tier": "negative",
+   "value": -0.2,
+   "label": "负抗特例",
+   "note": "走 1 - r/2 分段；实测存在 -0.4 / -0.5"
+  }
  ]
 }

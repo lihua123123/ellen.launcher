@@ -38,7 +38,7 @@ VersionInfoVersion={#MyAppVersion}
 DefaultDirName={autopf}\{#MyAppShortName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-LicenseFile=..\LICENSE
+LicenseFile=..\THIRD-PARTY-NOTICES.txt
 OutputDir={#OutputDir}
 OutputBaseFilename=Ellen.Launcher-{#MyAppVersion}-Setup
 Compression=lzma2/ultra64
@@ -68,6 +68,7 @@ Name: "startmenuicon"; Description: "{cm:CreateStartMenuIcon}"; GroupDescription
 
 [Files]
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\THIRD-PARTY-NOTICES.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: ignoreversion deleteafterinstall; Check: not IsVCInstalled
 #ifdef CodeSigningCertificatePath
 Source: "{#CodeSigningCertificatePath}"; DestDir: "{tmp}"; DestName: "{#CodeSigningCertificateFileName}"; Flags: ignoreversion deleteafterinstall

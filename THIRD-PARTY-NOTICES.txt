@@ -1,0 +1,69 @@
+Ellen Launcher — 许可与数据来源声明
+Ellen Launcher — Licenses and Data Attribution
+
+本安装包随附的软件与数据，来源于以下项目。各部分的著作权与许可条款分别列明。
+
+================================================================
+1. 应用代码
+================================================================
+
+MIT License
+
+Copyright (c) 2022-2025 DGP Studio
+Copyright (c) 2026 Snap.HutaoRemasteringProject
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+================================================================
+2. 游戏元数据（角色 / 武器 / 圣遗物 / 敌人 等内置快照）
+================================================================
+
+来源：SnapHutaoRemasteringProject/Snap.Metadata（Genshin/<locale>）
+      https://github.com/SnapHutaoRemasteringProject/Snap.Metadata
+
+MIT License
+
+Copyright (c) 2022 DGP Studio
+
+（许可全文同上第 1 节。）
+
+================================================================
+3. 角色「元素附着及产球」数据与伤害计算公式文档
+================================================================
+
+来源：艾莲的数据库
+      https://ellen.wiki
+      https://github.com/lihua123123/ellenwiki
+
+数据由 genshin-db、gachabase、lunaris.moe 等公开数据源整合整理，仅供学习与交流。
+
+游戏角色、武器、圣遗物等内容的著作权归米哈游（miHoYo / HoYoverse）所有；
+本站的整合整理成果可自由取用，请注明来源。
+
+本应用随包分发的以下文件为本项目的整合整理成果：
+  - Resource/CombatNotes/AvatarCombatNotes.json（元素附着及产球）
+  - Resource/Formulas/GenshinFormulas.json（伤害计算公式）
+
+================================================================
+4. 其他
+================================================================
+
+本应用为第三方非官方工具，与米哈游（miHoYo / HoYoverse）无隶属关系。
+游戏内角色、武器、圣遗物等名称与相关内容的著作权归米哈游所有。
+本应用不包含游戏美术资产（立绘、模型、图标、音乐等）。

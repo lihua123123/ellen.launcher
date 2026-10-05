@@ -12,7 +12,7 @@ public interface IInfrastructureEndpoints :
     IInfrastructureGitRepositoryEndpoints,
     IInfrastructureWallpaperEndpoints,
     IInfrastructureRootAccess,
-    IInfrastructureManagementEndpoints
+    IInfrastructureRawRootAccess
 {
     string Ip()
     {

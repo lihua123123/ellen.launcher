@@ -7,7 +7,6 @@ using Ellen.Launcher.Web.Endpoint.Upstream;
 using Ellen.Launcher.Web.Upstream.Response;
 using Ellen.Launcher.Web.Request.Builder;
 using Ellen.Launcher.Web.Request.Builder.Abstraction;
-using Ellen.Launcher.Win32;
 using System.Collections.Immutable;
 using System.Net.Http;
 
@@ -66,17 +65,6 @@ public sealed partial class EllenInfrastructureClient
             .Get();
 
         EllenResponse<EllenPackageInformation>? resp = await builder.SendAsync<EllenResponse<EllenPackageInformation>>(httpClient, token).ConfigureAwait(false);
-        return Web.Response.Response.DefaultIfNull(resp);
-    }
-
-    public async ValueTask<EllenResponse> AmIBannedAsync(string uid, CancellationToken token)
-    {
-        HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()
-            .SetRequestUri(ellenEndpointsFactory.Create().AmIBanned())
-            .SetHeader("x-hutao-island-identifier", EllenNative.Instance.ExchangeGameUidForIdentifier1820(uid))
-            .Get();
-
-        EllenResponse? resp = await builder.SendAsync<EllenResponse>(httpClient, token).ConfigureAwait(false);
         return Web.Response.Response.DefaultIfNull(resp);
     }
 

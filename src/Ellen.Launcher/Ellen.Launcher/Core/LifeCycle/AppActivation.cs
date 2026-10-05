@@ -8,7 +8,6 @@ using Ellen.Launcher.Core.LifeCycle.InterProcess;
 using Ellen.Launcher.Core.Logging;
 using Ellen.Launcher.Core.Setting;
 using Ellen.Launcher.Factory.Process;
-using Ellen.Launcher.Service.EllenWiki;
 using Ellen.Launcher.Service.Metadata;
 using Ellen.Launcher.Service.Navigation;
 using Ellen.Launcher.Service.Notification;
@@ -181,11 +180,7 @@ public sealed partial class AppActivation : IAppActivation
 
         async ValueTask InitializeBackgroundServicesAsync()
         {
-            await Task.WhenAll(
-            [
-                serviceProvider.GetRequiredService<IMetadataService>().InitializepublicAsync().AsTask(),
-                serviceProvider.GetRequiredService<IEllenWikiDataService>().InitializeAsync().AsTask(),
-            ]).ConfigureAwait(false);
+            await serviceProvider.GetRequiredService<IMetadataService>().InitializepublicAsync().AsTask().ConfigureAwait(false);
 
             SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateInfo("Background initialization completed", "Application"));
         }

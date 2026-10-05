@@ -22,7 +22,7 @@ namespace Ellen.Launcher.Service.Git;
 public sealed partial class GitRepositoryService : IGitRepositoryService
 {
     private const string RepositoryUrlSettingKey = "Ellen::Metadata::RepositoryUrl";
-    private const string DefaultMetadataRepositoryUrl = "https://github.com/DGP-Studio/Snap.Metadata.git";
+    private const string DefaultMetadataRepositoryUrl = "https://github.com/SnapHutaoRemasteringProject/Snap.Metadata.git";
 
     private readonly AsyncKeyedLock<string> repoLock = new();
     private readonly BackgroundActivityOptions backgroundActivityOptions;

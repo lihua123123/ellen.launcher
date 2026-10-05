@@ -3,7 +3,6 @@
 
 using Ellen.Launcher.Core;
 using Ellen.Launcher.Model.Combat;
-using Ellen.Launcher.Service.EllenWiki;
 using System.Collections.Frozen;
 using System.IO;
 using MetadataAvatar = Ellen.Launcher.Model.Metadata.Avatar.Avatar;
@@ -15,9 +14,9 @@ namespace Ellen.Launcher.Service.Combat;
 /// <summary>
 /// 「元素附着及产球」战斗备注的只读查询。
 /// <para>
-/// 数据来自 ellen.wiki 的 <c>GET /api/attachment</c>：优先使用
-/// <see cref="EllenWikiDataService"/> 运行期同步的快照，缺失时回退到随应用发布的
-/// <c>Resource/CombatNotes/AvatarCombatNotes.json</c>。该功能是纯附加信息：资源缺失或
+/// 数据来自随应用发布的 <c>Resource/CombatNotes/AvatarCombatNotes.json</c>
+/// （由 ellen.wiki 的 <c>GET /api/attachment</c> 离线同步生成，运行期不发起任何网络请求）。
+/// 该功能是纯附加信息：资源缺失或
 /// 格式错误时只记录日志并返回空表，不影响角色资料页的既有功能。
 /// </para>
 /// </summary>
@@ -27,7 +26,6 @@ public sealed partial class AvatarCombatNoteService : IAvatarCombatNoteService
     private const string ResourceRelativePath = "Resource/CombatNotes/AvatarCombatNotes.json";
 
     private readonly ILogger<AvatarCombatNoteService> logger;
-    private readonly IEllenWikiDataService ellenWikiDataService;
 
     private readonly Lock gate = new();
 
@@ -52,14 +50,6 @@ public sealed partial class AvatarCombatNoteService : IAvatarCombatNoteService
         {
             ApplyEntry(avatar.SkillDepot, entry);
         }
-    }
-
-    /// <summary>
-    /// 运行期同步写入新快照后，丢弃已反序列化的结果，下次查询时重新加载。
-    /// </summary>
-    partial void PostConstruct(IServiceProvider serviceProvider)
-    {
-        ellenWikiDataService.AttachmentUpdated += OnAttachmentUpdated;
     }
 
     /// <summary>
@@ -111,11 +101,6 @@ public sealed partial class AvatarCombatNoteService : IAvatarCombatNoteService
         skill.CombatNoteTable = new([.. entry.Rows]);
     }
 
-    private void OnAttachmentUpdated(object? sender, EventArgs e)
-    {
-        Volatile.Write(ref notes, null);
-    }
-
     private FrozenDictionary<string, AvatarCombatNote> Notes
     {
         get
@@ -143,12 +128,6 @@ public sealed partial class AvatarCombatNoteService : IAvatarCombatNoteService
 
     private FrozenDictionary<string, AvatarCombatNote> LoadNotes()
     {
-        // 运行期同步的快照优先；缺失或损坏时回退到随包快照。
-        if (TryLoad(ellenWikiDataService.GetAttachmentSnapshotPath(), out FrozenDictionary<string, AvatarCombatNote> synced))
-        {
-            return synced;
-        }
-
         if (TryLoad(InstalledLocation.GetAbsolutePath(ResourceRelativePath), out FrozenDictionary<string, AvatarCombatNote> bundled))
         {
             return bundled;

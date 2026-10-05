@@ -98,16 +98,6 @@ public static class EllenRuntime
         return string.Intern(directory);
     }
 
-    /// <summary>
-    /// ellen.wiki 数据快照的本地缓存目录（运行期同步写入）。
-    /// </summary>
-    public static ValueDirectory GetDataEllenWikiDirectory()
-    {
-        string directory = Path.Combine(DataDirectory, "EllenWiki");
-        Directory.CreateDirectory(directory);
-        return string.Intern(directory);
-    }
-
     public static ValueDirectory GetDataBackgroundDirectory()
     {
         string directory = Path.Combine(DataDirectory, "Background");

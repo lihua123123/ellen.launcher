@@ -89,4 +89,34 @@ public class MonsterResistanceReaderTest
             }
         }
     }
+
+    [TestMethod]
+    public void AllMonstersProduceFiniteCoefficient()
+    {
+        // 全量 562 条（含缺 BaseValue 的 88 条走兜底档）× 8 元素喂入 k(r)，断言无 NaN / Inf。
+        // 逐条遍历原始 JSON 而非字典，保证分母是 562 而不是去重后的键数。
+        using JsonDocument document = JsonDocument.Parse(File.ReadAllBytes(FixturePath));
+        int checkedCount = 0;
+
+        foreach (JsonElement entry in document.RootElement.EnumerateArray())
+        {
+            string name = entry.GetProperty("Name").GetString() ?? string.Empty;
+            MonsterResistance? monster = Monsters.TryGetValue(name, out MonsterResistance? found) ? found : null;
+
+            for (int index = 0; index < 8; index++)
+            {
+                double resistance = monster is null
+                    ? ResistanceTiers.Default
+                    : monster.Get((ResistanceElement)index);
+                double coefficient = ResistanceMath.Coefficient(resistance);
+
+                Assert.IsTrue(
+                    double.IsFinite(coefficient),
+                    $"{name} 元素{(ResistanceElement)index} 抗性={resistance} 产出非有限值 {coefficient}");
+                checkedCount++;
+            }
+        }
+
+        Assert.AreEqual(562 * 8, checkedCount);
+    }
 }

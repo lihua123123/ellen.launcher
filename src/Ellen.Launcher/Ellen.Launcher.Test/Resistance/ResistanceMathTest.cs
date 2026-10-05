@@ -36,6 +36,16 @@ public class ResistanceMathTest
         Assert.AreEqual(expected, ResistanceMath.Coefficient(resistance), Tolerance);
     }
 
+    [DataTestMethod]
+    [DataRow(double.NaN)]
+    [DataRow(double.PositiveInfinity)]
+    [DataRow(double.NegativeInfinity)]
+    public void NonFiniteResistanceYieldsZero(double resistance)
+    {
+        // 类型即契约：结果归零是可见的失败，不会伪装成看似合理的伤害数值。
+        Assert.AreEqual(0.0, ResistanceMath.Coefficient(resistance));
+    }
+
     [TestMethod]
     public void CoefficientIsContinuousAtZero()
     {

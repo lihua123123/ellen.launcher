@@ -6,15 +6,23 @@ namespace Ellen.Launcher.Domain.Resistance;
 public static class ResistanceMath
 {
     /// <summary>
-    /// 抗性乘区系数 <c>k(r)</c>：<c>r ≤ 0 → 1 - r/2</c>；
-    /// <c>0 &lt; r &lt; 0.75 → 1 - r</c>；<c>r ≥ 0.75 → 1 / (4r + 1)</c>。
+    /// 抗性乘区系数 <c>k(r)</c>：非有限输入 → <c>0</c>；
+    /// <c>r &lt; 0 → 1 - r/2</c>；<c>0 ≤ r &lt; 0.75 → 1 - r</c>；
+    /// <c>r ≥ 0.75 → 1 / (4r + 1)</c>。
     /// </summary>
     /// <remarks>
     /// 两处在 <c>r = 0</c> 与 <c>r = 0.75</c> 连续（均为 1 与 0.25）。
     /// 实测取值域包含 <c>r = 1.35</c> 与 <c>r = 2.0</c>，落在第三段。
+    /// 非有限输入返回 0 而非抛出：类型即契约，且结果归零是可见的失败，
+    /// 不会伪装成一个看似合理的伤害数值。
     /// </remarks>
     public static double Coefficient(double resistance)
     {
+        if (!double.IsFinite(resistance))
+        {
+            return 0;
+        }
+
         if (resistance < 0)
         {
             return 1 - (resistance / 2);

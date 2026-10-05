@@ -41,8 +41,10 @@ const HAND_COMPUTED = [
 const REALIZED_DOMAIN = [-0.5, -0.4, -0.2, 0.0, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.9, 1.35, 2.0];
 
 const failures = [];
+let checks = 0;
 
 function expect(label, actual, expected, tolerance = 0) {
+  checks++;
   const delta = Math.abs(actual - expected);
   if (!(delta <= tolerance)) {
     failures.push(`${label}: 期望 ${expected}, 实得 ${actual}, Δ=${delta}`);
@@ -58,6 +60,11 @@ expect('coefficient(0)', ResistanceMath.coefficient(0), 1.0, TOLERANCE);
 expect('coefficient(-0)', ResistanceMath.coefficient(-0), 1.0, TOLERANCE);
 expect('coefficient(0.75)', ResistanceMath.coefficient(0.75), 0.25, TOLERANCE);
 expect('coefficient(0.75-ε)', ResistanceMath.coefficient(0.75 - 1e-9), ResistanceMath.coefficient(0.75 + 1e-9), 1e-8);
+
+// 非有限输入：类型即契约，不吞错——返回 0（伤害归零是可见的失败）而非把 NaN 传播下去。
+expect('coefficient(NaN)', ResistanceMath.coefficient(Number.NaN), 0, 0);
+expect('coefficient(+Infinity)', ResistanceMath.coefficient(Number.POSITIVE_INFINITY), 0, 0);
+expect('coefficient(-Infinity)', ResistanceMath.coefficient(Number.NEGATIVE_INFINITY), 0, 0);
 
 // 实测域上的严格单调递减。
 for (let i = 1; i < REALIZED_DOMAIN.length; i++) {
@@ -86,7 +93,7 @@ expect('resolve(含 null)', ResistanceResolver.resolve([null, rule]).value, 0.5,
 expect('resolve 返回来源', ResistanceResolver.resolve([memory, rule]).kind, ResistanceSourceKind.Rule, 0);
 
 if (failures.length === 0) {
-  console.log(`DomainMirror: ${HAND_COMPUTED.length + 13} checks passed, 0 failed`);
+  console.log(`DomainMirror: ${checks} checks passed, 0 failed`);
   process.exit(0);
 }
 

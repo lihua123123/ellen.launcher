@@ -42,12 +42,17 @@ export class ResistanceTiers {
  */
 export class ResistanceMath {
   /**
-   * 抗性乘区系数 k(r)：r < 0 → 1 - r/2；r < 0.75 → 1 - r；否则 1 / (4r + 1)。
+   * 抗性乘区系数 k(r)：非有限输入 → 0；r < 0 → 1 - r/2；r < 0.75 → 1 - r；否则 1 / (4r + 1)。
    *
    * 两处在 r = 0 与 r = 0.75 连续（均为 1 与 0.25）。
    * 实测取值域包含 r = 1.35 与 r = 2.0，落在第三段。
+   * 非有限输入返回 0 而非抛出：结果归零是可见的失败，不会伪装成看似合理的伤害数值。
    */
   static coefficient(resistance: number): number {
+    if (!Number.isFinite(resistance)) {
+      return 0;
+    }
+
     if (resistance < 0) {
       return 1 - resistance / 2;
     }

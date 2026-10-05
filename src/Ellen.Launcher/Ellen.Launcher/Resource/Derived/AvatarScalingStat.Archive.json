@@ -1,0 +1,1162 @@
+{
+ "sourceType": "derived-from-AvatarScalingStat",
+ "generator": "tools/ScalingStatGen/weight_fallback.py",
+ "reviewStatus": "draft",
+ "fields": [
+  "archive_stat",
+  "evidence"
+ ],
+ "archivePriority": [
+  "stat_priority（权重表已覆盖）",
+  "l0_scaling[shield|heal] ∪ scaling_source（护盾/治疗优先）",
+  "multi 取非 ATK 者",
+  "scaling_source",
+  "Override.json（人工复核，最高优先）"
+ ],
+ "characters": {
+  "七七": {
+   "archive_stat": "ATK",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "heal": [
+     "ATK"
+    ]
+   },
+   "multi": null
+  },
+  "丝柯克": {
+   "archive_stat": "ATK",
+   "evidence": "stat_priority",
+   "stat_priority": "ATK",
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "丽莎": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "久岐忍": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "HP",
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "九条裟罗": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "云堇": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "DEF",
+   "l0_scaling": {
+    "shield": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "五郎": {
+   "archive_stat": "DEF",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "DEF",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "伊安珊": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "伊法": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "伊涅芙": {
+   "archive_stat": "ATK",
+   "evidence": "stat_priority",
+   "stat_priority": "ATK",
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "shield": [
+     "ATK"
+    ]
+   },
+   "multi": null
+  },
+  "优菈": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "克洛琳德": {
+   "archive_stat": "HP",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "HP",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "八重神子": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "兹白": {
+   "archive_stat": "DEF",
+   "evidence": "stat_priority",
+   "stat_priority": "DEF",
+   "scaling_source": "DEF",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "凝光": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "凯亚": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "刻晴": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "北斗": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "shield": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "千织": {
+   "archive_stat": "DEF",
+   "evidence": "multi",
+   "stat_priority": null,
+   "scaling_source": null,
+   "l0_scaling": null,
+   "multi": [
+    "ATK",
+    "DEF"
+   ]
+  },
+  "卡维": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "卡齐娜": {
+   "archive_stat": "DEF",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "DEF",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "可莉": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "叶洛亚": {
+   "archive_stat": "DEF",
+   "evidence": "stat_priority",
+   "stat_priority": "DEF",
+   "scaling_source": "DEF",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "哥伦比娅": {
+   "archive_stat": "HP",
+   "evidence": "stat_priority",
+   "stat_priority": "HP",
+   "scaling_source": "HP",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "嘉明": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ],
+    "other": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "坎蒂丝": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "HP",
+   "l0_scaling": {
+    "shield": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "埃洛伊": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "基尼奇": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "塔利雅": {
+   "archive_stat": "HP",
+   "evidence": "override",
+   "stat_priority": "HP",
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "shield": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "夏沃蕾": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "夏洛蒂": {
+   "archive_stat": "ATK",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "heal": [
+     "ATK"
+    ]
+   },
+   "multi": null
+  },
+  "多莉": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "夜兰": {
+   "archive_stat": "HP",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "HP",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "奈芙尔": {
+   "archive_stat": "ATK",
+   "evidence": "stat_priority",
+   "stat_priority": "ATK",
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "奥黛塔": {
+   "archive_stat": "ATK",
+   "evidence": "stat_priority",
+   "stat_priority": "ATK",
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "妮露": {
+   "archive_stat": "HP",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "HP",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "娜维娅": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "安柏": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "宵宫": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "尼可": {
+   "archive_stat": "ATK",
+   "evidence": "stat_priority",
+   "stat_priority": "ATK",
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "shield": [
+     "ATK"
+    ]
+   },
+   "multi": null
+  },
+  "布伦妮": {
+   "archive_stat": "ATK",
+   "evidence": "stat_priority",
+   "stat_priority": "ATK",
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "希格雯": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "HP",
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "希诺宁": {
+   "archive_stat": "DEF",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "DEF",
+   "l0_scaling": {
+    "heal": [
+     "DEF"
+    ]
+   },
+   "multi": null
+  },
+  "恰斯卡": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "托马": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "HP",
+   "l0_scaling": {
+    "shield": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "提纳里": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "早柚": {
+   "archive_stat": "ATK",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "heal": [
+     "ATK"
+    ]
+   },
+   "multi": null
+  },
+  "杜林": {
+   "archive_stat": "ATK",
+   "evidence": "stat_priority",
+   "stat_priority": "ATK",
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "林尼": {
+   "archive_stat": "HP",
+   "evidence": "multi",
+   "stat_priority": null,
+   "scaling_source": null,
+   "l0_scaling": null,
+   "multi": [
+    "ATK",
+    "HP"
+   ]
+  },
+  "枫原万叶": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "柯莱": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "桑多涅": {
+   "archive_stat": "ATK",
+   "evidence": "stat_priority",
+   "stat_priority": "ATK",
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "梦见月瑞希": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "欧洛伦": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "沃雅妮莎": {
+   "archive_stat": "HP",
+   "evidence": "stat_priority",
+   "stat_priority": "HP",
+   "scaling_source": "HP",
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "法尔伽": {
+   "archive_stat": "ATK",
+   "evidence": "stat_priority",
+   "stat_priority": "ATK",
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "洛恩": {
+   "archive_stat": "ATK",
+   "evidence": "stat_priority",
+   "stat_priority": "ATK",
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "流浪者": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "温迪": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "烟绯": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "爱可菲": {
+   "archive_stat": "ATK",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "heal": [
+     "ATK"
+    ]
+   },
+   "multi": null
+  },
+  "爱诺": {
+   "archive_stat": "ATK",
+   "evidence": "stat_priority",
+   "stat_priority": "ATK",
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "玛拉妮": {
+   "archive_stat": "HP",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "HP",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "玛薇卡": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "珊瑚宫心海": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "HP",
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "珐露珊": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "班尼特": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "琳妮特": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "琴": {
+   "archive_stat": "ATK",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "heal": [
+     "ATK"
+    ]
+   },
+   "multi": null
+  },
+  "瑶瑶": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "瓦雷莎": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "甘雨": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "申鹤": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "白术": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "HP",
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ],
+    "shield": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "砂糖": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "神里绫人": {
+   "archive_stat": "HP",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "HP",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "神里绫华": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "米卡": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "纳西妲": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "绮良良": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "HP",
+   "l0_scaling": {
+    "shield": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "罗莎莉亚": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "胡桃": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "HP",
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "艾尔海森": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "艾梅莉埃": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "芙宁娜": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "HP",
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ],
+    "other": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "芭芭拉": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "茜特菈莉": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "荒泷一斗": {
+   "archive_stat": "DEF",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "DEF",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "莉奈娅": {
+   "archive_stat": "DEF",
+   "evidence": "stat_priority",
+   "stat_priority": "DEF",
+   "scaling_source": "DEF",
+   "l0_scaling": {
+    "heal": [
+     "DEF"
+    ]
+   },
+   "multi": null
+  },
+  "莫娜": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "莱依拉": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "HP",
+   "l0_scaling": {
+    "shield": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "莱欧斯利": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "other": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "菈乌玛": {
+   "archive_stat": "ATK",
+   "evidence": "stat_priority",
+   "stat_priority": "ATK",
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "菲林斯": {
+   "archive_stat": "ATK",
+   "evidence": "stat_priority",
+   "stat_priority": "ATK",
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "菲米尼": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "菲谢尔": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "蓝砚": {
+   "archive_stat": "ATK",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "shield": [
+     "ATK"
+    ]
+   },
+   "multi": null
+  },
+  "薇斯纳": {
+   "archive_stat": "ATK",
+   "evidence": "stat_priority",
+   "stat_priority": "ATK",
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "行秋": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "诺艾尔": {
+   "archive_stat": "DEF",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "DEF",
+   "l0_scaling": {
+    "heal": [
+     "DEF"
+    ],
+    "shield": [
+     "DEF"
+    ]
+   },
+   "multi": null
+  },
+  "赛索斯": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "赛诺": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "辛焱": {
+   "archive_stat": "DEF",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "shield": [
+     "DEF"
+    ]
+   },
+   "multi": null
+  },
+  "达达利亚": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "迪卢克": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "迪奥娜": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "迪希雅": {
+   "archive_stat": "HP",
+   "evidence": "multi",
+   "stat_priority": null,
+   "scaling_source": null,
+   "l0_scaling": null,
+   "multi": [
+    "ATK",
+    "HP"
+   ]
+  },
+  "那维莱特": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "HP",
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
+   "multi": null
+  },
+  "重云": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "钟离": {
+   "archive_stat": "HP",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "HP",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "闲云": {
+   "archive_stat": "ATK",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "heal": [
+     "ATK"
+    ]
+   },
+   "multi": null
+  },
+  "阿罗夏": {
+   "archive_stat": "ATK",
+   "evidence": "stat_priority",
+   "stat_priority": "ATK",
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "阿蕾奇诺": {
+   "archive_stat": "HP",
+   "evidence": "l0_scaling",
+   "stat_priority": null,
+   "scaling_source": null,
+   "l0_scaling": {
+    "heal": [
+     "ATK"
+    ]
+   },
+   "multi": [
+    "ATK",
+    "HP"
+   ]
+  },
+  "阿贝多": {
+   "archive_stat": "DEF",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "DEF",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "雅珂达": {
+   "archive_stat": "ATK",
+   "evidence": "stat_priority",
+   "stat_priority": "ATK",
+   "scaling_source": "ATK",
+   "l0_scaling": {
+    "heal": [
+     "ATK"
+    ]
+   },
+   "multi": null
+  },
+  "雷泽": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "雷电将军": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "香菱": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "魈": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  },
+  "鹿野院平藏": {
+   "archive_stat": "ATK",
+   "evidence": "scaling_source",
+   "stat_priority": null,
+   "scaling_source": "ATK",
+   "l0_scaling": null,
+   "multi": null
+  }
+ }
+}

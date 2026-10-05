@@ -1,0 +1,30 @@
+{
+ "sourceType": "hand-curated-override",
+ "revision": 1,
+ "reviewStatus": "draft",
+ "decided_by": "pending",
+ "ci": {
+  "exitOnDrift": true,
+  "note": "派生结果与本节不一致时 CI 必须失败。分歧是信号不是噪声，不允许静默吞掉。"
+ },
+ "whyThisFileExists": "自动派生与权重表的分歧必须显式落盘并人工复核，而不是被规则悄悄修绿。",
+ "rows": [
+  {
+   "character": "塔利雅",
+   "avatarId": 10000115,
+   "archive_stat": "HP",
+   "derived_archive_stat": "ATK",
+   "derived_scaling_source": "ATK",
+   "derived_l0_scaling": {
+    "shield": ["HP"]
+   },
+   "weightTable": {
+    "HpPercent": 100,
+    "AttackPercent": 0,
+    "DefensePercent": 0
+   },
+   "reason": "权重表 HpPercent=100。其生命值上限只出现在两处：圣眷护盾的伤害吸收量（受益于生命值上限）、西风之眷的攻速提升（基于生命值上限）。零伤害缩放，故 scaling_source=ATK；但护盾使 HP% 成为其最有价值词条，故归档档位为 HP。这是语义差异而非派生错误——权重表编码「哪个 % 词条值钱」，不是「伤害吃哪个属性」。",
+   "status": "accepted-as-semantic-difference"
+  }
+ ]
+}

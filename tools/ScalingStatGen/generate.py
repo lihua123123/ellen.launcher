@@ -92,6 +92,9 @@ def segments(a):
 
 def derive(a):
     dmg, conv, cond_dmg, cond_conv, l0 = set(), set(), set(), set(), set()
+    # L0 排除掉的语境本身携带缩放属性，而它正是权重兜底最需要的输入：
+    # 塔利雅 HpPercent=100 就是因为护盾吃 HP。丢弃该属性 = 复现塔利雅误判。
+    l0_scaling = {}
     saw_dmg_descriptor = False
     for origin, raw in segments(a):
         for sent in re.split(r"[。\n]", raw):
@@ -103,6 +106,11 @@ def derive(a):
             if m:
                 label, spec = m.group("label"), m.group("spec")
                 if L0_LABEL.search(label):
+                    sc = stats_in(spec)
+                    if sc:
+                        key = "shield" if re.search(r"护盾|吸收量", label) else (
+                              "heal" if re.search(r"治疗|回复|恢复", label) else "other")
+                        l0_scaling.setdefault(key, set()).update(sc)
                     l0.add("label:" + label.strip()[:16]); continue
                 if not DMG_LABEL.search(label) and not BOOST_LABEL.search(label):
                     continue
@@ -177,6 +185,7 @@ def derive(a):
             "base_stat_variants": variants,
             "conditional_scaling": cond, "conditional_note": cond_note,
             "atk_basis": atk_basis, "is_default_atk": is_default,
+            "l0_scaling": {k: sorted(v) for k, v in l0_scaling.items()} or None,
             "l0_excluded": sorted(l0) or None}
 
 # ---------------- 金标准 ----------------

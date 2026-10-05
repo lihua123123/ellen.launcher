@@ -14,6 +14,11 @@
     "label:持续治疗量",
     "label:治疗量"
    ],
+   "l0_scaling": {
+    "heal": [
+     "ATK"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -29,6 +34,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": "ATK"
@@ -44,6 +50,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -60,6 +67,11 @@
     "heal",
     "label:越祓草轮治疗量"
    ],
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": null
@@ -73,6 +85,7 @@
    "id": 10000056,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -90,6 +103,11 @@
     "panel",
     "shield"
    ],
+   "l0_scaling": {
+    "shield": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "DEF",
    "stat_priority": null
@@ -106,6 +124,7 @@
     "heal",
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "DEF",
    "stat_priority": null
@@ -122,6 +141,7 @@
     "heal",
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -138,6 +158,7 @@
     "heal",
     "label:秘药弹命中治疗量"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -158,6 +179,11 @@
     "panel",
     "shield"
    ],
+   "l0_scaling": {
+    "shield": [
+     "ATK"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": "ATK"
@@ -175,6 +201,7 @@
     "label:抗性降低时间",
     "label:物理抗性降低"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -191,6 +218,7 @@
     "heal",
     "label:贯夜治疗量"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": null
@@ -206,6 +234,7 @@
    "l0_excluded": [
     "shred"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -223,6 +252,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "DEF",
    "stat_priority": "DEF"
@@ -236,6 +266,7 @@
    "id": 10000027,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -249,6 +280,7 @@
    "id": 10000015,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -264,6 +296,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -280,6 +313,11 @@
     "label:护盾吸收量",
     "shield"
    ],
+   "l0_scaling": {
+    "shield": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -295,6 +333,7 @@
    "id": 10000094,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": [
     "ATK",
     "DEF"
@@ -313,6 +352,7 @@
    "l0_excluded": [
     "heal"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -328,6 +368,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "DEF",
    "stat_priority": null
@@ -343,6 +384,7 @@
    "l0_excluded": [
     "shred"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -358,6 +400,7 @@
    "id": 10000127,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "DEF",
    "stat_priority": "DEF"
@@ -377,6 +420,7 @@
     "panel",
     "shield"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": "HP"
@@ -394,6 +438,14 @@
     "label:技能治疗量",
     "label:消耗生命值"
    ],
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ],
+    "other": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -411,6 +463,11 @@
     "panel",
     "shield"
    ],
+   "l0_scaling": {
+    "shield": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": null
@@ -426,6 +483,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -439,6 +497,7 @@
    "id": 10000101,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -456,6 +515,11 @@
     "panel",
     "shield"
    ],
+   "l0_scaling": {
+    "shield": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": "HP"
@@ -475,6 +539,11 @@
     "panel",
     "shred"
    ],
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -493,6 +562,11 @@
     "label:相机持续治疗量",
     "panel"
    ],
+   "l0_scaling": {
+    "heal": [
+     "ATK"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -510,6 +584,11 @@
     "label:元素能量恢复",
     "label:持续治疗量"
    ],
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -525,6 +604,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": null
@@ -538,6 +618,7 @@
    "id": 10000122,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": "ATK"
@@ -553,6 +634,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": "ATK"
@@ -566,6 +648,7 @@
    "id": 10000070,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": null
@@ -581,6 +664,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -596,6 +680,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -611,6 +696,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -631,6 +717,11 @@
     "shield",
     "shred"
    ],
+   "l0_scaling": {
+    "shield": [
+     "ATK"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": "ATK"
@@ -646,6 +737,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": "ATK"
@@ -665,6 +757,11 @@
     "panel",
     "shield"
    ],
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": null
@@ -686,6 +783,11 @@
     "panel",
     "shred"
    ],
+   "l0_scaling": {
+    "heal": [
+     "DEF"
+    ]
+   },
    "multi": null,
    "scaling_source": "DEF",
    "stat_priority": null
@@ -699,6 +801,7 @@
    "id": 10000104,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -717,6 +820,11 @@
     "label:护盾持续时间",
     "shield"
    ],
+   "l0_scaling": {
+    "shield": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": null
@@ -730,6 +838,7 @@
    "id": 10000069,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -747,6 +856,11 @@
     "label:不倒貉貉治疗量",
     "label:技能发动治疗量"
    ],
+   "l0_scaling": {
+    "heal": [
+     "ATK"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -765,6 +879,7 @@
     "label:元素能量恢复",
     "shred"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": "ATK"
@@ -781,6 +896,7 @@
     "heal",
     "label:恢复生命值"
    ],
+   "l0_scaling": null,
    "multi": [
     "ATK",
     "HP"
@@ -797,6 +913,7 @@
    "id": 10000047,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -810,6 +927,7 @@
    "id": 10000067,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -827,6 +945,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": "ATK"
@@ -843,6 +962,7 @@
     "heal",
     "label:拾取点心回复生命值"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -858,6 +978,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -878,6 +999,11 @@
     "label:遥久之歌治疗间隔",
     "panel"
    ],
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": "HP"
@@ -891,6 +1017,7 @@
    "id": 10000128,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": "ATK"
@@ -906,6 +1033,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": "ATK"
@@ -921,6 +1049,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -936,6 +1065,7 @@
    "l0_excluded": [
     "shred"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -949,6 +1079,7 @@
    "id": 10000048,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -967,6 +1098,11 @@
     "heal",
     "label:治疗量"
    ],
+   "l0_scaling": {
+    "heal": [
+     "ATK"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -980,6 +1116,7 @@
    "id": 10000121,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": "ATK"
@@ -995,6 +1132,7 @@
    "id": 10000102,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": null
@@ -1013,6 +1151,7 @@
     "panel",
     "shred"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1030,6 +1169,11 @@
     "label:命中治疗量",
     "label:治疗量"
    ],
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": null
@@ -1045,6 +1189,7 @@
    "l0_excluded": [
     "label:风元素抗性降低"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1061,6 +1206,11 @@
     "heal",
     "label:持续治疗"
    ],
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1078,6 +1228,11 @@
     "label:命中治疗量",
     "panel"
    ],
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1095,6 +1250,11 @@
     "label:持续治疗",
     "label:领域发动治疗量"
    ],
+   "l0_scaling": {
+    "heal": [
+     "ATK"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1113,6 +1273,11 @@
     "label:白玉萝卜治疗量",
     "label:草元素抗性提升"
    ],
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1130,6 +1295,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1143,6 +1309,7 @@
    "id": 10000037,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1159,6 +1326,7 @@
     "label:抗性降低",
     "shred"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1180,6 +1348,14 @@
     "label:无郤气护盾治疗量",
     "label:治疗量"
    ],
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ],
+    "shield": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": null
@@ -1193,6 +1369,7 @@
    "id": 10000043,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1206,6 +1383,7 @@
    "id": 10000066,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": null
@@ -1221,6 +1399,7 @@
    "l0_excluded": [
     "shred"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1239,6 +1418,11 @@
     "label:鹰翎治疗量",
     "label:鹰翎治疗间隔"
    ],
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1254,6 +1438,7 @@
    "l0_excluded": [
     "shred"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1274,6 +1459,11 @@
     "label:护盾持续时间",
     "shield"
    ],
+   "l0_scaling": {
+    "shield": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": null
@@ -1289,6 +1479,7 @@
    "l0_excluded": [
     "shred"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1309,6 +1500,11 @@
     "label:低血量时技能治疗量",
     "label:技能治疗量"
    ],
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": null
@@ -1322,6 +1518,7 @@
    "id": 10000078,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1337,6 +1534,7 @@
    "id": 10000099,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1360,6 +1558,14 @@
     "label:谢贝蕾妲小姐消耗生命值",
     "panel"
    ],
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ],
+    "other": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": null
@@ -1378,6 +1584,11 @@
     "label:持续治疗量",
     "label:治疗量"
    ],
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1395,6 +1606,7 @@
     "label:护盾持续时间",
     "shield"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1411,6 +1623,7 @@
     "panel",
     "shred"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "DEF",
    "stat_priority": null
@@ -1432,6 +1645,11 @@
     "label:首次治疗量",
     "panel"
    ],
+   "l0_scaling": {
+    "heal": [
+     "DEF"
+    ]
+   },
    "multi": null,
    "scaling_source": "DEF",
    "stat_priority": "DEF"
@@ -1445,6 +1663,7 @@
    "id": 10000041,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1464,6 +1683,11 @@
     "label:护盾持续时间",
     "shield"
    ],
+   "l0_scaling": {
+    "shield": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": null
@@ -1481,6 +1705,11 @@
     "label:消耗生命值",
     "panel"
    ],
+   "l0_scaling": {
+    "other": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1498,6 +1727,7 @@
     "label:元素抗性降低",
     "label:元素抗性降低持续时间"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": "ATK"
@@ -1515,6 +1745,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": "ATK"
@@ -1530,6 +1761,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1543,6 +1775,7 @@
    "id": 10000031,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1560,6 +1793,11 @@
     "label:护盾持续时间",
     "shield"
    ],
+   "l0_scaling": {
+    "shield": [
+     "ATK"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1575,6 +1813,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": "ATK"
@@ -1588,6 +1827,7 @@
    "id": 10000025,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1607,6 +1847,14 @@
     "label:治疗量",
     "shield"
    ],
+   "l0_scaling": {
+    "heal": [
+     "DEF"
+    ],
+    "shield": [
+     "DEF"
+    ]
+   },
    "multi": null,
    "scaling_source": "DEF",
    "stat_priority": null
@@ -1622,6 +1870,7 @@
    "l0_excluded": [
     "label:恢复元素能量"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1635,6 +1884,7 @@
    "id": 10000071,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1655,6 +1905,11 @@
     "shield",
     "shred"
    ],
+   "l0_scaling": {
+    "shield": [
+     "DEF"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1668,6 +1923,7 @@
    "id": 10000033,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1683,6 +1939,7 @@
    "l0_excluded": [
     "panel"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1701,6 +1958,11 @@
     "label:持续治疗量",
     "shield"
    ],
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1718,6 +1980,7 @@
    "l0_excluded": [
     "heal"
    ],
+   "l0_scaling": null,
    "multi": [
     "ATK",
     "HP"
@@ -1738,6 +2001,11 @@
     "heal",
     "label:恢复生命值"
    ],
+   "l0_scaling": {
+    "heal": [
+     "HP"
+    ]
+   },
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": null
@@ -1751,6 +2019,7 @@
    "id": 10000036,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1771,6 +2040,7 @@
     "shield",
     "shred"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "HP",
    "stat_priority": null
@@ -1791,6 +2061,11 @@
     "label:治疗量",
     "panel"
    ],
+   "l0_scaling": {
+    "heal": [
+     "ATK"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1806,6 +2081,7 @@
    "l0_excluded": [
     "heal"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": "ATK"
@@ -1824,6 +2100,11 @@
     "heal",
     "label:回复量"
    ],
+   "l0_scaling": {
+    "heal": [
+     "ATK"
+    ]
+   },
    "multi": [
     "ATK",
     "HP"
@@ -1840,6 +2121,7 @@
    "id": 10000038,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "DEF",
    "stat_priority": null
@@ -1857,6 +2139,11 @@
     "label:最低生命值角色额外治疗量",
     "label:猫型家用互助协调器治疗量"
    ],
+   "l0_scaling": {
+    "heal": [
+     "ATK"
+    ]
+   },
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": "ATK"
@@ -1874,6 +2161,7 @@
     "label:雷元素抗性提升",
     "shred"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1891,6 +2179,7 @@
     "panel",
     "shred"
    ],
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1904,6 +2193,7 @@
    "id": 10000023,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1917,6 +2207,7 @@
    "id": 10000026,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null
@@ -1930,6 +2221,7 @@
    "id": 10000059,
    "is_default_atk": false,
    "l0_excluded": null,
+   "l0_scaling": null,
    "multi": null,
    "scaling_source": "ATK",
    "stat_priority": null

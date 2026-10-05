@@ -1,8 +1,0 @@
-/node_modules/
-/oh_modules/
-/.hvigor/
-/local.properties
-/build/
-**/build/
-*.hap
-*.app

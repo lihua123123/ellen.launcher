@@ -43,7 +43,6 @@ public sealed partial class AnnouncementViewModel : Abstraction.ViewModel, IReci
     private readonly IServiceProvider serviceProvider;
     private readonly CultureOptions cultureOptions;
     private readonly ITaskContext taskContext;
-    private readonly AppOptions appOptions;
     private readonly INetworkRetryCoordinator networkRetryCoordinator;
     private readonly IGameLocatorFactory gameLocatorFactory;
     private readonly LaunchOptions launchOptions;
@@ -76,6 +75,11 @@ public sealed partial class AnnouncementViewModel : Abstraction.ViewModel, IReci
 
     [ObservableProperty]
     public partial ImmutableArray<Act> DisplayedActivityCards { get; set; } = [];
+
+    /// <summary>
+    /// 供首页快捷开关（「默认以管理员模式启动」）直接绑定。
+    /// </summary>
+    public partial AppOptions AppOptions { get; }
 
     public bool IsHomeAnnouncementActivityCalendarPresented
     {
@@ -130,7 +134,7 @@ public sealed partial class AnnouncementViewModel : Abstraction.ViewModel, IReci
     {
         try
         {
-            AnnouncementWrapper? announcementWrapper = await announcementService.GetAnnouncementWrapperAsync(cultureOptions.LanguageCode, appOptions.Region.Value, token).ConfigureAwait(false);
+            AnnouncementWrapper? announcementWrapper = await announcementService.GetAnnouncementWrapperAsync(cultureOptions.LanguageCode, AppOptions.Region.Value, token).ConfigureAwait(false);
             if (announcementWrapper is null)
             {
                 MarkHomePendingForRetry();
@@ -448,6 +452,11 @@ public sealed partial class AnnouncementViewModel : Abstraction.ViewModel, IReci
         if (LocalSetting.Get(SettingKeys.IsHomeCardDailyNotePresented, true))
         {
             result.Add(CardReference.Create(new DailyNoteCard(serviceProvider), SettingKeys.HomeCardDailyNoteOrder));
+        }
+
+        if (LocalSetting.Get(SettingKeys.IsHomeCardTravelersDiaryPresented, true))
+        {
+            result.Add(CardReference.Create(new TravelersDiaryCard(serviceProvider), SettingKeys.HomeCardTravelersDiaryOrder));
         }
 
         if (LocalSetting.Get(SettingKeys.IsHomeCardCalendarPresented, true))

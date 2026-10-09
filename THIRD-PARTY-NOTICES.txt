@@ -61,7 +61,21 @@ Copyright (c) 2022 DGP Studio
   - Resource/Formulas/GenshinFormulas.json（伤害计算公式）
 
 ================================================================
-4. 其他
+4. 计算公式的行内公式字体（KaTeX）
+================================================================
+
+来源：KaTeX（ellen-wiki 渲染公式用的字体）
+      https://katex.org
+      https://github.com/KaTeX/KaTeX
+
+本应用随包分发以下文件：
+  - Resource/Font/KaTeX_Main-Regular.ttf（KaTeX 公式字体，源自 Computer Modern）
+  - Resource/Font/KaTeX_Main-LICENSE.txt（上游 LICENSE 全文）
+
+（许可全文同上第 1 节。）
+
+================================================================
+5. 其他
 ================================================================
 
 本应用为第三方非官方工具，与米哈游（miHoYo / HoYoverse）无隶属关系。

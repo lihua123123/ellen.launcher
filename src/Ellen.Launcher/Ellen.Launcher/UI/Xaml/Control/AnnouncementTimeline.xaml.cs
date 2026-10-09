@@ -133,16 +133,36 @@ public sealed partial class AnnouncementTimeline : UserControl
         // 刻度按「天」对齐：起止都取当天零点
         DateTimeOffset minStart = items.Min(static item => item.StartTime).ToLocalTime();
         DateTimeOffset maxEnd = items.Max(static item => item.EndTime).ToLocalTime();
-        rangeStart = new DateTimeOffset(minStart.Date, minStart.Offset);
-        DateTimeOffset endDate = new DateTimeOffset(maxEnd.Date, maxEnd.Offset);
+        DateTimeOffset earliestDay = new(minStart.Date, minStart.Offset);
+        DateTimeOffset latestDay = new(maxEnd.Date, maxEnd.Offset);
 
-        totalDays = Math.Clamp((endDate - rangeStart).Days + 1, 1, MaxDays);
+        // 公告跨度可能横跨数年（部分公告的结束时间在 2035 年），远超可绘制宽度。
+        // 因此不能像原来那样「从最早一条开始、截断到 MaxDays」——那样今天的公告会全部落到画布外，
+        // 只剩最早那几天开始的三两条。跨度装不下时改为以「今天」为中心的 MaxDays 窗口。
+        int span = (latestDay - earliestDay).Days + 1;
+        if (span <= MaxDays)
+        {
+            rangeStart = earliestDay;
+            totalDays = Math.Max(span, 1);
+        }
+        else
+        {
+            DateTimeOffset today = DateTimeOffset.Now;
+            rangeStart = new DateTimeOffset(today.Date.AddDays(-(MaxDays / 2)), today.Offset);
+            totalDays = MaxDays;
+        }
+
+        DateTimeOffset windowEnd = rangeStart.AddDays(totalDays);
+
+        // 窗口之外的公告（早已结束、或尚未开始）不画，否则会全部叠在画布左端。
+        ImmutableArray<Announcement> visible = [.. items.Where(item =>
+            item.EndTime.ToLocalTime() >= rangeStart && item.StartTime.ToLocalTime() < windowEnd)];
 
         TodayText.Text = $"今天 {DateTimeOffset.Now:MM.dd}";
         RangeText.Text = $"{rangeStart:yyyy.MM.dd} - {rangeStart.AddDays(totalDays - 1):yyyy.MM.dd}";
 
         BuildDayCells();
-        BuildBars(items);
+        BuildBars(visible);
         Layout();
         CenterOnToday();
     }
@@ -235,11 +255,6 @@ public sealed partial class AnnouncementTimeline : UserControl
 
     private void Layout()
     {
-        if (bars.Count is 0)
-        {
-            return;
-        }
-
         double totalWidth = totalDays * dayWidth;
         ScaleLayer.Width = totalWidth;
         BarLayer.Width = totalWidth;

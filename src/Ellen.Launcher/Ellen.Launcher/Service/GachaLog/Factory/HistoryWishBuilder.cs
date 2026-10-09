@@ -14,11 +14,18 @@ public sealed class HistoryWishBuilder
 
     private readonly Dictionary<IStatisticsItemConvertible, int> orangeUpCounter = [];
     private readonly Dictionary<IStatisticsItemConvertible, int> purpleUpCounter = [];
-    private readonly Dictionary<IStatisticsItemConvertible, int> orangeCounter = [];
-    private readonly Dictionary<IStatisticsItemConvertible, int> purpleCounter = [];
-    private readonly Dictionary<IStatisticsItemConvertible, int> blueCounter = [];
+
+    // 按抽到顺序逐条记录每次获取（含「本期第几抽」），而非按物品聚合计数
+    private readonly List<StatisticsItem> orangeObtained = [];
+    private readonly List<StatisticsItem> purpleObtained = [];
+    private readonly List<StatisticsItem> blueObtained = [];
 
     private int totalCountTracker;
+
+    // 上一次抽到该品质物品时的抽数（1 起），用来算「这次抽到它花了多少抽」
+    private int lastOrangePullIndex;
+    private int lastPurplePullIndex;
+    private int lastBluePullIndex;
 
     private HistoryWishBuilder(GachaEvent gachaEvent, GachaLogServiceMetadataContext context)
     {
@@ -59,7 +66,7 @@ public sealed class HistoryWishBuilder
 
     public bool IncreaseOrange(IStatisticsItemConvertible item)
     {
-        orangeCounter.IncreaseByOne(item);
+        orangeObtained.Add(CreateObtainedItem(item, ref lastOrangePullIndex));
         ++totalCountTracker;
 
         return orangeUpCounter.TryIncreaseByOne(item);
@@ -68,14 +75,27 @@ public sealed class HistoryWishBuilder
     public void IncreasePurple(IStatisticsItemConvertible item)
     {
         purpleUpCounter.TryIncreaseByOne(item);
-        purpleCounter.IncreaseByOne(item);
+        purpleObtained.Add(CreateObtainedItem(item, ref lastPurplePullIndex));
         ++totalCountTracker;
     }
 
     public void IncreaseBlue(IStatisticsItemConvertible item)
     {
-        blueCounter.IncreaseByOne(item);
+        blueObtained.Add(CreateObtainedItem(item, ref lastBluePullIndex));
         ++totalCountTracker;
+    }
+
+    /// <summary>
+    /// 记录一次获取：<see cref="StatisticsItem.PullCount"/> 是「这次抽到它花了多少抽」，
+    /// 也就是本次抽数减去上一次抽到**同品质**物品的抽数（本期第一次出该品质就从开头算起）。
+    /// </summary>
+    private StatisticsItem CreateObtainedItem(IStatisticsItemConvertible item, ref int lastPullIndexOfSameRarity)
+    {
+        int pullIndex = totalCountTracker + 1;
+        StatisticsItem statisticsItem = item.ToStatisticsItem(1);
+        statisticsItem.PullCount = pullIndex - lastPullIndexOfSameRarity;
+        lastPullIndexOfSameRarity = pullIndex;
+        return statisticsItem;
     }
 
     public HistoryWish ToHistoryWish()
@@ -93,9 +113,9 @@ public sealed class HistoryWishBuilder
             BannerImage = gachaEvent.Banner,
             OrangeUpList = orangeUpCounter.ToStatisticsImmutableArray(),
             PurpleUpList = purpleUpCounter.ToStatisticsImmutableArray(),
-            SummaryList = orangeCounter.ToStatisticsImmutableArray(),
-            PurpleList = purpleCounter.ToStatisticsImmutableArray(),
-            BlueList = blueCounter.ToStatisticsImmutableArray(),
+            SummaryList = [.. orangeObtained],
+            PurpleList = [.. purpleObtained],
+            BlueList = [.. blueObtained],
         };
 
         return historyWish;

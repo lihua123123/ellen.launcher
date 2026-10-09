@@ -1,0 +1,34 @@
+<shuxc:ScopedPage
+    x:Class="Ellen.Launcher.UI.Xaml.View.Page.HoyoFanTranslatePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:shuxc="using:Ellen.Launcher.UI.Xaml.Control"
+    xmlns:shuxm="using:Ellen.Launcher.UI.Xaml.Markup"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    mc:Ignorable="d">
+
+    <!--
+        内嵌空荧酒馆的文本对照 / 翻译工具（https://hoyofan.yuanshen.site/）。
+        和提瓦特地图一样是整页铺满的网页，所以不套卡片、不留内边距。
+    -->
+    <Grid>
+        <WebView2 x:Name="TranslateWebView" DefaultBackgroundColor="Transparent"/>
+        <StackPanel
+            x:Name="TranslateLoadFailedHint"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Spacing="8"
+            Visibility="Collapsed">
+            <TextBlock
+                HorizontalAlignment="Center"
+                Style="{ThemeResource BodyTextBlockStyle}"
+                Text="{shuxm:ResourceString Name=ViewWebView2WindowLoadFailedHint}"/>
+            <HyperlinkButton
+                HorizontalAlignment="Center"
+                Content="{shuxm:ResourceString Name=ViewHoyoFanTranslateHeader}"
+                NavigateUri="https://hoyofan.yuanshen.site/"/>
+        </StackPanel>
+    </Grid>
+</shuxc:ScopedPage>

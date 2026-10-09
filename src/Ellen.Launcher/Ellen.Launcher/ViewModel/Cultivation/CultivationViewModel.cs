@@ -3,7 +3,6 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Controls;
-using Ellen.Launcher.Core;
 using Ellen.Launcher.Core.Database;
 using Ellen.Launcher.Core.ExceptionService;
 using Ellen.Launcher.Core.Logging;
@@ -275,9 +274,8 @@ public sealed partial class CultivationViewModel : Abstraction.ViewModel
             return;
         }
 
-        if (!EllenRuntime.IsProcessElevated)
+        if (!await embeddedYaeGate.EnsureElevatedAsync().ConfigureAwait(false))
         {
-            await contentDialogFactory.CreateForConfirmAsync(SH.ViewModelYaeProcessNotElevatedTitle, SH.ViewModelYaeProcessNotElevatedDescription).ConfigureAwait(false);
             return;
         }
 

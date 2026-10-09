@@ -17,14 +17,17 @@ namespace Ellen.Launcher.UI.Xaml.Control;
 /// <c>&lt;span class="pyro"&gt;</c> 这类行内标记与正文表现一致。
 /// 列宽一律用 <c>*</c>，让表格自适应可用宽度并自动换行（比固定宽度更抗窄窗口）。
 /// </para>
+/// <para>
+/// 外观对齐应用内既有表格（<c>WikiAvatarPage</c> 的战斗备注表）：文字居中、
+/// 只用行底分隔线、表头用次要色文字，不做盒式网格。
+/// </para>
 /// </summary>
 [SuppressMessage("", "SH001")]
 [DependencyProperty<FormulaBlock>("Block", PropertyChangedCallbackName = nameof(OnBlockChanged))]
 public sealed partial class MarkdownTable : ContentControl
 {
-    private const string StrokeBrushKey = "CardStrokeColorDefaultBrush";
-    private const string HeaderBackgroundKey = "SubtleFillColorSecondaryBrush";
-    private const string BodyBackgroundKey = "CardBackgroundFillColorDefaultBrush";
+    private const string StrokeBrushKey = "ControlStrokeColorDefaultBrush";
+    private const string HeaderForegroundKey = "TextFillColorSecondaryBrush";
 
     public MarkdownTable()
     {
@@ -64,16 +67,9 @@ public sealed partial class MarkdownTable : ContentControl
         }
 
         Brush? stroke = ResolveBrush(StrokeBrushKey);
-        Brush? headerBackground = ResolveBrush(HeaderBackgroundKey);
-        Brush? bodyBackground = ResolveBrush(BodyBackgroundKey);
+        Brush? headerForeground = ResolveBrush(HeaderForegroundKey);
 
-        Grid grid = new()
-        {
-            BorderBrush = stroke,
-            BorderThickness = new Thickness(1, 1, 0, 0),
-            Background = bodyBackground,
-            CornerRadius = new CornerRadius(6),
-        };
+        Grid grid = new();
 
         for (int i = 0; i < columnCount; i++)
         {
@@ -85,7 +81,7 @@ public sealed partial class MarkdownTable : ContentControl
         for (int column = 0; column < columnCount; column++)
         {
             string text = column < block.Head.Length ? block.Head[column] : string.Empty;
-            Border cell = CreateCell(text, stroke, headerBackground, isHeader: true);
+            Border cell = CreateCell(text, stroke, headerForeground, isHeader: true);
             Grid.SetColumn(cell, column);
             Grid.SetRow(cell, 0);
             grid.Children.Add(cell);
@@ -97,7 +93,7 @@ public sealed partial class MarkdownTable : ContentControl
             for (int column = 0; column < columnCount; column++)
             {
                 string text = column < block.Rows[row].Length ? block.Rows[row][column] : string.Empty;
-                Border cell = CreateCell(text, stroke, bodyBackground, isHeader: false);
+                Border cell = CreateCell(text, stroke, foreground: null, isHeader: false);
                 Grid.SetColumn(cell, column);
                 Grid.SetRow(cell, row + 1);
                 grid.Children.Add(cell);
@@ -107,14 +103,16 @@ public sealed partial class MarkdownTable : ContentControl
         Content = grid;
     }
 
-    private static Border CreateCell(string text, Brush? stroke, Brush? background, bool isHeader)
+    private static Border CreateCell(string text, Brush? stroke, Brush? foreground, bool isHeader)
     {
         // 注意：本命名空间下存在子命名空间 .TextBlock，直接写 TextBlock 会被解析成命名空间。
         Microsoft.UI.Xaml.Controls.TextBlock textBlock = new()
         {
             TextWrapping = TextWrapping.Wrap,
             FontSize = 13,
+            HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
+            TextAlignment = TextAlignment.Center,
         };
 
         if (isHeader)
@@ -122,14 +120,19 @@ public sealed partial class MarkdownTable : ContentControl
             textBlock.FontWeight = FontWeights.SemiBold;
         }
 
+        if (foreground is not null)
+        {
+            textBlock.Foreground = foreground;
+        }
+
         GuideRichText.SetSource(textBlock, text);
 
         return new Border
         {
-            Background = background,
             BorderBrush = stroke,
-            BorderThickness = new Thickness(0, 0, 1, 1),
-            Padding = new Thickness(8, 5, 8, 5),
+            BorderThickness = new Thickness(0, 0, 0, 1),
+            MinHeight = 40,
+            Padding = new Thickness(12, 6, 12, 6),
             Child = textBlock,
         };
     }

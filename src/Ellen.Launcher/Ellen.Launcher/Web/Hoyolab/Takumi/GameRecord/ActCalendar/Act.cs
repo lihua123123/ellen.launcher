@@ -58,6 +58,25 @@ public class Act
         }
     }
 
+    /// <summary>
+    /// 活动的时间进度（0~1），用于卡片上「起止时间」上方的蓝色进度条。
+    /// </summary>
+    [JsonIgnore]
+    public double TimeProgress
+    {
+        get
+        {
+            long total = EndTimestamp - StartTimestamp;
+            if (total <= 0)
+            {
+                return 0d;
+            }
+
+            long elapsed = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - StartTimestamp;
+            return Math.Clamp((double)elapsed / total, 0d, 1d);
+        }
+    }
+
     [JsonPropertyName("status")]
     public required ActStatus Status { get; init; }
 

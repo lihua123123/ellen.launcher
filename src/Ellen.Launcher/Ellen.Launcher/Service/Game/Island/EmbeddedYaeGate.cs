@@ -2,7 +2,9 @@
 // Licensed under the MIT license.
 
 using Microsoft.UI.Xaml.Controls;
+using Ellen.Launcher.Core;
 using Ellen.Launcher.Factory.ContentDialog;
+using Ellen.Launcher.Factory.Process;
 
 namespace Ellen.Launcher.Service.Game.Island;
 
@@ -43,5 +45,30 @@ public sealed partial class EmbeddedYaeGate : IEmbeddedYaeGate
         await taskContext.SwitchToMainThreadAsync();
         launchOptions.IsIslandEnabled.Value = true;
         return true;
+    }
+
+    public async ValueTask<bool> EnsureElevatedAsync()
+    {
+        if (EllenRuntime.IsProcessElevated)
+        {
+            return true;
+        }
+
+        ContentDialogResult result = await contentDialogFactory
+            .CreateForConfirmCancelAsync(
+                SH.ViewModelYaeProcessNotElevatedTitle,
+                SH.ViewModelYaeProcessNotElevatedDescription,
+                SH.ViewModelYaeProcessNotElevatedRestartAsAdmin,
+                SH.ContentDialogCancelCloseButtonText)
+            .ConfigureAwait(false);
+
+        if (result is not ContentDialogResult.Primary)
+        {
+            return false;
+        }
+
+        // 提权成功后当前实例会退出
+        ProcessFactory.TryRestartElevated();
+        return false;
     }
 }

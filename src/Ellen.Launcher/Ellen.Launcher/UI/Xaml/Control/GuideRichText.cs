@@ -17,7 +17,8 @@ namespace Ellen.Launcher.UI.Xaml.Control;
 /// <para>
 /// 标记与 ellen-wiki 的 <c>richtext.js</c> 对齐：
 /// <c>&lt;span class="hydro"&gt;**水盾**&lt;/span&gt;</c> 走元素配色（配色表见 <see cref="ElementPalette"/>），
-/// <c>`专有名词`</c> 与 <c>$公式/数值$</c> 用等宽字体（WinUI 没有 KaTeX，不做真正的公式排版），
+/// <c>`专有名词`</c> 沿用软件默认字体，<c>$公式/数值$</c> 用随包内置的 KaTeX 公式字体
+/// （WinUI 没有 KaTeX，不做真正的公式排版），
 /// <c>**加粗**</c> 直接加粗；其余 HTML 标签一律丢弃并保留其中文字。
 /// </para>
 /// <para>
@@ -27,17 +28,40 @@ namespace Ellen.Launcher.UI.Xaml.Control;
 /// </summary>
 public static class GuideRichText
 {
-    private static readonly FontFamily MonospaceFont = new("Consolas");
-
     // 元素/反应配色与关键词表已抽到 ElementPalette（内置 colors.json，供后续功能复用）。
 
-    private static readonly Regex ElementSpanRegex = new(
-        "<span\\s+class=\"(?<cls>[^\"]+)\"\\s*>(?<inner>.*?)</span>",
+    private static readonly Regex TokenRegex = new(
+        "`(?<code>[^`]+)`"
+        + "|\\$(?<math>[^$]+)\\$"
+        + "|\\*\\*(?<strong>.+?)\\*\\*"
+        + "|(?<spanOpen><span\\s+class=\"(?<cls>[^\"]+)\"\\s*>)"
+        + "|(?<spanClose></span\\s*>)"
+        + "|(?<tag><[^>]+>)",
         RegexOptions.Compiled | RegexOptions.Singleline);
 
-    private static readonly Regex TokenRegex = new(
-        "`(?<code>[^`]+)`|\\$(?<math>[^$]+)\\$|\\*\\*(?<strong>[^*]+)\\*\\*|(?<tag><[^>]+>)",
-        RegexOptions.Compiled);
+    private const int MaxTokenDepth = 4;
+
+    private static FontFamily? mathFontFamily;
+
+    /// <summary>
+    /// 行内公式用的字体：ellen-wiki 用 KaTeX 渲染公式（<c>katex/dist/katex.min.css</c> 里的
+    /// <c>KaTeX_Main</c>），这里把同一套字体随包内置并直接用在 <c>$...$</c> 上，
+    /// 让行内公式看起来是公式；中文等 KaTeX 没有的字形由 MiSans 兜底。
+    /// </summary>
+    private static FontFamily? MathFontFamily
+    {
+        get
+        {
+            if (mathFontFamily is null
+                && Application.Current?.Resources.TryGetValue("KaTeXMainAndMiSans", out object? value) is true
+                && value is FontFamily family)
+            {
+                mathFontFamily = family;
+            }
+
+            return mathFontFamily;
+        }
+    }
 
     /// <summary>
     /// 富文本源（保留标记的原始行）。
@@ -97,56 +121,62 @@ public static class GuideRichText
 
     private static void Render(WinUITextBlock textBlock, string source)
     {
-        bool autoColor = GetAutoElementColor(textBlock);
-
         textBlock.Inlines.Clear();
         if (source.Length is 0)
         {
             return;
         }
 
-        int cursor = 0;
-        foreach (Match span in ElementSpanRegex.Matches(source))
-        {
-            if (span.Index > cursor)
-            {
-                AppendTokens(textBlock, source[cursor..span.Index], null, autoColor);
-            }
-
-            string className = span.Groups["cls"].Value;
-            ElementPalette.TryGetBrush(className, out Brush? brush);
-            AppendTokens(textBlock, span.Groups["inner"].Value, brush, autoColor);
-
-            cursor = span.Index + span.Length;
-        }
-
-        if (cursor < source.Length)
-        {
-            AppendTokens(textBlock, source[cursor..], null, autoColor);
-        }
+        AppendTokens(textBlock, source, null, null, GetAutoElementColor(textBlock), 0);
     }
 
-    private static void AppendTokens(WinUITextBlock textBlock, string text, Brush? brush, bool autoColor)
+    /// <summary>
+    /// 单趟扫描整段文本：<c>**加粗**</c> 可以跨越 <c>&lt;span&gt;</c> 标签（wiki 里
+    /// <c>**反应&lt;span class="x"&gt;月感电&lt;/span&gt;**</c> 这种写法很常见），
+    /// 元素标签用栈维护配色，因此跨标签的标记也不会漏成字面文本。
+    /// </summary>
+    private static void AppendTokens(WinUITextBlock textBlock, string text, Brush? brush, FontWeight? weight, bool autoColor, int depth)
     {
+        if (depth > MaxTokenDepth)
+        {
+            AddRun(textBlock, text, brush, weight, null, autoColor);
+            return;
+        }
+
+        Stack<Brush?> brushStack = new();
         int cursor = 0;
+
         foreach (Match match in TokenRegex.Matches(text))
         {
             if (match.Index > cursor)
             {
-                AddRun(textBlock, text[cursor..match.Index], brush, null, null, autoColor);
+                AddRun(textBlock, text[cursor..match.Index], brush, weight, null, autoColor);
             }
 
             if (match.Groups["strong"].Success)
             {
-                AddRun(textBlock, match.Groups["strong"].Value, brush, FontWeights.SemiBold, null, autoColor);
+                // 加粗内部可能还嵌着元素标签，递归处理
+                AppendTokens(textBlock, match.Groups["strong"].Value, brush, FontWeights.SemiBold, autoColor, depth + 1);
             }
             else if (match.Groups["code"].Success)
             {
-                AddRun(textBlock, match.Groups["code"].Value, brush, null, MonospaceFont, autoColor);
+                AddRun(textBlock, match.Groups["code"].Value, brush, weight, null, autoColor);
             }
             else if (match.Groups["math"].Success)
             {
-                AddRun(textBlock, CleanMath(match.Groups["math"].Value), brush, null, MonospaceFont, autoColor);
+                AddRun(textBlock, CleanMath(match.Groups["math"].Value), brush, weight, MathFontFamily, autoColor);
+            }
+            else if (match.Groups["spanOpen"].Success)
+            {
+                brushStack.Push(brush);
+                if (ElementPalette.TryGetBrush(match.Groups["cls"].Value, out Brush? spanBrush))
+                {
+                    brush = spanBrush;
+                }
+            }
+            else if (match.Groups["spanClose"].Success && brushStack.Count > 0)
+            {
+                brush = brushStack.Pop();
             }
 
             // 其余标签（tag 组）直接丢弃
@@ -155,7 +185,7 @@ public static class GuideRichText
 
         if (cursor < text.Length)
         {
-            AddRun(textBlock, text[cursor..], brush, null, null, autoColor);
+            AddRun(textBlock, text[cursor..], brush, weight, null, autoColor);
         }
     }
 

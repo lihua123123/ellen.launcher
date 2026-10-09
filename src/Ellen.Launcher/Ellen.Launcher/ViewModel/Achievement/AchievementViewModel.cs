@@ -4,7 +4,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI.Collections;
 using Microsoft.UI.Xaml.Controls;
-using Ellen.Launcher.Core;
 using Ellen.Launcher.Core.Database;
 using Ellen.Launcher.Core.ExceptionService;
 using Ellen.Launcher.Core.IO;
@@ -259,9 +258,8 @@ public sealed partial class AchievementViewModel : Abstraction.ViewModel, INavig
     {
         SentrySdk.AddBreadcrumb(BreadcrumbFactory2.CreateUI("Import UIAF", "AchievementViewModel.Command", [("source", "Embedded Yae")]));
 
-        if (!EllenRuntime.IsProcessElevated)
+        if (!await embeddedYaeGate.EnsureElevatedAsync().ConfigureAwait(false))
         {
-            await scopeContext.ContentDialogFactory.CreateForConfirmAsync(SH.ViewModelYaeProcessNotElevatedTitle, SH.ViewModelYaeProcessNotElevatedDescription).ConfigureAwait(false);
             return;
         }
 

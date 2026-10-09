@@ -47,7 +47,7 @@ public sealed class FormulaBlock
     /// <summary>
     /// <c>p</c> / <c>h</c> 的正文，保留 ellen-wiki 的行内标记
     /// （<c>**加粗**</c>、<c>`专有名词`</c>、<c>&lt;span class="pyro"&gt;</c>），
-    /// 行内公式已在生成期转成普通文本。
+    /// 行内公式保留 <c>$...$</c> 标记（TeX 命令已在生成期规范化成 Unicode）。
     /// </summary>
     [JsonPropertyName("text")]
     public string? Text { get; set; }

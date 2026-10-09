@@ -1993,6 +1993,9 @@
     <data name="ViewModelYaeProcessNotElevatedDescription" xml:space="preserve">
     <value>Embedded Yae 需要管理员权限以启动并注入到游戏</value>
   </data>
+  <data name="ViewModelYaeProcessNotElevatedRestartAsAdmin" xml:space="preserve">
+    <value>以管理员模式重启</value>
+  </data>
   <data name="ViewModelYaeProcessNotElevatedTitle" xml:space="preserve">
     <value>艾莲进程权限不足</value>
   </data>
@@ -2115,6 +2118,12 @@
   </data>
   <data name="ViewPageAnnouncementSetGamePathSuccessTitle" xml:space="preserve">
     <value>设置成功</value>
+  </data>
+  <data name="ViewPageAnnouncementLaunchAsAdministratorLabel" xml:space="preserve">
+    <value>默认以管理员模式启动</value>
+  </data>
+  <data name="ViewPageAnnouncementLaunchAsAdministratorToolTip" xml:space="preserve">
+    <value>下次启动艾莲时自动申请管理员权限</value>
   </data>
   <data name="ViewPageAnnouncementRedeemCodeLabel" xml:space="preserve">
     <value>前瞻直播兑换码</value>
@@ -2340,6 +2349,9 @@
   </data>
   <data name="ViewPageGachaLogPivotOverview" xml:space="preserve">
     <value>总览</value>
+  </data>
+  <data name="ViewPageGachaLogPivotStatistics" xml:space="preserve">
+    <value>统计</value>
   </data>
     <data name="ViewPageGachaLogPivotWeapon" xml:space="preserve">
     <value>武器</value>
@@ -2674,11 +2686,35 @@
     <data name="ViewTitileUpdatePackageAvailableContent" xml:space="preserve">
     <value>是否立即更新？</value>
   </data>
-        <data name="ViewTitleUpdatePackageAvailableTitle" xml:space="preserve">
+        <data name="ViewHoyoFanTranslateHeader" xml:space="preserve">
+    <value>语言翻译</value>
+  </data>
+  <data name="ViewTitleUpdatePackageAvailableTitle" xml:space="preserve">
     <value>艾莲 {0} 版本现已可用</value>
+  </data>
+  <data name="ViewTeyvatMapHeader" xml:space="preserve">
+    <value>提瓦特地图</value>
+  </data>
+  <data name="ViewTeyvatMapSourceNoticeContent" xml:space="preserve">
+    <value>地图数据与界面来自空荧酒馆（Kongying Tavern）的提瓦特互动地图（map_front_v3），此处以内嵌网页方式呈现，版权归原作者所有。文档与授权说明：</value>
+  </data>
+  <data name="ViewTeyvatMapSourceNoticeTitle" xml:space="preserve">
+    <value>提瓦特地图来源</value>
   </data>
   <data name="ViewToolHeader" xml:space="preserve">
     <value>工具</value>
+  </data>
+  <data name="ViewTravelersDiaryHeader" xml:space="preserve">
+    <value>旅行者札记</value>
+  </data>
+  <data name="ViewTravelersDiaryMonth" xml:space="preserve">
+    <value>本月</value>
+  </data>
+  <data name="ViewTravelersDiaryNoIncomeSourceHint" xml:space="preserve">
+    <value>本月暂无原石收入记录</value>
+  </data>
+  <data name="ViewTravelersDiaryToday" xml:space="preserve">
+    <value>今日</value>
   </data>
   <data name="ViewUserCookieOperation" xml:space="preserve">
     <value>米游社</value>

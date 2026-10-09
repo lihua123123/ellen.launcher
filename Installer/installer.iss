@@ -9,11 +9,18 @@
 ; 2. 编译安装程序:
 ;   iscc Installer\installer.iss
 ;   （版本号默认与下面 MyAppVersion 一致，也可用 /DMyAppVersion=x.y.z.w 覆盖）
+;
+;   验收流程：验收通过 -> 直接 iscc 出正式包；
+;             未通过验收 -> 加 /DMyAppVersionSuffix=-preview 出预览包
+;             （预览后缀只进安装包名与 AppVersion，VersionInfoVersion 始终是纯数字）
 
 #define MyAppName "Ellen.Launcher"
 #define MyAppShortName "Ellen.Launcher"
 #ifndef MyAppVersion
-  #define MyAppVersion "1.0.0.4"
+  #define MyAppVersion "7.1.0.2"
+#endif
+#ifndef MyAppVersionSuffix
+  #define MyAppVersionSuffix ""
 #endif
 #define MyAppPublisher "艾莲意为爱恋"
 #define MyAppURL "https://ellen.wiki"
@@ -29,7 +36,7 @@
 [Setup]
 AppId={{8E5B7A87-D11A-4661-B0BC-987141DD9B43}
 AppName={#MyAppName}
-AppVersion={#MyAppVersion}
+AppVersion={#MyAppVersion}{#MyAppVersionSuffix}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
@@ -40,7 +47,7 @@ DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 LicenseFile=..\THIRD-PARTY-NOTICES.txt
 OutputDir={#OutputDir}
-OutputBaseFilename=Ellen.Launcher-{#MyAppVersion}-Setup
+OutputBaseFilename=Ellen.Launcher-{#MyAppVersion}{#MyAppVersionSuffix}-Setup
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern

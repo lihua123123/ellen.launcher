@@ -10,7 +10,8 @@
  * 3× 密度，亮/暗各一套，取用零风险。
  *
  * 行内公式不进图：genshin.md 里的行内公式都很简单（`90\%` / `(6+5\times元素量)`），
- * 由 sanitizeInlineMath() 转成普通文本，交给现有的 GuideRichText 渲染。
+ * 由 sanitizeInlineMath() 把 TeX 命令规范化成 Unicode 后仍以 `$...$` 标记写进 JSON，
+ * 交给 GuideRichText 用等宽字体渲染（WinUI 没有 KaTeX，不做真正的公式排版）。
  *
  * 用法：node gen.mjs [--wiki <ellen-wiki 根目录>] [--out <Ellen.Launcher 项目目录>]
  */
@@ -111,15 +112,15 @@ function sanitizeInlineMath(src) {
 
 /**
  * 把一段 wiki 行内文本转成 GuideRichText 能吃的标记文本。
- * - 行内公式 `$...$` → 普通文本
+ * - 行内公式 `$...$` → 规范化 TeX 命令后保留 `$...$`（GuideRichText 用等宽字体渲染）
  * - `==高亮==` → `**加粗**`（GuideRichText 没有 mark 概念）
- * - 单个 `*斜体*` → 去掉星号（多余强调标记会原样显示）
+ * - 单个 `*斜体*` → 去掉星号（多余强调标记会原样显示，允许内部出现 `**加粗**`）
  * - 其余 `**加粗**` / `` `代码` `` / `<span class="x">` 原样保留
  */
 function sanitizeText(src) {
-  let s = src.replace(INLINE_MATH_RE, (_m, math) => sanitizeInlineMath(math));
+  let s = src.replace(INLINE_MATH_RE, (_m, math) => `$${sanitizeInlineMath(math)}$`);
   s = s.replace(/==([^=]+?)==/g, '**$1**');
-  s = s.replace(/(?<!\*)\*(?!\*)([^*\n]+?)\*(?!\*)/g, '$1');
+  s = s.replace(/(?<!\*)\*(?!\*)([^\n]*?)(?<!\*)\*(?!\*)/g, '$1');
   return s;
 }
 

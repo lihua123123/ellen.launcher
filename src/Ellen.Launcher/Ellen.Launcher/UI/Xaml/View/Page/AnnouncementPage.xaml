@@ -34,6 +34,19 @@
     <shuxc:ScopedPage.Resources>
         <shux:BindingProxy x:Key="ViewModelBindingProxy" DataContext="{Binding}"/>
 
+        <!--
+            活动 / 卡池卡片上「起止时间」上方的进度条：
+            替换原来的 1px 分隔线，用蓝色填充表示该活动在本期内的耗时进度。
+        -->
+        <Style x:Key="ActivityTimeProgressBarStyle" TargetType="ProgressBar">
+            <Setter Property="Minimum" Value="0"/>
+            <Setter Property="Maximum" Value="1"/>
+            <Setter Property="Height" Value="3"/>
+            <Setter Property="CornerRadius" Value="2"/>
+            <Setter Property="Foreground" Value="#FF4C9BE8"/>
+            <Setter Property="Background" Value="{ThemeResource ControlAltFillColorSecondaryBrush}"/>
+        </Style>
+
         <DataTemplate x:Key="AnnouncementPivotItemContentTemplate" x:DataType="shwhhca:AnnouncementListWrapper">
             <ScrollViewer Margin="16">
                 <shuxc:AnnouncementTimeline ItemsSource="{Binding List}"/>
@@ -129,19 +142,20 @@
                             VerticalAlignment="Center">
                             <TextBlock HorizontalAlignment="Center" Text="{Binding FormattedStatus}"/>
                         </Border>
-                        <Border
+                        <StackPanel
                             Grid.Row="1"
                             Grid.ColumnSpan="3"
                             Padding="6"
-                            BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-                            BorderThickness="0,1,0,0"
-                            CornerRadius="{ThemeResource ControlCornerRadiusBottom}">
+                            Spacing="2">
+                            <ProgressBar
+                                Style="{StaticResource ActivityTimeProgressBarStyle}"
+                                Value="{Binding TimeProgress}"/>
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 Opacity="0.7"
                                 Style="{ThemeResource CaptionTextBlockStyle}"
                                 Text="{Binding FormattedDuration}"/>
-                        </Border>
+                        </StackPanel>
                     </Grid>
                 </DataTemplate>
             </shvh:ActivityTemplateSelector.SignInTemplate>
@@ -225,19 +239,20 @@
                             VerticalAlignment="Center">
                             <TextBlock HorizontalAlignment="Center" Text="{Binding FormattedStatus}"/>
                         </Border>
-                        <Border
+                        <StackPanel
                             Grid.Row="1"
                             Grid.ColumnSpan="3"
                             Padding="6"
-                            BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-                            BorderThickness="0,1,0,0"
-                            CornerRadius="{ThemeResource ControlCornerRadiusBottom}">
+                            Spacing="2">
+                            <ProgressBar
+                                Style="{StaticResource ActivityTimeProgressBarStyle}"
+                                Value="{Binding TimeProgress}"/>
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 Opacity="0.7"
                                 Style="{ThemeResource CaptionTextBlockStyle}"
                                 Text="{Binding FormattedDuration}"/>
-                        </Border>
+                        </StackPanel>
                     </Grid>
                 </DataTemplate>
             </shvh:ActivityTemplateSelector.DoubleTemplate>
@@ -321,19 +336,20 @@
                             VerticalAlignment="Center">
                             <TextBlock HorizontalAlignment="Center" Text="{Binding ExploreDetail.FormattedExplorePercent}"/>
                         </Border>
-                        <Border
+                        <StackPanel
                             Grid.Row="1"
                             Grid.ColumnSpan="3"
                             Padding="6"
-                            BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-                            BorderThickness="0,1,0,0"
-                            CornerRadius="{ThemeResource ControlCornerRadiusBottom}">
+                            Spacing="2">
+                            <ProgressBar
+                                Style="{StaticResource ActivityTimeProgressBarStyle}"
+                                Value="{Binding TimeProgress}"/>
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 Opacity="0.7"
                                 Style="{ThemeResource CaptionTextBlockStyle}"
                                 Text="{Binding FormattedDuration}"/>
-                        </Border>
+                        </StackPanel>
                     </Grid>
                 </DataTemplate>
             </shvh:ActivityTemplateSelector.ExploreTemplate>
@@ -417,19 +433,20 @@
                             VerticalAlignment="Center">
                             <TextBlock HorizontalAlignment="Center" Text="{Binding FormattedStatus}"/>
                         </Border>
-                        <Border
+                        <StackPanel
                             Grid.Row="1"
                             Grid.ColumnSpan="3"
                             Padding="6"
-                            BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-                            BorderThickness="0,1,0,0"
-                            CornerRadius="{ThemeResource ControlCornerRadiusBottom}">
+                            Spacing="2">
+                            <ProgressBar
+                                Style="{StaticResource ActivityTimeProgressBarStyle}"
+                                Value="{Binding TimeProgress}"/>
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 Opacity="0.7"
                                 Style="{ThemeResource CaptionTextBlockStyle}"
                                 Text="{Binding FormattedDuration}"/>
-                        </Border>
+                        </StackPanel>
                     </Grid>
                 </DataTemplate>
             </shvh:ActivityTemplateSelector.LiBenTemplate>
@@ -514,19 +531,20 @@
                             VerticalAlignment="Center">
                             <TextBlock HorizontalAlignment="Center" Text="{Binding TowerDetail.FormattedStar}"/>
                         </Border>
-                        <Border
+                        <StackPanel
                             Grid.Row="1"
                             Grid.ColumnSpan="3"
                             Padding="6"
-                            BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-                            BorderThickness="0,1,0,0"
-                            CornerRadius="{ThemeResource ControlCornerRadiusBottom}">
+                            Spacing="2">
+                            <ProgressBar
+                                Style="{StaticResource ActivityTimeProgressBarStyle}"
+                                Value="{Binding TimeProgress}"/>
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 Opacity="0.7"
                                 Style="{ThemeResource CaptionTextBlockStyle}"
                                 Text="{Binding FormattedDuration}"/>
-                        </Border>
+                        </StackPanel>
                     </Grid>
                 </DataTemplate>
             </shvh:ActivityTemplateSelector.TowerTemplate>
@@ -611,19 +629,20 @@
                             VerticalAlignment="Center">
                             <TextBlock HorizontalAlignment="Center" Text="{Binding RoleCombatDetail.FormattedMaxRound}"/>
                         </Border>
-                        <Border
+                        <StackPanel
                             Grid.Row="1"
                             Grid.ColumnSpan="3"
                             Padding="6"
-                            BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-                            BorderThickness="0,1,0,0"
-                            CornerRadius="{ThemeResource ControlCornerRadiusBottom}">
+                            Spacing="2">
+                            <ProgressBar
+                                Style="{StaticResource ActivityTimeProgressBarStyle}"
+                                Value="{Binding TimeProgress}"/>
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 Opacity="0.7"
                                 Style="{ThemeResource CaptionTextBlockStyle}"
                                 Text="{Binding FormattedDuration}"/>
-                        </Border>
+                        </StackPanel>
                     </Grid>
                 </DataTemplate>
             </shvh:ActivityTemplateSelector.RoleCombatTemplate>
@@ -708,19 +727,20 @@
                             VerticalAlignment="Center">
                             <TextBlock HorizontalAlignment="Center" Text="{Binding HardChallengeDetail.FormattedProgress}"/>
                         </Border>
-                        <Border
+                        <StackPanel
                             Grid.Row="1"
                             Grid.ColumnSpan="3"
                             Padding="6"
-                            BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-                            BorderThickness="0,1,0,0"
-                            CornerRadius="{ThemeResource ControlCornerRadiusBottom}">
+                            Spacing="2">
+                            <ProgressBar
+                                Style="{StaticResource ActivityTimeProgressBarStyle}"
+                                Value="{Binding TimeProgress}"/>
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 Opacity="0.7"
                                 Style="{ThemeResource CaptionTextBlockStyle}"
                                 Text="{Binding FormattedDuration}"/>
-                        </Border>
+                        </StackPanel>
                     </Grid>
                 </DataTemplate>
             </shvh:ActivityTemplateSelector.HardChallengeTemplate>
@@ -804,19 +824,20 @@
                             VerticalAlignment="Center">
                             <TextBlock HorizontalAlignment="Center" Text="{Binding FormattedStatus}"/>
                         </Border>
-                        <Border
+                        <StackPanel
                             Grid.Row="1"
                             Grid.ColumnSpan="3"
                             Padding="6"
-                            BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-                            BorderThickness="0,1,0,0"
-                            CornerRadius="{ThemeResource ControlCornerRadiusBottom}">
+                            Spacing="2">
+                            <ProgressBar
+                                Style="{StaticResource ActivityTimeProgressBarStyle}"
+                                Value="{Binding TimeProgress}"/>
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 Opacity="0.7"
                                 Style="{ThemeResource CaptionTextBlockStyle}"
                                 Text="{Binding FormattedDuration}"/>
-                        </Border>
+                        </StackPanel>
                     </Grid>
                 </DataTemplate>
             </shvh:ActivityTemplateSelector.OtherTemplate>
@@ -890,14 +911,33 @@
                                 Command="{Binding SetGamePathCommand}"
                                 Icon="{shuxm:FontIcon Glyph=&#xE8B7;}"
                                 Label="{shuxm:ResourceString Name=ViewPageAnnouncementSetGamePathLabel}"/>
+                            <AppBarElementContainer>
+                                <!--
+                                    下次启动时自动申请管理员权限（Bootstrap 读 LocalSetting 决定是否重启提权）。
+                                    字号取 CaptionTextBlockFontSize（12），与旁边 AppBarButton 的标签一致。
+                                -->
+                                <ToggleSwitch
+                                    MinWidth="0"
+                                    Margin="4,0"
+                                    FontSize="{ThemeResource CaptionTextBlockFontSize}"
+                                    IsOn="{Binding AppOptions.AutoRestartAsAdmin.Value, Mode=TwoWay}"
+                                    OffContent="{shuxm:ResourceString Name=ViewPageAnnouncementLaunchAsAdministratorLabel}"
+                                    OnContent="{shuxm:ResourceString Name=ViewPageAnnouncementLaunchAsAdministratorLabel}"
+                                    ToolTipService.ToolTip="{shuxm:ResourceString Name=ViewPageAnnouncementLaunchAsAdministratorToolTip}"/>
+                            </AppBarElementContainer>
                         </CommandBar>
                     </Grid>
                 </Border>
 
 
+                <!--
+                    卡池卡片上加了「时间进度条」后每张卡片高 4px，原来的 354.6 会把最下面
+                    那张卡池卡片（如「7.1 武器活动祈愿」）的起止时间裁掉，这里放宽。
+                    MaxHeight 只在内容超过时才起作用，所以留余量不会造成额外空白。
+                -->
                 <Grid
                     x:Name="ActivityCalendarGrid"
-                    MaxHeight="354.6"
+                    MaxHeight="380"
                     Padding="8"
                     x:FieldModifier="internal"
                     Style="{ThemeResource AcrylicGridCardStyle}"
@@ -1003,18 +1043,19 @@
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
-                                        <Border
+                                        <StackPanel
                                             Grid.Row="2"
                                             Padding="6"
-                                            BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-                                            BorderThickness="0,1,0,0"
-                                            CornerRadius="{ThemeResource ControlCornerRadiusBottom}">
+                                            Spacing="2">
+                                            <ProgressBar
+                                                Style="{StaticResource ActivityTimeProgressBarStyle}"
+                                                Value="{Binding TimeProgress}"/>
                                             <TextBlock
                                                 HorizontalAlignment="Center"
                                                 Opacity="0.7"
                                                 Style="{ThemeResource CaptionTextBlockStyle}"
                                                 Text="{Binding FormattedDuration}"/>
-                                        </Border>
+                                        </StackPanel>
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>

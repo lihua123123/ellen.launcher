@@ -825,11 +825,11 @@
     "version": "7.1",
     "bosses": [
       {
-        "shortName": "历经百战的锋灵刻师",
+        "shortName": "历经百战的矮灵雕刻师",
         "imgUrl": "images/历经百战的矮灵雕刻师·运风成斤.png",
         "imgLocal": "历经百战的矮灵雕刻师·运风成斤.png",
         "imgMissing": false,
-        "fullName": "历经百战的矮灵刻师·运风成斤",
+        "fullName": "历经百战的矮灵雕刻师·运风成斤",
         "hp": "N5 / N6：1359,4413 / 3327,8383",
         "skills": [
           "强敌常态$90\\%$全抗",

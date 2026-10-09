@@ -313,6 +313,22 @@
                         Content="{shuxm:ResourceString Name=ViewCultivationHeader}"
                         Icon="{shuxm:BitmapIcon Source=ms-appx:///Resource/Navigation/Cultivation.png}"/>
 
+                    <NavigationViewItem
+                        shuxc:NavigationViewItemHelper.NavigateTo="shuxvp:TeyvatMapPage"
+                        Content="{shuxm:ResourceString Name=ViewTeyvatMapHeader}">
+                        <NavigationViewItem.Icon>
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE707;"/>
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+
+                    <NavigationViewItem
+                        shuxc:NavigationViewItemHelper.NavigateTo="shuxvp:HoyoFanTranslatePage"
+                        Content="{shuxm:ResourceString Name=ViewHoyoFanTranslateHeader}">
+                        <NavigationViewItem.Icon>
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE774;"/>
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+
                     <NavigationViewItemHeader Content="{shuxm:ResourceString Name=ViewPeriodHeader}"/>
 
                     <NavigationViewItem
@@ -348,8 +364,11 @@
 
                     <NavigationViewItem
                         shuxc:NavigationViewItemHelper.NavigateTo="shuxvp:FormulasPage"
-                        Content="{shuxm:ResourceString Name=ViewFormulasHeader}"
-                        Icon="{shuxm:BitmapIcon Source=ms-appx:///Resource/Navigation/Cultivation.png}"/>
+                        Content="{shuxm:ResourceString Name=ViewFormulasHeader}">
+                        <NavigationViewItem.Icon>
+                            <FontIcon FontFamily="Segoe UI Emoji" Glyph="&#x1F9EE;"/>
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
                 </NavigationView.MenuItems>
 
                 <NavigationView.PaneFooter>

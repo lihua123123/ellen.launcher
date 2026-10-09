@@ -1984,6 +1984,9 @@ Space Available: {2}</value>
     <data name="ViewModelYaeProcessNotElevatedDescription" xml:space="preserve">
     <value>Embedded Yae requires administrator privileges to start and inject into the game</value>
   </data>
+  <data name="ViewModelYaeProcessNotElevatedRestartAsAdmin" xml:space="preserve">
+    <value>Restart as administrator</value>
+  </data>
   <data name="ViewModelYaeProcessNotElevatedTitle" xml:space="preserve">
     <value>Ellen Launcher has insufficient permissions</value>
   </data>
@@ -2082,6 +2085,12 @@ Space Available: {2}</value>
   </data>
   <data name="ViewPageAnnouncementRedeemCodeCopySucceed" xml:space="preserve">
     <value>Redemption code copied successfully</value>
+  </data>
+  <data name="ViewPageAnnouncementLaunchAsAdministratorLabel" xml:space="preserve">
+    <value>Launch as administrator by default</value>
+  </data>
+  <data name="ViewPageAnnouncementLaunchAsAdministratorToolTip" xml:space="preserve">
+    <value>Request administrator rights the next time Ellen Launcher starts</value>
   </data>
   <data name="ViewPageAnnouncementRedeemCodeLabel" xml:space="preserve">
     <value>Special Program Redemption Code</value>
@@ -2277,6 +2286,9 @@ Space Available: {2}</value>
   </data>
   <data name="ViewPageGachaLogPivotOverview" xml:space="preserve">
     <value>Overview</value>
+  </data>
+  <data name="ViewPageGachaLogPivotStatistics" xml:space="preserve">
+    <value>Statistics</value>
   </data>
     <data name="ViewPageGachaLogPivotWeapon" xml:space="preserve">
     <value>Weapon</value>
@@ -2545,11 +2557,35 @@ Space Available: {2}</value>
     <data name="ViewTitileUpdatePackageAvailableContent" xml:space="preserve">
     <value>Update now?</value>
   </data>
-        <data name="ViewTitleUpdatePackageAvailableTitle" xml:space="preserve">
+        <data name="ViewHoyoFanTranslateHeader" xml:space="preserve">
+    <value>Text Translator</value>
+  </data>
+  <data name="ViewTitleUpdatePackageAvailableTitle" xml:space="preserve">
     <value>Ellen Launcher {0} is now available</value>
+  </data>
+  <data name="ViewTeyvatMapHeader" xml:space="preserve">
+    <value>Teyvat Map</value>
+  </data>
+  <data name="ViewTeyvatMapSourceNoticeContent" xml:space="preserve">
+    <value>The map data and interface come from Kongying Tavern's interactive Teyvat map (map_front_v3), embedded here as a web page; all rights belong to the original authors. Documentation and licensing:</value>
+  </data>
+  <data name="ViewTeyvatMapSourceNoticeTitle" xml:space="preserve">
+    <value>Teyvat map source</value>
   </data>
   <data name="ViewToolHeader" xml:space="preserve">
     <value>Tools</value>
+  </data>
+  <data name="ViewTravelersDiaryHeader" xml:space="preserve">
+    <value>Traveler's Diary</value>
+  </data>
+  <data name="ViewTravelersDiaryMonth" xml:space="preserve">
+    <value>This Month</value>
+  </data>
+  <data name="ViewTravelersDiaryNoIncomeSourceHint" xml:space="preserve">
+    <value>No primogem income recorded this month</value>
+  </data>
+  <data name="ViewTravelersDiaryToday" xml:space="preserve">
+    <value>Today</value>
   </data>
   <data name="ViewUserCookieOperation" xml:space="preserve">
     <value>MiYouShe</value>

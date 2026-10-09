@@ -51,6 +51,8 @@ public static class SettingKeys
     public const string IsHomeCardGachaStatisticsPresented = "Ellen::UI::Home::Card::GachaStatistics::Presented";
     public const string HomeCardSignInOrder                = "Ellen::UI::Home::Card::SignIn::Order";
     public const string IsHomeCardSignInPresented          = "Ellen::UI::Home::Card::SignIn::Presented";
+    public const string HomeCardTravelersDiaryOrder        = "Ellen::UI::Home::Card::TravelersDiary::Order";
+    public const string IsHomeCardTravelersDiaryPresented  = "Ellen::UI::Home::Card::TravelersDiary::Presented";
     public const string HomeAnnouncementActPreviewEnabled  = "Ellen::UI::Home::Announcement::ActPreviewEnabled";
     public const string IsHomeAnnouncementActivityCalendarPresented = "Ellen::UI::Home::Announcement::ActivityCalendar::Presented";
 

@@ -188,18 +188,7 @@ public static partial class Bootstrap
 
     private static void RestartAsAdministrator()
     {
-        try
-        {
-            string? currentProcessPath = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName;
-            ArgumentNullException.ThrowIfNull(currentProcessPath);
-
-            ProcessFactory.StartUsingShellExecuteRunAs(currentProcessPath);
-            Environment.Exit(0);
-        }
-        catch (Exception ex)
-        {
-            SentrySdk.CaptureException(ex);
-        }
+        ProcessFactory.TryRestartElevated();
     }
 
     private static bool TryHandleToastNotificationHelper()

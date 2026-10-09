@@ -179,4 +179,27 @@ public sealed class ProcessFactory
             Verb = "runas",
         });
     }
+
+    /// <summary>
+    /// 以管理员权限重新启动当前进程；发起成功后当前实例会退出。
+    /// </summary>
+    /// <returns>是否成功发起了提权重启（用户在 UAC 弹窗点「否」时返回 false）。</returns>
+    public static bool TryRestartElevated()
+    {
+        try
+        {
+            string? currentProcessPath = Environment.ProcessPath ?? global::System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
+            ArgumentNullException.ThrowIfNull(currentProcessPath);
+
+            StartUsingShellExecuteRunAs(currentProcessPath);
+            Environment.Exit(0);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            // 用户取消 UAC 时会抛 Win32Exception(ERROR_CANCELLED)，这里不打扰用户
+            SentrySdk.CaptureException(ex);
+            return false;
+        }
+    }
 }

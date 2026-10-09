@@ -3,7 +3,6 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Controls;
-using Ellen.Launcher.Core;
 using Ellen.Launcher.Core.Database;
 using Ellen.Launcher.Core.Logging;
 using Ellen.Launcher.Factory.Picker;
@@ -406,11 +405,8 @@ public sealed partial class BackpackViewModel : Abstraction.ViewModel
     {
         SentrySdk.AddBreadcrumb(BreadcrumbFactory2.CreateUI("Refresh backpack", "BackpackViewModel.Command", [("source", "Embedded Yae")]));
 
-        if (!EllenRuntime.IsProcessElevated)
+        if (!await embeddedYaeGate.EnsureElevatedAsync().ConfigureAwait(false))
         {
-            await scopeContext.ContentDialogFactory
-                .CreateForConfirmAsync(SH.ViewModelYaeProcessNotElevatedTitle, SH.ViewModelYaeProcessNotElevatedDescription)
-                .ConfigureAwait(false);
             return;
         }
 

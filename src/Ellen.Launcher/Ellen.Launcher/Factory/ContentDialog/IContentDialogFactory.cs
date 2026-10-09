@@ -16,6 +16,12 @@ public interface IContentDialogFactory
 
     ValueTask<ContentDialogResult> CreateForConfirmCancelAsync([LocalizationRequired] string title, [LocalizationRequired] string content, ContentDialogButton defaultButton = ContentDialogButton.Close, bool isPrimaryButtonEnabled = true);
 
+    /// <summary>
+    /// 和 <see cref="CreateForConfirmCancelAsync(string, string, ContentDialogButton, bool)"/> 相同，
+    /// 但主/关闭按钮文案可自定义（例如「以管理员模式重启」）。
+    /// </summary>
+    ValueTask<ContentDialogResult> CreateForConfirmCancelAsync([LocalizationRequired] string title, [LocalizationRequired] string content, [LocalizationRequired] string primaryButtonText, [LocalizationRequired] string closeButtonText, ContentDialogButton defaultButton = ContentDialogButton.Primary);
+
     ValueTask<Microsoft.UI.Xaml.Controls.ContentDialog> CreateForIndeterminateProgressAsync([LocalizationRequired] string title);
 
     ValueTask<TContentDialog> CreateInstanceAsync<TContentDialog>(IServiceProvider serviceProvider, params object[] parameters)

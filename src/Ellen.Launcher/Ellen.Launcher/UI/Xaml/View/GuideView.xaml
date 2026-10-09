@@ -231,8 +231,8 @@
                     </Grid.ColumnDefinitions>
                     <Image
                         Grid.Column="0"
-                        Height="152"
-                        Source="ms-appx:///Assets/InAppLogo.png"/>
+                        Height="128"
+                        Source="ms-appx:///Assets/Logo.ico"/>
                     <StackPanel
                         Grid.Column="1"
                         VerticalAlignment="Center"

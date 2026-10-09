@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <Version>1.0.0.4</Version>
+    <Version>7.1.0.2</Version>
     <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
     <LangVersion>preview</LangVersion>
@@ -113,6 +113,9 @@
     <Content Include="Resource\BlurBackground.png" />
     <Content Include="Resource\Font\CascadiaMono.ttf" />
     <Content Include="Resource\Font\MiSans-Regular.ttf" />
+    <!--  行内公式用的 KaTeX 字体（ellen-wiki 的公式渲染字体），随包内置  -->
+    <Content Include="Resource\Font\KaTeX_Main-Regular.ttf" />
+    <Content Include="Resource\Font\KaTeX_Main-LICENSE.txt" />
     <Content Include="Resource\GuideLocalization\crowdin-symbol-cDark-64.png" />
     <Content Include="Resource\GuideLocalization\crowdin-symbol-cWhite-64.png" />
     <Content Include="Resource\GuideLocalization\DGP-v3-white-64.png" />

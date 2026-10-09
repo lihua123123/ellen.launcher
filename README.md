@@ -74,7 +74,7 @@ ellen-launcher/
 | `Factory/` | `ContentDialog/`（弹窗）、`ContentDialog/IContentDialogFactory`、`Picker/`、`Process/` 等 |
 | `Resource/` | `Localization/`（resx）、`Metadata/`（内置元数据快照）、`CombatNotes/`、`Icon/`、`ItemIcon/`、`GuideLocalization/`、`Navigation/`、`Font/`、`ThirdParty/` |
 | `Win32/` | CsWin32 原生交互（`EllenNative*`、`EllenString`、`MemoryUtilities`） |
-| `Assets/` | `Logo.ico`（唯一图标源）、`InAppLogo.png` |
+| `Assets/` | `Logo.ico`（唯一图标源） |
 | `ApiEndpoints.csv` | ★ 全部后端接口表，源生成为 `IApiEndpoints` |
 | `IdentityStructs.json` | 标识结构定义（源生成） |
 | `BannedSymbols.txt` / `CodeMetricsConfig.txt` | 分析器禁用符号 / 代码度量配置 |
@@ -143,7 +143,7 @@ python tools\EllenWikiSync\sync.py --list     # 列出数据集
 | 数据 | 来源 | 生成方式 |
 | --- | --- | --- |
 | 角色「元素附着/产球」战斗备注 | ellen.wiki `GET /api/attachment` | `python tools/EllenWikiSync/sync.py attachment` → `Resource/CombatNotes/AvatarCombatNotes.json`（运行期由 `AvatarCombatNoteConverter` 转换） |
-| 伤害计算公式 | `ellen-wiki` 仓库的 `content/formulas/genshin.md` | `node tools/FormulasGen/gen.mjs` → `Resource/Formulas/GenshinFormulas.json` + `Resource/Formulas/Genshin/{light,dark}/*.png` |
+| 伤害计算公式 | `ellen-wiki` 仓库的 `content/formulas/genshin.md` | `node tools/FormulasGen/gen.mjs` → `Resource/Formulas/GenshinFormulas.json` + `Resource/Formulas/Genshin/{light,dark}/*.png`；行内公式保留 `$...$`，由随包的 KaTeX 字体渲染（`Resource/Font/KaTeX_Main-Regular.ttf`，与 ellen-wiki 的公式字体一致） |
 | 幽境 Boss 攻略 | 外部 JSON + 图片目录 | 用 `tools/GuideDataCheck` 校验 |
 | 标识类型（UID、Region、AvatarId…） | `IdentityStructs.json` | `SourceGeneration/Identity/IdentityGenerator.cs` |
 | 静态资源 / 公告 | 米游社官方 CDN + `static.snaphutaorp.org` | 运行期下载，缓存在数据目录 |
@@ -182,8 +182,20 @@ Debug 构建把 `-c Release` 换成 `-c Debug` 即可。
 ### 版本号
 
 程序版本 = 程序集版本（`Core/AppVersion.cs` 读 `Assembly.GetName().Version`）。
-`Ellen.Launcher.csproj` 未设置 `<Version>`，因此默认为 `1.0.0.0`。
-**要升版本就在 `Ellen.Launcher.csproj` 的 `PropertyGroup` 里加 `<Version>x.y.z.w</Version>`**，并让 `Installer/installer.iss` 的 `MyAppVersion` 与其保持一致。
+
+版本号形如 `<Version>x.y.z.w</Version>`，写在 `Ellen.Launcher.csproj` 的 `PropertyGroup` 里：
+
+| 段 | 含义 |
+| --- | --- |
+| `x.y` | 原神当前版本号（如 `7.1`） |
+| `z` | 该原神版本下本软件的大更新次数 |
+| `w` | 该原神版本下本软件的小更新次数（每满 10 次进位到 `z`） |
+
+**升版本要同时改两处**：`Ellen.Launcher.csproj` 的 `<Version>`，以及 `Installer/installer.iss` 的 `MyAppVersion`（两者必须一致）。
+
+**预览轮次不占正式号**：`<Version>` 始终是「待验收的正式版本号」（= 上次已验收版本的第 4 位 +1），
+预览轮次只用安装包后缀区分（`-preview`、`-preview2`、…）。验收通过后清空后缀直接出正式包，
+版本号不再变动；下一次更新才把第 4 位再 +1。
 
 ### 测试
 
@@ -224,7 +236,24 @@ Copy-Item "$src\*" "Installer\Publish\" -Recurse -Force
 & "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe" "Installer\installer.iss"
 ```
 
-输出：`publish\Ellen.Launcher-<MyAppVersion>-Setup.exe`
+输出：`publish\Ellen.Launcher-<MyAppVersion><MyAppVersionSuffix>-Setup.exe`
+
+**验收流程（本次更新约定）**：
+
+```powershell
+# 验收通过 -> 正式包（<Version> 已在 csproj 里写好）
+& "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe" "Installer\installer.iss"
+
+# 未通过验收 -> 预览包：只加 -preview / -preview2… 后缀，不动 csproj 的版本号
+& "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe" /DMyAppVersionSuffix=-preview "Installer\installer.iss"
+#   -> publish\Ellen.Launcher-7.1.0.2-preview-Setup.exe
+
+# 同一版本的第 2 轮预览（修完 bug 再验收）
+& "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe" /DMyAppVersionSuffix=-preview2 "Installer\installer.iss"
+#   -> publish\Ellen.Launcher-7.1.0.2-preview2-Setup.exe
+```
+
+`MyAppVersionSuffix` 只影响安装包文件名与 `AppVersion`；`VersionInfoVersion` 始终取纯数字的 `MyAppVersion`（Inno 不接受带后缀的 VersionInfoVersion）。
 
 覆盖版本号（不必改 iss）：
 

@@ -59,6 +59,25 @@ public sealed partial class ContentDialogFactory : IContentDialogFactory
         return await EnqueueAndShowAsync(dialog).ShowTask.ConfigureAwait(false);
     }
 
+    public async ValueTask<ContentDialogResult> CreateForConfirmCancelAsync(string title, string content, string primaryButtonText, string closeButtonText, ContentDialogButton defaultButton = ContentDialogButton.Primary)
+    {
+        await TaskContext.SwitchToMainThreadAsync();
+
+        Microsoft.UI.Xaml.Controls.ContentDialog dialog = new()
+        {
+            XamlRoot = currentWindowReference.XamlRoot,
+            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+            Title = title,
+            Content = content,
+            DefaultButton = defaultButton,
+            PrimaryButtonText = primaryButtonText,
+            CloseButtonText = closeButtonText,
+            RequestedTheme = currentWindowReference.RequestedTheme,
+        };
+
+        return await EnqueueAndShowAsync(dialog).ShowTask.ConfigureAwait(false);
+    }
+
     public async ValueTask<Microsoft.UI.Xaml.Controls.ContentDialog> CreateForIndeterminateProgressAsync(string title)
     {
         await TaskContext.SwitchToMainThreadAsync();

@@ -29,7 +29,7 @@
         },
         {
           "kind": "p",
-          "text": "（来自角色的减防不能超过 90% ，无视防御不能超过 100%）"
+          "text": "（来自角色的减防不能超过 $90%$ ，无视防御不能超过 $100%$）"
         },
         {
           "kind": "p",
@@ -97,7 +97,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "当<span class=\"electro\">**雷元素**</span>触及<span class=\"dendro\">**草元素**</span>时，会按照 1:1:1 的比例互相消耗并生成**原激化元素**\n原激化元素可以发生<span class=\"dendro\">绽放</span>和<span class=\"pyro\">燃烧</span>反应，在这些反应中的表现**和**<span class=\"dendro\">**草元素**</span>**相同**\n原激化元素的持续时间：(6+5×元素量) 秒"
+          "text": "当<span class=\"electro\">**雷元素**</span>触及<span class=\"dendro\">**草元素**</span>时，会按照 $1:1:1$ 的比例互相消耗并生成**原激化元素**\n原激化元素可以发生<span class=\"dendro\">绽放</span>和<span class=\"pyro\">燃烧</span>反应，在这些反应中的表现**和**<span class=\"dendro\">**草元素**</span>**相同**\n原激化元素的持续时间：$(6+5×元素量)$ 秒"
         },
         {
           "kind": "p",
@@ -112,7 +112,7 @@
         },
         {
           "kind": "p",
-          "text": "当敌人触发上述反应时，原本的 1446.85 的数值有变化：\n90级 1202.81 | 95级 1411.74 | 100级 1674.81\n105级 1884.98 | 110级 1963.85"
+          "text": "当敌人触发上述反应时，原本的 $1446.85$ 的数值有变化：\n90级 $1202.81$ | 95级 $1411.74$ | 100级 $1674.81$\n105级 $1884.98$ | 110级 $1963.85$"
         }
       ]
     },
@@ -136,15 +136,15 @@
         },
         {
           "kind": "p",
-          "text": "反应倍率：\n<span class=\"pyro\">燃烧</span> 0.25 （每 0.25s 一次）\n<span class=\"anemo\">扩散</span> 0.6 | <span class=\"cryo\">超导</span> 1.5 | <span class=\"electro\">感电</span> 2\n<span class=\"pyro\">超载</span> 2.75 | 碎冰 3\n<span class=\"dendro\">绽放</span> 2 | <span class=\"dendro\"> 超绽放 烈绽放 </span> 3"
+          "text": "反应倍率：\n<span class=\"pyro\">燃烧</span> $0.25$ （每 0.25s 一次）\n<span class=\"anemo\">扩散</span> $0.6$ | <span class=\"cryo\">超导</span> $1.5$ | <span class=\"electro\">感电</span> $2$\n<span class=\"pyro\">超载</span> $2.75$ | 碎冰 $3$\n<span class=\"dendro\">绽放</span> $2$ | <span class=\"dendro\"> 超绽放 烈绽放 </span> $3$"
         },
         {
           "kind": "p",
-          "text": "触发剧变反应没有冷却，但剧变反应的**伤害有冷却**：\n每 **0.5s** 最多 1 次：<span class=\"pyro\">超载</span>\n每 **0.5s** 最多 2 次：<span class=\"cryo\">超导</span>、碎冰、<span class=\"anemo\">扩散</span>、<span class=\"dendro\">绽放</span>、<span class=\"dendro\">超绽放</span>、<span class=\"dendro\">烈绽放</span>"
+          "text": "触发剧变反应没有冷却，但剧变反应的**伤害有冷却**：\n每 **0.5s** 最多 $1$ 次：<span class=\"pyro\">超载</span>\n每 **0.5s** 最多 $2$ 次：<span class=\"cryo\">超导</span>、碎冰、<span class=\"anemo\">扩散</span>、<span class=\"dendro\">绽放</span>、<span class=\"dendro\">超绽放</span>、<span class=\"dendro\">烈绽放</span>"
         },
         {
           "kind": "p",
-          "text": "当敌人触发上述反应时，原本的 1446.85 的数值有变化：\n90级 1202.81 | 95级 1411.74 | 100级 1674.81\n105级 1884.98 | 110级 1963.85"
+          "text": "当敌人触发上述反应时，原本的 $1446.85$ 的数值有变化：\n90级 $1202.81$ | 95级 $1411.74$ | 100级 $1674.81$\n105级 $1884.98$ | 110级 $1963.85$"
         }
       ]
     },
@@ -153,7 +153,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "触发<span class=\"geo\">**结晶**</span>反应时，会掉落对应<span class=\"pyro\">火</span>/<span class=\"hydro\">水</span>/<span class=\"electro\">雷</span>/<span class=\"cryo\">冰</span>元素的晶片，拾取后可获得护盾\n结晶护盾对其自身属性的伤害有 250% 的吸收效率"
+          "text": "触发<span class=\"geo\">**结晶**</span>反应时，会掉落对应<span class=\"pyro\">火</span>/<span class=\"hydro\">水</span>/<span class=\"electro\">雷</span>/<span class=\"cryo\">冰</span>元素的晶片，拾取后可获得护盾\n结晶护盾对其自身属性的伤害有 $250%$ 的吸收效率"
         },
         {
           "kind": "formula",
@@ -173,7 +173,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "*仅有**部分角色**在队伍里时才能转化月曜反应*"
+          "text": "仅有**部分角色**在队伍里时才能转化月曜反应"
         },
         {
           "kind": "h",
@@ -189,40 +189,40 @@
         },
         {
           "kind": "p",
-          "text": "**反应<span class=\"lunar-charged-electro\">月感电</span>**：反应倍率：3，精通系数：6"
+          "text": "**反应<span class=\"lunar-charged-electro\">月感电</span>**：反应倍率：$3$，精通系数：$6$"
         },
         {
           "kind": "quote",
           "blocks": [
             {
               "kind": "p",
-              "text": "特定情况下，<span class=\"electro\">**雷**</span>触及<span class=\"hydro\">**水**</span>时，会生成一片不可移动的**雷暴云**，持续 **6s**\n雷暴云：每 **2s** 攻击一次附近所有**同时具有**<span class=\"electro\">**雷**</span>和<span class=\"hydro\">**水**</span>的目标，并消耗 0.4U 的<span class=\"electro\">雷</span>和<span class=\"hydro\">水</span>（**破盾效率极低**）\n触发<span class=\"lunar-charged-electro\">月感电</span>时，若附近已有雷暴云，则会**刷新持续时间**\n<span class=\"lunar-charged-electro\">月感电</span>**无视防御**，**可以暴击**（取决于每个角色自己的暴击率和暴击伤害）"
+              "text": "特定情况下，<span class=\"electro\">**雷**</span>触及<span class=\"hydro\">**水**</span>时，会生成一片不可移动的**雷暴云**，持续 **6s**\n雷暴云：每 **2s** 攻击一次附近所有**同时具有**<span class=\"electro\">**雷**</span>和<span class=\"hydro\">**水**</span>的目标，并消耗 $0.4U$ 的<span class=\"electro\">雷</span>和<span class=\"hydro\">水</span>（**破盾效率极低**）\n触发<span class=\"lunar-charged-electro\">月感电</span>时，若附近已有雷暴云，则会**刷新持续时间**\n<span class=\"lunar-charged-electro\">月感电</span>**无视防御**，**可以暴击**（取决于每个角色自己的暴击率和暴击伤害）"
             }
           ]
         },
         {
           "kind": "p",
-          "text": "**反应<span class=\"lunar-bloom-dendro\">月绽放</span>**：反应倍率为：<span class=\"dendro\"> 绽放 </span> 2 | <span class=\"dendro\"> 超绽放 烈绽放 </span> 3，精通系数为：16"
+          "text": "**反应<span class=\"lunar-bloom-dendro\">月绽放</span>**：反应倍率为：<span class=\"dendro\"> 绽放 </span> $2$ | <span class=\"dendro\"> 超绽放 烈绽放 </span> $3$，精通系数为：$16$"
         },
         {
           "kind": "quote",
           "blocks": [
             {
               "kind": "p",
-              "text": "特定情况下，<span class=\"dendro\">**草**</span>触及<span class=\"hydro\">**水**</span>时，会生成<span class=\"dendro\">草原核</span>，并为队伍提供「**草露**」，可被特定角色消耗，草露约每 2s 获得一颗\n<span class=\"dendro\">草原核</span>伤害**不算**<span class=\"lunar-bloom-dendro\">**月绽放**</span>**伤害**，<span class=\"lunar-bloom-dendro\">月绽放</span>伤害**只包括直伤**\n<span class=\"dendro\">草原核</span>伤害仍为<span class=\"dendro\">**绽放/烈绽放/超绽放伤害**</span>\n<span class=\"dendro\">草原核</span>无**最终伤害**计算"
+              "text": "特定情况下，<span class=\"dendro\">**草**</span>触及<span class=\"hydro\">**水**</span>时，会生成<span class=\"dendro\">草原核</span>，并为队伍提供「**草露**」，可被特定角色消耗，草露约每 $2s$ 获得一颗\n<span class=\"dendro\">草原核</span>伤害**不算**<span class=\"lunar-bloom-dendro\">**月绽放**</span>**伤害**，<span class=\"lunar-bloom-dendro\">月绽放</span>伤害**只包括直伤**\n<span class=\"dendro\">草原核</span>伤害仍为<span class=\"dendro\">**绽放/烈绽放/超绽放伤害**</span>\n<span class=\"dendro\">草原核</span>无**最终伤害**计算"
             }
           ]
         },
         {
           "kind": "p",
-          "text": "**反应**<span class=\"lunar-crystallize-geo\">**月结晶**</span>：反应倍率：1.6，精通系数：6"
+          "text": "**反应**<span class=\"lunar-crystallize-geo\">**月结晶**</span>：反应倍率：$1.6$，精通系数：$6$"
         },
         {
           "kind": "quote",
           "blocks": [
             {
               "kind": "p",
-              "text": "特定情况下，<span class=\"geo\">**岩**</span>触及<span class=\"hydro\">**水**</span>时，会生成三枚**月笼**\n每触发 3 次<span class=\"lunar-crystallize-geo\">月结晶</span>反应，三枚月笼各造成一次<span class=\"lunar-crystallize-geo\">**月结晶**</span>**伤害**\n<span class=\"lunar-crystallize-geo\">月结晶</span>**无视防御**，**可以暴击**（取决于每个角色自己的暴击率和暴击伤害）"
+              "text": "特定情况下，<span class=\"geo\">**岩**</span>触及<span class=\"hydro\">**水**</span>时，会生成三枚**月笼**\n每触发 $3$ 次<span class=\"lunar-crystallize-geo\">月结晶</span>反应，三枚月笼各造成一次<span class=\"lunar-crystallize-geo\">**月结晶**</span>**伤害**\n<span class=\"lunar-crystallize-geo\">月结晶</span>**无视防御**，**可以暴击**（取决于每个角色自己的暴击率和暴击伤害）"
             }
           ]
         },
@@ -243,15 +243,15 @@
           "blocks": [
             {
               "kind": "p",
-              "text": "**直伤**<span class=\"lunar-charged-electro\">**月感电**</span>：直伤系数为：3"
+              "text": "**直伤**<span class=\"lunar-charged-electro\">**月感电**</span>：直伤系数为：$3$"
             },
             {
               "kind": "p",
-              "text": "**直伤**<span class=\"lunar-bloom-dendro\">**月绽放**</span>：直伤系数为：1"
+              "text": "**直伤**<span class=\"lunar-bloom-dendro\">**月绽放**</span>：直伤系数为：$1$"
             },
             {
               "kind": "p",
-              "text": "**直伤**<span class=\"lunar-crystallize-geo\">**月结晶**</span>：直伤系数为：1.6"
+              "text": "**直伤**<span class=\"lunar-crystallize-geo\">**月结晶**</span>：直伤系数为：$1.6$"
             }
           ]
         }
@@ -262,7 +262,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "*仅有**部分角色**在队伍里时才能转化星反应*"
+          "text": "仅有**部分角色**在队伍里时才能转化星反应"
         },
         {
           "kind": "h",
@@ -278,7 +278,7 @@
         },
         {
           "kind": "p",
-          "text": "**反应星超导**：反应倍率：0 且不消耗额外提升次数"
+          "text": "**反应星超导**：反应倍率：$0$ 且不消耗额外提升次数"
         },
         {
           "kind": "quote",
@@ -289,17 +289,17 @@
             },
             {
               "kind": "p",
-              "text": "当记录次数为 0/1/12 次时，会获得 20%/29%/40% 的<span class=\"electro\">雷</span>/<span class=\"cryo\">冰</span>元素增伤以及 1/1.45/2.0 星超导系数\n当记录次数大于1时，每多一次增加 1% <span class=\"electro\">雷</span>/<span class=\"cryo\">冰</span>元素增伤以及 0.05 星超导系数\n每次结束记录时会根据记录数增加<span class=\"electro\">雷</span>/<span class=\"cryo\">冰</span>元素伤害以及星超导反应系数，持续 4s"
+              "text": "当记录次数为 $0/1/12$ 次时，会获得 $20%/29%/40%$ 的<span class=\"electro\">雷</span>/<span class=\"cryo\">冰</span>元素增伤以及 $1/1.45/2.0$ 星超导系数\n当记录次数大于1时，每多一次增加 $1%$ <span class=\"electro\">雷</span>/<span class=\"cryo\">冰</span>元素增伤以及 $0.05$ 星超导系数\n每次结束记录时会根据记录数增加<span class=\"electro\">雷</span>/<span class=\"cryo\">冰</span>元素伤害以及星超导反应系数，持续 4s"
             },
             {
               "kind": "p",
-              "text": "极星辉域内敌人物抗降低 40%，持续 12s"
+              "text": "极星辉域内敌人物抗降低 $40%$，持续 12s"
             }
           ]
         },
         {
           "kind": "p",
-          "text": "**反应星扩散**：<span class=\"anemo\">风属性</span>反应倍率：0.75，<span class=\"cryo\">冰属性</span>反应倍率：2 | 3"
+          "text": "**反应星扩散**：<span class=\"anemo\">风属性</span>反应倍率：$0.75$，<span class=\"cryo\">冰属性</span>反应倍率：$2$ | $3$"
         },
         {
           "kind": "quote",
@@ -310,7 +310,7 @@
             },
             {
               "kind": "p",
-              "text": "每次触发星扩散反应时，**星辉风旋系数**会增加 1，最多增加至 6\n风旋会在星辉风旋系数至少为 3 时提升大小，并增加伤害范围与<span class=\"cryo\">冰属性</span>反应倍率，当星辉风旋系数为 6 时将提前引爆风团\n风旋引爆时会为周围的敌人附着 1U <span class=\"cryo\">冰</span>并清空星辉风旋系数"
+              "text": "每次触发星扩散反应时，**星辉风旋系数**会增加 $1$，最多增加至 $6$\n风旋会在星辉风旋系数至少为 $3$ 时提升大小，并增加伤害范围与<span class=\"cryo\">冰属性</span>反应倍率，当星辉风旋系数为 $6$ 时将提前引爆风团\n风旋引爆时会为周围的敌人附着 $1U$ <span class=\"cryo\">冰</span>并清空星辉风旋系数"
             },
             {
               "kind": "p",
@@ -339,7 +339,7 @@
             },
             {
               "kind": "p",
-              "text": "星扩散系数为：1"
+              "text": "星扩散系数为：$1$"
             }
           ]
         }
@@ -371,7 +371,7 @@
           "blocks": [
             {
               "kind": "p",
-              "text": "由怪物产生的元素晶球仍遵循上述机制，如破除`历经百战的火刃突击队员·决死武装`护盾掉落基础回能值为 6 的<span class=\"electro\">雷元素</span>晶球和对护盾下`深黯魇语之主·袭掠锋刃`首次造成月曜伤害掉落基础回能值为 18 的无元素晶球"
+              "text": "由怪物产生的元素晶球仍遵循上述机制，如破除`历经百战的火刃突击队员·决死武装`护盾掉落基础回能值为 $6$ 的<span class=\"electro\">雷元素</span>晶球和对护盾下`深黯魇语之主·袭掠锋刃`首次造成月曜伤害掉落基础回能值为 $18$ 的无元素晶球"
             }
           ]
         },
@@ -543,7 +543,7 @@
               "",
               "0",
               "",
-              "削韧值 / 500",
+              "$削韧值 / 500$",
               "",
               ""
             ],
@@ -553,9 +553,9 @@
               "",
               "",
               "",
-              "3 × 削韧值 / 500",
+              "$3 × 削韧值 / 500$",
               "",
-              "7 × 削韧值 / 500",
+              "$7 × 削韧值 / 500$",
               "",
               ""
             ]
@@ -566,19 +566,19 @@
           "blocks": [
             {
               "kind": "p",
-              "text": "破盾元素量也会影响破盾效率， 弱元素:中元素:强元素:超强元素 = 1U:1.5U:2U:4U"
+              "text": "破盾元素量也会影响破盾效率， $弱元素:中元素:强元素:超强元素 = 1U:1.5U:2U:4U$"
             },
             {
               "kind": "p",
-              "text": "<span class=\"anemo\">风盾</span>目前只有`风拳前锋军`有，而且机制是染色盾，所以不过多研究\n<span class=\"geo\">岩盾</span>只能用<span class=\"cryo\">冰</span><span class=\"geo\">岩</span>结晶破的原因是：<span class=\"geo\">岩盾</span>和岩造物只能附着<span class=\"cryo\">冰</span>\n`钟离` 的元素战技会吸收周围 6U <span class=\"geo\">岩元素</span>"
+              "text": "<span class=\"anemo\">风盾</span>目前只有`风拳前锋军`有，而且机制是染色盾，所以不过多研究\n<span class=\"geo\">岩盾</span>只能用<span class=\"cryo\">冰</span><span class=\"geo\">岩</span>结晶破的原因是：<span class=\"geo\">岩盾</span>和岩造物只能附着<span class=\"cryo\">冰</span>\n`钟离` 的元素战技会吸收周围 $6U$ <span class=\"geo\">岩元素</span>"
             },
             {
               "kind": "p",
-              "text": "**元素盾**表现为无伤害数字，在破盾之前为无敌状态，受到的伤害为 0，从而无法触发`西风类武器`等特效"
+              "text": "**元素盾**表现为无伤害数字，在破盾之前为无敌状态，受到的伤害为 $0$，从而无法触发`西风类武器`等特效"
             },
             {
               "kind": "p",
-              "text": "对于**元素伤害盾**来说，除了上述方式破盾外，还可以使用非本系伤害数值破盾 破盾值 = 伤害 × 总盾值 / (5 × 怪物生命) 此公式可以简单理解为**对于伤害来说，盾量为生命值的5倍**"
+              "text": "对于**元素伤害盾**来说，除了上述方式破盾外，还可以使用非本系伤害数值破盾 $破盾值 = 伤害 × 总盾值 / (5 × 怪物生命)$ 此公式可以简单理解为**对于伤害来说，盾量为生命值的5倍**"
             }
           ]
         },
@@ -663,7 +663,7 @@
             },
             {
               "kind": "p",
-              "text": "愚人众先遣队员有盾时会获得 80% 减伤"
+              "text": "愚人众先遣队员有盾时会获得 $80%$ 减伤"
             }
           ]
         },

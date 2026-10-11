@@ -550,6 +550,49 @@
                 </Grid>
             </DataTemplate>
 
+            <!--
+                圣遗物词条统计行：左词条名，右词条值（强化数之和）。大/小词条已合并为同一词条名。
+            -->
+            <DataTemplate x:Key="AvatarReliquarySubPropertySummaryTemplate" x:DataType="shva:ReliquarySubPropertySummary">
+                <Grid Padding="0,2" ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        HorizontalAlignment="Left"
+                        Style="{StaticResource BaseTextBlockStyle}"
+                        Text="{Binding Name}"
+                        TextWrapping="NoWrap"/>
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        Style="{StaticResource BaseTextBlockStyle}"
+                        Text="{Binding CountText}"
+                        TextWrapping="NoWrap"/>
+                </Grid>
+            </DataTemplate>
+
+            <!--
+                圣遗物词条统计卡片：位于圣遗物网格末尾，尺寸与普通圣遗物卡片一致。
+                无标题，内部可滚动查看全部词条统计行。
+            -->
+            <DataTemplate x:Key="AvatarReliquarySubPropertySummaryCardTemplate" x:DataType="shva:ReliquarySubPropertySummaryCard">
+                <Grid Style="{ThemeResource GridShimmerStyle}">
+                    <ScrollViewer Padding="12" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl
+                            ItemTemplate="{StaticResource AvatarReliquarySubPropertySummaryTemplate}"
+                            ItemsPanel="{ThemeResource StackPanelSpacing8Template}"
+                            ItemsSource="{Binding Summaries}"/>
+                    </ScrollViewer>
+                </Grid>
+            </DataTemplate>
+
+            <shva:ReliquarySubPropertySummaryTemplateSelector
+                x:Key="ReliquarySubPropertySummaryTemplateSelector"
+                ReliquaryTemplate="{StaticResource AvatarReliquaryTemplate}"
+                SummaryCardTemplate="{StaticResource AvatarReliquarySubPropertySummaryCardTemplate}"/>
+
             <DataTemplate x:Key="TokenTemplate" x:DataType="shuxca:SearchToken">
                 <Grid Height="22" VerticalAlignment="Center">
                     <Grid.ColumnDefinitions>
@@ -1088,8 +1131,10 @@
                                                     </shuxcc:VerticalCard>
                                                 </Grid>
 
-                                                <!--  圣遗物  -->
-                                                <ItemsControl ItemTemplate="{StaticResource AvatarReliquaryTemplate}" ItemsSource="{Binding Summary.Avatars.CurrentItem.Reliquaries}">
+                                                <!--  圣遗物（含末尾的词条统计卡片）  -->
+                                                <ItemsControl
+                                                    ItemTemplateSelector="{StaticResource ReliquarySubPropertySummaryTemplateSelector}"
+                                                    ItemsSource="{Binding Summary.Avatars.CurrentItem.ReliquaryItems}">
                                                     <ItemsControl.ItemsPanel>
                                                         <ItemsPanelTemplate>
                                                             <shuxcp:UniformPanel

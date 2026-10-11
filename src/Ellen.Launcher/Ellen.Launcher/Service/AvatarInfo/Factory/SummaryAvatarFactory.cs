@@ -73,6 +73,7 @@ public sealed class SummaryAvatarFactory
             .SetWeapon(CreateWeapon(character.Weapon))
             .SetRecommendedProperties(character.RecommendRelicProperty.RecommendProperties)
             .SetReliquaries(reliquaries)
+            .SetReliquarySubPropertySummaryCard(ReliquarySubPropertySummaryFactory.Compute(reliquaries))
             .SetCostumeIconOrDefault(character, avatar)
             .SetPromoteLevel(character.Base.PromoteLevel)
             .View;

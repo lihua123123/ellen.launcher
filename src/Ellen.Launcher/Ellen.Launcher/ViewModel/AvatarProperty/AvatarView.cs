@@ -34,6 +34,10 @@ public sealed partial class AvatarView : INameIconSide<Uri>,
 
     public ImmutableArray<ReliquaryView> Reliquaries { get; set; }
 
+    public ImmutableArray<object> ReliquaryItems { get; set; }
+
+    public ReliquarySubPropertySummaryCard? SummaryCard { get; set; }
+
     public ImmutableArray<ConstellationView> Constellations { get; set; }
 
     public int ActivatedConstellationCount { get => Constellations.Count(c => c.IsActivated); }

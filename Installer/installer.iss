@@ -17,7 +17,7 @@
 #define MyAppName "Ellen.Launcher"
 #define MyAppShortName "Ellen.Launcher"
 #ifndef MyAppVersion
-  #define MyAppVersion "7.1.0.2"
+  #define MyAppVersion "7.1.0.3"
 #endif
 #ifndef MyAppVersionSuffix
   #define MyAppVersionSuffix ""

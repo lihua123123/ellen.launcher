@@ -150,6 +150,18 @@ public static class AvatarViewBuilderExtension
         return builder.Configure(b => b.View.Reliquaries = reliquaries);
     }
 
+    public static TBuilder SetReliquarySubPropertySummaryCard<TBuilder>(this TBuilder builder, ReliquarySubPropertySummaryCard? card)
+        where TBuilder : class, IAvatarViewBuilder
+    {
+        return builder.Configure(b =>
+        {
+            b.View.SummaryCard = card;
+            b.View.ReliquaryItems = card is null
+                ? b.View.Reliquaries.Cast<object>().ToImmutableArray()
+                : b.View.Reliquaries.Cast<object>().Append(card).ToImmutableArray();
+        });
+    }
+
 
     public static TBuilder SetWeapon<TBuilder>(this TBuilder builder, WeaponView? weapon)
         where TBuilder : class, IAvatarViewBuilder

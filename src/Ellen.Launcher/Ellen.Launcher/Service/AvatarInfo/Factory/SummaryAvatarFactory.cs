@@ -44,6 +44,14 @@ public sealed class SummaryAvatarFactory
     {
         MetadataAvatar avatar = context.GetAvatar(character.Base.Id);
 
+        // 上游元数据缺失（目前只有旅行者）时，用战绩接口的实时数据补齐。
+        // 判据是「数据缺失」而非「角色 id」，上游一旦收录就会自动走正常分支。
+        bool isSynthesized = avatar.IsPlaceholder;
+        if (isSynthesized)
+        {
+            avatar = PlayerAvatarFactory.Create(avatar, character);
+        }
+
         ProcessConstellations(
             avatar.SkillDepot,
             character.Constellations,
@@ -78,6 +86,7 @@ public sealed class SummaryAvatarFactory
             .SetPromoteLevel(character.Base.PromoteLevel)
             .View;
 
+        propertyAvatar.IsMetadataSynthesized = isSynthesized;
         return propertyAvatar;
     }
 
@@ -229,7 +238,7 @@ public sealed class SummaryAvatarFactory
             .SetSubProperty(baseValues.ElementAtOrDefault(1))
             .SetAffixLevelNumber(detailedWeapon.AffixLevel)
             .SetAffixName(metadataWeapon.Affix?.Name)
-            .SetAffixDescription(metadataWeapon.Affix?.Descriptions.Single(a => a.Level == (detailedWeapon.AffixLevel - 1)).Description)
+            .SetAffixDescription(metadataWeapon.Affix?.Descriptions.FirstOrDefault(a => a.Level == (detailedWeapon.AffixLevel - 1))?.Description)
             .SetWeaponType(metadataWeapon.WeaponType)
             .SetPromoteLevel(detailedWeapon.PromoteLevel)
             .View;

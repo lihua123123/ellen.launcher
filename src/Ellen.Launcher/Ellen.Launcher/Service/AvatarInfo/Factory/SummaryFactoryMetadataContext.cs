@@ -16,7 +16,7 @@ using MetadataWeapon = Ellen.Launcher.Model.Metadata.Weapon.Weapon;
 namespace Ellen.Launcher.Service.AvatarInfo.Factory;
 
 public sealed class SummaryFactoryMetadataContext : IMetadataContext,
-    IMetadataDictionaryIdAvatarSource,
+    IMetadataDictionaryIdAvatarWithPlayersSource,
     IMetadataDictionaryIdWeaponSource,
     IMetadataDictionaryIdReliquaryMainPropertySource,
     IMetadataDictionaryIdReliquarySetSource,

@@ -4,7 +4,6 @@
 using Ellen.Launcher.Core.Database;
 using Ellen.Launcher.Core.DependencyInjection.Abstraction;
 using Ellen.Launcher.Model.Entity.Database;
-using Ellen.Launcher.Model.Metadata.Avatar;
 using Ellen.Launcher.Model.Primitive;
 using Ellen.Launcher.ViewModel.User;
 using Ellen.Launcher.Web.Hoyolab.Takumi.Event.Calculate;
@@ -76,11 +75,7 @@ public sealed partial class AvatarInfoRepositoryOperation
 
             foreach (DetailedCharacter character in detailsWrapper.List)
             {
-                if (AvatarIds.IsPlayer(character.Base.Id))
-                {
-                    continue;
-                }
-
+                // 旅行者也入库，以便「我的角色」页能展示旅行者的面板
                 CalculableAvatar? calculableAvatar = calculableAvatarMap.GetValueOrDefault(character.Base.Id);
                 character.Base.PromoteLevel = calculableAvatar?.PromoteLevel ?? 0;
 

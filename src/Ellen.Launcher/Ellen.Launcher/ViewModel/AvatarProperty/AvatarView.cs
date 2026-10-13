@@ -64,6 +64,12 @@ public sealed partial class AvatarView : INameIconSide<Uri>,
 
     public PromoteLevel PromoteLevel { get; set; }
 
+    /// <summary>
+    /// 该角色的元数据是否为运行时补齐（上游 Snap.Metadata 未收录时为 <see langword="true"/>）。
+    /// 为真时培养计算等依赖完整元数据的功能不可用。
+    /// </summary>
+    public bool IsMetadataSynthesized { get; set; }
+
     public ICalculableAvatar ToCalculable()
     {
         return CalculableAvatar.From(this);

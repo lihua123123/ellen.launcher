@@ -206,6 +206,12 @@ public sealed partial class AvatarPropertyViewModel : Abstraction.ViewModel, IRe
             return;
         }
 
+        if (avatar.IsMetadataSynthesized)
+        {
+            scopeContext.Messenger.Send(InfoBarMessage.Warning(SH.ViewModelAvatarPropertyPlayerCultivateUnsupported));
+            return;
+        }
+
         if (avatar.Weapon is null)
         {
             scopeContext.Messenger.Send(InfoBarMessage.Warning(SH.ViewModelAvatarPropertyCalculateWeaponNull));
@@ -238,6 +244,12 @@ public sealed partial class AvatarPropertyViewModel : Abstraction.ViewModel, IRe
 
         if (avatar is null)
         {
+            return;
+        }
+
+        if (avatar.IsMetadataSynthesized)
+        {
+            scopeContext.Messenger.Send(InfoBarMessage.Warning(SH.ViewModelAvatarPropertyPlayerCultivateUnsupported));
             return;
         }
 
@@ -365,6 +377,12 @@ public sealed partial class AvatarPropertyViewModel : Abstraction.ViewModel, IRe
             ImmutableArray<CalculatorAvatarPromotionDelta>.Builder deltasBuilder = ImmutableArray.CreateBuilder<CalculatorAvatarPromotionDelta>();
             foreach (AvatarView avatar in targetAvatars)
             {
+                if (avatar.IsMetadataSynthesized)
+                {
+                    ++result.SkippedCount;
+                    continue;
+                }
+
                 if (!baseline.Delta.TryGetNonErrorCopy(avatar, out CalculatorAvatarPromotionDelta? copy))
                 {
                     ++result.SkippedCount;

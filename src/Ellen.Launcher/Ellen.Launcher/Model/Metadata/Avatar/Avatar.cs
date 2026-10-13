@@ -64,6 +64,16 @@ public partial class Avatar : IDefaultIdentity<AvatarId>,
 
     public TraceEffect? TraceEffect { get; init; }
 
+    /// <summary>
+    /// 是否为运行时合成的占位元数据（上游 Snap.Metadata 未收录该角色时为 <see langword="true"/>）。
+    /// <para>
+    /// 随包/仓库元数据反序列化出来的条目恒为 <see langword="false"/>，
+    /// 因此上游一旦补齐资料，依赖该标记的合成逻辑会自动失效，不会与上游产生分歧。
+    /// </para>
+    /// </summary>
+    [JsonIgnore]
+    public bool IsPlaceholder { get; init; }
+
     [JsonIgnore]
     public CookBonusView? CookBonusView { get; set; }
 

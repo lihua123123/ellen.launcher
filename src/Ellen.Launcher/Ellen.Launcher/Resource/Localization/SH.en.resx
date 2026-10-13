@@ -450,6 +450,21 @@
   <data name="ModelMetadataAvatarPlayerName" xml:space="preserve">
     <value>Traveler</value>
   </data>
+  <data name="ModelMetadataAvatarPlayerSkillElementalBurst" xml:space="preserve">
+    <value>Elemental Burst</value>
+  </data>
+  <data name="ModelMetadataAvatarPlayerSkillElementalSkill" xml:space="preserve">
+    <value>Elemental Skill</value>
+  </data>
+  <data name="ModelMetadataAvatarPlayerSkillInherent" xml:space="preserve">
+    <value>Passive Talent</value>
+  </data>
+  <data name="ModelMetadataAvatarPlayerSkillNoData" xml:space="preserve">
+    <value>{0} (no local stat data yet)</value>
+  </data>
+  <data name="ModelMetadataAvatarPlayerSkillNormalAttack" xml:space="preserve">
+    <value>Normal Attack</value>
+  </data>
   <data name="ModelMetadataFetterInfoBirthday" xml:space="preserve">
     <value>{0} {1}</value>
   </data>
@@ -1578,6 +1593,9 @@ Space Available: {2}</value>
   </data>
   <data name="ViewModelAvatarPropertyFetch" xml:space="preserve">
     <value>Fetching Data</value>
+  </data>
+  <data name="ViewModelAvatarPropertyPlayerCultivateUnsupported" xml:space="preserve">
+    <value>Traveler is not supported by cultivation plan yet.</value>
   </data>
   <data name="ViewModelAvatarPropertySortDescriptionKindActivatedConstellationCount" xml:space="preserve">
     <value>Constellation Level</value>

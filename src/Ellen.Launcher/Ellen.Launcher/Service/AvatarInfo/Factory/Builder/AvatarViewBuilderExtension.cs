@@ -22,13 +22,13 @@ public static class AvatarViewBuilderExtension
     public static TBuilder SetCostumeIconOrDefault<TBuilder>(this TBuilder builder, DetailedCharacter detailedCharacter, MetadataAvatar avatar)
         where TBuilder : IAvatarViewBuilder
     {
-        if (detailedCharacter.Costumes is [{ Id: { } id }, ..])
+        // 战绩接口返回的装扮可能不在元数据里（例如旅行者的装扮），
+        // 找不到或图标缺失时回退到角色默认图标，而不是抛异常。
+        if (detailedCharacter.Costumes is [{ Id: { } id }, ..]
+            && avatar.Costumes.FirstOrDefault(c => c.Id == id) is { } costume
+            && !string.IsNullOrEmpty(costume.FrontIcon)
+            && !string.IsNullOrEmpty(costume.SideIcon))
         {
-            MetadataCostume costume = avatar.Costumes.Single(c => c.Id == id);
-
-            ArgumentNullException.ThrowIfNull(costume.FrontIcon);
-            ArgumentNullException.ThrowIfNull(costume.SideIcon);
-
             // Set to costume icon
             builder.View.Icon = AvatarIconConverter.IconNameToUri(costume.FrontIcon);
             builder.View.SideIcon = AvatarIconConverter.IconNameToUri(costume.SideIcon);

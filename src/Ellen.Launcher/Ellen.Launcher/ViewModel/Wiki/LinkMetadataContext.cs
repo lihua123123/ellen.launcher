@@ -85,7 +85,7 @@ public sealed class LinkMetadataContext
         switch (kind)
         {
             case MiHoYoSyntaxParameterKind.ProudSkill:
-                foreach (ProudSkill skill in Skills)
+                foreach (ProudSkill skill in Skills.Concat(Inherents))
                 {
                     foreach ((ProudSkillId skillId, ImmutableArray<float> parameters) in skill.Proud.Parameters.IdParameters)
                     {

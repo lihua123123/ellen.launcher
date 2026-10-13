@@ -35,7 +35,17 @@ public static class AvatarViewBuilderSkillExtension
 
         SkillState state = new(skillLevels, extraLevels);
 
-        return proudSkills.SelectAsArray(
+        // 元数据中的技能可能没有对应的实时等级数据（如运行时补齐的旅行者占位技能），跳过它们
+        ImmutableArray<ProudSkill> leveledProudSkills = proudSkills
+            .Where(proudSkill => state.SkillLevels.ContainsKey(proudSkill.Id))
+            .ToImmutableArray();
+
+        if (leveledProudSkills.IsDefaultOrEmpty)
+        {
+            return [];
+        }
+
+        return leveledProudSkills.SelectAsArray(
             static (proudSkill, state) => new SkillViewBuilder()
                 .SetName(proudSkill.Name)
                 .SetIcon(SkillIconConverter.IconNameToUri(proudSkill.Icon))

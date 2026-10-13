@@ -1,7 +1,6 @@
 // Copyright (c) DGP Studio. All rights reserved.
 // Licensed under the MIT license.
 
-using Ellen.Launcher.Model.Metadata.Avatar;
 using Ellen.Launcher.UI.Xaml.Data;
 using Ellen.Launcher.ViewModel.AvatarProperty;
 
@@ -20,7 +19,7 @@ public sealed partial class SummaryFactory : ISummaryFactory
         await taskContext.SwitchToBackgroundAsync();
 
         IOrderedEnumerable<AvatarView> avatars = avatarInfos
-            .Where(a => a.Info2 is not null && !AvatarIds.IsPlayer(a.Info2.Base.Id))
+            .Where(a => a.Info2 is not null)
             .Select(a => SummaryAvatarFactory.Create(context, a))
             .OrderByDescending(a => a.Quality)
             .ThenByDescending(a => a.LevelNumber)

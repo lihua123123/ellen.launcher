@@ -1,6 +1,7 @@
 ﻿// Copyright (c) DGP Studio. All rights reserved.
 // Licensed under the MIT license.
 
+using Ellen.Launcher.Model.Intrinsic;
 using Ellen.Launcher.Model.Primitive;
 using System.Collections.Frozen;
 using System.Collections.Immutable;
@@ -199,91 +200,98 @@ public static class AvatarIds
         ImmutableDictionary<AvatarId, Avatar>.Builder builder = ImmutableDictionary.CreateBuilder<AvatarId, Avatar>();
 
         builder.AddRange(idAvatarMap);
-        builder.Add(PlayerBoy, new()
-        {
-            Name = SH.ModelMetadataAvatarPlayerName,
-            Icon = "UI_AvatarIcon_PlayerBoy",
-            SideIcon = "UI_AvatarIcon_Side_PlayerBoy",
-            Quality = Intrinsic.QualityType.QUALITY_ORANGE,
-            Id = PlayerBoy,
-            PromoteId = default,
-            Sort = default,
-            Body = default,
-            Description = default!,
-            BeginTime = default,
-            Weapon = default,
-            BaseValue = default!,
-            GrowCurves = default!,
-            SkillDepot = default!,
-            FetterInfo = default!,
-            Costumes = default,
-            CultivationItems = default,
-            NameCard = default!,
-        });
-        builder.Add(PlayerGirl, new()
-        {
-            Name = SH.ModelMetadataAvatarPlayerName,
-            Icon = "UI_AvatarIcon_PlayerGirl",
-            SideIcon = "UI_AvatarIcon_Side_PlayerGirl",
-            Quality = Intrinsic.QualityType.QUALITY_ORANGE,
-            Id = PlayerGirl,
-            PromoteId = default,
-            Sort = default,
-            Body = default,
-            Description = default!,
-            BeginTime = default,
-            Weapon = default,
-            BaseValue = default!,
-            GrowCurves = default!,
-            SkillDepot = default!,
-            FetterInfo = default!,
-            Costumes = default,
-            CultivationItems = default,
-            NameCard = default!,
-        });
-        builder.Add(MannequinBoy, new()
-        {
-            Name = "奇偶·男性",
-            Icon = "UI_AvatarIcon_MannequinBoy",
-            SideIcon = "UI_AvatarIcon_Side_MannequinBoy",
-            Quality = Intrinsic.QualityType.QUALITY_ORANGE_SP,
-            Id = MannequinBoy,
-            PromoteId = default,
-            Sort = default,
-            Body = default,
-            Description = default!,
-            BeginTime = default,
-            Weapon = default,
-            BaseValue = default!,
-            GrowCurves = default!,
-            SkillDepot = default!,
-            FetterInfo = default!,
-            Costumes = default,
-            CultivationItems = default,
-            NameCard = default!,
-        });
-        builder.Add(MannequinGirl, new()
-        {
-            Name = "奇偶·女性",
-            Icon = "UI_AvatarIcon_MannequinGirl",
-            SideIcon = "UI_AvatarIcon_Side_MannequinGirl",
-            Quality = Intrinsic.QualityType.QUALITY_ORANGE_SP,
-            Id = MannequinGirl,
-            PromoteId = default,
-            Sort = default,
-            Body = default,
-            Description = default!,
-            BeginTime = default,
-            Weapon = default,
-            BaseValue = default!,
-            GrowCurves = default!,
-            SkillDepot = default!,
-            FetterInfo = default!,
-            Costumes = default,
-            CultivationItems = default,
-            NameCard = default!,
-        });
+
+        // 只补充上游缺失的条目：一旦 Snap.Metadata 收录了旅行者，这里就不会再造占位数据，
+        // 也不会因为重复键而抛异常，合成逻辑随之自动退役。
+        AddPlaceholder(builder, PlayerBoy, "UI_AvatarIcon_PlayerBoy", "UI_AvatarIcon_Side_PlayerBoy", QualityType.QUALITY_ORANGE);
+        AddPlaceholder(builder, PlayerGirl, "UI_AvatarIcon_PlayerGirl", "UI_AvatarIcon_Side_PlayerGirl", QualityType.QUALITY_ORANGE);
+        AddPlaceholder(builder, MannequinBoy, "UI_AvatarIcon_MannequinBoy", "UI_AvatarIcon_Side_MannequinBoy", QualityType.QUALITY_ORANGE_SP);
+        AddPlaceholder(builder, MannequinGirl, "UI_AvatarIcon_MannequinGirl", "UI_AvatarIcon_Side_MannequinGirl", QualityType.QUALITY_ORANGE_SP);
 
         return builder.ToImmutable();
+    }
+
+    private static void AddPlaceholder(ImmutableDictionary<AvatarId, Avatar>.Builder builder, AvatarId id, string icon, string sideIcon, QualityType quality)
+    {
+        if (!builder.ContainsKey(id))
+        {
+            builder.Add(id, CreatePlayerMetadata(id, icon, sideIcon, quality));
+        }
+    }
+
+    // 旅行者没有随包元数据，这里合成一份仅含基本资料的占位元数据，
+    // 保证任何消费者（如 ToItem / ToStatisticsItem）都不会因为空引用而崩溃。
+    // 「我的角色」页的完整资料由 PlayerAvatarFactory 在运行时补齐。
+    private static Avatar CreatePlayerMetadata(AvatarId id, string icon, string sideIcon, QualityType quality)
+    {
+        return new Avatar
+        {
+            Id = id,
+            Name = SH.ModelMetadataAvatarPlayerName,
+            Icon = icon,
+            SideIcon = sideIcon,
+            Quality = quality,
+            IsPlaceholder = true,
+            PromoteId = default,
+            Sort = default,
+            Body = default,
+            Description = string.Empty,
+            BeginTime = default,
+            Weapon = default,
+            BaseValue = new AvatarBaseValue()
+            {
+                HpBase = default,
+                AttackBase = default,
+                DefenseBase = default,
+            },
+            GrowCurves = new([]),
+            SkillDepot = new()
+            {
+                Arkhe = Arkhe.None,
+                Skills = [],
+                EnergySkill = new()
+                {
+                    Id = default,
+                    GroupId = default,
+                    Name = string.Empty,
+                    Description = string.Empty,
+                    Icon = string.Empty,
+                    SpecialEnergyType = EnergyType.SPECIAL_ENERGY_NONE,
+                    Proud = new()
+                    {
+                        Descriptions = [],
+                        Parameters = new([]),
+                    },
+                },
+                Inherents = [],
+                Talents = [],
+            },
+            FetterInfo = new()
+            {
+                Title = string.Empty,
+                Detail = string.Empty,
+                Association = default,
+                Native = string.Empty,
+                BirthMonth = default,
+                BirthDay = default,
+                VisionBefore = string.Empty,
+                ConstellationBefore = string.Empty,
+                CvChinese = string.Empty,
+                CvJapanese = string.Empty,
+                CvEnglish = string.Empty,
+                CvKorean = string.Empty,
+                Fetters = [],
+                FetterStories = [],
+            },
+            Costumes = [],
+            CultivationItems = [],
+            NameCard = new()
+            {
+                Name = string.Empty,
+                Description = string.Empty,
+                Icon = string.Empty,
+                PicturePrefix = string.Empty,
+            },
+        };
     }
 }

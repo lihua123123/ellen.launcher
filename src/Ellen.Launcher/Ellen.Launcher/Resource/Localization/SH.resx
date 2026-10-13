@@ -450,6 +450,21 @@
   <data name="ModelMetadataAvatarPlayerName" xml:space="preserve">
     <value>旅行者</value>
   </data>
+  <data name="ModelMetadataAvatarPlayerSkillElementalBurst" xml:space="preserve">
+    <value>元素爆发</value>
+  </data>
+  <data name="ModelMetadataAvatarPlayerSkillElementalSkill" xml:space="preserve">
+    <value>元素战技</value>
+  </data>
+  <data name="ModelMetadataAvatarPlayerSkillInherent" xml:space="preserve">
+    <value>固有天赋</value>
+  </data>
+  <data name="ModelMetadataAvatarPlayerSkillNoData" xml:space="preserve">
+    <value>{0}（暂无本地数值数据）</value>
+  </data>
+  <data name="ModelMetadataAvatarPlayerSkillNormalAttack" xml:space="preserve">
+    <value>普通攻击</value>
+  </data>
   <data name="ModelMetadataFetterInfoBirthday" xml:space="preserve">
     <value>{0} 月 {1} 日</value>
   </data>
@@ -1581,6 +1596,9 @@
   </data>
   <data name="ViewModelAvatarPropertyFetch" xml:space="preserve">
     <value>获取数据中</value>
+  </data>
+  <data name="ViewModelAvatarPropertyPlayerCultivateUnsupported" xml:space="preserve">
+    <value>旅行者暂不支持培养计算</value>
   </data>
   <data name="ViewModelAvatarPropertySortDescriptionKindActivatedConstellationCount" xml:space="preserve">
     <value>命之座解锁层数顺序</value>

@@ -5,11 +5,15 @@ using Ellen.Launcher.Core.Database;
 using Ellen.Launcher.Core.Diagnostics;
 using Ellen.Launcher.Core.ExceptionService;
 using Ellen.Launcher.Model.Entity;
+using Ellen.Launcher.Model.Intrinsic;
 using Ellen.Launcher.Service.GachaLog.Factory;
 using Ellen.Launcher.Service.GachaLog.QueryProvider;
+using Ellen.Launcher.Service.Notification;
 using Ellen.Launcher.ViewModel.GachaLog;
 using Ellen.Launcher.Web.Hoyolab.Hk4e.Event.GachaInfo;
+using Ellen.Launcher.Web.Hoyolab.Nap.Event.GachaRecord;
 using Ellen.Launcher.Web.Response;
+using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.Immutable;
 
 namespace Ellen.Launcher.Service.GachaLog;
@@ -25,26 +29,33 @@ public sealed partial class GachaLogService : IGachaLogService
     private readonly ITaskContext taskContext;
 
     private readonly AsyncLock archivesLock = new();
-    private IAdvancedDbCollectionView<GachaArchive>? archives;
+    private readonly Dictionary<GachaGameType, IAdvancedDbCollectionView<GachaArchive>> archivesByGame = [];
 
     [GeneratedConstructor]
     public partial GachaLogService(IServiceProvider serviceProvider);
 
-    public async ValueTask<IAdvancedDbCollectionView<GachaArchive>> GetArchiveCollectionAsync()
+    public async ValueTask<IAdvancedDbCollectionView<GachaArchive>> GetArchiveCollectionAsync(GachaGameType game)
     {
         using (await archivesLock.LockAsync().ConfigureAwait(false))
         {
-            return archives ??= gachaLogRepository.GetGachaArchiveCollection().ToAdvancedDbCollectionView(serviceProvider);
+            if (!archivesByGame.TryGetValue(game, out IAdvancedDbCollectionView<GachaArchive>? archives))
+            {
+                archives = gachaLogRepository.GetGachaArchiveCollection(game).ToAdvancedDbCollectionView(serviceProvider);
+                archivesByGame[game] = archives;
+            }
+
+            return archives;
         }
     }
 
-    public async ValueTask<IAdvancedDbCollectionView<GachaArchive>> ReloadArchiveCollectionAsync()
+    public async ValueTask<IAdvancedDbCollectionView<GachaArchive>> ReloadArchiveCollectionAsync(GachaGameType game)
     {
         using (await archivesLock.LockAsync().ConfigureAwait(false))
         {
             // GetGachaArchiveCollection() always runs a fresh AsNoTracking query, so rebuilding the
             // view is enough to pick up archives that were inserted through another DbContext scope.
-            archives = gachaLogRepository.GetGachaArchiveCollection().ToAdvancedDbCollectionView(serviceProvider);
+            IAdvancedDbCollectionView<GachaArchive> archives = gachaLogRepository.GetGachaArchiveCollection(game).ToAdvancedDbCollectionView(serviceProvider);
+            archivesByGame[game] = archives;
             return archives;
         }
     }
@@ -71,7 +82,7 @@ public sealed partial class GachaLogService : IGachaLogService
     public async ValueTask<ImmutableArray<GachaStatisticsSlim>> GetStatisticsSlimImmutableArrayAsync(GachaLogServiceMetadataContext context, CancellationToken token = default)
     {
         ImmutableArray<GachaStatisticsSlim>.Builder statistics = ImmutableArray.CreateBuilder<GachaStatisticsSlim>();
-        foreach (GachaArchive archive in await GetArchiveCollectionAsync().ConfigureAwait(false))
+        foreach (GachaArchive archive in await GetArchiveCollectionAsync(GachaGameType.Genshin).ConfigureAwait(false))
         {
             ImmutableArray<GachaItem> items = gachaLogRepository.GetGachaItemImmutableArrayByArchiveId(archive.InnerId);
             GachaStatisticsSlim slim = await gachaStatisticsSlimFactory.CreateAsync(context, items, archive.Uid).ConfigureAwait(false);
@@ -94,7 +105,7 @@ public sealed partial class GachaLogService : IGachaLogService
 
         if (target is not null)
         {
-            IAdvancedDbCollectionView<GachaArchive> localArchives = await GetArchiveCollectionAsync().ConfigureAwait(false);
+            IAdvancedDbCollectionView<GachaArchive> localArchives = await GetArchiveCollectionAsync(target.Game).ConfigureAwait(false);
             await taskContext.SwitchToMainThreadAsync();
             localArchives.MoveCurrentTo(target);
         }
@@ -115,7 +126,7 @@ public sealed partial class GachaLogService : IGachaLogService
 
         if (target is not null)
         {
-            IAdvancedDbCollectionView<GachaArchive> localArchives = await GetArchiveCollectionAsync().ConfigureAwait(false);
+            IAdvancedDbCollectionView<GachaArchive> localArchives = await GetArchiveCollectionAsync(target.Game).ConfigureAwait(false);
             await taskContext.SwitchToMainThreadAsync();
             localArchives.MoveCurrentTo(target);
         }
@@ -130,7 +141,7 @@ public sealed partial class GachaLogService : IGachaLogService
         gachaLogRepository.RemoveGachaArchiveById(archive.InnerId);
 
         // Sync cache
-        IAdvancedDbCollectionView<GachaArchive> localArchives = await GetArchiveCollectionAsync().ConfigureAwait(false);
+        IAdvancedDbCollectionView<GachaArchive> localArchives = await GetArchiveCollectionAsync(archive.Game).ConfigureAwait(false);
         await taskContext.SwitchToMainThreadAsync();
         localArchives.Remove(archive);
         localArchives.MoveCurrentToFirst();
@@ -138,14 +149,14 @@ public sealed partial class GachaLogService : IGachaLogService
 
     public async ValueTask<GachaArchive> EnsureArchiveInCollectionAsync(Guid archiveId, CancellationToken token = default)
     {
-        IAdvancedDbCollectionView<GachaArchive> localArchives = await GetArchiveCollectionAsync().ConfigureAwait(false);
+        GachaArchive? newArchive = gachaLogRepository.GetGachaArchiveById(archiveId);
+        ArgumentNullException.ThrowIfNull(newArchive);
+
+        IAdvancedDbCollectionView<GachaArchive> localArchives = await GetArchiveCollectionAsync(newArchive.Game).ConfigureAwait(false);
         if (localArchives.Source.SingleOrDefault(a => a.InnerId == archiveId) is { } archive)
         {
             return archive;
         }
-
-        GachaArchive? newArchive = gachaLogRepository.GetGachaArchiveById(archiveId);
-        ArgumentNullException.ThrowIfNull(newArchive);
 
         await taskContext.SwitchToMainThreadAsync();
         localArchives.Add(newArchive);
@@ -154,32 +165,55 @@ public sealed partial class GachaLogService : IGachaLogService
 
     private async ValueTask<ValueResult<bool, GachaArchive?>> FetchGachaLogsAsync(GachaLogServiceMetadataContext context, GachaLogQuery query, bool isLazy, IProgress<GachaLogFetchStatus> progress, CancellationToken token)
     {
-        IAdvancedDbCollectionView<GachaArchive> localArchives = await GetArchiveCollectionAsync().ConfigureAwait(false);
-        GachaLogFetchContext fetchContext = new(gachaLogRepository, context, isLazy);
+        GachaGameType game = query.Game;
+        IAdvancedDbCollectionView<GachaArchive> localArchives = await GetArchiveCollectionAsync(game).ConfigureAwait(false);
+        GachaLogFetchContext fetchContext = new(gachaLogRepository, context, isLazy, game);
 
         using (IServiceScope scope = serviceProvider.CreateScope())
         {
             GachaInfoClient gachaInfoClient = scope.ServiceProvider.GetRequiredService<GachaInfoClient>();
+            ZZZGachaInfoClient zzzGachaInfoClient = scope.ServiceProvider.GetRequiredService<ZZZGachaInfoClient>();
 
-            foreach (GachaType configType in GachaLog.QueryTypes)
+            foreach (GachaType configType in game is GachaGameType.ZZZ ? ZZZGachaLog.QueryTypes : GachaLog.QueryTypes)
             {
                 fetchContext.ResetType(configType, query);
 
                 do
                 {
-                    Response<GachaLogPage> response = await gachaInfoClient
-                        .GetGachaLogPageAsync(fetchContext.TypedQueryOptions, token)
-                        .ConfigureAwait(false);
+                    ImmutableArray<GachaLogItem> items;
 
-                    // Fast break fetching if authkey timeout
-                    if (!ResponseValidator.TryValidateWithoutUINotification(response, out GachaLogPage? page))
+                    if (game is GachaGameType.ZZZ)
                     {
-                        fetchContext.Report(progress, isAuthKeyTimeout: true);
-                        break;
+                        Response<ZZZGachaLogPage> response = await zzzGachaInfoClient
+                            .GetGachaLogPageAsync(fetchContext.TypedQueryOptions, token)
+                            .ConfigureAwait(false);
+
+                        // 绝区零分支：显式弹通知暴露真实 retcode/message，便于定位
+                        if (!ResponseValidator.TryValidate(response, serviceProvider, out ZZZGachaLogPage? zzzPage))
+                        {
+                            fetchContext.Report(progress, isAuthKeyTimeout: true);
+                            break;
+                        }
+
+                        items = zzzPage.List;
+                    }
+                    else
+                    {
+                        Response<GachaLogPage> response = await gachaInfoClient
+                            .GetGachaLogPageAsync(fetchContext.TypedQueryOptions, token)
+                            .ConfigureAwait(false);
+
+                        // Fast break fetching if authkey timeout
+                        if (!ResponseValidator.TryValidateWithoutUINotification(response, out GachaLogPage? page))
+                        {
+                            fetchContext.Report(progress, isAuthKeyTimeout: true);
+                            break;
+                        }
+
+                        items = page.List;
                     }
 
                     fetchContext.ResetCurrentPage();
-                    ImmutableArray<GachaLogItem> items = page.List;
 
                     foreach (GachaLogItem item in items)
                     {
@@ -204,6 +238,12 @@ public sealed partial class GachaLogService : IGachaLogService
                         // Exit current type fetch loop
                         break;
                     }
+
+                    // 绝区零用 page 翻页（与 zzz-signal-search-export 一致）
+                    if (game is GachaGameType.ZZZ)
+                    {
+                        fetchContext.TypedQueryOptions.Page++;
+                    }
                 }
                 while (true);
 
@@ -222,12 +262,19 @@ public sealed partial class GachaLogService : IGachaLogService
             }
         }
 
+        // 绝区零：所有频段都没有返回任何记录、且没有触发 authkey 失效时，明确提示，避免「静默无结果」
+        if (game is GachaGameType.ZZZ && fetchContext.TargetArchive is null && !fetchContext.Status.AuthKeyTimeout)
+        {
+            serviceProvider.GetRequiredService<IMessenger>()
+                .Send(InfoBarMessage.Warning(SH.ServiceGachaLogZZZNoRecordFetched));
+        }
+
         return new(!fetchContext.Status.AuthKeyTimeout, fetchContext.TargetArchive);
     }
 
     private async ValueTask<ValueResult<bool, GachaArchive?>> FetchBeyondGachaLogsAsync(GachaLogServiceMetadataContext context, GachaLogQuery query, bool isLazy, IProgress<GachaLogFetchStatus> progress, CancellationToken token)
     {
-        IAdvancedDbCollectionView<GachaArchive> localArchives = await GetArchiveCollectionAsync().ConfigureAwait(false);
+        IAdvancedDbCollectionView<GachaArchive> localArchives = await GetArchiveCollectionAsync(GachaGameType.Genshin).ConfigureAwait(false);
         BeyondGachaLogFetchContext fetchContext = new(gachaLogRepository, context, isLazy);
 
         using (IServiceScope scope = serviceProvider.CreateScope())

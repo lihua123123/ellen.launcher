@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using Ellen.Launcher.Model.Entity;
+using Ellen.Launcher.Model.Intrinsic;
 using Ellen.Launcher.Service.Abstraction;
 using Ellen.Launcher.Web.Hoyolab.Hk4e.Event.GachaInfo;
 using System.Collections.Immutable;
@@ -23,9 +24,13 @@ public interface IGachaLogRepository : IRepository<GachaArchive>, IRepository<Ga
 
     GachaArchive? GetGachaArchiveByUid(string uid);
 
+    GachaArchive? GetGachaArchiveByUidAndGame(string uid, GachaGameType game);
+
     ImmutableArray<string> GetGachaArchiveUidImmutableArray();
 
     ObservableCollection<GachaArchive> GetGachaArchiveCollection();
+
+    ObservableCollection<GachaArchive> GetGachaArchiveCollection(GachaGameType game);
 
     ImmutableArray<GachaItem> GetGachaItemImmutableArrayByArchiveId(Guid archiveId);
 

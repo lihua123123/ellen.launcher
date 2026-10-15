@@ -9,22 +9,27 @@ using Ellen.Launcher.Core.Logging;
 using Ellen.Launcher.Factory.ContentDialog;
 using Ellen.Launcher.Factory.Picker;
 using Ellen.Launcher.Factory.Progress;
+using Ellen.Launcher.Model;
 using Ellen.Launcher.Model.Entity;
 using Ellen.Launcher.Model.InterChange.GachaLog;
+using Ellen.Launcher.Model.Intrinsic;
 using Ellen.Launcher.Service;
 using Ellen.Launcher.Service.GachaLog;
+using Ellen.Launcher.Service.GachaLog.Factory;
 using Ellen.Launcher.Service.GachaLog.QueryProvider;
 using Ellen.Launcher.Service.Metadata;
 using Ellen.Launcher.Service.Metadata.ContextAbstraction;
-using Ellen.Launcher.Service.Navigation;
 using Ellen.Launcher.Service.Notification;
 using Ellen.Launcher.Service.UIGF;
 using Ellen.Launcher.UI.Xaml.Data;
 using Ellen.Launcher.UI.Xaml.View.Dialog;
-using Ellen.Launcher.UI.Xaml.View.Page;
-using Ellen.Launcher.ViewModel.Setting;
+using Ellen.Launcher.Web.Hoyolab.Hk4e.Event.GachaInfo;
+using Ellen.Launcher.Web.Upstream.GachaLog;
 using Ellen.Launcher.Win32.Foundation;
+using Ellen.Launcher.Core.Threading;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -53,6 +58,27 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
     public partial GachaLogViewModel(IServiceProvider serviceProvider);
 
     public partial WishCountdownViewModel WishCountdownViewModel { get; }
+
+    /// <summary>
+    /// 可切换的游戏（原神 / 绝区零）
+    /// </summary>
+    public ImmutableArray<NameValue<GachaGameType>> Games { get; } =
+    [
+        new(SH.ViewPageGachaLogGameGenshin, GachaGameType.Genshin),
+        new(SH.ViewPageGachaLogGameZZZ, GachaGameType.ZZZ),
+    ];
+
+    /// <summary>
+    /// 当前选中的游戏
+    /// </summary>
+    [ObservableProperty]
+    public partial NameValue<GachaGameType> SelectedGame { get; set; } = new(SH.ViewPageGachaLogGameGenshin, GachaGameType.Genshin);
+
+    /// <summary>
+    /// 是否处于绝区零模式
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsZZZMode { get; set; }
 
     public IAdvancedDbCollectionView<GachaArchive>? Archives
     {
@@ -133,7 +159,7 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
             metadataContext = await metadataService.GetContextAsync<GachaLogServiceMetadataContext>(token).ConfigureAwait(false);
             using (await EnterCriticalSectionAsync().ConfigureAwait(false))
             {
-                IAdvancedDbCollectionView<GachaArchive> archives = await gachaLogService.GetArchiveCollectionAsync().ConfigureAwait(false);
+                IAdvancedDbCollectionView<GachaArchive> archives = await gachaLogService.GetArchiveCollectionAsync(SelectedGame.Value).ConfigureAwait(false);
                 await taskContext.SwitchToMainThreadAsync();
                 Archives = archives;
                 Archives.MoveCurrentTo(Archives.Source.SelectedOrFirstOrDefault());
@@ -178,6 +204,45 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
         }
 
         UpdateStatisticsAsync(Archives?.CurrentItem).SafeForget();
+    }
+
+    /// <summary>
+    /// 切换游戏：换用对应游戏的存档集合，并复位当前存档
+    /// </summary>
+    partial void OnSelectedGameChanged(NameValue<GachaGameType> value)
+    {
+        IsZZZMode = value.Value is GachaGameType.ZZZ;
+        if (IsZZZMode && IsBeyondMode)
+        {
+            // 千星奇域（UGC）模式仅适用于原神
+            IsBeyondMode = false;
+        }
+
+        SwitchGameAsync(value.Value).SafeForget();
+    }
+
+    private async ValueTask SwitchGameAsync(GachaGameType game)
+    {
+        try
+        {
+            using (await EnterCriticalSectionAsync().ConfigureAwait(false))
+            {
+                suppressCurrentItemChangedHandling = true;
+
+                IAdvancedDbCollectionView<GachaArchive> archives = await gachaLogService.GetArchiveCollectionAsync(game).ConfigureAwait(false);
+                await taskContext.SwitchToMainThreadAsync();
+
+                Archives = archives;
+                Archives.MoveCurrentTo(archives.Source.SelectedOrFirstOrDefault());
+
+                GachaArchive? current = Archives.CurrentItem;
+                UpdateStatisticsAsync(current).SafeForget();
+            }
+        }
+        finally
+        {
+            suppressCurrentItemChangedHandling = false;
+        }
     }
 
     [Command("RefreshByWebCacheCommand")]
@@ -257,7 +322,7 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
         using (IServiceScope scope = serviceProvider.CreateScope())
         {
             IGachaLogQueryProvider provider = scope.ServiceProvider.GetRequiredKeyedService<IGachaLogQueryProvider>(optionKind);
-            (bool isOk, query) = await provider.GetQueryAsync().ConfigureAwait(false);
+            (bool isOk, query) = await provider.GetQueryAsync(SelectedGame.Value).ConfigureAwait(false);
 
             if (!isOk)
             {
@@ -407,7 +472,11 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
             return;
         }
 
-        if (uigf!.Hk4e.IsDefaultOrEmpty)
+        bool hasGenshin = !uigf!.Hk4e.IsDefaultOrEmpty;
+        bool hasZZZ = uigf is UIGF42 uigf42 && !uigf42.Nap.IsDefaultOrEmpty;
+
+        // UIGF v4.2 的绝区零记录位于 nap 字段；原神记录位于 hk4e 字段。两者任一存在即可导入。
+        if (!hasGenshin && !hasZZZ)
         {
             messenger.Send(InfoBarMessage.Warning(SH.ViewModelUIGFImportNoHk4eEntry));
             return;
@@ -506,7 +575,7 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
         {
             // UIGF 导入是通过独立作用域写入数据库的，缓存里的存档集合快照不会包含新行，
             // 因此这里必须强制重新查询，否则会出现「提示导入成功但列表仍为空」。
-            IAdvancedDbCollectionView<GachaArchive> archives = await gachaLogService.ReloadArchiveCollectionAsync().ConfigureAwait(false);
+            IAdvancedDbCollectionView<GachaArchive> archives = await gachaLogService.ReloadArchiveCollectionAsync(SelectedGame.Value).ConfigureAwait(false);
             await taskContext.SwitchToMainThreadAsync();
             Archives = archives;
             Archives.MoveCurrentTo(Archives.Source.SelectedOrFirstOrDefault());
@@ -518,6 +587,19 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
         if (archive is null)
         {
             Statistics = default;
+            return;
+        }
+
+        if (archive.Game is GachaGameType.ZZZ)
+        {
+            // 绝区零：复用原神的 TypedWishSummaryBuilder 管线产出 GachaStatistics，
+            // 这样总览页的 StatisticsCard 直接复用，无需另写 UI。
+            // 映射：常驻→StandardWish, 独家+独家重映→AvatarWish, 音擎+音擎回响→WeaponWish, 邦布→ChronicledWish
+            GachaStatistics zzzStatistics = BuildZZZStatistics(archive);
+            await taskContext.SwitchToMainThreadAsync();
+            Statistics = zzzStatistics;
+            UpdateCardVisibility();
+            IsInitialized = true;
             return;
         }
 
@@ -543,5 +625,72 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
         {
             messenger.Send(InfoBarMessage.Error(ex));
         }
+    }
+
+    /// <summary>
+    /// 用原神的 TypedWishSummaryBuilder 管线为绝区零产出 GachaStatistics，
+    /// 这样总览页的 StatisticsCard 直接复用。ZZZ 物品不依赖原神元数据，
+    /// 名称与稀有度从 GachaItem.Name/Quality 取。
+    /// 映射：常驻频段→StandardWish, 独家频段+独家重映→AvatarWish,
+    /// 音擎频段+音擎回响→WeaponWish, 邦布频段→ChronicledWish
+    /// </summary>
+    private GachaStatistics BuildZZZStatistics(GachaArchive archive)
+    {
+        ImmutableArray<GachaItem> items = gachaLogRepository.GetGachaItemImmutableArrayByArchiveId(archive.InnerId);
+        HashSet<uint> standardItemIds = ZZZGachaUpHelper.GetStandardItemIds(items);
+
+        TypedWishSummaryBuilderContext standardCtx = new(serviceProvider, SH.WebGachaConfigTypeZZZStandardChannel, 90, 10, 0,
+            static type => type is GachaType.ZZZStandardChannel, GachaDistributionType.Standard);
+        TypedWishSummaryBuilderContext avatarCtx = new(serviceProvider, SH.WebGachaConfigTypeZZZExclusiveChannel, 90, 10, 0,
+            static type => type is GachaType.ZZZExclusiveChannel or GachaType.ZZZExclusiveRescreening, GachaDistributionType.AvatarEvent);
+        TypedWishSummaryBuilderContext weaponCtx = new(serviceProvider, SH.WebGachaConfigTypeZZZWEngineChannel, 80, 10, 0,
+            static type => type is GachaType.ZZZWEngineChannel or GachaType.ZZZWEngineReverberation, GachaDistributionType.WeaponEvent);
+        TypedWishSummaryBuilderContext chronicledCtx = new(serviceProvider, SH.WebGachaConfigTypeZZZBangbooChannel, 90, 10, 0,
+            static type => type is GachaType.ZZZBangbooChannel, GachaDistributionType.Chronicled);
+        TypedWishSummaryBuilderContext noviceCtx = new(serviceProvider, string.Empty, 90, 10, 0,
+            static _ => false, GachaDistributionType.Standard);
+        TypedWishSummaryBuilderContext beyondStandardCtx = new(serviceProvider, string.Empty, int.MaxValue, 90, 10,
+            static _ => false, GachaDistributionType.BeyondStandard, true, true);
+        TypedWishSummaryBuilderContext beyondEventCtx = new(serviceProvider, string.Empty, 90, 10, 0,
+            static _ => false, GachaDistributionType.BeyondEvent, true);
+
+        TypedWishSummaryBuilder standardBuilder = standardCtx.CreateBuilder();
+        TypedWishSummaryBuilder avatarBuilder = avatarCtx.CreateBuilder();
+        TypedWishSummaryBuilder weaponBuilder = weaponCtx.CreateBuilder();
+        TypedWishSummaryBuilder chronicledBuilder = chronicledCtx.CreateBuilder();
+        TypedWishSummaryBuilder noviceBuilder = noviceCtx.CreateBuilder();
+        TypedWishSummaryBuilder beyondStandardBuilder = beyondStandardCtx.CreateBuilder();
+        TypedWishSummaryBuilder beyondEventBuilder = beyondEventCtx.CreateBuilder();
+
+        foreach (GachaItem item in items.OrderBy(static i => i.Id))
+        {
+            ZZZSummaryItemConvertible source = new(item);
+            bool isUp = ZZZGachaUpHelper.IsUp(item, standardItemIds);
+            standardBuilder.Track(item, source, isUp);
+            avatarBuilder.Track(item, source, isUp);
+            weaponBuilder.Track(item, source, isUp);
+            chronicledBuilder.Track(item, source, isUp);
+            noviceBuilder.Track(item, source, isUp);
+            beyondStandardBuilder.Track(item, source, isUp);
+            beyondEventBuilder.Track(item, source, isUp);
+        }
+
+        AsyncBarrier barrier = new(7);
+        return new GachaStatistics
+        {
+            StandardWish = standardBuilder.ToTypedWishSummary(barrier),
+            AvatarWish = avatarBuilder.ToTypedWishSummary(barrier),
+            WeaponWish = weaponBuilder.ToTypedWishSummary(barrier),
+            ChronicledWish = chronicledBuilder.ToTypedWishSummary(barrier),
+            NoviceWish = noviceBuilder.ToTypedWishSummary(barrier),
+            BeyondStandardWish = beyondStandardBuilder.ToTypedWishSummary(barrier),
+            BeyondEventWish = beyondEventBuilder.ToTypedWishSummary(barrier),
+            HistoryWishes = ImmutableArray<HistoryWish>.Empty.AsAdvancedCollectionView(),
+            OrangeAvatars = [],
+            PurpleAvatars = [],
+            OrangeWeapons = [],
+            PurpleWeapons = [],
+            BlueWeapons = [],
+        };
     }
 }

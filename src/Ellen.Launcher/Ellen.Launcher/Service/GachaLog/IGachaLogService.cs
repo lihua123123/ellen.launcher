@@ -3,6 +3,7 @@
 
 using Ellen.Launcher.Core.Database;
 using Ellen.Launcher.Model.Entity;
+using Ellen.Launcher.Model.Intrinsic;
 using Ellen.Launcher.Service.GachaLog.QueryProvider;
 using Ellen.Launcher.ViewModel.GachaLog;
 using System.Collections.Immutable;
@@ -25,12 +26,12 @@ public interface IGachaLogService
 
     ValueTask RemoveArchiveAsync(GachaArchive archive);
 
-    ValueTask<IAdvancedDbCollectionView<GachaArchive>> GetArchiveCollectionAsync();
+    ValueTask<IAdvancedDbCollectionView<GachaArchive>> GetArchiveCollectionAsync(GachaGameType game);
 
     /// <summary>
     /// 重新从数据库查询存档集合。
-    /// <see cref="GetArchiveCollectionAsync"/> 返回的是一次性查询的快照并会被缓存，
+    /// <see cref="GetArchiveCollectionAsync(GachaGameType)"/> 返回的是一次性查询的快照并会被缓存，
     /// 当存档由本服务以外的作用域插入时（例如 UIGF 导入、刷新），必须调用本方法才能看到新行。
     /// </summary>
-    ValueTask<IAdvancedDbCollectionView<GachaArchive>> ReloadArchiveCollectionAsync();
+    ValueTask<IAdvancedDbCollectionView<GachaArchive>> ReloadArchiveCollectionAsync(GachaGameType game);
 }

@@ -161,6 +161,23 @@
                     Padding="16"
                     Style="{ThemeResource AcrylicBorderCardStyle}">
                     <StackPanel>
+                        <!--
+                            切换到尚未获取过记录的游戏时，Pivot 会被 StandardView 隐藏，
+                            因此空状态卡片里必须保留游戏切换入口，否则无法切回原神。
+                        -->
+                        <StackPanel
+                            Margin="0,0,0,16"
+                            HorizontalAlignment="Center"
+                            Orientation="Horizontal"
+                            Spacing="8">
+                            <TextBlock VerticalAlignment="Center" Text="{shuxm:ResourceString Name=ViewPageGachaLogGameHeader}"/>
+                            <ComboBox
+                                MinWidth="140"
+                                DisplayMemberPath="Name"
+                                ItemsSource="{Binding Games}"
+                                SelectedItem="{Binding SelectedGame, Mode=TwoWay}"
+                                Style="{ThemeResource CommandBarComboBoxStyle}"/>
+                        </StackPanel>
                         <shuxci:CachedImage Height="120" Source="{StaticResource UI_EmotionIcon71}"/>
                         <TextBlock
                             Margin="0,16,0,0"
@@ -196,16 +213,28 @@
         </shuxc:StandardView.EmptyContent>
         <Pivot x:Name="Pivot" Style="{ThemeResource CardPivotStyle}">
             <mxi:Interaction.Behaviors>
-                <shuxb:PivotBeyondModeBehavior IsBeyondMode="{Binding IsBeyondMode}"/>
+                <shuxb:PivotBeyondModeBehavior IsBeyondMode="{Binding IsBeyondMode}" IsGameZZZMode="{Binding IsZZZMode}"/>
             </mxi:Interaction.Behaviors>
             <Pivot.LeftHeader>
-                <shuxc:SizeRestrictedContentControl Margin="6,6,0,6">
-                    <ComboBox
-                        DisplayMemberPath="Uid"
-                        ItemsSource="{Binding Archives}"
-                        SelectedItem="{Binding Archives.CurrentItem, Mode=TwoWay}"
-                        Style="{ThemeResource CommandBarComboBoxStyle}"/>
-                </shuxc:SizeRestrictedContentControl>
+                <StackPanel
+                    Margin="6,6,0,6"
+                    Orientation="Horizontal"
+                    Spacing="6">
+                    <shuxc:SizeRestrictedContentControl>
+                        <ComboBox
+                            DisplayMemberPath="Name"
+                            ItemsSource="{Binding Games}"
+                            SelectedItem="{Binding SelectedGame, Mode=TwoWay}"
+                            Style="{ThemeResource CommandBarComboBoxStyle}"/>
+                    </shuxc:SizeRestrictedContentControl>
+                    <shuxc:SizeRestrictedContentControl>
+                        <ComboBox
+                            DisplayMemberPath="Uid"
+                            ItemsSource="{Binding Archives}"
+                            SelectedItem="{Binding Archives.CurrentItem, Mode=TwoWay}"
+                            Style="{ThemeResource CommandBarComboBoxStyle}"/>
+                    </shuxc:SizeRestrictedContentControl>
+                </StackPanel>
             </Pivot.LeftHeader>
             <Pivot.RightHeader>
                 <CommandBar DefaultLabelPosition="Right">
@@ -248,7 +277,8 @@
                     <AppBarToggleButton
                         Icon="{shuxm:BitmapIcon Source=ms-appx:///Resource/Icon/UI_ItemIcon_231.png}"
                         IsChecked="{Binding IsBeyondMode, Mode=TwoWay}"
-                        Label="{shuxm:ResourceString Name=ViewPageGachaLogSwitchToBeyondGachaModeHeader}">
+                        Label="{shuxm:ResourceString Name=ViewPageGachaLogSwitchToBeyondGachaModeHeader}"
+                        Visibility="{Binding IsZZZMode, Converter={StaticResource BoolNegationToVisibilityConverter}}">
                         <AppBarToggleButton.Resources>
                             <Style BasedOn="{StaticResource DefaultAppBarToggleButtonStyle}" TargetType="AppBarToggleButton">
                                 <Setter Property="ToolTipService.ToolTip" Value="{shuxm:ResourceString Name=ViewPageGachaLogSwitchToBeyondGachaModeDescription}"/>
@@ -265,16 +295,17 @@
                 </CommandBar>
             </Pivot.RightHeader>
             <PivotItem x:Name="PivotOverview" Header="{shuxm:ResourceString Name=ViewPageGachaLogPivotOverview}">
-                <ScrollViewer
-                    Margin="16,0"
-                    cw:ScrollViewerExtensions.HorizontalScrollBarMargin="0,0,-16,0"
-                    HorizontalScrollBarVisibility="Auto"
-                    HorizontalScrollMode="Enabled"
-                    VerticalScrollMode="Disabled">
-                    <shuxcp:HorizontalEqualPanel
-                        Margin="0,16"
-                        MinItemWidth="302"
-                        Spacing="16">
+                <Grid>
+                    <ScrollViewer
+                        Margin="16,0"
+                        cw:ScrollViewerExtensions.HorizontalScrollBarMargin="0,0,-16,0"
+                        HorizontalScrollBarVisibility="Auto"
+                        HorizontalScrollMode="Enabled"
+                        VerticalScrollMode="Disabled">
+                        <shuxcp:HorizontalEqualPanel
+                            Margin="0,16"
+                            MinItemWidth="302"
+                            Spacing="16">
                         <shuxvs:StatisticsCard DataContext="{Binding Statistics.AvatarWish}" Visibility="{Binding DataContext.IsAvatarWishCardVisible, ElementName=RootPage, Converter={StaticResource BoolToVisibilityConverter}}"/>
                         <shuxvs:StatisticsCard
                             DataContext="{Binding Statistics.WeaponWish}"
@@ -306,10 +337,13 @@
                             ShowUpPull="True"
                             Visibility="{Binding DataContext.IsBeyondEventWishCardVisible, ElementName=RootPage, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     </shuxcp:HorizontalEqualPanel>
-                </ScrollViewer>
+                    </ScrollViewer>
+                </Grid>
             </PivotItem>
 
-            <PivotItem x:Name="PivotStatistics" Header="{shuxm:ResourceString Name=ViewPageGachaLogPivotStatistics}">
+            <PivotItem
+                x:Name="PivotStatistics"
+                Header="{shuxm:ResourceString Name=ViewPageGachaLogPivotStatistics}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -498,7 +532,9 @@
                 </Grid>
             </PivotItem>
 
-            <PivotItem x:Name="PivotCountdown" Header="{shuxm:ResourceString Name=ViewPageGachaLogPivotCountdown}">
+            <PivotItem
+                x:Name="PivotCountdown"
+                Header="{shuxm:ResourceString Name=ViewPageGachaLogPivotCountdown}">
                 <Grid>
                     <shuxc:Loading
                         Margin="16"

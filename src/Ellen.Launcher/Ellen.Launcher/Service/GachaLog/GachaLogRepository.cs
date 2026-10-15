@@ -4,6 +4,7 @@
 using Ellen.Launcher.Core.Database;
 using Ellen.Launcher.Model.Entity;
 using Ellen.Launcher.Model.Entity.Database;
+using Ellen.Launcher.Model.Intrinsic;
 using Ellen.Launcher.Service.Abstraction;
 using Ellen.Launcher.Web.Hoyolab.Hk4e.Event.GachaInfo;
 using System.Collections.Immutable;
@@ -22,6 +23,11 @@ public sealed partial class GachaLogRepository : IGachaLogRepository
     public ObservableCollection<GachaArchive> GetGachaArchiveCollection()
     {
         return this.ObservableCollection<GachaArchive>();
+    }
+
+    public ObservableCollection<GachaArchive> GetGachaArchiveCollection(GachaGameType game)
+    {
+        return this.ObservableCollection<GachaArchive>(a => a.Game == game);
     }
 
     public ImmutableArray<GachaItem> GetGachaItemImmutableArrayByArchiveId(Guid archiveId)
@@ -83,6 +89,11 @@ public sealed partial class GachaLogRepository : IGachaLogRepository
         return this.SingleOrDefault<GachaArchive>(a => a.Uid == uid);
     }
 
+    public GachaArchive? GetGachaArchiveByUidAndGame(string uid, GachaGameType game)
+    {
+        return this.SingleOrDefault<GachaArchive>(a => a.Uid == uid && a.Game == game);
+    }
+
     public void AddGachaItemRange(IEnumerable<GachaItem> items)
     {
         this.AddRange(items);
@@ -95,7 +106,8 @@ public sealed partial class GachaLogRepository : IGachaLogRepository
 
     public ImmutableArray<string> GetGachaArchiveUidImmutableArray()
     {
-        return this.ImmutableArray<GachaArchive, string>(query => query.Select(archive => archive.Uid));
+        // UIGF 交换格式只适用于原神
+        return this.ImmutableArray<GachaArchive, string>(query => query.Where(archive => archive.Game == GachaGameType.Genshin).Select(archive => archive.Uid));
     }
 
     public void AddBeyondGachaItemRange(IEnumerable<BeyondGachaItem> items)

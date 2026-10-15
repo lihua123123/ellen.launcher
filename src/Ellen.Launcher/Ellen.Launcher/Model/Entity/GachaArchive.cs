@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using Ellen.Launcher.Core.Database.Abstraction;
+using Ellen.Launcher.Model.Intrinsic;
 using Ellen.Launcher.UI.Xaml.Data;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -19,8 +20,13 @@ public sealed partial class GachaArchive : ISelectable, IPropertyValuesProvider
 
     public bool IsSelected { get; set; }
 
-    public static GachaArchive Create(string uid)
+    /// <summary>
+    /// 存档所属的游戏，存量数据默认为原神
+    /// </summary>
+    public GachaGameType Game { get; set; }
+
+    public static GachaArchive Create(string uid, GachaGameType game = GachaGameType.Genshin)
     {
-        return new() { Uid = uid };
+        return new() { Uid = uid, Game = game };
     }
 }

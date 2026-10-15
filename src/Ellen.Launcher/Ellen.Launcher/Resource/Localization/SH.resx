@@ -2131,6 +2131,12 @@
   <data name="ViewPageAnnouncementSetGamePathLabel" xml:space="preserve">
     <value>设置游戏路径</value>
   </data>
+  <data name="ViewPageAnnouncementSetZZZGamePathLabel" xml:space="preserve">
+    <value>设置绝区零路径</value>
+  </data>
+  <data name="ViewPageAnnouncementSetZZZGamePathSuccessMessage" xml:space="preserve">
+    <value>绝区零游戏路径已设置为「{0}」，网页缓存方式获取调频记录将使用该路径</value>
+  </data>
   <data name="ViewPageAnnouncementSetGamePathSuccessMessage" xml:space="preserve">
     <value>当前游戏路径已设置为「{0}」</value>
   </data>
@@ -2982,6 +2988,75 @@
   </data>
   <data name="WebGachaConfigTypeWeaponEventWish" xml:space="preserve">
     <value>武器活动祈愿</value>
+  </data>
+  <data name="WebGachaConfigTypeZZZStandardChannel" xml:space="preserve">
+    <value>常驻频段</value>
+  </data>
+  <data name="WebGachaConfigTypeZZZExclusiveChannel" xml:space="preserve">
+    <value>独家频段</value>
+  </data>
+  <data name="WebGachaConfigTypeZZZWEngineChannel" xml:space="preserve">
+    <value>音擎频段</value>
+  </data>
+  <data name="WebGachaConfigTypeZZZBangbooChannel" xml:space="preserve">
+    <value>邦布频段</value>
+  </data>
+  <data name="WebGachaConfigTypeZZZExclusiveRescreening" xml:space="preserve">
+    <value>独家重映</value>
+  </data>
+  <data name="WebGachaConfigTypeZZZWEngineReverberation" xml:space="preserve">
+    <value>音擎回响</value>
+  </data>
+  <data name="ViewPageGachaLogGameGenshin" xml:space="preserve">
+    <value>原神</value>
+  </data>
+  <data name="ViewPageGachaLogGameHeader" xml:space="preserve">
+    <value>游戏</value>
+  </data>
+  <data name="ViewPageGachaLogGameZZZ" xml:space="preserve">
+    <value>绝区零</value>
+  </data>
+  <data name="ViewPageGachaLogZZZEmptyHint" xml:space="preserve">
+    <value>暂无调频记录，请点击右上角刷新获取</value>
+  </data>
+  <data name="ViewPageGachaLogZZZColumnTime" xml:space="preserve">
+    <value>时间</value>
+  </data>
+  <data name="ViewPageGachaLogZZZColumnRank" xml:space="preserve">
+    <value>稀有度</value>
+  </data>
+  <data name="ViewPageGachaLogZZZColumnChannel" xml:space="preserve">
+    <value>频段</value>
+  </data>
+  <data name="ViewPageGachaLogZZZColumnName" xml:space="preserve">
+    <value>名称</value>
+  </data>
+  <data name="ViewPageGachaLogZZZTotalPulls" xml:space="preserve">
+    <value>总抽数</value>
+  </data>
+  <data name="ViewPageGachaLogZZZSRank" xml:space="preserve">
+    <value>S 级</value>
+  </data>
+  <data name="ViewPageGachaLogZZZARank" xml:space="preserve">
+    <value>A 级</value>
+  </data>
+  <data name="ViewPageGachaLogZZZBRank" xml:space="preserve">
+    <value>B 级</value>
+  </data>
+  <data name="ViewPageGachaLogZZZPity" xml:space="preserve">
+    <value>距上次 S</value>
+  </data>
+  <data name="ServiceGachaLogUrlProviderManualInputGameMismatch" xml:space="preserve">
+    <value>输入的链接与当前选择的游戏不匹配，请检查链接或切换游戏</value>
+  </data>
+  <data name="ServiceGachaLogUrlProviderZZZCachePathNotFound" xml:space="preserve">
+    <value>未找到绝区零的安装路径，请确认已安装绝区零官方启动器版客户端</value>
+  </data>
+  <data name="ServiceGachaLogZZZNoGameRoleFound" xml:space="preserve">
+    <value>当前账号下未找到绝区零角色，请先在米游社绑定绝区零角色</value>
+  </data>
+  <data name="ServiceGachaLogZZZNoRecordFetched" xml:space="preserve">
+    <value>接口未返回任何调频记录，可能是 authkey 失效或区服不匹配</value>
   </data>
   <data name="WebGameResourcePathCopySucceed" xml:space="preserve">
     <value>下载链接复制成功</value>

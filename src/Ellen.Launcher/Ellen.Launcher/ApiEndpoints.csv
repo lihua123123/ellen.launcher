@@ -44,6 +44,7 @@ Extra:{ "Namespace": "Ellen.Launcher.Web.Endpoint.Hoyolab" }
 "string DeviceFpGetFp()",https://public-data-api.mihoyo.com/device-fp/api/getFp,
 "string GachaInfoGetGachaLog(string query)",https://public-operation-hk4e.mihoyo.com/gacha_info/api/getGachaLog?{query},https://public-operation-hk4e-sg.hoyoverse.com/gacha_info/api/getGachaLog?{query}
 "string GachaInfoGetBeyondGachaLog(string query)",https://public-operation-hk4e.mihoyo.com/gacha_info/api/getBeyondGachaLog?{query},https://public-operation-hk4e-sg.hoyoverse.com/gacha_info/api/getBeyondGachaLog?{query}
+"string GachaRecordZZZGetGachaLog(string query)",https://public-operation-common.mihoyo.com/common/gacha_record/api/getGachaLog?{query},https://public-operation-common-sg.hoyoverse.com/common/gacha_record/api/getGachaLog?{query}
 "string GameRecordActCalendar()",https://api-takumi-record.mihoyo.com/game_record/app/genshin/api/act_calendar,https://bbs-api-os.hoyolab.com/game_record/app/genshin/api/act_calendar
 "string GameRecordCharacterList()",https://api-takumi-record.mihoyo.com/game_record/app/genshin/api/character/list,https://bbs-api-os.hoyolab.com/game_record/app/genshin/api/character/list
 "string GameRecordCharacterDetail()",https://api-takumi-record.mihoyo.com/game_record/app/genshin/api/character/detail,https://bbs-api-os.hoyolab.com/game_record/app/genshin/api/character/detail
@@ -81,7 +82,9 @@ Extra:{ "Namespace": "Ellen.Launcher.Web.Endpoint.Hoyolab" }
 "string UserFullInfo()",https://bbs-api.mihoyo.com/user/wapi/getUserFullInfo?gids=2,https://bbs-api-os.hoyolab.com/community/user/wapi/getUserFullInfo?gid=2
 "string UserFullInfoQuery(string accountId)",https://bbs-api.mihoyo.com/user/wapi/getUserFullInfo?uid={accountId}&gids=2,https://bbs-api-os.hoyolab.com/community/painter/wapi/user/full
 "string UserGameRolesByActionTicket(string actionTicket)",https://api-takumi.mihoyo.com/binding/api/getUserGameRoles?action_ticket={actionTicket}&game_biz=hk4e_cn,
+"string UserGameRolesByActionTicketZZZ(string actionTicket)",https://api-takumi.mihoyo.com/binding/api/getUserGameRoles?action_ticket={actionTicket}&game_biz=nap_cn,
 "string UserGameRolesByCookie()",https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie?game_biz=hk4e_cn,https://api-os-takumi.hoyoverse.com/binding/api/getUserGameRolesByCookie?game_biz=hk4e_global
+"string UserGameRolesByCookieZZZ()",https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie?game_biz=nap_cn,https://api-os-takumi.hoyoverse.com/binding/api/getUserGameRolesByCookie?game_biz=nap_global
 "string UserGameRolesByLtoken(Ellen.Launcher.Web.Hoyolab.Region region)",,https://api-account-os.hoyoverse.com/binding/api/getUserGameRolesByLtoken?game_biz=hk4e_global&region={region}
 "string UserGameRolesBySToken()",https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByStoken,
 "string WebApiOsAccountLoginByCookie()",,https://webapi-os.account.hoyoverse.com/Api/login_by_cookie

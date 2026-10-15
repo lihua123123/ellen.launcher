@@ -149,6 +149,7 @@ public static class SettingKeys
     public const string PhysicalDriverIsAlwaysSolidState                 = "Ellen::Game::Package::PhysicalDriver::Type::IsSolidState";
     public const string LaunchGamePath                                   = "Ellen::Game::Path";
     public const string LaunchGamePathEntries                            = "Ellen::Game::Path::Entries";
+    public const string LaunchZZZGamePath                                = "Ellen::Game::ZZZ::Path";
     public const string LaunchIsWindowsHDREnabled                        = "Ellen::Game::Registry::WindowsHDR::Enabled";
 
     // Advanced Start

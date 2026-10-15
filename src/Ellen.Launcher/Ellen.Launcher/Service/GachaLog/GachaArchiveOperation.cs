@@ -3,21 +3,22 @@
 
 using Ellen.Launcher.Core.Database;
 using Ellen.Launcher.Model.Entity;
+using Ellen.Launcher.Model.Intrinsic;
 
 namespace Ellen.Launcher.Service.GachaLog;
 
 public static class GachaArchiveOperation
 {
-    public static GachaArchive GetOrAdd(IGachaLogRepository repository, string uid, IAdvancedDbCollectionView<GachaArchive> archives)
+    public static GachaArchive GetOrAdd(IGachaLogRepository repository, string uid, GachaGameType game, IAdvancedDbCollectionView<GachaArchive> archives)
     {
-        GachaArchive? archive = archives.Source.SingleOrDefault(a => a.Uid == uid);
+        GachaArchive? archive = archives.Source.SingleOrDefault(a => a.Uid == uid && a.Game == game);
 
         if (archive is not null)
         {
             return archive;
         }
 
-        GachaArchive created = GachaArchive.Create(uid);
+        GachaArchive created = GachaArchive.Create(uid, game);
         repository.AddGachaArchive(created);
         CollectionViewAddGachaArchive(archives, created, repository.ServiceProvider.GetRequiredService<ITaskContext>());
         return created;

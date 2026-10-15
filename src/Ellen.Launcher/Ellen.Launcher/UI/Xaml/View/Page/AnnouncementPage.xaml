@@ -911,6 +911,10 @@
                                 Command="{Binding SetGamePathCommand}"
                                 Icon="{shuxm:FontIcon Glyph=&#xE8B7;}"
                                 Label="{shuxm:ResourceString Name=ViewPageAnnouncementSetGamePathLabel}"/>
+                            <AppBarButton
+                                Command="{Binding SetZZZGamePathCommand}"
+                                Icon="{shuxm:FontIcon Glyph=&#xE8B5;}"
+                                Label="{shuxm:ResourceString Name=ViewPageAnnouncementSetZZZGamePathLabel}"/>
                             <AppBarElementContainer>
                                 <!--
                                     下次启动时自动申请管理员权限（Bootstrap 读 LocalSetting 决定是否重启提权）。

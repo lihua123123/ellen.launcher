@@ -82,6 +82,13 @@ public sealed partial class TypedWishSummary : Wish, INotifyPropertyChanged
 
     public required List<SummaryItem> SummaryList { get; init; }
 
+    // 原神叫「五星/四星/三星」，绝区零叫「S/A/B 级」；卡池卡片复用同一模板，仅替换文案。
+    public string OrangeQualityText { get; set; } = SH.ViewControlStatisticsCardOrangeText;
+
+    public string PurpleQualityText { get; set; } = SH.ViewControlStatisticsCardPurpleText;
+
+    public string BlueQualityText { get; set; } = SH.ViewControlStatisticsCardBlueText;
+
     public bool ShowCombinedTotal
     {
         get => field;

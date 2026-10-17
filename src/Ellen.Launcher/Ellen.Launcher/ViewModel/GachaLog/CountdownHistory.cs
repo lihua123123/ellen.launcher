@@ -15,6 +15,17 @@ public sealed class CountdownHistory
         Banner = gachaEvent.Banner;
     }
 
+    /// <summary>
+    /// 绝区零「计时」用的获取记录：没有卡池横幅，用物品图标代替。
+    /// </summary>
+    public CountdownHistory(DateTimeOffset time, string channelName, Uri image)
+    {
+        LastTime = time;
+        FormattedTime = $"{time:yyyy-MM-dd}";
+        FormattedVersionOrder = channelName;
+        Banner = image;
+    }
+
     public string FormattedTime { get; }
 
     public string FormattedVersionOrder { get; }

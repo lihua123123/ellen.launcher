@@ -3388,4 +3388,25 @@
           <data name="ViewControlStatisticsCardGreenText" xml:space="preserve">
     <value>二星</value>
   </data>
+  <data name="ViewControlStatisticsCardBlueQualityZZZ" xml:space="preserve">
+    <value>B 级</value>
+  </data>
+  <data name="ViewControlStatisticsCardOrangeQualityZZZ" xml:space="preserve">
+    <value>S 级</value>
+  </data>
+  <data name="ViewControlStatisticsCardPurpleQualityZZZ" xml:space="preserve">
+    <value>A 级</value>
+  </data>
+  <data name="ViewPageGachaLogZZZOrangeAgentCountdown" xml:space="preserve">
+    <value>S 级代理人</value>
+  </data>
+  <data name="ViewPageGachaLogZZZOrangeWEngineCountdown" xml:space="preserve">
+    <value>S 级音擎</value>
+  </data>
+  <data name="ViewPageGachaLogPivotZZZAgent" xml:space="preserve">
+    <value>代理人</value>
+  </data>
+  <data name="ViewPageGachaLogPivotZZZWEngine" xml:space="preserve">
+    <value>音擎 / 邦布</value>
+  </data>
 </root>

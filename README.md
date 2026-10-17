@@ -149,6 +149,8 @@ python tools\EllenWikiSync\sync.py --list     # 列出数据集
 | 数据 | 来源 | 生成方式 |
 | --- | --- | --- |
 | 角色「元素附着/产球」战斗备注 | ellen.wiki `GET /api/attachment` | `python tools/EllenWikiSync/sync.py attachment` → `Resource/CombatNotes/AvatarCombatNotes.json`（运行期由 `AvatarCombatNoteConverter` 转换） |
+| 绝区零调频物品（代理人 / 音擎 / 邦布）图标与名称 | Starward 公共元数据镜像 `https://starward-static.scighost.com/metadata/v1/zzz/ZZZGachaInfo.nap_cn.zh-cn.json` | `python tools/ZZZGachaInfoGen/generate.py`（先 `--check` 看差异）→ `Resource/Metadata/ZZZ/GachaItem.json` |
+| 绝区零调频档期（计时页「上次 UP」/ 历史卡池图） | HoYo.Gacha 公共元数据 v2（`lgou2w/HoYo.Gacha`）+ 米游社官方「X版本限时频段」「XXX调频说明」公告 | `python tools/ZZZGachaBannerGen/generate.py`（先 `--check` 看差异）→ `Resource/Metadata/ZZZ/GachaBanner.json`；同期双频段拆成独立记录，卡池图只存 URL，运行期下载 |
 | 伤害计算公式 | `ellen-wiki` 仓库的 `content/formulas/genshin.md` | `node tools/FormulasGen/gen.mjs` → `Resource/Formulas/GenshinFormulas.json` + `Resource/Formulas/Genshin/{light,dark}/*.png`；行内公式保留 `$...$`，由随包的 KaTeX 字体渲染（`Resource/Font/KaTeX_Main-Regular.ttf`，与 ellen-wiki 的公式字体一致） |
 | 幽境 Boss 攻略 | 外部 JSON + 图片目录 | 用 `tools/GuideDataCheck` 校验 |
 | 标识类型（UID、Region、AvatarId…） | `IdentityStructs.json` | `SourceGeneration/Identity/IdentityGenerator.cs` |
@@ -298,6 +300,8 @@ Copy-Item "$src\*" "Installer\Publish\" -Recurse -Force
 | 角色战斗备注 | 改 wiki 数据源 → `python tools\EllenWikiSync\sync.py attachment`（先 `--check` 看差异） |
 | 伤害计算公式 | 改 `ellen-wiki` 的 `content/formulas/genshin.md` → `node tools/FormulasGen/gen.mjs`（公式位图会一并重渲染） |
 | 元数据 | 改上游 `DGP-Studio/Snap.Metadata`，或替换 `Resource/Metadata/Genshin/CHS/**` 内置快照 |
+| 绝区零物品图标 / 名称 | `python tools\ZZZGachaInfoGen\generate.py`（数据源为 Starward 公共元数据镜像，生成 `Resource/Metadata/ZZZ/GachaItem.json`） |
+| 绝区零卡池档期 | `python tools\ZZZGachaBannerGen\generate.py`（数据源为 HoYo.Gacha 公共元数据 + 米游社官方频段公告，生成 `Resource/Metadata/ZZZ/GachaBanner.json`，每行一个独立卡池） |
 
 ### 代码约定
 

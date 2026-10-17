@@ -11,7 +11,6 @@ namespace Ellen.Launcher.UI.Xaml.Behavior;
 
 [UsedImplicitly]
 [DependencyProperty<bool>("IsBeyondMode", PropertyChangedCallbackName = nameof(OnIsBeyondModeChanged))]
-[DependencyProperty<bool>("IsGameZZZMode", PropertyChangedCallbackName = nameof(OnIsGameZZZModeChanged))]
 public sealed partial class PivotBeyondModeBehavior : BehaviorBase<Pivot>
 {
     private PivotItem? overviewItem;
@@ -50,17 +49,6 @@ public sealed partial class PivotBeyondModeBehavior : BehaviorBase<Pivot>
         behavior.UpdatePivotItems();
     }
 
-    private static void OnIsGameZZZModeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs _)
-    {
-        PivotBeyondModeBehavior behavior = sender.As<PivotBeyondModeBehavior>();
-        if (behavior.AssociatedObject is null || behavior.overviewItem is null || !behavior.isBeyondModeInitialized)
-        {
-            return;
-        }
-
-        behavior.UpdatePivotItems();
-    }
-
     private void UpdatePivotItems()
     {
         if (AssociatedObject is null || overviewItem is null)
@@ -68,13 +56,12 @@ public sealed partial class PivotBeyondModeBehavior : BehaviorBase<Pivot>
             return;
         }
 
-        // 千星奇域（UGC）模式与绝区零模式都只保留「总览」页签
-        bool hideNormalOnlyItems = IsBeyondMode.GetValueOrDefault() || IsGameZZZMode.GetValueOrDefault();
-
+        // 千星奇域（UGC）模式只保留「总览」页签；
+        // 绝区零的统计与计时页签已按调频记录适配，不再隐藏。
         AssociatedObject.Items.Clear();
         AssociatedObject.Items.Add(overviewItem);
 
-        if (!hideNormalOnlyItems)
+        if (!IsBeyondMode.GetValueOrDefault())
         {
             foreach (PivotItem item in normalOnlyItems)
             {

@@ -13,6 +13,7 @@ using Ellen.Launcher.Model;
 using Ellen.Launcher.Model.Entity;
 using Ellen.Launcher.Model.InterChange.GachaLog;
 using Ellen.Launcher.Model.Intrinsic;
+using Ellen.Launcher.Model.Metadata.ZZZ;
 using Ellen.Launcher.Service;
 using Ellen.Launcher.Service.GachaLog;
 using Ellen.Launcher.Service.GachaLog.Factory;
@@ -24,6 +25,7 @@ using Ellen.Launcher.Service.UIGF;
 using Ellen.Launcher.UI.Xaml.Data;
 using Ellen.Launcher.UI.Xaml.View.Dialog;
 using Ellen.Launcher.Web.Hoyolab.Hk4e.Event.GachaInfo;
+using Ellen.Launcher.Web.Endpoint.Upstream;
 using Ellen.Launcher.Web.Upstream.GachaLog;
 using Ellen.Launcher.Win32.Foundation;
 using Ellen.Launcher.Core.Threading;
@@ -49,6 +51,8 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
     private readonly IFileSystemPickerInteraction fileSystemPickerInteraction;
     private readonly IGachaLogRepository gachaLogRepository;
     private readonly IUIGFService uigfService;
+    private readonly IZZZGachaItemMetadataService zzzGachaItemMetadataService;
+    private readonly IZZZGachaBannerService zzzGachaBannerService;
 
     private bool suppressCurrentItemChangedHandling;
     private GachaLogServiceMetadataContext? metadataContext;
@@ -587,6 +591,7 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
         if (archive is null)
         {
             Statistics = default;
+            await WishCountdownViewModel.UpdateAsync(null).ConfigureAwait(false);
             return;
         }
 
@@ -595,11 +600,12 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
             // 绝区零：复用原神的 TypedWishSummaryBuilder 管线产出 GachaStatistics，
             // 这样总览页的 StatisticsCard 直接复用，无需另写 UI。
             // 映射：常驻→StandardWish, 独家+独家重映→AvatarWish, 音擎+音擎回响→WeaponWish, 邦布→ChronicledWish
-            GachaStatistics zzzStatistics = BuildZZZStatistics(archive);
+            GachaStatistics zzzStatistics = await BuildZZZStatisticsAsync(archive).ConfigureAwait(false);
             await taskContext.SwitchToMainThreadAsync();
             Statistics = zzzStatistics;
             UpdateCardVisibility();
             IsInitialized = true;
+            await WishCountdownViewModel.UpdateAsync(archive).ConfigureAwait(false);
             return;
         }
 
@@ -625,17 +631,21 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
         {
             messenger.Send(InfoBarMessage.Error(ex));
         }
+
+        await WishCountdownViewModel.UpdateAsync(archive).ConfigureAwait(false);
     }
 
     /// <summary>
     /// 用原神的 TypedWishSummaryBuilder 管线为绝区零产出 GachaStatistics，
     /// 这样总览页的 StatisticsCard 直接复用。ZZZ 物品不依赖原神元数据，
-    /// 名称与稀有度从 GachaItem.Name/Quality 取。
+    /// 名称与稀有度从 GachaItem.Name/Quality 取，图标由随包物品元数据补齐。
     /// 映射：常驻频段→StandardWish, 独家频段+独家重映→AvatarWish,
     /// 音擎频段+音擎回响→WeaponWish, 邦布频段→ChronicledWish
     /// </summary>
-    private GachaStatistics BuildZZZStatistics(GachaArchive archive)
+    private async ValueTask<GachaStatistics> BuildZZZStatisticsAsync(GachaArchive archive)
     {
+        await taskContext.SwitchToBackgroundAsync();
+
         ImmutableArray<GachaItem> items = gachaLogRepository.GetGachaItemImmutableArrayByArchiveId(archive.InnerId);
         HashSet<uint> standardItemIds = ZZZGachaUpHelper.GetStandardItemIds(items);
 
@@ -662,10 +672,16 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
         TypedWishSummaryBuilder beyondStandardBuilder = beyondStandardCtx.CreateBuilder();
         TypedWishSummaryBuilder beyondEventBuilder = beyondEventCtx.CreateBuilder();
 
+        // 统计页的「角色 / 武器」头像墙：按物品聚合获取次数。
+        Dictionary<uint, StatisticsItem> agentItems = [];
+        Dictionary<uint, StatisticsItem> otherItems = [];
+
         foreach (GachaItem item in items.OrderBy(static i => i.Id))
         {
-            ZZZSummaryItemConvertible source = new(item);
+            ZZZGachaItemInfo? info = zzzGachaItemMetadataService.GetById(item.ItemId);
+            ZZZSummaryItemConvertible source = new(item, info);
             bool isUp = ZZZGachaUpHelper.IsUp(item, standardItemIds);
+
             standardBuilder.Track(item, source, isUp);
             avatarBuilder.Track(item, source, isUp);
             weaponBuilder.Track(item, source, isUp);
@@ -673,24 +689,386 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
             noviceBuilder.Track(item, source, isUp);
             beyondStandardBuilder.Track(item, source, isUp);
             beyondEventBuilder.Track(item, source, isUp);
+
+            TrackZZZStatisticsItem(item, info, agentItems, otherItems);
         }
 
         AsyncBarrier barrier = new(7);
+        TypedWishSummary standardWish = standardBuilder.ToTypedWishSummary(barrier);
+        TypedWishSummary avatarWish = avatarBuilder.ToTypedWishSummary(barrier);
+        TypedWishSummary weaponWish = weaponBuilder.ToTypedWishSummary(barrier);
+        TypedWishSummary chronicledWish = chronicledBuilder.ToTypedWishSummary(barrier);
+        TypedWishSummary noviceWish = noviceBuilder.ToTypedWishSummary(barrier);
+        TypedWishSummary beyondStandardWish = beyondStandardBuilder.ToTypedWishSummary(barrier);
+        TypedWishSummary beyondEventWish = beyondEventBuilder.ToTypedWishSummary(barrier);
+
+        ApplyZZZQualityLabels(standardWish);
+        ApplyZZZQualityLabels(avatarWish);
+        ApplyZZZQualityLabels(weaponWish);
+        ApplyZZZQualityLabels(chronicledWish);
+        ApplyZZZQualityLabels(noviceWish);
+        ApplyZZZQualityLabels(beyondStandardWish);
+        ApplyZZZQualityLabels(beyondEventWish);
+
         return new GachaStatistics
         {
-            StandardWish = standardBuilder.ToTypedWishSummary(barrier),
-            AvatarWish = avatarBuilder.ToTypedWishSummary(barrier),
-            WeaponWish = weaponBuilder.ToTypedWishSummary(barrier),
-            ChronicledWish = chronicledBuilder.ToTypedWishSummary(barrier),
-            NoviceWish = noviceBuilder.ToTypedWishSummary(barrier),
-            BeyondStandardWish = beyondStandardBuilder.ToTypedWishSummary(barrier),
-            BeyondEventWish = beyondEventBuilder.ToTypedWishSummary(barrier),
-            HistoryWishes = ImmutableArray<HistoryWish>.Empty.AsAdvancedCollectionView(),
-            OrangeAvatars = [],
-            PurpleAvatars = [],
-            OrangeWeapons = [],
-            PurpleWeapons = [],
-            BlueWeapons = [],
+            StandardWish = standardWish,
+            AvatarWish = avatarWish,
+            WeaponWish = weaponWish,
+            ChronicledWish = chronicledWish,
+            NoviceWish = noviceWish,
+            BeyondStandardWish = beyondStandardWish,
+            BeyondEventWish = beyondEventWish,
+            HistoryWishes = BuildZZZHistoryWishes(items).AsAdvancedCollectionView(),
+            OrangeAvatars = SelectZZZStatisticsItems(agentItems, QualityType.QUALITY_ORANGE),
+            PurpleAvatars = SelectZZZStatisticsItems(agentItems, QualityType.QUALITY_PURPLE),
+            OrangeWeapons = SelectZZZStatisticsItems(otherItems, QualityType.QUALITY_ORANGE),
+            PurpleWeapons = SelectZZZStatisticsItems(otherItems, QualityType.QUALITY_PURPLE),
+            BlueWeapons = SelectZZZStatisticsItems(otherItems, QualityType.QUALITY_BLUE),
+        };
+    }
+
+    /// <summary>
+    /// 按物品聚合绝区零调频记录，供统计页头像墙使用。
+    /// 代理人（含常驻）进角色页，音擎与邦布进武器页。
+    /// </summary>
+    private static void TrackZZZStatisticsItem(GachaItem item, ZZZGachaItemInfo? info, Dictionary<uint, StatisticsItem> agents, Dictionary<uint, StatisticsItem> others)
+    {
+        QualityType quality = (QualityType)item.Quality;
+        if (quality is QualityType.QUALITY_NONE)
+        {
+            quality = info?.Quality ?? QualityType.QUALITY_NONE;
+        }
+
+        if (quality is not (QualityType.QUALITY_ORANGE or QualityType.QUALITY_PURPLE or QualityType.QUALITY_BLUE))
+        {
+            return;
+        }
+
+        bool isAgent = info?.IsAgent ?? item.ItemId < 10000U;
+        Dictionary<uint, StatisticsItem> target = isAgent ? agents : others;
+
+        if (target.TryGetValue(item.ItemId, out StatisticsItem? existing))
+        {
+            ++existing.Count;
+            return;
+        }
+
+        target[item.ItemId] = new StatisticsItem
+        {
+            Id = item.ItemId,
+            Name = item.Name ?? info?.Name ?? string.Empty,
+            Icon = info?.IconUri ?? StaticResourcesEndpoints.UIIconNone,
+            Quality = quality,
+            Count = 1,
+        };
+    }
+
+    private static ImmutableArray<StatisticsItem> SelectZZZStatisticsItems(Dictionary<uint, StatisticsItem> source, QualityType quality)
+    {
+        return
+        [
+            .. source.Values
+                .Where(item => item.Quality == quality)
+                .OrderByDescending(static item => item.Count)
+                .ThenBy(static item => item.Name, StringComparer.Ordinal),
+        ];
+    }
+
+    private static void ApplyZZZQualityLabels(TypedWishSummary summary)
+    {
+        summary.OrangeQualityText = SH.ViewControlStatisticsCardOrangeQualityZZZ;
+        summary.PurpleQualityText = SH.ViewControlStatisticsCardPurpleQualityZZZ;
+        summary.BlueQualityText = SH.ViewControlStatisticsCardBlueQualityZZZ;
+    }
+
+    /// <summary>
+    /// 用随包档期快照把调频记录按卡池分组，产出与「历史」页签相同结构的 HistoryWish。
+    /// 快照里每个条目就是一个独立卡池，同期开放的两个频段各自成组（与原神一致）。
+    /// 时间比较使用墙钟（<see cref="DateTimeOffset.DateTime"/>），
+    /// 避免 UIGF 导入记录（+00:00）与实抓记录（+08:00）的偏移差异把记录分到错误的卡池。
+    /// </summary>
+    private ImmutableArray<HistoryWish> BuildZZZHistoryWishes(ImmutableArray<GachaItem> items)
+    {
+        ImmutableArray<ZZZGachaBanner> banners = zzzGachaBannerService.Banners;
+        if (banners.IsDefaultOrEmpty || items.IsDefaultOrEmpty)
+        {
+            return [];
+        }
+
+        bool showEmpty = AppOptions.IsEmptyHistoryWishVisible.Value;
+        HashSet<Guid> matchedItemIds = [];
+        List<HistoryWish> histories = [];
+
+        foreach (IGrouping<int, GachaItem> group in items.GroupBy(static item => (int)item.GachaType))
+        {
+            // 历史页只保留限定卡池（独家 / 独家重映 / 音擎 / 音擎回响），
+            // 常驻与邦布不进入历史。
+            if (group.Key is 1 or 5)
+            {
+                continue;
+            }
+
+            ZZZGachaBanner[] typeBanners =
+            [
+                .. banners
+                    .Where(banner => banner.Type == group.Key)
+                    .OrderBy(static banner => banner.Start),
+            ];
+
+            foreach ((ZZZGachaBanner banner, List<GachaItem> records) in AssignZZZRecords(typeBanners, group))
+            {
+                foreach (GachaItem item in records)
+                {
+                    matchedItemIds.Add(item.InnerId);
+                }
+
+                if (records.Count == 0 && !showEmpty)
+                {
+                    continue;
+                }
+
+                histories.Add(BuildZZZHistoryWish(banner, records));
+            }
+
+            // 快照未覆盖的记录（例如新版本刚上线的卡池）单独成组，避免历史页丢数据。
+            List<GachaItem> unmatched = [.. group.Where(item => !matchedItemIds.Contains(item.InnerId))];
+            if (unmatched.Count > 0)
+            {
+                ZZZGachaBanner fallback = new()
+                {
+                    Type = group.Key,
+                    Start = unmatched.Min(static item => item.Time),
+                    End = unmatched.Max(static item => item.Time),
+                };
+
+                histories.Add(BuildZZZHistoryWish(fallback, unmatched));
+            }
+        }
+
+        return
+        [
+            .. histories
+                .OrderByDescending(static history => history.From)
+                .ThenBy(static history => history.Name, StringComparer.Ordinal),
+        ];
+    }
+
+    /// <summary>
+    /// 把同一频段的记录分配到具体卡池。同期开放的多个卡池共用调频次数，
+    /// 记录本身无法区分归属，因此以「抽到的 S 级 UP 物品」为锚点：
+    /// 把两次 S 之间的记录归给该 S 所属的卡池；判断不出时归给同期第一个卡池。
+    /// </summary>
+    private List<(ZZZGachaBanner Banner, List<GachaItem> Records)> AssignZZZRecords(ZZZGachaBanner[] banners, IEnumerable<GachaItem> items)
+    {
+        Dictionary<ZZZGachaBanner, List<GachaItem>> assigned = [];
+        foreach (ZZZGachaBanner banner in banners)
+        {
+            assigned[banner] = [];
+        }
+
+        List<(GachaItem Item, ZZZGachaBanner[] Candidates)> pending = [];
+
+        foreach (GachaItem item in items.OrderBy(static item => item.Id))
+        {
+            ZZZGachaBanner[] candidates = [.. banners.Where(banner => IsInBanner(item.Time, banner))];
+            if (candidates.Length == 0)
+            {
+                // 落在所有档期之外的记录没有归属卡池，交给调用方的兜底分组。
+                continue;
+            }
+
+            if (candidates.Length > 1)
+            {
+                QualityType quality = GetZZZItemQuality(item, zzzGachaItemMetadataService.GetById(item.ItemId));
+                if (quality is not QualityType.QUALITY_ORANGE)
+                {
+                    pending.Add((item, candidates));
+                    continue;
+                }
+
+                ZZZGachaBanner[] owners = [.. candidates.Where(banner => banner.Up.Contains(item.ItemId))];
+                ZZZGachaBanner target = owners.Length is 1 ? owners[0] : candidates[0];
+                foreach ((GachaItem pendingItem, ZZZGachaBanner[] pendingCandidates) in pending)
+                {
+                    assigned[pendingCandidates.Contains(target) ? target : pendingCandidates[0]].Add(pendingItem);
+                }
+
+                pending.Clear();
+                assigned[target].Add(item);
+                continue;
+            }
+
+            assigned[candidates[0]].Add(item);
+        }
+
+        foreach ((GachaItem item, ZZZGachaBanner[] candidates) in pending)
+        {
+            assigned[candidates[0]].Add(item);
+        }
+
+        return [.. assigned.Select(static pair => (pair.Key, pair.Value))];
+    }
+
+    private static bool IsInBanner(DateTimeOffset time, ZZZGachaBanner banner)
+    {
+        if (banner.End.Year is 9999)
+        {
+            return true;
+        }
+
+        DateTime wallClock = time.DateTime;
+        return wallClock >= banner.Start.DateTime && wallClock <= banner.End.DateTime;
+    }
+
+    private HistoryWish BuildZZZHistoryWish(ZZZGachaBanner banner, List<GachaItem> records)
+    {
+        Dictionary<uint, StatisticsItem> orangeUp = [];
+        Dictionary<uint, StatisticsItem> purpleUp = [];
+        List<StatisticsItem> orangeObtained = [];
+        List<StatisticsItem> purpleObtained = [];
+        List<StatisticsItem> blueObtained = [];
+
+        foreach (uint itemId in banner.Up)
+        {
+            if (zzzGachaItemMetadataService.GetById(itemId) is { } info)
+            {
+                orangeUp[itemId] = CreateZZZStatisticsItem(info, QualityType.QUALITY_ORANGE, count: 0);
+            }
+        }
+
+        foreach (uint itemId in banner.UpPurple)
+        {
+            if (zzzGachaItemMetadataService.GetById(itemId) is { } info)
+            {
+                purpleUp[itemId] = CreateZZZStatisticsItem(info, QualityType.QUALITY_PURPLE, count: 0);
+            }
+        }
+
+        int totalCount = 0;
+        int lastOrangePull = 0;
+        int lastPurplePull = 0;
+        int lastBluePull = 0;
+
+        foreach (GachaItem item in records.OrderBy(static item => item.Id))
+        {
+            ZZZGachaItemInfo? info = zzzGachaItemMetadataService.GetById(item.ItemId);
+            QualityType quality = GetZZZItemQuality(item, info);
+            ++totalCount;
+
+            switch (quality)
+            {
+                case QualityType.QUALITY_ORANGE:
+                    {
+                        StatisticsItem statisticsItem = CreateZZZStatisticsItem(item, info, quality, count: 1);
+                        statisticsItem.PullCount = totalCount - lastOrangePull;
+                        lastOrangePull = totalCount;
+                        orangeObtained.Add(statisticsItem);
+                        if (orangeUp.TryGetValue(item.ItemId, out StatisticsItem? up))
+                        {
+                            ++up.Count;
+                        }
+
+                        break;
+                    }
+
+                case QualityType.QUALITY_PURPLE:
+                    {
+                        StatisticsItem statisticsItem = CreateZZZStatisticsItem(item, info, quality, count: 1);
+                        statisticsItem.PullCount = totalCount - lastPurplePull;
+                        lastPurplePull = totalCount;
+                        purpleObtained.Add(statisticsItem);
+                        if (purpleUp.TryGetValue(item.ItemId, out StatisticsItem? up))
+                        {
+                            ++up.Count;
+                        }
+
+                        break;
+                    }
+
+                case QualityType.QUALITY_BLUE:
+                    {
+                        StatisticsItem statisticsItem = CreateZZZStatisticsItem(item, info, quality, count: 1);
+                        statisticsItem.PullCount = totalCount - lastBluePull;
+                        lastBluePull = totalCount;
+                        blueObtained.Add(statisticsItem);
+                        break;
+                    }
+            }
+        }
+
+        DateTimeOffset from = banner.Start;
+        DateTimeOffset to = banner.End;
+        if (banner.End.Year is 9999)
+        {
+            from = records.Min(static item => item.Time);
+            to = records.Max(static item => item.Time);
+        }
+
+        Uri bannerImage = orangeUp.Values.FirstOrDefault()?.Icon
+            ?? purpleUp.Values.FirstOrDefault()?.Icon
+            ?? StaticResourcesEndpoints.UIIconNone;
+
+        bool hasBannerImage = !string.IsNullOrEmpty(banner.Image);
+
+        return new HistoryWish
+        {
+            Name = string.IsNullOrEmpty(banner.Name) ? GetZZZChannelName(banner.Type) : banner.Name,
+            Version = banner.Version,
+            TotalCount = totalCount,
+            From = from,
+            To = to,
+            BannerImage = hasBannerImage ? banner.Image.ToUri() : bannerImage,
+            HasBannerImage = hasBannerImage,
+            OrangeUpList = [.. orangeUp.Values.OrderByDescending(static item => item.Count).ThenBy(static item => item.Name, StringComparer.Ordinal)],
+            PurpleUpList = [.. purpleUp.Values.OrderByDescending(static item => item.Count).ThenBy(static item => item.Name, StringComparer.Ordinal)],
+            SummaryList = [.. orangeObtained],
+            PurpleList = [.. purpleObtained],
+            BlueList = [.. blueObtained],
+        };
+    }
+
+    private static QualityType GetZZZItemQuality(GachaItem item, ZZZGachaItemInfo? info)
+    {
+        QualityType quality = (QualityType)item.Quality;
+        return quality is QualityType.QUALITY_NONE ? info?.Quality ?? QualityType.QUALITY_NONE : quality;
+    }
+
+    private static StatisticsItem CreateZZZStatisticsItem(GachaItem item, ZZZGachaItemInfo? info, QualityType quality, int count)
+    {
+        return new StatisticsItem
+        {
+            Id = item.ItemId,
+            Name = item.Name ?? info?.Name ?? string.Empty,
+            Icon = info?.IconUri ?? StaticResourcesEndpoints.UIIconNone,
+            Quality = quality,
+            Count = count,
+        };
+    }
+
+    private static StatisticsItem CreateZZZStatisticsItem(ZZZGachaItemInfo info, QualityType quality, int count)
+    {
+        return new StatisticsItem
+        {
+            Id = info.Id,
+            Name = info.Name,
+            Icon = info.IconUri ?? StaticResourcesEndpoints.UIIconNone,
+            Quality = quality,
+            Count = count,
+        };
+    }
+
+    private static string GetZZZChannelName(int gachaType)
+    {
+        return gachaType switch
+        {
+            1 => SH.WebGachaConfigTypeZZZStandardChannel,
+            2 => SH.WebGachaConfigTypeZZZExclusiveChannel,
+            3 => SH.WebGachaConfigTypeZZZWEngineChannel,
+            5 => SH.WebGachaConfigTypeZZZBangbooChannel,
+            102 => SH.WebGachaConfigTypeZZZExclusiveRescreening,
+            103 => SH.WebGachaConfigTypeZZZWEngineReverberation,
+            _ => gachaType.ToString(CultureInfo.InvariantCulture),
         };
     }
 }

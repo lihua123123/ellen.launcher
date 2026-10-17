@@ -75,7 +75,33 @@ Copyright (c) 2022 DGP Studio
 （许可全文同上第 1 节。）
 
 ================================================================
-5. 其他
+5. 绝区零调频物品元数据
+================================================================
+
+来源：Starward 公共元数据镜像（Starward 项目 MIT License）
+      https://github.com/Scighost/Starward
+      https://starward-static.scighost.com/metadata/v1/zzz/ZZZGachaInfo.nap_cn.zh-cn.json
+
+本应用随包分发以下文件（仅 id / 名称 / 图标 URL / 稀有度 / 类型，不含图片本体，
+图标由运行期从米游社 CDN 下载并缓存）：
+  - Resource/Metadata/ZZZ/GachaItem.json
+
+================================================================
+6. 绝区零调频档期
+================================================================
+
+来源：HoYo.Gacha 公共元数据 v2
+      https://github.com/lgou2w/HoYo.Gacha
+      https://hoyo-gacha-v1.lgou2w.com/GachaMetadata/v2/
+
+本应用随包分发以下文件（仅卡池类型 / 起止时间 / 卡池名 / S 级 UP 物品 id / 版本号 / 卡池图 URL）：
+  - Resource/Metadata/ZZZ/GachaBanner.json
+
+卡池图 URL 来自米游社官方「X版本限时频段」与「XXX调频说明」公告，图片本体不随包分发，
+由运行期从米游社 CDN 下载并缓存。
+
+================================================================
+7. 其他
 ================================================================
 
 本应用为第三方非官方工具，与米哈游（miHoYo / HoYoverse）无隶属关系。

@@ -346,7 +346,7 @@
                                     <TextBlock
                                         Foreground="{StaticResource OrangeColorBrush}"
                                         Style="{StaticResource CaptionTextBlockStyle}"
-                                        Text="{shuxm:ResourceString Name=ViewControlStatisticsCardOrangeText}"/>
+                                        Text="{Binding OrangeQualityText}"/>
                                     <Viewbox StretchDirection="DownOnly">
                                         <TextBlock Foreground="{StaticResource OrangeColorBrush}" Text="{Binding FormattedTotalOrange}"/>
                                     </Viewbox>
@@ -360,7 +360,7 @@
                                     <TextBlock
                                         Foreground="{StaticResource PurpleColorBrush}"
                                         Style="{StaticResource CaptionTextBlockStyle}"
-                                        Text="{shuxm:ResourceString Name=ViewControlStatisticsCardPurpleText}"/>
+                                        Text="{Binding PurpleQualityText}"/>
                                     <Viewbox StretchDirection="DownOnly">
                                         <TextBlock Foreground="{StaticResource PurpleColorBrush}" Text="{Binding FormattedTotalPurple}"/>
                                     </Viewbox>
@@ -374,7 +374,7 @@
                                     <TextBlock
                                         Foreground="{StaticResource BlueColorBrush}"
                                         Style="{StaticResource CaptionTextBlockStyle}"
-                                        Text="{shuxm:ResourceString Name=ViewControlStatisticsCardBlueText}"/>
+                                        Text="{Binding BlueQualityText}"/>
                                     <Viewbox StretchDirection="DownOnly">
                                         <TextBlock Foreground="{StaticResource BlueColorBrush}" Text="{Binding FormattedTotalBlue}"/>
                                     </Viewbox>

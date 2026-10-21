@@ -23,6 +23,7 @@ public static class ConstellationViewBuilderExtension
         where TBuilder : IConstellationViewBuilder
     {
         builder.View.IsActivated = isActivated;
+        builder.View.ShowLock = !isActivated;
         return builder;
     }
 

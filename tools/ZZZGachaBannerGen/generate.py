@@ -185,6 +185,11 @@ def collect_announcement_entries() -> list[dict]:
                 continue
 
             subject = post.get("subject") or ""
+            # 「X版本更新说明」等公告也会带「S级代理人[菲欧妮]」字样，
+            # 其封面图不是卡池图；只接受真正的频段/调频公告。
+            if not any(keyword in subject for keyword in ("限时频段", "调频说明", "调频活动")):
+                continue
+
             version = ""
             limited = VERSION_LIMITED_RE.search(subject)
             if limited:

@@ -397,16 +397,26 @@
                                                     <Border
                                                         Margin="16"
                                                         HorizontalAlignment="Left"
-                                                        cw:Effects.Shadow="{ThemeResource CompatCardShadow}"
-                                                        Visibility="{Binding Statistics.HistoryWishes.CurrentItem.HasBannerImage, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                        cw:Effects.Shadow="{ThemeResource CompatCardShadow}">
                                                         <Grid HorizontalAlignment="Center" Style="{StaticResource AcrylicGridCardStyle}">
                                                             <cwcont:ConstrainedBox AspectRatio="1080:533">
-                                                                <shuxci:CachedImage
-                                                                    HorizontalAlignment="Center"
-                                                                    VerticalAlignment="Center"
-                                                                    CornerRadius="{ThemeResource ControlCornerRadius}"
-                                                                    Source="{Binding Statistics.HistoryWishes.CurrentItem.BannerImage}"
-                                                                    Stretch="UniformToFill"/>
+                                                                <Grid>
+                                                                    <shuxci:CachedImage
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center"
+                                                                        CornerRadius="{ThemeResource ControlCornerRadius}"
+                                                                        Source="{Binding Statistics.HistoryWishes.CurrentItem.BannerImage}"
+                                                                        Stretch="UniformToFill"
+                                                                        Visibility="{Binding Statistics.HistoryWishes.CurrentItem.HasBannerImage, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                                    <shuxci:CachedImage
+                                                                        Width="160"
+                                                                        Height="160"
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center"
+                                                                        Source="{Binding Statistics.HistoryWishes.CurrentItem.BannerImage}"
+                                                                        Stretch="Uniform"
+                                                                        Visibility="{Binding Statistics.HistoryWishes.CurrentItem.HasBannerImage, Converter={StaticResource BoolNegationToVisibilityConverter}}"/>
+                                                                </Grid>
                                                             </cwcont:ConstrainedBox>
                                                             <Border
                                                                 Grid.ColumnSpan="2"

@@ -51,10 +51,10 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
     private readonly IFileSystemPickerInteraction fileSystemPickerInteraction;
     private readonly IGachaLogRepository gachaLogRepository;
     private readonly IUIGFService uigfService;
-    private readonly IZZZGachaItemMetadataService zzzGachaItemMetadataService;
-    private readonly IZZZGachaBannerService zzzGachaBannerService;
+    private readonly IZZZGachaMetadataService zzzGachaMetadataService;
 
     private bool suppressCurrentItemChangedHandling;
+    private volatile bool isRefreshingZZZMetadata;
     private GachaLogServiceMetadataContext? metadataContext;
     private AppOptions? appOptions;
 
@@ -161,6 +161,7 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
             }
 
             metadataContext = await metadataService.GetContextAsync<GachaLogServiceMetadataContext>(token).ConfigureAwait(false);
+            zzzGachaMetadataService.Updated += OnZZZGachaMetadataUpdated;
             using (await EnterCriticalSectionAsync().ConfigureAwait(false))
             {
                 IAdvancedDbCollectionView<GachaArchive> archives = await gachaLogService.GetArchiveCollectionAsync(SelectedGame.Value).ConfigureAwait(false);
@@ -189,6 +190,8 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
 
     protected override void UninitializeOverride()
     {
+        zzzGachaMetadataService.Updated -= OnZZZGachaMetadataUpdated;
+
         if (appOptions is not null)
         {
             appOptions.IsEmptyOverviewVisible.PropertyChanged -= OnIsEmptyOverviewVisibleChanged;
@@ -290,6 +293,18 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
     partial void OnIsBeyondModeChanged(bool value)
     {
         UpdateCardVisibility();
+        UpdateStatisticsAsync(Archives?.CurrentItem).SafeForget();
+    }
+
+    private void OnZZZGachaMetadataUpdated(object? sender, EventArgs e)
+    {
+        if (!IsZZZMode || isRefreshingZZZMetadata)
+        {
+            return;
+        }
+
+        // 运行期元数据可能在页面停留期间刷新完成（含后台补卡池图），
+        // 重建一次统计，避免必须切游戏/刷新记录才能看到新图标与卡池图。
         UpdateStatisticsAsync(Archives?.CurrentItem).SafeForget();
     }
 
@@ -597,9 +612,18 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
 
         if (archive.Game is GachaGameType.ZZZ)
         {
-            // 绝区零：复用原神的 TypedWishSummaryBuilder 管线产出 GachaStatistics，
-            // 这样总览页的 StatisticsCard 直接复用，无需另写 UI。
-            // 映射：常驻→StandardWish, 独家+独家重映→AvatarWish, 音擎+音擎回响→WeaponWish, 邦布→ChronicledWish
+            // 绝区零：先确保运行期元数据已加载（过期时会先拉取一次），
+            // 再用与原神相同的 StatisticsCard 管线产出总览。
+            isRefreshingZZZMetadata = true;
+            try
+            {
+                await zzzGachaMetadataService.EnsureInitializedAsync(CancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                isRefreshingZZZMetadata = false;
+            }
+
             GachaStatistics zzzStatistics = await BuildZZZStatisticsAsync(archive).ConfigureAwait(false);
             await taskContext.SwitchToMainThreadAsync();
             Statistics = zzzStatistics;
@@ -678,7 +702,7 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
 
         foreach (GachaItem item in items.OrderBy(static i => i.Id))
         {
-            ZZZGachaItemInfo? info = zzzGachaItemMetadataService.GetById(item.ItemId);
+            ZZZGachaItemInfo? info = zzzGachaMetadataService.GetById(item.ItemId);
             ZZZSummaryItemConvertible source = new(item, info);
             bool isUp = ZZZGachaUpHelper.IsUp(item, standardItemIds);
 
@@ -790,7 +814,7 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
     /// </summary>
     private ImmutableArray<HistoryWish> BuildZZZHistoryWishes(ImmutableArray<GachaItem> items)
     {
-        ImmutableArray<ZZZGachaBanner> banners = zzzGachaBannerService.Banners;
+        ImmutableArray<ZZZGachaBanner> banners = zzzGachaMetadataService.Banners;
         if (banners.IsDefaultOrEmpty || items.IsDefaultOrEmpty)
         {
             return [];
@@ -880,7 +904,7 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
 
             if (candidates.Length > 1)
             {
-                QualityType quality = GetZZZItemQuality(item, zzzGachaItemMetadataService.GetById(item.ItemId));
+                QualityType quality = GetZZZItemQuality(item, zzzGachaMetadataService.GetById(item.ItemId));
                 if (quality is not QualityType.QUALITY_ORANGE)
                 {
                     pending.Add((item, candidates));
@@ -931,7 +955,7 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
 
         foreach (uint itemId in banner.Up)
         {
-            if (zzzGachaItemMetadataService.GetById(itemId) is { } info)
+            if (zzzGachaMetadataService.GetById(itemId) is { } info)
             {
                 orangeUp[itemId] = CreateZZZStatisticsItem(info, QualityType.QUALITY_ORANGE, count: 0);
             }
@@ -939,7 +963,7 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
 
         foreach (uint itemId in banner.UpPurple)
         {
-            if (zzzGachaItemMetadataService.GetById(itemId) is { } info)
+            if (zzzGachaMetadataService.GetById(itemId) is { } info)
             {
                 purpleUp[itemId] = CreateZZZStatisticsItem(info, QualityType.QUALITY_PURPLE, count: 0);
             }
@@ -952,7 +976,7 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
 
         foreach (GachaItem item in records.OrderBy(static item => item.Id))
         {
-            ZZZGachaItemInfo? info = zzzGachaItemMetadataService.GetById(item.ItemId);
+            ZZZGachaItemInfo? info = zzzGachaMetadataService.GetById(item.ItemId);
             QualityType quality = GetZZZItemQuality(item, info);
             ++totalCount;
 

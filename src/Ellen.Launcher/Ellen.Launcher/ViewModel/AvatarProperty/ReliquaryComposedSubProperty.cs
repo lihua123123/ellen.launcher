@@ -8,8 +8,8 @@ namespace Ellen.Launcher.ViewModel.AvatarProperty;
 
 public class ReliquaryComposedSubProperty : ReliquarySubProperty
 {
-    public ReliquaryComposedSubProperty(FightProperty type, string value, uint enhancedCount, double enhancementCount)
-        : base(type, value)
+    public ReliquaryComposedSubProperty(FightProperty type, string value, uint enhancedCount, double enhancementCount, string? name = null)
+        : base(type, value, name)
     {
         Type = type;
         EnhancedCount = enhancedCount;
@@ -30,7 +30,12 @@ public class ReliquaryComposedSubProperty : ReliquarySubProperty
     /// </summary>
     public double EnhancementCount { get; set; }
 
-    public string EnhancementCountText => EnhancementCount > 0 ? EnhancementCount.ToString("0.0", CultureInfo.CurrentCulture) : string.Empty;
+    /// <summary>
+    /// 词条数显示格式。原神保留一位小数，绝区零使用两位小数。
+    /// </summary>
+    public string EnhancementCountFormat { get; set; } = "0.0";
+
+    public string EnhancementCountText => EnhancementCount > 0 ? EnhancementCount.ToString(EnhancementCountFormat, CultureInfo.CurrentCulture) : string.Empty;
 
     public FightProperty Type { get; }
 }

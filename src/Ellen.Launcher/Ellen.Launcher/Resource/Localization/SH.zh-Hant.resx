@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -2071,11 +2071,35 @@
   <data name="ViewPageAvatarPropertyDefaultDescription" xml:space="preserve">
     <value>尚未獲取任何角色資訊</value>
   </data>
+  <data name="ViewPageAvatarPropertyZZZAgentHeader" xml:space="preserve">
+    <value>代理人</value>
+  </data>
+  <data name="ViewPageAvatarPropertyZZZWEngineHeader" xml:space="preserve">
+    <value>音擎</value>
+  </data>
+  <data name="ViewPageAvatarPropertyZZZEmptyDescription" xml:space="preserve">
+    <value>暫無絕區零角色資料。請先登入米遊社，並在米遊社公開絕區零角色詳情。</value>
+  </data>
+  <data name="ViewPageAvatarPropertyZZZBasicHint" xml:space="preserve">
+    <value>絕區零角色資料來自米遊社戰績，等級、影畫、音擎、驅動盤與技能均按米遊社公開資料展示。</value>
+  </data>
+  <data name="ViewPageAvatarPropertyZZZNeedLogin" xml:space="preserve">
+    <value>請先登入米遊社帳號</value>
+  </data>
+  <data name="ViewPageAvatarPropertyZZZNoRole" xml:space="preserve">
+    <value>未找到絕區零角色，請先在米遊社綁定絕區零並公開角色詳情</value>
+  </data>
+  <data name="ViewPageAvatarPropertyZZZRollSummary" xml:space="preserve">
+    <value>詞條數統計</value>
+  </data>
       <data name="ViewPageAvatarPropertyExportToTextLabel" xml:space="preserve">
     <value>匯出文字到剪貼簿</value>
   </data>
   <data name="ViewPageAvatarPropertyHeader" xml:space="preserve">
     <value>角色屬性</value>
+  </data>
+  <data name="ViewPageAvatarPropertyHeaderZZZ" xml:space="preserve">
+    <value>代理人屬性</value>
   </data>
   <data name="ViewPageAvatarPropertyRefreshAction" xml:space="preserve">
     <value>同步</value>

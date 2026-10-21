@@ -3,7 +3,7 @@
   "index": "https://hoyo-gacha-v1.lgou2w.com/GachaMetadata/v2/index.json",
   "latest": "11ef6b4b89e3979d13ec6f2eea4859108eea1427",
   "banner_image_source": "https://bbs-api.miyoushe.com/post/wapi/searchPosts",
-  "banner_image_count": 152,
+  "banner_image_count": 155,
   "banners": [
     {
       "type": 2,
@@ -572,7 +572,7 @@
       "type": 2,
       "start": "2025-04-23T06:00:00+08:00",
       "end": "2025-05-14T11:59:59+08:00",
-      "name": "将眼泪与过往一同埋葬",
+      "name": "飞鸟坠入良夜",
       "up": [
         1331
       ],
@@ -581,7 +581,7 @@
         1271
       ],
       "version": "1.7",
-      "image": "https://upload-bbs.miyoushe.com/upload/2025/04/22/152039148/f79075ba89b451485b5ed5500cc105dc_3295049327814124941.png"
+      "image": "https://upload-bbs.miyoushe.com/upload/2025/04/21/152039148/f652715b048e05dcbefc9fe1498f002a_5986334155610057738.png"
     },
     {
       "type": 3,
@@ -692,7 +692,7 @@
       "type": 2,
       "start": "2025-06-06T06:00:00+08:00",
       "end": "2025-06-25T11:59:59+08:00",
-      "name": "云霞同归处",
+      "name": "独步沧溟",
       "up": [
         1371
       ],
@@ -701,7 +701,7 @@
         1351
       ],
       "version": "2.0",
-      "image": "https://upload-bbs.miyoushe.com/upload/2025/06/05/152039148/f917c6d05c0630bbadb1ef8700679738_1816213808203713162.png"
+      "image": "https://upload-bbs.miyoushe.com/upload/2025/05/31/152039148/53a32c8d80aa54f1fc2e2a0b6f820644_7584931480601361971.png"
     },
     {
       "type": 3,
@@ -932,7 +932,7 @@
       "type": 2,
       "start": "2025-09-04T06:00:00+08:00",
       "end": "2025-09-24T11:59:59+08:00",
-      "name": "不要温和地走入那良夜",
+      "name": "泪铸生花",
       "up": [
         1461
       ],
@@ -941,7 +941,7 @@
         1011
       ],
       "version": "2.2",
-      "image": "https://upload-bbs.miyoushe.com/upload/2025/09/03/152039148/74a730642430fc4ca5392de4ea26a02e_4033770819574966666.png"
+      "image": "https://upload-bbs.miyoushe.com/upload/2025/09/01/152039148/442bbbce04ca2bc06072a8f79f999dc4_1748020238254485290.png"
     },
     {
       "type": 3,
@@ -1052,7 +1052,7 @@
       "type": 2,
       "start": "2025-10-15T06:00:00+08:00",
       "end": "2025-11-05T11:59:59+08:00",
-      "name": "可曾记得梦",
+      "name": "绮夜游灯",
       "up": [
         1451
       ],
@@ -1061,7 +1061,7 @@
         1281
       ],
       "version": "2.3",
-      "image": "https://upload-bbs.miyoushe.com/upload/2025/10/14/152039148/75fab051d58504766948a8a5df3fd66f_4970881782940312237.png"
+      "image": "https://upload-bbs.miyoushe.com/upload/2025/10/13/152039148/39d2b64b6bd962d07c91a247f846c172_7252066415815712132.png"
     },
     {
       "type": 3,
@@ -1172,7 +1172,7 @@
       "type": 2,
       "start": "2025-11-26T06:00:00+08:00",
       "end": "2025-12-17T11:59:59+08:00",
-      "name": "将临未抵的深渊",
+      "name": "唤寂昔声",
       "up": [
         1481
       ],
@@ -1181,7 +1181,7 @@
         1081
       ],
       "version": "2.4",
-      "image": "https://upload-bbs.miyoushe.com/upload/2025/11/25/152039148/3bd03cb8b174081ed9404b21edc9c482_9157547602870500271.png"
+      "image": "https://upload-bbs.miyoushe.com/upload/2025/11/24/152039148/c29d7ccdc7138fb4d410c7f47793c5ce_9188845105459927780.png"
     },
     {
       "type": 3,
@@ -1294,7 +1294,7 @@
       "type": 2,
       "start": "2025-12-30T06:00:00+08:00",
       "end": "2026-02-05T14:59:59+08:00",
-      "name": "微光引灯时",
+      "name": "光落于指尖",
       "up": [
         1431
       ],
@@ -1305,7 +1305,7 @@
         1121
       ],
       "version": "2.5",
-      "image": "https://upload-bbs.miyoushe.com/upload/2025/12/30/152039148/ae6a911dc860c5d26ae6ac228ce10759_4903016439003367845.png"
+      "image": "https://upload-bbs.miyoushe.com/upload/2025/12/27/152039148/fad1bb77e30911daa2b27d5798e4be70_5526067915563109578.jpg"
     },
     {
       "type": 3,
@@ -1432,7 +1432,7 @@
       "type": 2,
       "start": "2026-02-06T06:00:00+08:00",
       "end": "2026-03-04T11:59:59+08:00",
-      "name": "旧梦的安可曲",
+      "name": "四三拍谬想",
       "up": [
         1491
       ],
@@ -1441,7 +1441,7 @@
         1081
       ],
       "version": "2.6",
-      "image": "https://upload-bbs.miyoushe.com/upload/2026/02/05/152039148/def049a15728db511f8ebe6da171c90c_6115882788206679559.jpg"
+      "image": "https://upload-bbs.miyoushe.com/upload/2026/02/04/152039148/7c19f5e6fa29a6ece857518938a13988_6707305404871523925.png"
     },
     {
       "type": 3,
@@ -1552,7 +1552,7 @@
       "type": 2,
       "start": "2026-03-24T06:00:00+08:00",
       "end": "2026-04-15T11:59:59+08:00",
-      "name": "英雄不死于往昔",
+      "name": "视线定格公理",
       "up": [
         1511
       ],
@@ -1561,7 +1561,7 @@
         1281
       ],
       "version": "2.7",
-      "image": "https://upload-bbs.miyoushe.com/upload/2026/03/23/152039148/140f6387e6fa4b987d9b158a70c1fcc0_347540746140313858.png"
+      "image": "https://upload-bbs.miyoushe.com/upload/2026/03/20/152039148/bb4fda7d52dc8e52854de787c4a1dffb_5501871266916249108.png"
     },
     {
       "type": 3,
@@ -1672,7 +1672,7 @@
       "type": 2,
       "start": "2026-05-06T06:00:00+08:00",
       "end": "2026-05-27T11:59:59+08:00",
-      "name": "新·艾利都日落时",
+      "name": "冷雨将尽之夜",
       "up": [
         1541
       ],
@@ -1681,7 +1681,7 @@
         1151
       ],
       "version": "2.8",
-      "image": "https://upload-bbs.miyoushe.com/upload/2026/05/02/152039148/c9a9ef7282a149865e7ad74975a4c8f3_6641570488875817397.jpg"
+      "image": "https://upload-bbs.miyoushe.com/upload/2026/05/02/152039148/cd792eea1a1c1a4c9d3d86d7ed667263_6499788128677208182.jpg"
     },
     {
       "type": 3,
@@ -1792,7 +1792,7 @@
       "type": 2,
       "start": "2026-06-17T06:00:00+08:00",
       "end": "2026-07-08T11:59:59+08:00",
-      "name": "某个梦游者的自白",
+      "name": "凛风吟仪",
       "up": [
         1561
       ],
@@ -1801,7 +1801,7 @@
         1281
       ],
       "version": "3.0",
-      "image": "https://upload-bbs.miyoushe.com/upload/2026/06/16/152039148/b929bf9ea2fbf49d095a0207754a8e27_6460495048714658936.png"
+      "image": "https://upload-bbs.miyoushe.com/upload/2026/06/15/152039148/76fae059628fb774ca236666d11eec1a_2211943054203050143.png"
     },
     {
       "type": 3,
@@ -1837,7 +1837,7 @@
       "type": 2,
       "start": "2026-07-08T12:00:00+08:00",
       "end": "2026-07-28T14:59:59+08:00",
-      "name": "旧梦的安可曲",
+      "name": "四三拍谬想",
       "up": [
         1491
       ],
@@ -1909,13 +1909,13 @@
       "type": 2,
       "start": "2026-07-29T06:00:00+08:00",
       "end": "2026-08-19T11:59:59+08:00",
-      "name": "漫长的告别",
+      "name": "复乐园",
       "up": [
         1581
       ],
       "up_purple": [],
       "version": "3.1",
-      "image": "https://upload-bbs.miyoushe.com/upload/2026/07/28/152039148/7c00678993d3ec97e94d5ac49e1bd46d_6036686050357358334.png"
+      "image": "https://upload-bbs.miyoushe.com/upload/2026/07/27/152039148/997a109d4c39db628648ccc151ab84c5_7345768529877190747.png"
     },
     {
       "type": 3,
@@ -1945,13 +1945,13 @@
       "type": 2,
       "start": "2026-08-19T12:00:00+08:00",
       "end": "2026-09-08T14:59:59+08:00",
-      "name": "漫长的告别",
+      "name": "复乐园",
       "up": [
         1581
       ],
       "up_purple": [],
       "version": "3.1",
-      "image": "https://upload-bbs.miyoushe.com/upload/2026/07/28/152039148/7c00678993d3ec97e94d5ac49e1bd46d_6036686050357358334.png"
+      "image": "https://upload-bbs.miyoushe.com/upload/2026/07/27/152039148/997a109d4c39db628648ccc151ab84c5_7345768529877190747.png"
     },
     {
       "type": 2,
@@ -2017,13 +2017,13 @@
       "type": 102,
       "start": "2026-08-19T12:00:00+08:00",
       "end": "2026-09-08T14:59:59+08:00",
-      "name": "将临未抵的深渊",
+      "name": "唤寂昔声",
       "up": [
         1481
       ],
       "up_purple": [],
       "version": "3.1",
-      "image": "https://upload-bbs.miyoushe.com/upload/2025/11/25/152039148/3bd03cb8b174081ed9404b21edc9c482_9157547602870500271.png"
+      "image": "https://upload-bbs.miyoushe.com/upload/2025/11/24/152039148/c29d7ccdc7138fb4d410c7f47793c5ce_9188845105459927780.png"
     },
     {
       "type": 103,
@@ -2077,13 +2077,13 @@
       "type": 2,
       "start": "2026-09-09T06:00:00+08:00",
       "end": "2026-09-30T11:59:59+08:00",
-      "name": "她与她的隐秘往事",
+      "name": "红月初升",
       "up": [
         1611
       ],
       "up_purple": [],
       "version": "3.2",
-      "image": "https://upload-bbs.miyoushe.com/upload/2026/09/08/152039148/e84bdac127c93a4c96a95ccdea373eb8_1702889424466440037.png"
+      "image": "https://upload-bbs.miyoushe.com/upload/2026/09/07/152039148/316fd6f512d487620568a421b6fcb1ab_5781494924221207589.png"
     },
     {
       "type": 3,
@@ -2161,25 +2161,25 @@
       "type": 2,
       "start": "2026-10-21T06:00:00+08:00",
       "end": "2026-11-11T11:59:59+08:00",
-      "name": "某个梦游者的自白",
+      "name": "凛风吟仪",
       "up": [
         1561
       ],
       "up_purple": [],
       "version": "3.3",
-      "image": "https://upload-bbs.miyoushe.com/upload/2026/06/16/152039148/b929bf9ea2fbf49d095a0207754a8e27_6460495048714658936.png"
+      "image": "https://upload-bbs.miyoushe.com/upload/2026/10/19/152039148/d46a4ba243a1df19541f7df4c6c62ce0_7590794359161891647.png"
     },
     {
       "type": 2,
       "start": "2026-10-21T06:00:00+08:00",
       "end": "2026-11-11T11:59:59+08:00",
-      "name": "",
+      "name": "倾掷浮生",
       "up": [
         1641
       ],
       "up_purple": [],
       "version": "3.3",
-      "image": ""
+      "image": "https://upload-bbs.miyoushe.com/upload/2026/10/19/152039148/72f1bcd55ba629e72dcc2602592eda6e_183367485279322598.png"
     },
     {
       "type": 3,
@@ -2191,19 +2191,19 @@
       ],
       "up_purple": [],
       "version": "3.3",
-      "image": "https://upload-bbs.miyoushe.com/upload/2026/06/15/152039148/3a13dc1808e91fb2de7bb68556519ca5_6380770189767111855.png"
+      "image": "https://upload-bbs.miyoushe.com/upload/2026/10/19/152039148/5b19f182aeee8d8b59a247a15bf4d27e_3901870242090618769.png"
     },
     {
       "type": 3,
       "start": "2026-10-21T06:00:00+08:00",
       "end": "2026-11-11T11:59:59+08:00",
-      "name": "",
+      "name": "涅槃初翎",
       "up": [
         14164
       ],
       "up_purple": [],
       "version": "3.3",
-      "image": ""
+      "image": "https://upload-bbs.miyoushe.com/upload/2026/10/19/152039148/833932410f07666ccb41b1bc37e2df58_3959273026267840077.png"
     },
     {
       "type": 2,
@@ -2245,13 +2245,13 @@
       "type": 3,
       "start": "2026-11-11T12:00:00+08:00",
       "end": "2026-12-01T14:59:59+08:00",
-      "name": "",
+      "name": "涅槃初翎",
       "up": [
         14164
       ],
       "up_purple": [],
       "version": "3.3",
-      "image": ""
+      "image": "https://upload-bbs.miyoushe.com/upload/2026/10/19/152039148/833932410f07666ccb41b1bc37e2df58_3959273026267840077.png"
     }
   ]
 }

@@ -20,8 +20,7 @@ public sealed partial class WishCountdownViewModel : Abstraction.ViewModelSlim
 {
     private readonly IGachaLogWishCountdownService gachaLogWishCountdownService;
     private readonly IMetadataService metadataService;
-    private readonly IZZZGachaItemMetadataService zzzGachaItemMetadataService;
-    private readonly IZZZGachaBannerService zzzGachaBannerService;
+    private readonly IZZZGachaMetadataService zzzGachaMetadataService;
     private readonly ITaskContext taskContext;
 
     [GeneratedConstructor(CallBaseConstructor = true)]
@@ -47,6 +46,7 @@ public sealed partial class WishCountdownViewModel : Abstraction.ViewModelSlim
         if (archive.Game is GachaGameType.ZZZ)
         {
             await taskContext.SwitchToBackgroundAsync();
+            await zzzGachaMetadataService.EnsureInitializedAsync(CancellationToken.None).ConfigureAwait(false);
             countdowns = BuildZZZCountdownBundle();
         }
         else
@@ -75,7 +75,7 @@ public sealed partial class WishCountdownViewModel : Abstraction.ViewModelSlim
         Dictionary<uint, Countdown> orangeWeapons = [];
         DateTimeOffset now = DateTimeOffset.Now;
 
-        foreach (ZZZGachaBanner banner in zzzGachaBannerService.Banners)
+        foreach (ZZZGachaBanner banner in zzzGachaMetadataService.Banners)
         {
             if (banner.Start > now)
             {
@@ -92,7 +92,7 @@ public sealed partial class WishCountdownViewModel : Abstraction.ViewModelSlim
 
             foreach (uint itemId in banner.Up)
             {
-                ZZZGachaItemInfo? info = zzzGachaItemMetadataService.GetById(itemId);
+                ZZZGachaItemInfo? info = zzzGachaMetadataService.GetById(itemId);
                 if (info is null || info.IsAgent != isAgent)
                 {
                     continue;

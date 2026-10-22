@@ -1,4 +1,4 @@
-<Button
+<UserControl
     x:Class="Ellen.Launcher.UI.Xaml.View.Card.SignInCard"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -10,16 +10,9 @@
     xmlns:shuxm="using:Ellen.Launcher.UI.Xaml.Markup"
     xmlns:shvs="using:Ellen.Launcher.ViewModel.SignIn"
     Height="{ThemeResource HomeAdaptiveCardHeight}"
-    Padding="0"
     HorizontalAlignment="Stretch"
     VerticalAlignment="Stretch"
-    HorizontalContentAlignment="Stretch"
     d:DataContext="{d:DesignInstance shvs:SignInViewModelSlim}"
-    Background="Transparent"
-    BorderBrush="{x:Null}"
-    BorderThickness="0"
-    Command="{Binding RefreshCommand}"
-    Style="{ThemeResource DefaultButtonStyle}"
     mc:Ignorable="d">
 
     <mxi:Interaction.Behaviors>
@@ -40,10 +33,12 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBlock
                     Grid.Column="0"
+                    VerticalAlignment="Center"
                     Style="{StaticResource BaseTextBlockStyle}"
                     Text="{shuxm:ResourceString Name=ViewCardSignInTitle}"/>
 
@@ -53,6 +48,15 @@
                     Opacity="0.7"
                     Style="{StaticResource CaptionTextBlockStyle}"
                     Text="{Binding Summary}"/>
+
+                <Button
+                    Grid.Column="2"
+                    MinHeight="26"
+                    Padding="8,2"
+                    Command="{Binding SignAllCommand}"
+                    Content="{shuxm:ResourceString Name=ViewCardSignInSignAll}"
+                    IsEnabled="{Binding CanSignAll}"
+                    Style="{StaticResource AccentButtonStyle}"/>
             </Grid>
 
             <TextBlock
@@ -75,7 +79,6 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
                                     <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0">
@@ -93,15 +96,6 @@
                                     Style="{StaticResource CaptionTextBlockStyle}"
                                     Text="{shuxm:ResourceString Name=ViewCardSignInSigned}"
                                     Visibility="{Binding IsSign, Converter={StaticResource BoolToVisibilityConverter}}"/>
-
-                                <Button
-                                    Grid.Column="2"
-                                    MinWidth="0"
-                                    Padding="10,4"
-                                    VerticalAlignment="Center"
-                                    Command="{Binding SignInCommand}"
-                                    Content="{shuxm:ResourceString Name=ViewCardSignInAction}"
-                                    Visibility="{Binding IsSign, Converter={StaticResource BoolToVisibilityRevertConverter}}"/>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -111,4 +105,4 @@
 
         <shuxc:Loading IsLoading="{Binding IsInitialized, Converter={StaticResource BoolNegationConverter}}" Style="{ThemeResource DefaultLoadingCardStyle}"/>
     </Grid>
-</Button>
+</UserControl>

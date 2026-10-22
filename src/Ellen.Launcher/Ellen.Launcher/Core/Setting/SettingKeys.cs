@@ -49,8 +49,16 @@ public static class SettingKeys
     public const string IsHomeCardDailyNotePresented       = "Ellen::UI::Home::Card::DailyNote::Presented";
     public const string HomeCardGachaStatisticsOrder       = "Ellen::UI::Home::Card::GachaStatistics::Order";
     public const string IsHomeCardGachaStatisticsPresented = "Ellen::UI::Home::Card::GachaStatistics::Presented";
+    public const string HomeCardLaunchGameOrder            = "Ellen::UI::Home::Card::LaunchGame::Order";
+    public const string IsHomeCardLaunchGamePresented      = "Ellen::UI::Home::Card::LaunchGame::Presented";
     public const string HomeCardSignInOrder                = "Ellen::UI::Home::Card::SignIn::Order";
     public const string IsHomeCardSignInPresented          = "Ellen::UI::Home::Card::SignIn::Presented";
+
+    // SignIn
+    /// <summary>
+    /// 上次「自动签到」全部成功的 Unix 毫秒时间戳，用于 12 小时内不再重复自动签到。
+    /// </summary>
+    public const string SignInAutoSignInLastSuccessTime    = "Ellen::SignIn::AutoSignIn::LastSuccessTime";
     public const string HomeCardTravelersDiaryOrder        = "Ellen::UI::Home::Card::TravelersDiary::Order";
     public const string IsHomeCardTravelersDiaryPresented  = "Ellen::UI::Home::Card::TravelersDiary::Presented";
     public const string HomeAnnouncementActPreviewEnabled  = "Ellen::UI::Home::Announcement::ActPreviewEnabled";

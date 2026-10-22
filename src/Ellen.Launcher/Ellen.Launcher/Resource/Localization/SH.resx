@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -1018,6 +1018,15 @@
   <data name="ServicePackageAdvancedExecuteOperationCanceledTitle" xml:space="preserve">
     <value>游戏资源操作已取消</value>
   </data>
+  <data name="ServiceSignInGameGenshin" xml:space="preserve">
+    <value>原神</value>
+  </data>
+  <data name="ServiceSignInGameStarRail" xml:space="preserve">
+    <value>崩坏：星穹铁道</value>
+  </data>
+  <data name="ServiceSignInGameZenlessZoneZero" xml:space="preserve">
+    <value>绝区零</value>
+  </data>
   <data name="ServiceSignInAutoSignInFailedDialogContent" xml:space="preserve">
     <value>以下账号签到失败，请检查网络或重新登录后重试：</value>
   </data>
@@ -1111,6 +1120,78 @@
   <data name="ViewCardGachaStatisticsTitle" xml:space="preserve">
     <value>保底计数</value>
   </data>
+  <data name="ViewCardLaunchGameAccountFallback" xml:space="preserve">
+    <value>已登录账号</value>
+  </data>
+  <data name="ViewCardLaunchGameActionLaunch" xml:space="preserve">
+    <value>启动</value>
+  </data>
+  <data name="ViewCardLaunchGameActionLaunching" xml:space="preserve">
+    <value>启动中</value>
+  </data>
+  <data name="ViewCardLaunchGameActionRunning" xml:space="preserve">
+    <value>运行中</value>
+  </data>
+  <data name="ViewCardLaunchGameActionSetPath" xml:space="preserve">
+    <value>设置路径</value>
+  </data>
+  <data name="ViewCardLaunchGameElevationCancelled" xml:space="preserve">
+    <value>未获得管理员授权，游戏未启动（在 UAC 弹窗里点「是」即可）</value>
+  </data>
+  <data name="ViewCardLaunchGameGenshinTitle" xml:space="preserve">
+    <value>原神</value>
+  </data>
+  <data name="ViewCardLaunchGameLaunchFailed" xml:space="preserve">
+    <value>启动失败，请检查游戏路径是否有效</value>
+  </data>
+  <data name="ViewCardLaunchGameNeedsInGameLogin" xml:space="preserve">
+    <value>需在游戏内登录</value>
+  </data>
+  <data name="ViewCardLaunchGameNotLogin" xml:space="preserve">
+    <value>未登录米游社账号，可在左侧边栏底部头像处登录</value>
+  </data>
+  <data name="ViewCardLaunchGamePathNotSet" xml:space="preserve">
+    <value>尚未设置游戏路径</value>
+  </data>
+  <data name="ViewCardLaunchGameRefreshToolTip" xml:space="preserve">
+    <value>鼠标移入卡片可刷新游戏状态</value>
+  </data>
+  <data name="ViewCardLaunchGameSetPathSuccess" xml:space="preserve">
+    <value>已设置「{0}」的游戏路径</value>
+  </data>
+  <data name="ViewCardLaunchGameStartedMessage" xml:space="preserve">
+    <value>正在启动「{0}」</value>
+  </data>
+  <data name="ViewCardLaunchGameStartedTitle" xml:space="preserve">
+    <value>游戏启动</value>
+  </data>
+  <data name="ViewCardLaunchGameStatusInstalled" xml:space="preserve">
+    <value>已安装</value>
+  </data>
+  <data name="ViewCardLaunchGameStatusNotInstalled" xml:space="preserve">
+    <value>未检测到游戏</value>
+  </data>
+  <data name="ViewCardLaunchGameStatusRunning" xml:space="preserve">
+    <value>运行中</value>
+  </data>
+  <data name="ViewCardLaunchGameSummary" xml:space="preserve">
+    <value>{0}/{1} 款游戏可启动</value>
+  </data>
+  <data name="ViewCardLaunchGameSummaryNoGame" xml:space="preserve">
+    <value>未检测到已安装的游戏</value>
+  </data>
+  <data name="ViewCardLaunchGameSummaryRunning" xml:space="preserve">
+    <value>游戏运行中</value>
+  </data>
+  <data name="ViewCardLaunchGameTitle" xml:space="preserve">
+    <value>游戏启动</value>
+  </data>
+  <data name="ViewCardLaunchGameUid" xml:space="preserve">
+    <value>UID {0}</value>
+  </data>
+  <data name="ViewCardLaunchGameZenlessZoneZeroTitle" xml:space="preserve">
+    <value>绝区零</value>
+  </data>
   <data name="ViewCardSignInAction" xml:space="preserve">
     <value>签到</value>
   </data>
@@ -1119,6 +1200,9 @@
   </data>
   <data name="ViewCardSignInMonthDays" xml:space="preserve">
     <value>本月已签 {0} 天</value>
+  </data>
+  <data name="ViewCardSignInSignAll" xml:space="preserve">
+    <value>一键全签</value>
   </data>
   <data name="ViewCardSignInSigned" xml:space="preserve">
     <value>今日已签</value>
@@ -2135,7 +2219,7 @@
     <value>兑换码复制成功</value>
   </data>
   <data name="ViewPageAnnouncementSetGamePathLabel" xml:space="preserve">
-    <value>设置游戏路径</value>
+    <value>设置原神路径</value>
   </data>
   <data name="ViewPageAnnouncementSetZZZGamePathLabel" xml:space="preserve">
     <value>设置绝区零路径</value>

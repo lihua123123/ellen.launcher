@@ -11,13 +11,20 @@
 ;   （版本号默认与下面 MyAppVersion 一致，也可用 /DMyAppVersion=x.y.z.w 覆盖）
 ;
 ;   验收流程：验收通过 -> 直接 iscc 出正式包；
-;             未通过验收 -> 加 /DMyAppVersionSuffix=-preview 出预览包
+;             未验收 / 想先看效果 -> 不编预览包，直接构建并运行 Debug 版预览:
+;               dotnet build "src\Ellen.Launcher\Ellen.Launcher\Ellen.Launcher.csproj" -c Debug
+;               bin\Debug\net10.0-windows10.0.26100.0\win-x64\Ellen.Launcher.exe
+;             Debug 版与安装版共用 %LOCALAPPDATA%\EllenLauncher 数据目录（账号、设置、
+;             游戏路径、数据库完全一致），所以它就是「最新代码的预览」；运行前先关掉已安装
+;             版本，否则新进程会重定向到已运行的那个实例并退出；若开启「默认以管理员模式
+;             启动」而当前不是管理员，会弹 UAC，点是即可。
+;             只有需要把未验收版本打成安装包发给别人时，才加 /DMyAppVersionSuffix=-preview。
 ;             （预览后缀只进安装包名与 AppVersion，VersionInfoVersion 始终是纯数字）
 
 #define MyAppName "Ellen.Launcher"
 #define MyAppShortName "Ellen.Launcher"
 #ifndef MyAppVersion
-  #define MyAppVersion "7.1.0.8"
+  #define MyAppVersion "7.1.0.9"
 #endif
 #ifndef MyAppVersionSuffix
   #define MyAppVersionSuffix ""

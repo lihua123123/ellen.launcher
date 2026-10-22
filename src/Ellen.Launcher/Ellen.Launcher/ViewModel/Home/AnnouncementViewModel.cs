@@ -469,6 +469,12 @@ public sealed partial class AnnouncementViewModel : Abstraction.ViewModel, IReci
     {
         List<CardReference> result = [];
 
+        // 游戏启动卡片放在最前：首页最常用的操作是「打开游戏」
+        if (LocalSetting.Get(SettingKeys.IsHomeCardLaunchGamePresented, true))
+        {
+            result.Add(CardReference.Create(new LaunchGameCard(serviceProvider), SettingKeys.HomeCardLaunchGameOrder));
+        }
+
         if (LocalSetting.Get(SettingKeys.IsHomeCardGachaStatisticsPresented, true))
         {
             result.Add(CardReference.Create(new GachaStatisticsCard(serviceProvider), SettingKeys.HomeCardGachaStatisticsOrder));

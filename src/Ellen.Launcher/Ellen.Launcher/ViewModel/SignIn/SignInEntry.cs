@@ -3,37 +3,38 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using Ellen.Launcher.Service.Notification;
-using Ellen.Launcher.ViewModel.User;
-using Ellen.Launcher.Web.Hoyolab.Takumi.Binding;
 using Ellen.Launcher.Web.Hoyolab.Takumi.Event.BbsSignReward;
 using Ellen.Launcher.Web.Response;
+using EntityUser = Ellen.Launcher.Model.Entity.User;
 
 namespace Ellen.Launcher.ViewModel.SignIn;
 
 /// <summary>
-/// 首页签到卡片中的一行：一个游戏角色（UID）的签到状态。
+/// 首页签到卡片中的一行：某个账号在某个游戏下的角色签到状态。
 /// </summary>
 public sealed partial class SignInEntry : ObservableObject
 {
     private readonly ISignInClient signInClient;
     private readonly ITaskContext taskContext;
     private readonly IMessenger messenger;
+    private readonly EntityUser user;
 
-    public SignInEntry(ISignInClient signInClient, ITaskContext taskContext, IMessenger messenger, UserAndUid userAndUid, UserGameRole role)
+    public SignInEntry(ISignInClient signInClient, ITaskContext taskContext, IMessenger messenger, EntityUser user, SignInGameRole role)
     {
         this.signInClient = signInClient;
         this.taskContext = taskContext;
         this.messenger = messenger;
+        this.user = user;
 
-        UserAndUid = userAndUid;
-        Attribution = $"{role.Nickname} | {role.RegionName}";
-        Uid = role.GameUid;
+        Role = role;
+        Attribution = role.DisplayName;
+        Uid = role.Uid;
     }
 
-    public UserAndUid UserAndUid { get; }
+    public SignInGameRole Role { get; }
 
     /// <summary>
-    /// 昵称 | 区服
+    /// 昵称 | 游戏名
     /// </summary>
     public string Attribution { get; }
 
@@ -55,7 +56,7 @@ public sealed partial class SignInEntry : ObservableObject
 
     public async Task UpdateAsync(CancellationToken token = default)
     {
-        Response<SignInRewardInfo> response = await signInClient.GetInfoAsync(UserAndUid, token).ConfigureAwait(false);
+        Response<SignInRewardInfo> response = await signInClient.GetInfoAsync(user, Role, token).ConfigureAwait(false);
 
         if (!ResponseValidator.TryValidateWithoutUINotification(response, out SignInRewardInfo? info))
         {
@@ -68,28 +69,36 @@ public sealed partial class SignInEntry : ObservableObject
         OnPropertyChanged(nameof(TotalSignDayText));
     }
 
-    [Command("SignInCommand")]
-    private async Task SignInAsync()
+    /// <summary>
+    /// 签到。返回是否已签（签到成功或今日已签都算已签）。
+    /// </summary>
+    public async Task<bool> SignAsync(CancellationToken token = default)
     {
-        if (IsBusy || IsSign)
+        if (IsSign)
         {
-            return;
+            return true;
         }
 
+        await taskContext.SwitchToMainThreadAsync();
         IsBusy = true;
+
         try
         {
-            Response<SignInResult> response = await signInClient.SignAsync(UserAndUid).ConfigureAwait(false);
+            Response<SignInResult> response = await signInClient.SignAsync(user, Role, token).ConfigureAwait(false);
 
             // 0 为签到成功，-5003 为今日已签到，两者都按成功处理
             if (response.ReturnCode is 0 || (KnownReturnCode)response.ReturnCode is KnownReturnCode.AlreadySignedIn)
             {
-                await UpdateAsync().ConfigureAwait(false);
-                return;
+                await UpdateAsync(token).ConfigureAwait(false);
+
+                await taskContext.SwitchToMainThreadAsync();
+                IsSign = true;
+                return true;
             }
 
             await taskContext.SwitchToMainThreadAsync();
             messenger.Send(InfoBarMessage.Error(SH.ViewCardSignInTitle, response.Message));
+            return false;
         }
         finally
         {

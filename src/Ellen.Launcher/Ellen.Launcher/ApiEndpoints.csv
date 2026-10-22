@@ -1,4 +1,4 @@
-Name,CN,OS
+﻿Name,CN,OS
 Extra:{ "Namespace": "Ellen.Launcher.Web.Endpoint.Hoyolab" }
 "string AccountCreateActionTicket()",https://passport-api.mihoyo.com/account/ma-cn-verifier/app/createActionTicketByToken,
 "string AccountCreateAuthTicketByGameBiz()",https://passport-api.mihoyo.com/account/ma-cn-verifier/app/createAuthTicketByGameBiz,https://sg-public-api.hoyoverse.com/account/ma-verifier/api/createAuthTicketBySToken,
@@ -70,12 +70,15 @@ Extra:{ "Namespace": "Ellen.Launcher.Web.Endpoint.Hoyolab" }
 "string HoyoPlayConnectGameBranches(Service.Game.Scheme.LaunchScheme scheme)",https://hyp-api.mihoyo.com/hyp/hyp-connect/api/getGameBranches?game_ids[]={scheme.GameId}&launcher_id={scheme.LauncherId},https://sg-hyp-api.hoyoverse.com/hyp/hyp-connect/api/getGameBranches?game_ids[]={scheme.GameId}&launcher_id={scheme.LauncherId}
 "string HoyoPlayConnectGameChannelSDKs(Service.Game.Scheme.LaunchScheme scheme)",https://hyp-api.mihoyo.com/hyp/hyp-connect/api/getGameChannelSDKs?channel={scheme.Channel:D}&game_ids[]={scheme.GameId}&launcher_id={scheme.LauncherId}&sub_channel={scheme.SubChannel:D},https://sg-hyp-api.hoyoverse.com/hyp/hyp-connect/api/getGameChannelSDKs?channel={scheme.Channel:D}&game_ids[]={scheme.GameId}&launcher_id={scheme.LauncherId}&sub_channel={scheme.SubChannel:D}
 "string HoyoPlayConnectGamePackages(Service.Game.Scheme.LaunchScheme scheme)",https://hyp-api.mihoyo.com/hyp/hyp-connect/api/getGamePackages?game_ids[]={scheme.GameId}&launcher_id={scheme.LauncherId},https://sg-hyp-api.hoyoverse.com/hyp/hyp-connect/api/getGamePackages?game_ids[]={scheme.GameId}&launcher_id={scheme.LauncherId}
-"string LunaSolActivityId()",e202311201442471,e202102251931481
-"string LunaSolHome(string languageCode)",https://api-takumi.mihoyo.com/event/luna/home?lang={languageCode}&act_id={LunaSolActivityId()},https://sg-hk4e-api.hoyoverse.com/event/sol/home?lang={languageCode}&act_id={LunaSolActivityId()}
-"string LunaSolInfo(Ellen.Launcher.Web.Hoyolab.PlayerUid uid, string languageCode)",https://api-takumi.mihoyo.com/event/luna/info?lang={languageCode}&act_id={LunaSolActivityId()}&{Ellen.Launcher.Web.Hoyolab.PlayerUidExtension.ToUidRegionQueryString(uid)},https://sg-hk4e-api.hoyoverse.com/event/sol/info?lang={languageCode}&act_id={LunaSolActivityId()}&{Ellen.Launcher.Web.Hoyolab.PlayerUidExtension.ToUidRegionQueryString(uid)}
-"string LunaSolReSign(string languageCode)",https://api-takumi.mihoyo.com/event/luna/resign,https://sg-hk4e-api.hoyoverse.com/event/sol/resign?lang={languageCode}
-"string LunaSolResignInfo(Ellen.Launcher.Web.Hoyolab.PlayerUid uid, string languageCode)",https://api-takumi.mihoyo.com/event/luna/resign_info?act_id={LunaSolActivityId()}&{Ellen.Launcher.Web.Hoyolab.PlayerUidExtension.ToUidRegionQueryString(uid)},https://sg-hk4e-api.hoyoverse.com/event/sol/resign_info?lang={languageCode}&act_id={LunaSolActivityId()}&{Ellen.Launcher.Web.Hoyolab.PlayerUidExtension.ToUidRegionQueryString(uid)}
-"string LunaSolSign()",https://api-takumi.mihoyo.com/event/luna/sign,https://sg-hk4e-api.hoyoverse.com/event/sol/sign?lang=zh-cn
+"string LunaActivityIdGenshin()",e202311201442471,e202102251931481
+"string LunaActivityIdStarRail()",e202304121516551,e202303301540311
+"string LunaActivityIdZenlessZoneZero()",e202406242138391,e202406031448091
+"string LunaInfoGenshin(string languageCode, Ellen.Launcher.Web.Hoyolab.Takumi.Event.BbsSignReward.SignInGameRole role)",https://api-takumi.mihoyo.com/event/luna/info?lang={languageCode}&act_id=e202311201442471&{Ellen.Launcher.Web.Hoyolab.Takumi.Event.BbsSignReward.SignInGameRoleExtension.ToUidRegionQueryString(role)},https://sg-hk4e-api.hoyoverse.com/event/sol/info?lang={languageCode}&act_id=e202102251931481&{Ellen.Launcher.Web.Hoyolab.Takumi.Event.BbsSignReward.SignInGameRoleExtension.ToUidRegionQueryString(role)}
+"string LunaInfoStarRail(string languageCode, Ellen.Launcher.Web.Hoyolab.Takumi.Event.BbsSignReward.SignInGameRole role)",https://api-takumi.mihoyo.com/event/luna/info?lang={languageCode}&act_id=e202304121516551&{Ellen.Launcher.Web.Hoyolab.Takumi.Event.BbsSignReward.SignInGameRoleExtension.ToUidRegionQueryString(role)},https://sg-public-api.hoyoverse.com/event/luna/os/info?lang={languageCode}&act_id=e202303301540311&{Ellen.Launcher.Web.Hoyolab.Takumi.Event.BbsSignReward.SignInGameRoleExtension.ToUidRegionQueryString(role)}
+"string LunaInfoZenlessZoneZero(string languageCode, Ellen.Launcher.Web.Hoyolab.Takumi.Event.BbsSignReward.SignInGameRole role)",https://act-nap-api.mihoyo.com/event/luna/zzz/info?lang={languageCode}&act_id=e202406242138391&{Ellen.Launcher.Web.Hoyolab.Takumi.Event.BbsSignReward.SignInGameRoleExtension.ToUidRegionQueryString(role)},https://sg-act-nap-api.hoyoverse.com/event/luna/zzz/os/info?lang={languageCode}&act_id=e202406031448091&{Ellen.Launcher.Web.Hoyolab.Takumi.Event.BbsSignReward.SignInGameRoleExtension.ToUidRegionQueryString(role)}
+"string LunaSignGenshin()",https://api-takumi.mihoyo.com/event/luna/sign,https://sg-hk4e-api.hoyoverse.com/event/sol/sign
+"string LunaSignStarRail()",https://api-takumi.mihoyo.com/event/luna/sign,https://sg-public-api.hoyoverse.com/event/luna/os/sign
+"string LunaSignZenlessZoneZero()",https://act-nap-api.mihoyo.com/event/luna/zzz/sign,https://sg-act-nap-api.hoyoverse.com/event/luna/zzz/os/sign
 "string MiyoliveRefreshCode()",https://api-takumi-static.mihoyo.com/event/miyolive/refreshCode?time={DateTimeOffset.Now.ToUnixTimeSeconds()},
 "string QrCodeFetch()",https://hk4e-sdk.mihoyo.com/hk4e_cn/combo/panda/qrcode/fetch,
 "string QrCodeQuery()",https://hk4e-sdk.mihoyo.com/hk4e_cn/combo/panda/qrcode/query,
@@ -87,6 +90,7 @@ Extra:{ "Namespace": "Ellen.Launcher.Web.Endpoint.Hoyolab" }
 "string UserGameRolesByActionTicket(string actionTicket)",https://api-takumi.mihoyo.com/binding/api/getUserGameRoles?action_ticket={actionTicket}&game_biz=hk4e_cn,
 "string UserGameRolesByActionTicketZZZ(string actionTicket)",https://api-takumi.mihoyo.com/binding/api/getUserGameRoles?action_ticket={actionTicket}&game_biz=nap_cn,
 "string UserGameRolesByCookie()",https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie?game_biz=hk4e_cn,https://api-os-takumi.hoyoverse.com/binding/api/getUserGameRolesByCookie?game_biz=hk4e_global
+"string UserGameRolesByCookieBiz(string gameBiz)",https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie?game_biz={gameBiz},https://api-os-takumi.hoyoverse.com/binding/api/getUserGameRolesByCookie?game_biz={gameBiz}
 "string UserGameRolesByCookieZZZ()",https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie?game_biz=nap_cn,https://api-os-takumi.hoyoverse.com/binding/api/getUserGameRolesByCookie?game_biz=nap_global
 "string UserGameRolesByLtoken(Ellen.Launcher.Web.Hoyolab.Region region)",,https://api-account-os.hoyoverse.com/binding/api/getUserGameRolesByLtoken?game_biz=hk4e_global&region={region}
 "string UserGameRolesBySToken()",https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByStoken,

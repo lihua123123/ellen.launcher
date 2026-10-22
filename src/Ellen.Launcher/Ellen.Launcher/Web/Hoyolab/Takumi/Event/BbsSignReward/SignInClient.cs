@@ -4,7 +4,6 @@
 using Ellen.Launcher.Core.DependencyInjection.Annotation.HttpClient;
 using Ellen.Launcher.Service;
 using Ellen.Launcher.Service.Geetest;
-using Ellen.Launcher.ViewModel.User;
 using Ellen.Launcher.Web.Endpoint.Hoyolab;
 using Ellen.Launcher.Web.Hoyolab.DataSigning;
 using Ellen.Launcher.Web.Request.Builder;
@@ -28,13 +27,15 @@ public sealed partial class SignInClient : ISignInClient
     [GeneratedConstructor]
     public partial SignInClient(IServiceProvider serviceProvider, HttpClient httpClient);
 
-    public async ValueTask<Response<SignInRewardInfo>> GetInfoAsync(UserAndUid userAndUid, CancellationToken token = default)
+    public async ValueTask<Response<SignInRewardInfo>> GetInfoAsync(Model.Entity.User user, SignInGameRole role, CancellationToken token = default)
     {
         HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()
-            .SetRequestUri(apiEndpoints.LunaSolInfo(userAndUid.Uid, cultureOptions.LanguageCode))
-            .SetUserCookieAndFpHeader(userAndUid, CookieType.CookieToken)
-            .SetHeader("x-rpc-signgame", "hk4e")
+            .SetRequestUri(GetInfoUri(role))
+            .SetUserCookieAndFpHeader(user, CookieType.CookieToken)
+            .SetHeader("x-rpc-signgame", role.SignGameHeader)
             .Get();
+
+        ApplyActHeaders(builder, role);
 
         await builder.SignDataAsync(DataSignAlgorithmVersion.Gen1, SaltType.LK2, true).ConfigureAwait(false);
 
@@ -45,45 +46,15 @@ public sealed partial class SignInClient : ISignInClient
         return Response.Response.DefaultIfNull(resp);
     }
 
-    public async ValueTask<Response<SignInRewardReSignInfo>> GetResignInfoAsync(UserAndUid userAndUid, CancellationToken token = default)
+    public async ValueTask<Response<SignInResult>> SignAsync(Model.Entity.User user, SignInGameRole role, CancellationToken token = default)
     {
         HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()
-            .SetRequestUri(apiEndpoints.LunaSolResignInfo(userAndUid.Uid, cultureOptions.LanguageCode))
-            .SetUserCookieAndFpHeader(userAndUid, CookieType.CookieToken)
-            .SetHeader("x-rpc-signgame", "hk4e")
-            .Get();
-
-        await builder.SignDataAsync(DataSignAlgorithmVersion.Gen1, SaltType.LK2, true).ConfigureAwait(false);
-
-        Response<SignInRewardReSignInfo>? resp = await builder
-            .SendAsync<Response<SignInRewardReSignInfo>>(httpClient, token)
-            .ConfigureAwait(false);
-
-        return Response.Response.DefaultIfNull(resp);
-    }
-
-    public async ValueTask<Response<Reward>> GetRewardAsync(Model.Entity.User user, CancellationToken token = default)
-    {
-        HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()
-            .SetRequestUri(apiEndpoints.LunaSolHome(cultureOptions.LanguageCode))
+            .SetRequestUri(GetSignUri(role))
             .SetUserCookieAndFpHeader(user, CookieType.CookieToken)
-            .SetHeader("x-rpc-signgame", "hk4e")
-            .Get();
+            .SetHeader("x-rpc-signgame", role.SignGameHeader)
+            .PostJson(new SignInGameData(GetActivityId(role), role));
 
-        Response<Reward>? resp = await builder
-            .SendAsync<Response<Reward>>(httpClient, token)
-            .ConfigureAwait(false);
-
-        return Response.Response.DefaultIfNull(resp);
-    }
-
-    public async ValueTask<Response<SignInResult>> ReSignAsync(UserAndUid userAndUid, CancellationToken token = default)
-    {
-        HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()
-            .SetRequestUri(apiEndpoints.LunaSolReSign(cultureOptions.LanguageCode))
-            .SetUserCookieAndFpHeader(userAndUid, CookieType.CookieToken)
-            .SetHeader("x-rpc-signgame", "hk4e")
-            .PostJson(new SignInData(apiEndpoints, userAndUid.Uid));
+        ApplyActHeaders(builder, role);
 
         await builder.SignDataAsync(DataSignAlgorithmVersion.Gen1, SaltType.LK2, true).ConfigureAwait(false);
 
@@ -97,7 +68,7 @@ public sealed partial class SignInClient : ISignInClient
             {
                 builder
                     .Resurrect()
-                    .SetHeader("x-rpc-signgame", "hk4e")
+                    .SetHeader("x-rpc-signgame", role.SignGameHeader)
                     .SetXrpcChallenge(data.Challenge, data.Validate);
 
                 await builder.SignDataAsync(DataSignAlgorithmVersion.Gen1, SaltType.LK2, true).ConfigureAwait(false);
@@ -116,42 +87,44 @@ public sealed partial class SignInClient : ISignInClient
         return Response.Response.DefaultIfNull(resp);
     }
 
-    public async ValueTask<Response<SignInResult>> SignAsync(UserAndUid userAndUid, CancellationToken token = default)
+    private string GetInfoUri(SignInGameRole role)
     {
-        HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()
-            .SetRequestUri(apiEndpoints.LunaSolSign())
-            .SetUserCookieAndFpHeader(userAndUid, CookieType.CookieToken)
-            .SetHeader("x-rpc-signgame", "hk4e")
-            .PostJson(new SignInData(apiEndpoints, userAndUid.Uid));
-
-        await builder.SignDataAsync(DataSignAlgorithmVersion.Gen1, SaltType.LK2, true).ConfigureAwait(false);
-
-        Response<SignInResult>? resp = await builder
-            .SendAsync<Response<SignInResult>>(httpClient, token)
-            .ConfigureAwait(false);
-
-        if (resp is { Data: { Success: 1, Gt: { } gt, Challenge: { } originChallenge } })
+        return role.Game switch
         {
-            if (await geetestService.TryVerifyGtChallengeAsync(gt, originChallenge, false, token).ConfigureAwait(false) is { } data)
-            {
-                builder
-                    .Resurrect()
-                    .SetHeader("x-rpc-signgame", "hk4e")
-                    .SetXrpcChallenge(data.Challenge, data.Validate);
+            SignInGame.StarRail => apiEndpoints.LunaInfoStarRail(cultureOptions.LanguageCode, role),
+            SignInGame.ZenlessZoneZero => apiEndpoints.LunaInfoZenlessZoneZero(cultureOptions.LanguageCode, role),
+            _ => apiEndpoints.LunaInfoGenshin(cultureOptions.LanguageCode, role),
+        };
+    }
 
-                await builder.SignDataAsync(DataSignAlgorithmVersion.Gen1, SaltType.LK2, true).ConfigureAwait(false);
+    private string GetSignUri(SignInGameRole role)
+    {
+        return role.Game switch
+        {
+            SignInGame.StarRail => apiEndpoints.LunaSignStarRail(),
+            SignInGame.ZenlessZoneZero => apiEndpoints.LunaSignZenlessZoneZero(),
+            _ => apiEndpoints.LunaSignGenshin(),
+        };
+    }
 
-                resp = await builder
-                    .SendAsync<Response<SignInResult>>(httpClient, token)
-                    .ConfigureAwait(false);
-            }
-            else
-            {
-                resp.ReturnCode = resp.Data.RiskCode;
-                resp.Message = SH.ServiceSignInRiskVerificationFailed;
-            }
+    private string GetActivityId(SignInGameRole role)
+    {
+        return role.Game switch
+        {
+            SignInGame.StarRail => apiEndpoints.LunaActivityIdStarRail(),
+            SignInGame.ZenlessZoneZero => apiEndpoints.LunaActivityIdZenlessZoneZero(),
+            _ => apiEndpoints.LunaActivityIdGenshin(),
+        };
+    }
+
+    private static void ApplyActHeaders(HttpRequestMessageBuilder builder, SignInGameRole role)
+    {
+        // 绝区零签到活动挂在 act.mihoyo.com 下，缺少这两个头会 403
+        if (role.Game is SignInGame.ZenlessZoneZero)
+        {
+            builder
+                .SetHeader("Origin", "https://act.mihoyo.com")
+                .SetHeader("Referer", "https://act.mihoyo.com/");
         }
-
-        return Response.Response.DefaultIfNull(resp);
     }
 }

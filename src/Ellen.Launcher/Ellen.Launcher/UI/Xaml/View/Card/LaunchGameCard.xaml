@@ -1,0 +1,253 @@
+<UserControl
+    x:Class="Ellen.Launcher.UI.Xaml.View.Card.LaunchGameCard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mxi="using:Microsoft.Xaml.Interactivity"
+    xmlns:shuxb="using:Ellen.Launcher.UI.Xaml.Behavior"
+    xmlns:shuxc="using:Ellen.Launcher.UI.Xaml.Control"
+    xmlns:shuxci="using:Ellen.Launcher.UI.Xaml.Control.Image"
+    xmlns:shuxm="using:Ellen.Launcher.UI.Xaml.Markup"
+    xmlns:shvh="using:Ellen.Launcher.ViewModel.Home"
+    Height="{ThemeResource HomeAdaptiveCardHeight}"
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    d:DataContext="{d:DesignInstance shvh:LaunchGameCardViewModel}"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <!--  单个游戏磁贴：低一层级的卡片背景，与首页其它卡片保持一致的视觉重量  -->
+        <Style x:Key="LaunchGameTileStyle" TargetType="Grid">
+            <Setter Property="Background" Value="{ThemeResource ControlAltFillColorSecondaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}"/>
+            <Setter Property="Padding" Value="10,8"/>
+        </Style>
+    </UserControl.Resources>
+
+    <mxi:Interaction.Behaviors>
+        <shuxb:InvokeCommandOnLoadedBehavior Command="{Binding LoadCommand}"/>
+    </mxi:Interaction.Behaviors>
+
+    <Grid>
+        <Grid
+            Margin="12"
+            RowSpacing="8"
+            Visibility="{Binding IsInitialized, Converter={StaticResource BoolToVisibilityConverter}}">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <!--  标题 + 状态摘要  -->
+            <Grid Grid.Row="0" ColumnSpacing="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    Style="{StaticResource BaseTextBlockStyle}"
+                    Text="{shuxm:ResourceString Name=ViewCardLaunchGameTitle}"/>
+
+                <StackPanel
+                    Grid.Column="1"
+                    Orientation="Horizontal"
+                    Spacing="6"
+                    ToolTipService.ToolTip="{shuxm:ResourceString Name=ViewCardLaunchGameRefreshToolTip}">
+                    <ProgressRing
+                        Width="12"
+                        Height="12"
+                        VerticalAlignment="Center"
+                        IsActive="{Binding IsRefreshing}"
+                        Visibility="{Binding IsRefreshing, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Opacity="0.7"
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        Text="{Binding SummaryText}"/>
+                </StackPanel>
+            </Grid>
+
+            <!--  当前登录账号  -->
+            <Grid Grid.Row="1">
+                <Grid
+                    ColumnSpacing="8"
+                    Visibility="{Binding IsLoggedIn, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <shuxci:CachedImage
+                        Grid.Column="0"
+                        Width="36"
+                        Height="36"
+                        Background="#FFDAB79B"
+                        CornerRadius="18"
+                        Source="{Binding AccountAvatarUrl, Converter={StaticResource AvatarIconCircleConverter}}"/>
+
+                    <StackPanel
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Spacing="2">
+                        <TextBlock
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Text="{Binding AccountNickname}"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="NoWrap"/>
+                        <TextBlock
+                            Opacity="0.7"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="{Binding AccountAttribution}"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="NoWrap"/>
+                    </StackPanel>
+
+                    <TextBlock
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        IsTextSelectionEnabled="True"
+                        Opacity="0.7"
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        Text="{Binding AccountUidText}"/>
+                </Grid>
+
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Opacity="0.7"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="{shuxm:ResourceString Name=ViewCardLaunchGameNotLogin}"
+                    TextWrapping="Wrap"
+                    Visibility="{Binding IsLoggedIn, Converter={StaticResource BoolToVisibilityRevertConverter}}"/>
+            </Grid>
+
+            <!--  游戏启动入口  -->
+            <Grid Grid.Row="2" ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <Grid
+                    Grid.Column="0"
+                    RowSpacing="6"
+                    Style="{StaticResource LaunchGameTileStyle}"
+                    ToolTipService.ToolTip="{Binding GenshinEntry.ToolTipText}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <Image
+                            Width="28"
+                            Height="28"
+                            Source="{Binding GenshinEntry.IconSource}"/>
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                Text="{shuxm:ResourceString Name=ViewCardLaunchGameGenshinTitle}"/>
+                            <TextBlock
+                                Opacity="0.7"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{Binding GenshinEntry.DetailText}"
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="NoWrap"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="1" VerticalAlignment="Bottom">
+                        <Button
+                            MinHeight="28"
+                            Padding="8,3"
+                            HorizontalAlignment="Stretch"
+                            Command="{Binding LaunchCommand}"
+                            CommandParameter="{Binding GenshinEntry}"
+                            Content="{Binding GenshinEntry.ActionText}"
+                            IsEnabled="{Binding GenshinEntry.CanLaunch}"
+                            Style="{StaticResource AccentButtonStyle}"
+                            Visibility="{Binding GenshinEntry.IsInstalled, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        <Button
+                            MinHeight="28"
+                            Padding="8,3"
+                            HorizontalAlignment="Stretch"
+                            Command="{Binding SetGenshinGamePathCommand}"
+                            Content="{shuxm:ResourceString Name=ViewCardLaunchGameActionSetPath}"
+                            Visibility="{Binding GenshinEntry.IsInstalled, Converter={StaticResource BoolToVisibilityRevertConverter}}"/>
+                    </Grid>
+                </Grid>
+
+                <Grid
+                    Grid.Column="1"
+                    RowSpacing="6"
+                    Style="{StaticResource LaunchGameTileStyle}"
+                    ToolTipService.ToolTip="{Binding ZenlessZoneZeroEntry.ToolTipText}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <Image
+                            Width="28"
+                            Height="28"
+                            Source="{Binding ZenlessZoneZeroEntry.IconSource}"/>
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                Text="{shuxm:ResourceString Name=ViewCardLaunchGameZenlessZoneZeroTitle}"/>
+                            <TextBlock
+                                Opacity="0.7"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{Binding ZenlessZoneZeroEntry.DetailText}"
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="NoWrap"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="1" VerticalAlignment="Bottom">
+                        <Button
+                            MinHeight="28"
+                            Padding="8,3"
+                            HorizontalAlignment="Stretch"
+                            Command="{Binding LaunchCommand}"
+                            CommandParameter="{Binding ZenlessZoneZeroEntry}"
+                            Content="{Binding ZenlessZoneZeroEntry.ActionText}"
+                            IsEnabled="{Binding ZenlessZoneZeroEntry.CanLaunch}"
+                            Style="{StaticResource AccentButtonStyle}"
+                            Visibility="{Binding ZenlessZoneZeroEntry.IsInstalled, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        <Button
+                            MinHeight="28"
+                            Padding="8,3"
+                            HorizontalAlignment="Stretch"
+                            Command="{Binding SetZenlessZoneZeroGamePathCommand}"
+                            Content="{shuxm:ResourceString Name=ViewCardLaunchGameActionSetPath}"
+                            Visibility="{Binding ZenlessZoneZeroEntry.IsInstalled, Converter={StaticResource BoolToVisibilityRevertConverter}}"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <shuxc:Loading IsLoading="{Binding IsInitialized, Converter={StaticResource BoolNegationConverter}}" Style="{ThemeResource DefaultLoadingCardStyle}"/>
+    </Grid>
+</UserControl>

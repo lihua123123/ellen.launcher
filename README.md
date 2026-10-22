@@ -1,6 +1,21 @@
-# Ellen.Launcher
+﻿# Ellen.Launcher
 
 一个纯粹的生态类原神工具
+
+---
+
+# 使用说明
+
+## 启动游戏
+
+本启动器**不提供游戏本体下载**，也不提供预下载 / 资源更新等功能——游戏本体请自行通过官方启动器或其他方式安装，本程序只负责「启动游戏」和「查看数据」。
+
+1. 先用官方启动器（HoYoPlay / 原神启动器）或其他方式安装好《原神》《绝区零》。
+2. 首页右上角工具条点「设置原神路径」选择 `YuanShen.exe`（国服）或 `GenshinImpact.exe`（国际服）；点「设置绝区零路径」选择 `ZenlessZoneZero.exe`。
+   路径会被记住，下次自动识别，识别顺序为：启动器里保存过的路径 → 官方启动器卸载表登记的安装目录 + 其 `config.ini` 的 `game_install_path` → 原神再退回 Unity 输出日志。
+3. 首页「游戏启动」卡片显示当前米游社账号在该游戏下的 UID，点「启动」直接拉起游戏本体，不经过官方启动器。
+   账号在该游戏下没有角色时卡片会显示「需在游戏内登录」，照常启动、在游戏内登录即可。
+4. 权限说明：《原神》《绝区零》的可执行文件自带 `requireAdministrator` 清单，启动器以管理员身份运行时游戏直接继承权限；以普通权限运行时点「启动」会弹一次 UAC，确认即可。
 
 ---
 
@@ -252,7 +267,10 @@ Copy-Item "$src\*" "Installer\Publish\" -Recurse -Force
 # 验收通过 -> 正式包（<Version> 已在 csproj 里写好）
 & "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe" "Installer\installer.iss"
 
-# 未通过验收 -> 预览包：只加 -preview / -preview2… 后缀，不动 csproj 的版本号
+# 未通过验收 -> 不再编预览包，直接构建并运行 Debug 版预览（与安装版共用 %LOCALAPPDATA% 的账号/设置/数据库）
+#   dotnet build "src\Ellen.Launcher\Ellen.Launcher\Ellen.Launcher.csproj" -c Debug
+#   src\Ellen.Launcher\Ellen.Launcher\bin\Debug\net10.0-windows10.0.26100.0\win-x64\Ellen.Launcher.exe
+# 只有要把未验收版本打包发给别人时，才加 -preview / -preview2… 后缀（不动 csproj 的版本号）
 & "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe" /DMyAppVersionSuffix=-preview "Installer\installer.iss"
 #   -> publish\Ellen.Launcher-7.1.0.2-preview-Setup.exe
 

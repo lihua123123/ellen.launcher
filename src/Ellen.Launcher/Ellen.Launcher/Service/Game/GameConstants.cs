@@ -21,6 +21,7 @@ public static class GameConstants
     public const string ZenlessZoneZeroFileName = "ZenlessZoneZero.exe";
     public const string ZenlessZoneZeroFileNameUpper = "ZENLESSZONEZERO.EXE";
     public const string ZenlessZoneZeroData = "ZenlessZoneZero_Data";
+    public const string ZenlessZoneZeroProcessName = "ZenlessZoneZero";
     public const string AudioChinesePkgVersion = "Audio_Chinese_pkg_version";
     public const string AudioEnglishPkgVersion = "Audio_English(US)_pkg_version";
     public const string AudioJapanesePkgVersion = "Audio_Japanese_pkg_version";

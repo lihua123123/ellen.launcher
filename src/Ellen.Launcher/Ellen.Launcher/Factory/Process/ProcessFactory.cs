@@ -103,6 +103,27 @@ public sealed class ProcessFactory
         return false;
     }
 
+    /// <summary>
+    /// 直接以当前进程的身份启动目标程序，不经过 ShellExecute，因此不会弹出 UAC。
+    /// 与 Starward 启动游戏的方式一致：直接拉起游戏可执行文件。
+    /// </summary>
+    public static IProcess CreateDirect(string arguments, string fileName, string workingDirectory)
+    {
+        global::System.Diagnostics.Process process = new()
+        {
+            StartInfo = new()
+            {
+                Arguments = arguments,
+                FileName = fileName,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WorkingDirectory = workingDirectory,
+            },
+        };
+
+        return new DiagnosticsProcess(process);
+    }
+
     public static IProcess CreateUsingShellExecuteRunAs(string arguments, string fileName, string workingDirectory)
     {
         global::System.Diagnostics.Process process = new()

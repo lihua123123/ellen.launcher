@@ -2,19 +2,38 @@
 // Licensed under the MIT license.
 
 using Ellen.Launcher.Core;
+using Ellen.Launcher.Core.DependencyInjection.Abstraction;
 using Ellen.Launcher.Core.Diagnostics;
 using Ellen.Launcher.Factory.Process;
+using Ellen.Launcher.Service.Notification;
+using Ellen.Launcher.Service.User;
 using Ellen.Launcher.Win32.Foundation;
+using Ellen.Launcher.Web.Hoyolab.Passport;
+using Ellen.Launcher.Web.Response;
 using System.IO;
+using BindingUser = Ellen.Launcher.ViewModel.User.User;
 
 namespace Ellen.Launcher.Service.Game.QuickLaunch;
 
 [Service(ServiceLifetime.Singleton, typeof(IGameLaunchService))]
 public sealed partial class GameLaunchService : IGameLaunchService
 {
+    private readonly IServiceProvider serviceProvider;
     private readonly IGameInstallationLocator installationLocator;
+    private readonly IGameRegistrySessionService registrySession;
     private readonly LaunchOptions launchOptions;
     private readonly ITaskContext taskContext;
+    private readonly IMessenger messenger;
+
+    /// <summary>
+    /// 票据创建失败只提示一次，避免每次启动都弹提示。
+    /// </summary>
+    private static int hasWarnedAuthTicketFailure;
+
+    private static bool userHasWarnedLoginFailureOnce()
+    {
+        return Interlocked.CompareExchange(ref hasWarnedAuthTicketFailure, 1, 0) is 0;
+    }
 
     [GeneratedConstructor]
     public partial GameLaunchService(IServiceProvider serviceProvider);
@@ -49,7 +68,21 @@ public sealed partial class GameLaunchService : IGameLaunchService
 
         string executablePath = installation.ExecutablePath!;
         string workingDirectory = installation.InstallDirectory!;
-        string arguments = BuildArguments();
+
+        BindingUser? currentUser = await GetCurrentUserAsync().ConfigureAwait(false);
+
+        // 和 Starward 一样：游戏登录态存在注册表里，启动前把「当前选中的账号」的快照写回注册表，
+        // 游戏就会直接登录这个账号；本机还没有该账号快照时退回通行证登录票据（login_auth_ticket）。
+        (string? authTicket, string? loginError) = await ResolveLoginAsync(kind, currentUser, token).ConfigureAwait(false);
+        if (!string.IsNullOrEmpty(loginError)
+            && userHasWarnedLoginFailureOnce())
+        {
+            await taskContext.SwitchToMainThreadAsync();
+            messenger.Send(InfoBarMessage.Warning(SH.ViewModelLaunchGameCreateAuthTicketFailed, loginError));
+            await taskContext.SwitchToBackgroundAsync();
+        }
+
+        string arguments = BuildArguments(authTicket);
 
         try
         {
@@ -110,21 +143,103 @@ public sealed partial class GameLaunchService : IGameLaunchService
     /// 与 Starward 一致：给 Unity 游戏传分辨率 / 窗口模式参数。
     /// 用户在「启动设置」里关掉命令行参数时只启动 exe。
     /// </summary>
-    private string BuildArguments()
+    private string BuildArguments(string? authTicket)
     {
-        if (!launchOptions.AreCommandLineArgumentsEnabled.Value)
+        CommandLineBuilder builder = new();
+
+        if (launchOptions.AreCommandLineArgumentsEnabled.Value)
         {
-            return string.Empty;
+            builder.Append("-screen-fullscreen", launchOptions.IsFullScreen.Value ? 1 : 0);
+            builder.AppendIf(launchOptions.IsBorderless.Value, "-popupwindow");
+            builder.AppendIf(launchOptions.IsExclusive.Value, "-window-mode", "exclusive");
+            builder.AppendIf(launchOptions.IsScreenWidthEnabled.Value, "-screen-width", launchOptions.ScreenWidth.Value);
+            builder.AppendIf(launchOptions.IsScreenHeightEnabled.Value, "-screen-height", launchOptions.ScreenHeight.Value);
+            builder.AppendIf(launchOptions.IsMonitorEnabled.Value, "-monitor", launchOptions.Monitor.Value?.Value ?? 1);
         }
 
-        CommandLineBuilder builder = new();
-        builder.Append("-screen-fullscreen", launchOptions.IsFullScreen.Value ? 1 : 0);
-        builder.AppendIf(launchOptions.IsBorderless.Value, "-popupwindow");
-        builder.AppendIf(launchOptions.IsExclusive.Value, "-window-mode", "exclusive");
-        builder.AppendIf(launchOptions.IsScreenWidthEnabled.Value, "-screen-width", launchOptions.ScreenWidth.Value);
-        builder.AppendIf(launchOptions.IsScreenHeightEnabled.Value, "-screen-height", launchOptions.ScreenHeight.Value);
-        builder.AppendIf(launchOptions.IsMonitorEnabled.Value, "-monitor", launchOptions.Monitor.Value?.Value ?? 1);
+        // 登录票据不受「命令行参数」开关影响：它是「用当前账号登录」的凭据
+        builder.AppendIf(!string.IsNullOrEmpty(authTicket), "login_auth_ticket", authTicket, CommandLineArgumentPrefix.Equal);
 
         return builder.ToString().Trim();
+    }
+
+    /// <summary>
+    /// 决定用哪种方式让游戏登录「当前账号」：先用注册表快照切换，失败再用通行证登录票据。
+    /// </summary>
+    private async ValueTask<(string? Ticket, string? Error)> ResolveLoginAsync(GameLaunchKind kind, BindingUser? user, CancellationToken token)
+    {
+        if (user is null)
+        {
+            return (null, null);
+        }
+
+        if (TrySwitchRegistrySession(kind, user))
+        {
+            return (null, null);
+        }
+
+        (string? ticket, string? error) = await TryCreateAuthTicketAsync(kind, user, token).ConfigureAwait(false);
+        return ticket is null ? (null, error ?? SH.ViewCardLaunchGameAccountNotSaved) : (ticket, null);
+    }
+
+    /// <summary>
+    /// 读取注册表里当前的登录账号做一次快照，然后把目标账号的快照写回去。
+    /// </summary>
+    private bool TrySwitchRegistrySession(GameLaunchKind kind, BindingUser user)
+    {
+        registrySession.Capture(kind, user.IsOversea);
+
+        string? mid = user.Entity.Mid;
+        return !string.IsNullOrEmpty(mid) && registrySession.TryApply(kind, user.IsOversea, mid);
+    }
+
+    private async ValueTask<BindingUser?> GetCurrentUserAsync()
+    {
+        using IServiceScope scope = serviceProvider.CreateScope();
+        return await scope.ServiceProvider.GetRequiredService<IUserService>().GetCurrentUserAsync().ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// 为当前米游社账号申请指定游戏的登录票据，失败时返回错误信息但仍然允许正常启动。
+    /// </summary>
+    private async ValueTask<(string? Ticket, string? Error)> TryCreateAuthTicketAsync(GameLaunchKind kind, BindingUser currentUser, CancellationToken token)
+    {
+        try
+        {
+            if (currentUser.SToken is null)
+            {
+                return (null, SH.ViewModelLaunchGameCreateAuthTicketFailed);
+            }
+
+            string gameBiz = (kind, currentUser.IsOversea) switch
+            {
+                (GameLaunchKind.Genshin, false) => "hk4e_cn",
+                (GameLaunchKind.Genshin, true) => "hk4e_global",
+                (GameLaunchKind.ZenlessZoneZero, false) => "nap_cn",
+                _ => "nap_global",
+            };
+
+            using IServiceScope scope = serviceProvider.CreateScope();
+            IHoyoPlayPassportClient client = scope.ServiceProvider
+                .GetRequiredService<IOverseaSupportFactory<IHoyoPlayPassportClient>>()
+                .Create(currentUser.IsOversea);
+
+            Response<AuthTicketWrapper> response = await client
+                .CreateAuthTicketAsync(currentUser.Entity, gameBiz, token)
+                .ConfigureAwait(false);
+
+            if (ResponseValidator.TryValidateWithoutUINotification(response, out AuthTicketWrapper? wrapper)
+                && !string.IsNullOrEmpty(wrapper.Ticket))
+            {
+                return (wrapper.Ticket, null);
+            }
+
+            return (null, response.Message);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            SentrySdk.CaptureException(ex);
+            return (null, ex.Message);
+        }
     }
 }

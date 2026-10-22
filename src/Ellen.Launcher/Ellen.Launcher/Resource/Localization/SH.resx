@@ -1132,6 +1132,9 @@
   <data name="ViewCardLaunchGameActionRunning" xml:space="preserve">
     <value>运行中</value>
   </data>
+  <data name="ViewCardLaunchGameAccountNotSaved" xml:space="preserve">
+    <value>该账号还没在本机登录过这个游戏，先在游戏内登录一次，之后就能直接切换</value>
+  </data>
   <data name="ViewCardLaunchGameActionSetPath" xml:space="preserve">
     <value>设置路径</value>
   </data>

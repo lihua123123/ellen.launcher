@@ -8,7 +8,7 @@ namespace Ellen.Launcher.Web.Hoyolab.Passport;
 
 public interface IHoyoPlayPassportClient
 {
-    ValueTask<Response<AuthTicketWrapper>> CreateAuthTicketAsync(User user, CancellationToken token = default);
+    ValueTask<Response<AuthTicketWrapper>> CreateAuthTicketAsync(User user, string gameBiz, CancellationToken token = default);
 
     ValueTask<Response<QrLogin>> CreateQrLoginAsync(CancellationToken token = default);
 

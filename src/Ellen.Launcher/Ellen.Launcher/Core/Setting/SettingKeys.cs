@@ -1,4 +1,4 @@
-﻿// Copyright (c) DGP Studio. All rights reserved.
+// Copyright (c) DGP Studio. All rights reserved.
 // Licensed under the MIT license.
 // Copyright (c) Millennium-Science-Technology-R-D-Inst. All rights reserved.
 // Licensed under the MIT license.
@@ -64,7 +64,8 @@ public static class SettingKeys
     public const string LowLevelKeyboardOverlayHide              = "Ellen::HotKey::LowLevel::Overlay::Hide";
 
     // AvatarProperty
-    public const string AvatarPropertySortDescriptionKind = "Ellen::AvatarProperty::SortDescriptionKind";
+    public const string AvatarPropertySortDescriptionKind    = "Ellen::AvatarProperty::SortDescriptionKind";
+    public const string AvatarPropertySortDescriptionKindZZZ = "Ellen::AvatarProperty::SortDescriptionKind::ZZZ";
 
     // Cultivation
     public const string CultivationAvatarLevelCurrent           = "Ellen::Cultivation::Avatar::Level::Current";
@@ -149,6 +150,7 @@ public static class SettingKeys
     public const string PhysicalDriverIsAlwaysSolidState                 = "Ellen::Game::Package::PhysicalDriver::Type::IsSolidState";
     public const string LaunchGamePath                                   = "Ellen::Game::Path";
     public const string LaunchGamePathEntries                            = "Ellen::Game::Path::Entries";
+    public const string LaunchZZZGamePath                                = "Ellen::Game::ZZZ::Path";
     public const string LaunchIsWindowsHDREnabled                        = "Ellen::Game::Registry::WindowsHDR::Enabled";
 
     // Advanced Start

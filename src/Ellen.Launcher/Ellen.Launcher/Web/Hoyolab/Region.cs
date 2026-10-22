@@ -23,6 +23,12 @@ public readonly struct Region : IEquatable<Region>
         Value = value;
     }
 
+    private Region(string value, bool validate)
+    {
+        EllenException.ThrowIfNot(!validate || HoyolabRegex.RegionRegex.IsMatch(value), SH.WebHoyolabInvalidRegion);
+        Value = value;
+    }
+
     public static implicit operator Region(string value)
     {
         return FromRegionString(value);
@@ -31,6 +37,14 @@ public readonly struct Region : IEquatable<Region>
     public static Region FromRegionString(string value)
     {
         return new(value);
+    }
+
+    /// <summary>
+    /// 跳过校验直接构造区服，用于非原神游戏的区服字符串（例如绝区零的 prod_gf_cn）
+    /// </summary>
+    public static Region UnsafeFromRegionString(string value)
+    {
+        return new(value, false);
     }
 
     public static string ToRegionString(Region region)

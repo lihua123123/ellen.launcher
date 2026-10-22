@@ -18,9 +18,19 @@ public sealed partial class SearchData : ObservableObject
         AvailableTokens = availableTokens;
     }
 
-    public FrozenDictionary<string, SearchToken> AvailableTokens { get; }
+    public FrozenDictionary<string, SearchToken> AvailableTokens { get; private set; }
 
     public ObservableCollection<SearchToken> FilterTokens { get; } = [];
+
+    /// <summary>
+    /// 切换游戏时原地替换候选 token，保持 <see cref="FilterTokens"/> 集合对象不变，
+    /// 避免 AutoSuggestTokenBox 已经包装过 ItemsSource 后无法重新绑定。
+    /// </summary>
+    public void SetAvailableTokens(FrozenDictionary<string, SearchToken> availableTokens)
+    {
+        AvailableTokens = availableTokens;
+        OnPropertyChanged(nameof(AvailableTokens));
+    }
 
     [ObservableProperty]
     public partial string? FilterToken { get; set; }
@@ -28,6 +38,11 @@ public sealed partial class SearchData : ObservableObject
     public static SearchData CreateForAvatarProperty()
     {
         return new(SearchTokens.GetForAvatarProperty());
+    }
+
+    public static SearchData CreateForZZZAvatarProperty()
+    {
+        return new(SearchTokens.GetForZZZAvatarProperty());
     }
 
     public static SearchData CreateForCultivation()

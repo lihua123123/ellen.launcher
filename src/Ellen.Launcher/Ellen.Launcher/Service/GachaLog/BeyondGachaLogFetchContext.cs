@@ -3,6 +3,7 @@
 
 using Ellen.Launcher.Core.Database;
 using Ellen.Launcher.Model.Entity;
+using Ellen.Launcher.Model.Intrinsic;
 using Ellen.Launcher.Model.Metadata.Abstraction;
 using Ellen.Launcher.Service.GachaLog.QueryProvider;
 using Ellen.Launcher.Service.Metadata.ContextAbstraction;
@@ -55,7 +56,7 @@ public sealed class BeyondGachaLogFetchContext
 
     public void EnsureArchiveAndEndId(BeyondGachaLogItem item, IAdvancedDbCollectionView<GachaArchive> archives, IGachaLogRepository repository)
     {
-        TargetArchive ??= GachaArchiveOperation.GetOrAdd(repository, item.Uid, archives);
+        TargetArchive ??= GachaArchiveOperation.GetOrAdd(repository, item.Uid, GachaGameType.Genshin, archives);
         DbEndId ??= repository.GetNewestBeyondGachaItemIdByArchiveIdAndGachaType(TargetArchive.InnerId, CurrentType);
     }
 

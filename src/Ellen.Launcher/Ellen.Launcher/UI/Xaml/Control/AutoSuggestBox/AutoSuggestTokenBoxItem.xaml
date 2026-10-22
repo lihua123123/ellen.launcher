@@ -444,6 +444,7 @@
                         Name="TextAutoSuggestBox"
                         DisplayMemberPath="{Binding Path=Owner.DisplayMemberPath, RelativeSource={RelativeSource Mode=TemplatedParent}}"
                         ItemTemplate="{Binding Path=Owner.SuggestedItemTemplate, RelativeSource={RelativeSource Mode=TemplatedParent}}"
+                        ItemTemplateSelector="{Binding Path=Owner.SuggestedItemTemplateSelector, RelativeSource={RelativeSource Mode=TemplatedParent}}"
                         ItemsSource="{Binding Path=Owner.SuggestedItemsSource, RelativeSource={RelativeSource Mode=TemplatedParent}}"
                         PlaceholderText="{Binding Path=Owner.PlaceholderText, RelativeSource={RelativeSource Mode=TemplatedParent}}"
                         Style="{StaticResource SystemAutoSuggestBoxStyle}"

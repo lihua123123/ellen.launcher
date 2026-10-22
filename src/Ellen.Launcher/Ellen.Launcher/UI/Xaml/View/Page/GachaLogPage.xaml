@@ -161,6 +161,23 @@
                     Padding="16"
                     Style="{ThemeResource AcrylicBorderCardStyle}">
                     <StackPanel>
+                        <!--
+                            切换到尚未获取过记录的游戏时，Pivot 会被 StandardView 隐藏，
+                            因此空状态卡片里必须保留游戏切换入口，否则无法切回原神。
+                        -->
+                        <StackPanel
+                            Margin="0,0,0,16"
+                            HorizontalAlignment="Center"
+                            Orientation="Horizontal"
+                            Spacing="8">
+                            <TextBlock VerticalAlignment="Center" Text="{shuxm:ResourceString Name=ViewPageGachaLogGameHeader}"/>
+                            <ComboBox
+                                MinWidth="140"
+                                DisplayMemberPath="Name"
+                                ItemsSource="{Binding Games}"
+                                SelectedItem="{Binding SelectedGame, Mode=TwoWay}"
+                                Style="{ThemeResource CommandBarComboBoxStyle}"/>
+                        </StackPanel>
                         <shuxci:CachedImage Height="120" Source="{StaticResource UI_EmotionIcon71}"/>
                         <TextBlock
                             Margin="0,16,0,0"
@@ -199,13 +216,25 @@
                 <shuxb:PivotBeyondModeBehavior IsBeyondMode="{Binding IsBeyondMode}"/>
             </mxi:Interaction.Behaviors>
             <Pivot.LeftHeader>
-                <shuxc:SizeRestrictedContentControl Margin="6,6,0,6">
-                    <ComboBox
-                        DisplayMemberPath="Uid"
-                        ItemsSource="{Binding Archives}"
-                        SelectedItem="{Binding Archives.CurrentItem, Mode=TwoWay}"
-                        Style="{ThemeResource CommandBarComboBoxStyle}"/>
-                </shuxc:SizeRestrictedContentControl>
+                <StackPanel
+                    Margin="6,6,0,6"
+                    Orientation="Horizontal"
+                    Spacing="6">
+                    <shuxc:SizeRestrictedContentControl>
+                        <ComboBox
+                            DisplayMemberPath="Name"
+                            ItemsSource="{Binding Games}"
+                            SelectedItem="{Binding SelectedGame, Mode=TwoWay}"
+                            Style="{ThemeResource CommandBarComboBoxStyle}"/>
+                    </shuxc:SizeRestrictedContentControl>
+                    <shuxc:SizeRestrictedContentControl>
+                        <ComboBox
+                            DisplayMemberPath="Uid"
+                            ItemsSource="{Binding Archives}"
+                            SelectedItem="{Binding Archives.CurrentItem, Mode=TwoWay}"
+                            Style="{ThemeResource CommandBarComboBoxStyle}"/>
+                    </shuxc:SizeRestrictedContentControl>
+                </StackPanel>
             </Pivot.LeftHeader>
             <Pivot.RightHeader>
                 <CommandBar DefaultLabelPosition="Right">
@@ -248,7 +277,8 @@
                     <AppBarToggleButton
                         Icon="{shuxm:BitmapIcon Source=ms-appx:///Resource/Icon/UI_ItemIcon_231.png}"
                         IsChecked="{Binding IsBeyondMode, Mode=TwoWay}"
-                        Label="{shuxm:ResourceString Name=ViewPageGachaLogSwitchToBeyondGachaModeHeader}">
+                        Label="{shuxm:ResourceString Name=ViewPageGachaLogSwitchToBeyondGachaModeHeader}"
+                        Visibility="{Binding IsZZZMode, Converter={StaticResource BoolNegationToVisibilityConverter}}">
                         <AppBarToggleButton.Resources>
                             <Style BasedOn="{StaticResource DefaultAppBarToggleButtonStyle}" TargetType="AppBarToggleButton">
                                 <Setter Property="ToolTipService.ToolTip" Value="{shuxm:ResourceString Name=ViewPageGachaLogSwitchToBeyondGachaModeDescription}"/>
@@ -265,16 +295,17 @@
                 </CommandBar>
             </Pivot.RightHeader>
             <PivotItem x:Name="PivotOverview" Header="{shuxm:ResourceString Name=ViewPageGachaLogPivotOverview}">
-                <ScrollViewer
-                    Margin="16,0"
-                    cw:ScrollViewerExtensions.HorizontalScrollBarMargin="0,0,-16,0"
-                    HorizontalScrollBarVisibility="Auto"
-                    HorizontalScrollMode="Enabled"
-                    VerticalScrollMode="Disabled">
-                    <shuxcp:HorizontalEqualPanel
-                        Margin="0,16"
-                        MinItemWidth="302"
-                        Spacing="16">
+                <Grid>
+                    <ScrollViewer
+                        Margin="16,0"
+                        cw:ScrollViewerExtensions.HorizontalScrollBarMargin="0,0,-16,0"
+                        HorizontalScrollBarVisibility="Auto"
+                        HorizontalScrollMode="Enabled"
+                        VerticalScrollMode="Disabled">
+                        <shuxcp:HorizontalEqualPanel
+                            Margin="0,16"
+                            MinItemWidth="302"
+                            Spacing="16">
                         <shuxvs:StatisticsCard DataContext="{Binding Statistics.AvatarWish}" Visibility="{Binding DataContext.IsAvatarWishCardVisible, ElementName=RootPage, Converter={StaticResource BoolToVisibilityConverter}}"/>
                         <shuxvs:StatisticsCard
                             DataContext="{Binding Statistics.WeaponWish}"
@@ -306,26 +337,41 @@
                             ShowUpPull="True"
                             Visibility="{Binding DataContext.IsBeyondEventWishCardVisible, ElementName=RootPage, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     </shuxcp:HorizontalEqualPanel>
-                </ScrollViewer>
+                    </ScrollViewer>
+                </Grid>
             </PivotItem>
 
-            <PivotItem x:Name="PivotStatistics" Header="{shuxm:ResourceString Name=ViewPageGachaLogPivotStatistics}">
+            <PivotItem
+                x:Name="PivotStatistics"
+                Header="{shuxm:ResourceString Name=ViewPageGachaLogPivotStatistics}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!--  二级标签：历史 / 角色 / 武器  -->
+                    <!--  二级标签：原神 历史 / 角色 / 武器；绝区零 角色 / 音擎·邦布  -->
                     <cwcont:Segmented
-                        x:Name="StatisticsSegmented"
+                        x:Name="StatisticsSegmentedGenshin"
                         Margin="16,12,16,0"
                         HorizontalAlignment="Stretch"
                         SelectedIndex="0"
-                        SelectionChanged="OnStatisticsSegmentedSelectionChanged">
+                        SelectionChanged="OnStatisticsSegmentedSelectionChanged"
+                        Visibility="{Binding IsZZZMode, Converter={StaticResource BoolNegationToVisibilityConverter}}">
                         <cwcont:SegmentedItem Content="{shuxm:ResourceString Name=ViewPageGachaLogPivotHistory}"/>
                         <cwcont:SegmentedItem Content="{shuxm:ResourceString Name=ViewPageGachaLogPivotAvatar}"/>
                         <cwcont:SegmentedItem Content="{shuxm:ResourceString Name=ViewPageGachaLogPivotWeapon}"/>
+                    </cwcont:Segmented>
+                    <cwcont:Segmented
+                        x:Name="StatisticsSegmentedZZZ"
+                        Margin="16,12,16,0"
+                        HorizontalAlignment="Stretch"
+                        SelectedIndex="0"
+                        SelectionChanged="OnStatisticsSegmentedSelectionChanged"
+                        Visibility="{Binding IsZZZMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <cwcont:SegmentedItem Content="{shuxm:ResourceString Name=ViewPageGachaLogPivotHistory}"/>
+                        <cwcont:SegmentedItem Content="{shuxm:ResourceString Name=ViewPageGachaLogPivotZZZAgent}"/>
+                        <cwcont:SegmentedItem Content="{shuxm:ResourceString Name=ViewPageGachaLogPivotZZZWEngine}"/>
                     </cwcont:Segmented>
 
                     <Grid Grid.Row="1">
@@ -354,12 +400,23 @@
                                                         cw:Effects.Shadow="{ThemeResource CompatCardShadow}">
                                                         <Grid HorizontalAlignment="Center" Style="{StaticResource AcrylicGridCardStyle}">
                                                             <cwcont:ConstrainedBox AspectRatio="1080:533">
-                                                                <shuxci:CachedImage
-                                                                    HorizontalAlignment="Center"
-                                                                    VerticalAlignment="Center"
-                                                                    CornerRadius="{ThemeResource ControlCornerRadius}"
-                                                                    Source="{Binding Statistics.HistoryWishes.CurrentItem.BannerImage}"
-                                                                    Stretch="UniformToFill"/>
+                                                                <Grid>
+                                                                    <shuxci:CachedImage
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center"
+                                                                        CornerRadius="{ThemeResource ControlCornerRadius}"
+                                                                        Source="{Binding Statistics.HistoryWishes.CurrentItem.BannerImage}"
+                                                                        Stretch="UniformToFill"
+                                                                        Visibility="{Binding Statistics.HistoryWishes.CurrentItem.HasBannerImage, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                                    <shuxci:CachedImage
+                                                                        Width="160"
+                                                                        Height="160"
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center"
+                                                                        Source="{Binding Statistics.HistoryWishes.CurrentItem.BannerImage}"
+                                                                        Stretch="Uniform"
+                                                                        Visibility="{Binding Statistics.HistoryWishes.CurrentItem.HasBannerImage, Converter={StaticResource BoolNegationToVisibilityConverter}}"/>
+                                                                </Grid>
                                                             </cwcont:ConstrainedBox>
                                                             <Border
                                                                 Grid.ColumnSpan="2"
@@ -370,6 +427,7 @@
 
                                                     <StackPanel Margin="16,0,0,0" Spacing="8">
                                                         <TextBlock
+                                                            x:Name="HistoryOrangeLabel"
                                                             Margin="0,8,0,0"
                                                             Style="{StaticResource BaseTextBlockStyle}"
                                                             Text="{shuxm:ResourceString Name=ViewControlStatisticsCardOrangeText}"
@@ -380,6 +438,7 @@
                                                             SelectionMode="None"/>
 
                                                         <TextBlock
+                                                            x:Name="HistoryPurpleLabel"
                                                             Margin="0,8,0,0"
                                                             Style="{StaticResource BaseTextBlockStyle}"
                                                             Text="{shuxm:ResourceString Name=ViewControlStatisticsCardPurpleText}"
@@ -390,6 +449,7 @@
                                                             SelectionMode="None"/>
 
                                                         <TextBlock
+                                                            x:Name="HistoryBlueLabel"
                                                             Margin="0,8,0,0"
                                                             Style="{StaticResource BaseTextBlockStyle}"
                                                             Text="{shuxm:ResourceString Name=ViewControlStatisticsCardBlueText}"
@@ -416,6 +476,7 @@
                                         <Border Padding="16,16,12,4" Style="{ThemeResource AcrylicBorderCardStyle}">
                                             <StackPanel Spacing="8">
                                                 <TextBlock
+                                                    x:Name="AvatarOrangeLabel"
                                                     Foreground="{ThemeResource OrangeColorBrush}"
                                                     Style="{StaticResource BaseTextBlockStyle}"
                                                     Text="{shuxm:ResourceString Name=ViewControlStatisticsCardOrangeText}"/>
@@ -431,6 +492,7 @@
                                         <Border Padding="16,16,12,4" Style="{ThemeResource AcrylicBorderCardStyle}">
                                             <StackPanel Spacing="8">
                                                 <TextBlock
+                                                    x:Name="AvatarPurpleLabel"
                                                     Foreground="{ThemeResource PurpleColorBrush}"
                                                     Style="{StaticResource BaseTextBlockStyle}"
                                                     Text="{shuxm:ResourceString Name=ViewControlStatisticsCardPurpleText}"/>
@@ -453,6 +515,7 @@
                                         <Border Padding="16,16,12,4" Style="{ThemeResource AcrylicBorderCardStyle}">
                                             <StackPanel Spacing="8">
                                                 <TextBlock
+                                                    x:Name="WeaponOrangeLabel"
                                                     Foreground="{ThemeResource OrangeColorBrush}"
                                                     Style="{StaticResource BaseTextBlockStyle}"
                                                     Text="{shuxm:ResourceString Name=ViewControlStatisticsCardOrangeText}"/>
@@ -467,6 +530,7 @@
                                         <Border Padding="16,16,12,4" Style="{ThemeResource AcrylicBorderCardStyle}">
                                             <StackPanel Spacing="8">
                                                 <TextBlock
+                                                    x:Name="WeaponPurpleLabel"
                                                     Foreground="{ThemeResource PurpleColorBrush}"
                                                     Style="{StaticResource BaseTextBlockStyle}"
                                                     Text="{shuxm:ResourceString Name=ViewControlStatisticsCardPurpleText}"/>
@@ -481,6 +545,7 @@
                                         <Border Padding="16,16,12,4" Style="{ThemeResource AcrylicBorderCardStyle}">
                                             <StackPanel Spacing="8">
                                                 <TextBlock
+                                                    x:Name="WeaponBlueLabel"
                                                     Foreground="{ThemeResource BlueColorBrush}"
                                                     Style="{StaticResource BaseTextBlockStyle}"
                                                     Text="{shuxm:ResourceString Name=ViewControlStatisticsCardBlueText}"/>
@@ -498,7 +563,9 @@
                 </Grid>
             </PivotItem>
 
-            <PivotItem x:Name="PivotCountdown" Header="{shuxm:ResourceString Name=ViewPageGachaLogPivotCountdown}">
+            <PivotItem
+                x:Name="PivotCountdown"
+                Header="{shuxm:ResourceString Name=ViewPageGachaLogPivotCountdown}">
                 <Grid>
                     <shuxc:Loading
                         Margin="16"
@@ -512,18 +579,26 @@
                         HorizontalScrollMode="Enabled"
                         VerticalScrollBarVisibility="Disabled"
                         VerticalScrollMode="Disabled">
-                        <shuxcp:HorizontalEqualPanel
-                            Margin="0,16"
-                            MinItemWidth="320"
-                            Spacing="16">
-                            <mxi:Interaction.Behaviors>
-                                <shuxb:InvokeCommandOnLoadedBehavior Command="{Binding WishCountdownViewModel.LoadCommand}"/>
-                            </mxi:Interaction.Behaviors>
-                            <shuxvs:CountdownCard Title="{shuxm:ResourceString Name=ViewPageGachaLogOrangeAvatarCountdown}" Countdowns="{Binding WishCountdownViewModel.WishCountdowns.OrangeAvatars}"/>
-                            <shuxvs:CountdownCard Title="{shuxm:ResourceString Name=ViewPageGachaLogPurpleAvatarCountdown}" Countdowns="{Binding WishCountdownViewModel.WishCountdowns.PurpleAvatars}"/>
-                            <shuxvs:CountdownCard Title="{shuxm:ResourceString Name=ViewPageGachaLogOrangeWeaponCountdown}" Countdowns="{Binding WishCountdownViewModel.WishCountdowns.OrangeWeapons}"/>
-                            <shuxvs:CountdownCard Title="{shuxm:ResourceString Name=ViewPageGachaLogPurpleWeaponCountdown}" Countdowns="{Binding WishCountdownViewModel.WishCountdowns.PurpleWeapons}"/>
-                        </shuxcp:HorizontalEqualPanel>
+                        <Grid>
+                            <shuxcp:HorizontalEqualPanel
+                                Margin="0,16"
+                                MinItemWidth="320"
+                                Spacing="16"
+                                Visibility="{Binding IsZZZMode, Converter={StaticResource BoolNegationToVisibilityConverter}}">
+                                <shuxvs:CountdownCard Title="{shuxm:ResourceString Name=ViewPageGachaLogOrangeAvatarCountdown}" Countdowns="{Binding WishCountdownViewModel.WishCountdowns.OrangeAvatars}"/>
+                                <shuxvs:CountdownCard Title="{shuxm:ResourceString Name=ViewPageGachaLogPurpleAvatarCountdown}" Countdowns="{Binding WishCountdownViewModel.WishCountdowns.PurpleAvatars}"/>
+                                <shuxvs:CountdownCard Title="{shuxm:ResourceString Name=ViewPageGachaLogOrangeWeaponCountdown}" Countdowns="{Binding WishCountdownViewModel.WishCountdowns.OrangeWeapons}"/>
+                                <shuxvs:CountdownCard Title="{shuxm:ResourceString Name=ViewPageGachaLogPurpleWeaponCountdown}" Countdowns="{Binding WishCountdownViewModel.WishCountdowns.PurpleWeapons}"/>
+                            </shuxcp:HorizontalEqualPanel>
+                            <shuxcp:HorizontalEqualPanel
+                                Margin="0,16"
+                                MinItemWidth="320"
+                                Spacing="16"
+                                Visibility="{Binding IsZZZMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <shuxvs:CountdownCard Title="{shuxm:ResourceString Name=ViewPageGachaLogZZZOrangeAgentCountdown}" Countdowns="{Binding WishCountdownViewModel.WishCountdowns.OrangeAvatars}"/>
+                                <shuxvs:CountdownCard Title="{shuxm:ResourceString Name=ViewPageGachaLogZZZOrangeWEngineCountdown}" Countdowns="{Binding WishCountdownViewModel.WishCountdowns.OrangeWeapons}"/>
+                            </shuxcp:HorizontalEqualPanel>
+                        </Grid>
                     </ScrollViewer>
                 </Grid>
 

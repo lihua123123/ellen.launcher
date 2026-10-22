@@ -46,20 +46,22 @@ public sealed partial class PivotBeyondModeBehavior : BehaviorBase<Pivot>
             return;
         }
 
-        behavior.UpdatePivotItems(behavior.IsBeyondMode.GetValueOrDefault());
+        behavior.UpdatePivotItems();
     }
 
-    private void UpdatePivotItems(bool isBeyondMode)
+    private void UpdatePivotItems()
     {
         if (AssociatedObject is null || overviewItem is null)
         {
             return;
         }
 
+        // 千星奇域（UGC）模式只保留「总览」页签；
+        // 绝区零的统计与计时页签已按调频记录适配，不再隐藏。
         AssociatedObject.Items.Clear();
         AssociatedObject.Items.Add(overviewItem);
 
-        if (!isBeyondMode)
+        if (!IsBeyondMode.GetValueOrDefault())
         {
             foreach (PivotItem item in normalOnlyItems)
             {

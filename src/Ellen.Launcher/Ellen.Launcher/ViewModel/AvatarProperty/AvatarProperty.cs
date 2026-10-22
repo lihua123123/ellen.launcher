@@ -1,4 +1,4 @@
-﻿// Copyright (c) DGP Studio. All rights reserved.
+// Copyright (c) DGP Studio. All rights reserved.
 // Licensed under the MIT license.
 
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -39,7 +39,7 @@ public sealed partial class AvatarProperty : ObservableObject, INameIcon<Uri>
         FightProperty = property;
         Name = name;
         Value = value;
-        Icon = PropertyIcons.GetValueOrDefault(property);
+        Icon = PropertyIcons.GetValueOrDefault(property) ?? StaticResourcesEndpoints.UIIconNone;
         if (!string.IsNullOrEmpty(addValue))
         {
             AddValue = addValue;

@@ -5,8 +5,11 @@ using Ellen.Launcher.Core.DataTransfer;
 using Ellen.Launcher.Factory.ContentDialog;
 using Ellen.Launcher.Service.AvatarInfo;
 using Ellen.Launcher.Service.Cultivation;
+using Ellen.Launcher.Service.GachaLog;
 using Ellen.Launcher.Service.Metadata;
 using Ellen.Launcher.Service.User;
+using Ellen.Launcher.Web.Hoyolab.Takumi.Binding;
+using Ellen.Launcher.Web.Hoyolab.Takumi.GameRecord.ZZZ;
 
 namespace Ellen.Launcher.ViewModel.AvatarProperty;
 
@@ -29,6 +32,18 @@ public sealed partial class AvatarPropertyViewModelScopeContext
     public partial IServiceProvider ServiceProvider { get; }
 
     public partial IMetadataService MetadataService { get; }
+
+    public partial IZZZGachaMetadataService ZZZGachaMetadataService { get; }
+
+    public partial IZZZCinemaImageService ZZZCinemaImageService { get; }
+
+    public partial IZZZAvatarCacheService ZZZAvatarCacheService { get; }
+
+    public partial BindingClient BindingClient { get; }
+
+    public partial IZZZGameRecordClient ZZZGameRecordClient { get; }
+
+    public partial IGachaLogRepository GachaLogRepository { get; }
 
     public partial ITaskContext TaskContext { get; }
 

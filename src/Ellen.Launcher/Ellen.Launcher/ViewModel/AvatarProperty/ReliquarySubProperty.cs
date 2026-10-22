@@ -8,9 +8,9 @@ namespace Ellen.Launcher.ViewModel.AvatarProperty;
 
 public class ReliquarySubProperty
 {
-    public ReliquarySubProperty(FightProperty type, string value)
+    public ReliquarySubProperty(FightProperty type, string value, string? name = null)
     {
-        Name = type.GetLocalizedDescription(SH.ResourceManager, CultureInfo.CurrentCulture);
+        Name = name ?? type.GetLocalizedDescription(SH.ResourceManager, CultureInfo.CurrentCulture);
         Value = value;
     }
 

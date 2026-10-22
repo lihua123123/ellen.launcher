@@ -14,6 +14,7 @@ public static class AvatarPropertySortDescriptions
     private static readonly SortDescription Element = new(nameof(AvatarView.Element), SortDirection.Descending);
     private static readonly SortDescription Id = new(nameof(AvatarView.Id), SortDirection.Descending);
     private static readonly SortDescription ActivatedConstellationCount = new(nameof(AvatarView.ActivatedConstellationCount), SortDirection.Descending);
+    private static readonly SortDescription ZZZRank = new(nameof(AvatarView.ZZZRank), SortDirection.Descending);
     private static readonly SortDescription FetterLevel = new(nameof(AvatarView.FetterLevel), SortDirection.Descending);
     private static readonly SortDescription MaxHp = new(nameof(AvatarView.MaxHp), SortDirection.Descending);
     private static readonly SortDescription CurAttack = new(nameof(AvatarView.CurAttack), SortDirection.Descending);
@@ -41,6 +42,15 @@ public static class AvatarPropertySortDescriptions
     private static readonly ImmutableArray<SortDescription> ActivatedConstellationCountSortDescriptions =
     [
         ActivatedConstellationCount,
+        LevelNumber,
+        Quality,
+        Element,
+        Id
+    ];
+
+    private static readonly ImmutableArray<SortDescription> ZZZRankSortDescriptions =
+    [
+        ZZZRank,
         LevelNumber,
         Quality,
         Element,
@@ -104,6 +114,8 @@ public static class AvatarPropertySortDescriptions
             AvatarPropertySortDescriptionKind.CurAttack => CurAttackSortDescriptions,
             AvatarPropertySortDescriptionKind.CurDefense => CurDefenseSortDescriptions,
             AvatarPropertySortDescriptionKind.ElementMastery => ElementMasterySortDescriptions,
+            AvatarPropertySortDescriptionKind.ZZZActivatedConstellationCount => ZZZRankSortDescriptions,
+            AvatarPropertySortDescriptionKind.ZZZElementMastery => ElementMasterySortDescriptions,
             _ => DefaultSortDescriptions,
         };
     }

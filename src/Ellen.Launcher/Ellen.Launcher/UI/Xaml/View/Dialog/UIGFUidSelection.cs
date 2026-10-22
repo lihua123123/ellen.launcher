@@ -1,6 +1,8 @@
 // Copyright (c) DGP Studio. All rights reserved.
 // Licensed under the MIT license.
 
+using Ellen.Launcher.Model.Intrinsic;
+using Ellen.Launcher.Resource.Localization;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Immutable;
 
@@ -8,16 +10,26 @@ namespace Ellen.Launcher.UI.Xaml.View.Dialog;
 
 public sealed partial class UIGFUidSelection
 {
-    public UIGFUidSelection(uint uid)
+    public UIGFUidSelection(uint uid, GachaGameType game)
     {
         Uid = uid;
+        Game = game;
     }
 
     public uint Uid { get; }
 
+    public GachaGameType Game { get; }
+
+    public string GameName => Game is GachaGameType.ZZZ ? SH.ViewPageGachaLogGameZZZ : SH.ViewPageGachaLogGameGenshin;
+
     public static UIGFUidSelection Create(uint uid)
     {
-        return new(uid);
+        return new(uid, GachaGameType.Genshin);
+    }
+
+    public static UIGFUidSelection Create(uint uid, GachaGameType game)
+    {
+        return new(uid, game);
     }
 
     public static ImmutableArray<uint> GetSelectedUidArray(ListViewBase listView)

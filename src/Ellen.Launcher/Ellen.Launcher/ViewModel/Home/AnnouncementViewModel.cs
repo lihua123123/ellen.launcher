@@ -7,7 +7,9 @@ using CommunityToolkit.Common;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Ellen.Launcher.Core.DataTransfer;
 using Ellen.Launcher.Core.DependencyInjection.Abstraction;
+using Ellen.Launcher.Core.IO;
 using Ellen.Launcher.Core.Logging;
+using Ellen.Launcher.Factory.Picker;
 using Ellen.Launcher.Core.Setting;
 using Ellen.Launcher.Service;
 using Ellen.Launcher.Service.Announcement;
@@ -30,6 +32,7 @@ using Ellen.Launcher.Web.Request.Builder;
 using Ellen.Launcher.Web.Response;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 
@@ -321,6 +324,33 @@ public sealed partial class AnnouncementViewModel : Abstraction.ViewModel, IReci
         await taskContext.SwitchToMainThreadAsync();
         launchOptions.PerformGamePathEntrySynchronization(path);
         serviceProvider.GetRequiredService<IMessenger>().Send(InfoBarMessage.Success(SH.ViewPageAnnouncementSetGamePathSuccessTitle, SH.FormatViewPageAnnouncementSetGamePathSuccessMessage(path)));
+    }
+
+    /// <summary>
+    /// 设置绝区零游戏路径，供网页缓存方式获取调频记录使用（本启动器不启动绝区零）。
+    /// 适配 Starward 等非官方启动器安装位置，注册表查不到时由用户手动指定。
+    /// </summary>
+    [Command("SetZZZGamePathCommand")]
+    private async Task SetZZZGamePathAsync()
+    {
+        SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateUI("Set ZZZ game path", "AnnouncementViewModel.Command"));
+
+        IFileSystemPickerInteraction fileSystemPickerInteraction = serviceProvider.GetRequiredService<IFileSystemPickerInteraction>();
+        (bool isPickerOk, ValueFile file) = fileSystemPickerInteraction.PickFile(
+            SH.ViewPageAnnouncementSetZZZGamePathLabel,
+            SH.ServiceGameLocatorPickerFilterText,
+            GameConstants.ZenlessZoneZeroFileName);
+
+        if (isPickerOk)
+        {
+            string fileName = Path.GetFileName(file);
+            if (fileName.ToUpperInvariant() is GameConstants.ZenlessZoneZeroFileNameUpper)
+            {
+                await taskContext.SwitchToMainThreadAsync();
+                launchOptions.ZZZGamePath.Value = file;
+                serviceProvider.GetRequiredService<IMessenger>().Send(InfoBarMessage.Success(SH.ViewPageAnnouncementSetGamePathSuccessTitle, SH.FormatViewPageAnnouncementSetZZZGamePathSuccessMessage(file)));
+            }
+        }
     }
 
     private async ValueTask<bool> RetryHomeAsync(CancellationToken token)

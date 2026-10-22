@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -1627,6 +1627,12 @@
   <data name="ViewModelAvatarPropertySortDescriptionKindQuality" xml:space="preserve">
     <value>品质顺序</value>
   </data>
+  <data name="ViewModelAvatarPropertySortDescriptionKindZZZActivatedConstellationCount" xml:space="preserve">
+    <value>影画解锁层数顺序</value>
+  </data>
+  <data name="ViewModelAvatarPropertySortDescriptionKindZZZElementMastery" xml:space="preserve">
+    <value>异常精通顺序</value>
+  </data>
   <data name="ViewModelAvatarPropertyTotalAvatarCountHint" xml:space="preserve">
     <value>共 {0} 位角色</value>
   </data>
@@ -2131,6 +2137,12 @@
   <data name="ViewPageAnnouncementSetGamePathLabel" xml:space="preserve">
     <value>设置游戏路径</value>
   </data>
+  <data name="ViewPageAnnouncementSetZZZGamePathLabel" xml:space="preserve">
+    <value>设置绝区零路径</value>
+  </data>
+  <data name="ViewPageAnnouncementSetZZZGamePathSuccessMessage" xml:space="preserve">
+    <value>绝区零游戏路径已设置为「{0}」，网页缓存方式获取调频记录将使用该路径</value>
+  </data>
   <data name="ViewPageAnnouncementSetGamePathSuccessMessage" xml:space="preserve">
     <value>当前游戏路径已设置为「{0}」</value>
   </data>
@@ -2179,11 +2191,92 @@
   <data name="ViewPageAvatarPropertyDefaultDescription" xml:space="preserve">
     <value>尚未获取任何角色信息</value>
   </data>
+  <data name="ModelIntrinsicZZZElementPhysical" xml:space="preserve">
+    <value>物理</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementFire" xml:space="preserve">
+    <value>火</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementIce" xml:space="preserve">
+    <value>冰</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementElectric" xml:space="preserve">
+    <value>电</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementWind" xml:space="preserve">
+    <value>风</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementEther" xml:space="preserve">
+    <value>以太</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementFrost" xml:space="preserve">
+    <value>烈霜</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementInk" xml:space="preserve">
+    <value>玄墨</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementRime" xml:space="preserve">
+    <value>凛刃</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementLumen" xml:space="preserve">
+    <value>流明</value>
+  </data>
+  <data name="ModelIntrinsicZZZProfessionAttack" xml:space="preserve">
+    <value>强攻</value>
+  </data>
+  <data name="ModelIntrinsicZZZProfessionStun" xml:space="preserve">
+    <value>击破</value>
+  </data>
+  <data name="ModelIntrinsicZZZProfessionAnomaly" xml:space="preserve">
+    <value>异常</value>
+  </data>
+  <data name="ModelIntrinsicZZZProfessionSupport" xml:space="preserve">
+    <value>支援</value>
+  </data>
+  <data name="ModelIntrinsicZZZProfessionDefense" xml:space="preserve">
+    <value>防护</value>
+  </data>
+  <data name="ModelIntrinsicZZZProfessionRupture" xml:space="preserve">
+    <value>命破</value>
+  </data>
+  <data name="ModelIntrinsicZZZProfessionVanguard" xml:space="preserve">
+    <value>锋御</value>
+  </data>
+  <data name="ViewPageAvatarPropertyZZZAgentHeader" xml:space="preserve">
+    <value>代理人</value>
+  </data>
+  <data name="ViewPageAvatarPropertyZZZWEngineHeader" xml:space="preserve">
+    <value>音擎</value>
+  </data>
+  <data name="ViewPageAvatarPropertyZZZEmptyDescription" xml:space="preserve">
+    <value>暂无绝区零角色数据。请先登录米游社，并在米游社公开绝区零角色详情。</value>
+  </data>
+  <data name="ViewPageAvatarPropertyZZZBasicHint" xml:space="preserve">
+    <value>绝区零角色数据来自米游社战绩，等级、影画、音擎、驱动盘与技能均按米游社公开数据展示。</value>
+  </data>
+  <data name="ViewPageAvatarPropertyZZZNeedLogin" xml:space="preserve">
+    <value>请先登录米游社账号</value>
+  </data>
+  <data name="ViewPageAvatarPropertyZZZNoRole" xml:space="preserve">
+    <value>未找到绝区零角色，请先在米游社绑定绝区零并公开角色详情</value>
+  </data>
+  <data name="ViewPageAvatarPropertyZZZRollSummary" xml:space="preserve">
+    <value>词条数统计</value>
+  </data>
+  <data name="ViewPageAvatarPropertyZZZLoadFailed" xml:space="preserve">
+    <value>绝区零角色信息获取失败，请稍后重试</value>
+  </data>
+  <data name="ViewPageAvatarPropertyZZZRefreshFailedUsingCache" xml:space="preserve">
+    <value>刷新失败，已显示本地缓存</value>
+  </data>
       <data name="ViewPageAvatarPropertyExportToTextLabel" xml:space="preserve">
     <value>导出文本到剪贴板</value>
   </data>
   <data name="ViewPageAvatarPropertyHeader" xml:space="preserve">
     <value>角色属性</value>
+  </data>
+  <data name="ViewPageAvatarPropertyHeaderZZZ" xml:space="preserve">
+    <value>代理人属性</value>
   </data>
   <data name="ViewPageAvatarPropertyRefreshAction" xml:space="preserve">
     <value>同步</value>
@@ -2983,6 +3076,75 @@
   <data name="WebGachaConfigTypeWeaponEventWish" xml:space="preserve">
     <value>武器活动祈愿</value>
   </data>
+  <data name="WebGachaConfigTypeZZZStandardChannel" xml:space="preserve">
+    <value>常驻频段</value>
+  </data>
+  <data name="WebGachaConfigTypeZZZExclusiveChannel" xml:space="preserve">
+    <value>独家频段</value>
+  </data>
+  <data name="WebGachaConfigTypeZZZWEngineChannel" xml:space="preserve">
+    <value>音擎频段</value>
+  </data>
+  <data name="WebGachaConfigTypeZZZBangbooChannel" xml:space="preserve">
+    <value>邦布频段</value>
+  </data>
+  <data name="WebGachaConfigTypeZZZExclusiveRescreening" xml:space="preserve">
+    <value>独家重映</value>
+  </data>
+  <data name="WebGachaConfigTypeZZZWEngineReverberation" xml:space="preserve">
+    <value>音擎回响</value>
+  </data>
+  <data name="ViewPageGachaLogGameGenshin" xml:space="preserve">
+    <value>原神</value>
+  </data>
+  <data name="ViewPageGachaLogGameHeader" xml:space="preserve">
+    <value>游戏</value>
+  </data>
+  <data name="ViewPageGachaLogGameZZZ" xml:space="preserve">
+    <value>绝区零</value>
+  </data>
+  <data name="ViewPageGachaLogZZZEmptyHint" xml:space="preserve">
+    <value>暂无调频记录，请点击右上角刷新获取</value>
+  </data>
+  <data name="ViewPageGachaLogZZZColumnTime" xml:space="preserve">
+    <value>时间</value>
+  </data>
+  <data name="ViewPageGachaLogZZZColumnRank" xml:space="preserve">
+    <value>稀有度</value>
+  </data>
+  <data name="ViewPageGachaLogZZZColumnChannel" xml:space="preserve">
+    <value>频段</value>
+  </data>
+  <data name="ViewPageGachaLogZZZColumnName" xml:space="preserve">
+    <value>名称</value>
+  </data>
+  <data name="ViewPageGachaLogZZZTotalPulls" xml:space="preserve">
+    <value>总抽数</value>
+  </data>
+  <data name="ViewPageGachaLogZZZSRank" xml:space="preserve">
+    <value>S 级</value>
+  </data>
+  <data name="ViewPageGachaLogZZZARank" xml:space="preserve">
+    <value>A 级</value>
+  </data>
+  <data name="ViewPageGachaLogZZZBRank" xml:space="preserve">
+    <value>B 级</value>
+  </data>
+  <data name="ViewPageGachaLogZZZPity" xml:space="preserve">
+    <value>距上次 S</value>
+  </data>
+  <data name="ServiceGachaLogUrlProviderManualInputGameMismatch" xml:space="preserve">
+    <value>输入的链接与当前选择的游戏不匹配，请检查链接或切换游戏</value>
+  </data>
+  <data name="ServiceGachaLogUrlProviderZZZCachePathNotFound" xml:space="preserve">
+    <value>未找到绝区零的安装路径，请确认已安装绝区零官方启动器版客户端</value>
+  </data>
+  <data name="ServiceGachaLogZZZNoGameRoleFound" xml:space="preserve">
+    <value>当前账号下未找到绝区零角色，请先在米游社绑定绝区零角色</value>
+  </data>
+  <data name="ServiceGachaLogZZZNoRecordFetched" xml:space="preserve">
+    <value>接口未返回任何调频记录，可能是 authkey 失效或区服不匹配</value>
+  </data>
   <data name="WebGameResourcePathCopySucceed" xml:space="preserve">
     <value>下载链接复制成功</value>
   </data>
@@ -3312,5 +3474,26 @@
   </data>
           <data name="ViewControlStatisticsCardGreenText" xml:space="preserve">
     <value>二星</value>
+  </data>
+  <data name="ViewControlStatisticsCardBlueQualityZZZ" xml:space="preserve">
+    <value>B 级</value>
+  </data>
+  <data name="ViewControlStatisticsCardOrangeQualityZZZ" xml:space="preserve">
+    <value>S 级</value>
+  </data>
+  <data name="ViewControlStatisticsCardPurpleQualityZZZ" xml:space="preserve">
+    <value>A 级</value>
+  </data>
+  <data name="ViewPageGachaLogZZZOrangeAgentCountdown" xml:space="preserve">
+    <value>S 级代理人</value>
+  </data>
+  <data name="ViewPageGachaLogZZZOrangeWEngineCountdown" xml:space="preserve">
+    <value>S 级音擎</value>
+  </data>
+  <data name="ViewPageGachaLogPivotZZZAgent" xml:space="preserve">
+    <value>代理人</value>
+  </data>
+  <data name="ViewPageGachaLogPivotZZZWEngine" xml:space="preserve">
+    <value>音擎 / 邦布</value>
   </data>
 </root>

@@ -40,6 +40,12 @@ public sealed partial class LaunchOptions : DbStoreOptions, IRestrictedGamePathA
     [field: MaybeNull]
     public IObservableProperty<ImmutableArray<GamePathEntry>> GamePathEntries { get => field ??= CreatePropertyForStructUsingJson(SettingKeys.LaunchGamePathEntries, ImmutableArray<GamePathEntry>.Empty); }
 
+    /// <summary>
+    /// 绝区零游戏可执行文件路径，仅用于网页缓存方式获取调频记录（本启动器不启动绝区零）
+    /// </summary>
+    [field: MaybeNull]
+    public IObservableProperty<string> ZZZGamePath { get => field ??= CreateProperty(SettingKeys.LaunchZZZGamePath, string.Empty); }
+
     [field: MaybeNull]
     public IObservableProperty<bool> UsingHoyolabAccount { get => field ??= CreateProperty(SettingKeys.LaunchUsingHoyolabAccount, false); }
 

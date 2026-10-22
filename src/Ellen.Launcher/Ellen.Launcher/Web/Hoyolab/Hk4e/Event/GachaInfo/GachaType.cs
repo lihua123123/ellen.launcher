@@ -42,5 +42,25 @@ public enum GachaType
     UGCActivityAvatarFemaleOne = 20021,
 
     [LocalizationKey(nameof(SH.WebUGCGachaConfigTypeActivityAvatarFemaleTwo))]
-    UGCActivityAvatarFemaleTwo = 20022
+    UGCActivityAvatarFemaleTwo = 20022,
+
+    // 绝区零
+
+    [LocalizationKey(nameof(SH.WebGachaConfigTypeZZZStandardChannel))]
+    ZZZStandardChannel = 1,
+
+    [LocalizationKey(nameof(SH.WebGachaConfigTypeZZZExclusiveChannel))]
+    ZZZExclusiveChannel = 2,
+
+    [LocalizationKey(nameof(SH.WebGachaConfigTypeZZZWEngineChannel))]
+    ZZZWEngineChannel = 3,
+
+    [LocalizationKey(nameof(SH.WebGachaConfigTypeZZZBangbooChannel))]
+    ZZZBangbooChannel = 5,
+
+    [LocalizationKey(nameof(SH.WebGachaConfigTypeZZZExclusiveRescreening))]
+    ZZZExclusiveRescreening = 102,
+
+    [LocalizationKey(nameof(SH.WebGachaConfigTypeZZZWEngineReverberation))]
+    ZZZWEngineReverberation = 103,
 }

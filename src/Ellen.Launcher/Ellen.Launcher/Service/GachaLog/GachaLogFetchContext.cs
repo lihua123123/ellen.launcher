@@ -2,7 +2,9 @@
 // Licensed under the MIT license.
 
 using Ellen.Launcher.Core.Database;
+using Ellen.Launcher.Model;
 using Ellen.Launcher.Model.Entity;
+using Ellen.Launcher.Model.Intrinsic;
 using Ellen.Launcher.Service.GachaLog.QueryProvider;
 using Ellen.Launcher.Web.Hoyolab.Hk4e.Event.GachaInfo;
 using System.Collections.Immutable;
@@ -14,12 +16,14 @@ public sealed class GachaLogFetchContext
     private readonly GachaLogServiceMetadataContext serviceContext;
     private readonly IGachaLogRepository repository;
     private readonly bool isLazy;
+    private readonly GachaGameType game;
 
-    public GachaLogFetchContext(IGachaLogRepository repository, GachaLogServiceMetadataContext serviceContext, bool isLazy)
+    public GachaLogFetchContext(IGachaLogRepository repository, GachaLogServiceMetadataContext serviceContext, bool isLazy, GachaGameType game = GachaGameType.Genshin)
     {
         this.repository = repository;
         this.serviceContext = serviceContext;
         this.isLazy = isLazy;
+        this.game = game;
     }
 
     public GachaLogFetchStatus Status { get; set; } = default!;
@@ -53,7 +57,7 @@ public sealed class GachaLogFetchContext
 
     public void EnsureArchiveAndEndId(GachaLogItem item, IAdvancedDbCollectionView<GachaArchive> archives, IGachaLogRepository repository)
     {
-        TargetArchive ??= GachaArchiveOperation.GetOrAdd(repository, item.Uid, archives);
+        TargetArchive ??= GachaArchiveOperation.GetOrAdd(repository, item.Uid, game, archives);
         DbEndId ??= repository.GetNewestGachaItemIdByArchiveIdAndQueryType(TargetArchive.InnerId, CurrentType);
     }
 
@@ -65,14 +69,41 @@ public sealed class GachaLogFetchContext
 
     public bool HasReachCurrentTypeEnd(ImmutableArray<GachaLogItem> items)
     {
-        return CurrentTypeAddingCompleted || items.Length < GachaLogTypedQueryOptions.Size;
+        if (CurrentTypeAddingCompleted)
+        {
+            return true;
+        }
+
+        // 绝区零 API 每页返回的条数可能与 Size 不同（实测每页 5 条），
+        // 用「空页」判断结束，与 zzz-signal-search-export 一致
+        if (game is GachaGameType.ZZZ)
+        {
+            return items.Length == 0;
+        }
+
+        return items.Length < GachaLogTypedQueryOptions.Size;
     }
 
     public void AddItem(GachaLogItem item)
     {
         ArgumentNullException.ThrowIfNull(TargetArchive);
-        ItemsToAdd.Add(GachaItem.From(TargetArchive.InnerId, item, serviceContext.GetItemId(item)));
-        Status.Items.Add(serviceContext.GetItemByNameAndType(item.Name, item.ItemType));
+
+        if (game is GachaGameType.ZZZ)
+        {
+            // 绝区零物品不在原神元数据中，名称与稀有度直接落库
+            ItemsToAdd.Add(GachaItem.FromZZZ(TargetArchive.InnerId, item));
+            Status.Items.Add(new Item
+            {
+                Name = item.Name,
+                Quality = GachaItem.ZZZQualityToQualityType(item.RankType),
+            });
+        }
+        else
+        {
+            ItemsToAdd.Add(GachaItem.From(TargetArchive.InnerId, item, serviceContext.GetItemId(item)));
+            Status.Items.Add(serviceContext.GetItemByNameAndType(item.Name, item.ItemType));
+        }
+
         TypedQueryOptions.EndId = item.Id;
     }
 

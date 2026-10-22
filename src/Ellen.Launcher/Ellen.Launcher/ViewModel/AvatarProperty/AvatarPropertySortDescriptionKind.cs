@@ -32,4 +32,16 @@ public enum AvatarPropertySortDescriptionKind
 
     [LocalizationKey(nameof(SH.ViewModelAvatarPropertySortDescriptionKindElementMastery))]
     ElementMastery,
+
+    /// <summary>
+    /// 绝区零专用：按影画解锁层数排序（字段与命之座一致，显示名不同）。
+    /// </summary>
+    [LocalizationKey(nameof(SH.ViewModelAvatarPropertySortDescriptionKindZZZActivatedConstellationCount))]
+    ZZZActivatedConstellationCount,
+
+    /// <summary>
+    /// 绝区零专用：按异常精通排序（字段与元素精通一致，显示名不同）。
+    /// </summary>
+    [LocalizationKey(nameof(SH.ViewModelAvatarPropertySortDescriptionKindZZZElementMastery))]
+    ZZZElementMastery,
 }

@@ -12,6 +12,11 @@ public sealed partial class HistoryWish : Wish, IPropertyValuesProvider
 
     public required Uri BannerImage { get; init; }
 
+    /// <summary>
+    /// 绝区零没有卡池横幅图，历史详情页隐藏横幅图片区域。
+    /// </summary>
+    public bool HasBannerImage { get; init; } = true;
+
     public required ImmutableArray<StatisticsItem> OrangeUpList { get; init; }
 
     public required ImmutableArray<StatisticsItem> PurpleUpList { get; init; }

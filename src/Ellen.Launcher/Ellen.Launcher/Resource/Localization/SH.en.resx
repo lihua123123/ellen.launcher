@@ -3184,4 +3184,25 @@ Space Available: {2}</value>
           <data name="ViewControlStatisticsCardGreenText" xml:space="preserve">
     <value>2 Stars</value>
   </data>
+  <data name="ViewControlStatisticsCardBlueQualityZZZ" xml:space="preserve">
+    <value>Rank B</value>
+  </data>
+  <data name="ViewControlStatisticsCardOrangeQualityZZZ" xml:space="preserve">
+    <value>Rank S</value>
+  </data>
+  <data name="ViewControlStatisticsCardPurpleQualityZZZ" xml:space="preserve">
+    <value>Rank A</value>
+  </data>
+  <data name="ViewPageGachaLogZZZOrangeAgentCountdown" xml:space="preserve">
+    <value>S-Rank Agents</value>
+  </data>
+  <data name="ViewPageGachaLogZZZOrangeWEngineCountdown" xml:space="preserve">
+    <value>S-Rank W-Engines</value>
+  </data>
+  <data name="ViewPageGachaLogPivotZZZAgent" xml:space="preserve">
+    <value>Agents</value>
+  </data>
+  <data name="ViewPageGachaLogPivotZZZWEngine" xml:space="preserve">
+    <value>W-Engines / Bangboo</value>
+  </data>
 </root>

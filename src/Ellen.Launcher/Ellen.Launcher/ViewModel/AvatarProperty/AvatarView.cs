@@ -26,6 +26,26 @@ public sealed partial class AvatarView : INameIconSide<Uri>,
 
     public ElementType Element { get; set; }
 
+    /// <summary>
+    /// 绝区零属性。原神角色保持 <see cref="ZZZElementType.None"/>。
+    /// </summary>
+    public ZZZElementType ZZZElement { get; set; }
+
+    /// <summary>
+    /// 绝区零职业（特性）。原神角色保持 <see cref="ZZZProfessionType.None"/>。
+    /// </summary>
+    public ZZZProfessionType ZZZProfession { get; set; }
+
+    /// <summary>
+    /// 绝区零影画解锁层数（0~6）。原神角色保持 0。
+    /// </summary>
+    public int ZZZRank { get; set; }
+
+    /// <summary>
+    /// 绝区零限定 S 级代理人（对应筛选里的“限定五星”）。原神角色保持 false。
+    /// </summary>
+    public bool IsZZZLimited { get; set; }
+
     public string Level { get => LevelFormat.Format(LevelNumber); }
 
     public WeaponView? Weapon { get; set; }
@@ -77,7 +97,14 @@ public sealed partial class AvatarView : INameIconSide<Uri>,
 
     private int GetAvatarPropertyValue(FightProperty fightProperty)
     {
-        AvatarProperty property = Properties.Single(p => p.FightProperty == fightProperty);
+        // ZZZ 代理人详情不保证包含所有原神 FightProperty（例如没有元素精通词条时），
+        // 排序/筛选读取时按 0 处理，避免 Single 抛异常。
+        AvatarProperty? property = Properties.FirstOrDefault(p => p.FightProperty == fightProperty);
+        if (property is null)
+        {
+            return 0;
+        }
+
         int value = int.Parse(property.Value);
         if (!string.IsNullOrEmpty(property.AddValue))
         {

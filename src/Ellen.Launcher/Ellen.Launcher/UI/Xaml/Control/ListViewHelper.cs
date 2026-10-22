@@ -43,10 +43,20 @@ public sealed partial class ListViewHelper
 
             if (args.OldValue != args.NewValue)
             {
-                if (weakView.TryGetTarget(out ListView? view))
+                // Detach from the panel that actually raised the event. The ListView may
+                // already be unloaded/re-templated here, so view.ItemsPanelRoot can be null.
+                if (sender is FrameworkElement panel)
                 {
-                    view.SmoothScrollIntoViewWithIndexAsync(0).SafeForget();
-                    view.ItemsPanelRoot.LayoutUpdated -= Handle;
+                    panel.LayoutUpdated -= Handle;
+                }
+
+                if (weakView.TryGetTarget(out ListView? view)
+                    && view.FindDescendant<ScrollViewer>() is { } scrollViewer)
+                {
+                    // Do not animate here. A smooth scroll can be interrupted by page
+                    // navigation and leave the ListView's internal ScrollViewer stuck at
+                    // its current offset, making the list impossible to scroll later.
+                    _ = scrollViewer.ChangeView(null, 0, null, disableAnimation: true);
                 }
             }
         }

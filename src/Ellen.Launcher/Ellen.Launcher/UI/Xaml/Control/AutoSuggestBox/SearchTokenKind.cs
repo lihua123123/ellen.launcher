@@ -23,4 +23,6 @@ public enum SearchTokenKind
     BackpackCookFoodType,
     BackpackReliquarySet,
     BackpackQuality,
+    ZZZProfession,
+    ZZZElement,
 }

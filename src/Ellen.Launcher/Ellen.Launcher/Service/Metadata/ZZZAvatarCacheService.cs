@@ -2,23 +2,26 @@
 // Licensed under the MIT license.
 
 using Ellen.Launcher.Core;
-using Ellen.Launcher.Core.Logging;
 using Ellen.Launcher.Model.Metadata.ZZZ;
 using System.IO;
-using System.Text.Json;
 
 namespace Ellen.Launcher.Service.Metadata;
 
 /// <summary>
 /// 绝区零「我的角色」缓存读写。缓存按区服 + UID 分文件，避免多账号互相覆盖。
+///
+/// 与原神「我的角色」一致：缓存是持久数据，不做过期删除，也不做自动刷新。
+/// 只有用户点击「同步角色信息」时才会强制联网更新。
 /// </summary>
 public interface IZZZAvatarCacheService
 {
-    TimeSpan MaxAge { get; }
-
     ZZZAvatarCache? Load(string uid, string region);
 
     void Save(ZZZAvatarCache cache);
+
+    ZZZRoleCache? LoadRoles(Guid userInnerId);
+
+    void SaveRoles(ZZZRoleCache cache);
 }
 
 [Service(ServiceLifetime.Singleton, typeof(IZZZAvatarCacheService))]
@@ -33,8 +36,6 @@ public sealed partial class ZZZAvatarCacheService : IZZZAvatarCacheService
 
     [GeneratedConstructor]
     public partial ZZZAvatarCacheService(IServiceProvider serviceProvider);
-
-    public TimeSpan MaxAge { get; } = TimeSpan.FromHours(6);
 
     public ZZZAvatarCache? Load(string uid, string region)
     {
@@ -51,11 +52,14 @@ public sealed partial class ZZZAvatarCacheService : IZZZAvatarCacheService
             if (cache is null
                 || !string.Equals(cache.GameUid, uid, StringComparison.Ordinal)
                 || !string.Equals(cache.Region, region, StringComparison.Ordinal)
-                || cache.Agents.Count is 0)
+                || cache.Agents is not { Count: > 0 })
             {
                 return null;
             }
 
+            // 旧版本/手工改坏的 JSON 可能把字典写成 null，读取时归一化。
+            cache.DetailsJson ??= [];
+            cache.WikiAssets ??= new(StringComparer.Ordinal);
             return cache;
         }
         catch (Exception ex)
@@ -90,10 +94,66 @@ public sealed partial class ZZZAvatarCacheService : IZZZAvatarCacheService
         }
     }
 
+    public ZZZRoleCache? LoadRoles(Guid userInnerId)
+    {
+        string path = GetRolesPath(userInnerId);
+        if (!File.Exists(path))
+        {
+            return null;
+        }
+
+        try
+        {
+            using FileStream stream = File.OpenRead(path);
+            ZZZRoleCache? cache = JsonSerializer.Deserialize<ZZZRoleCache>(stream, SerializerOptions);
+            if (cache is null || cache.UserInnerId != userInnerId || cache.Roles is not { Count: > 0 })
+            {
+                return null;
+            }
+
+            return cache;
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Failed to read ZZZ role cache: {Path}", path);
+            return null;
+        }
+    }
+
+    public void SaveRoles(ZZZRoleCache cache)
+    {
+        string path = GetRolesPath(cache.UserInnerId);
+        try
+        {
+            string? directory = Path.GetDirectoryName(path);
+            if (!string.IsNullOrEmpty(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            string temporaryPath = $"{path}.tmp";
+            using (FileStream stream = File.Create(temporaryPath))
+            {
+                JsonSerializer.Serialize(stream, cache, SerializerOptions);
+            }
+
+            File.Move(temporaryPath, path, true);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Failed to save ZZZ role cache: {Path}", path);
+        }
+    }
+
     private static string GetPath(string uid, string region)
     {
         string fileName = $"{Sanitize(region)}_{Sanitize(uid)}.json";
         return Path.Combine(EllenRuntime.GetDataServerCacheDirectory(), "ZZZ", "Avatar", fileName);
+    }
+
+    private static string GetRolesPath(Guid userInnerId)
+    {
+        return Path.Combine(EllenRuntime.GetDataServerCacheDirectory(), "ZZZ", "Avatar", $"roles_{userInnerId:N}.json");
     }
 
     private static string Sanitize(string value)

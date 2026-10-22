@@ -1,6 +1,7 @@
 // Copyright (c) DGP Studio. All rights reserved.
 // Licensed under the MIT license.
 
+using Ellen.Launcher.Web.Hoyolab.Takumi.Binding;
 using Ellen.Launcher.Web.Hoyolab.Takumi.GameRecord.ZZZ;
 
 namespace Ellen.Launcher.Model.Metadata.ZZZ;
@@ -28,4 +29,19 @@ public sealed class ZZZWikiAssetCache
     public string[] CinemaImages { get; set; } = [];
 
     public string[] SkillIcons { get; set; } = [];
+}
+
+/// <summary>
+/// 米游社账号下绑定的绝区零角色列表缓存。
+/// 断网或重启后即使战绩接口不可用，也能回到上次选中的角色及其本地代理人缓存。
+/// </summary>
+public sealed class ZZZRoleCache
+{
+    public Guid UserInnerId { get; set; }
+
+    public DateTimeOffset UpdatedAt { get; set; }
+
+    public List<ZZZUserGameRole> Roles { get; set; } = [];
+
+    public string? SelectedGameUid { get; set; }
 }

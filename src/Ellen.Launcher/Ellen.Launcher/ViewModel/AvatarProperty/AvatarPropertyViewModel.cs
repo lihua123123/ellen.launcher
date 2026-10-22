@@ -9,7 +9,6 @@ using Ellen.Launcher.Core.Setting;
 using Ellen.Launcher.Factory.ContentDialog;
 using Ellen.Launcher.Model;
 using Ellen.Launcher.Model.Calculable;
-using Ellen.Launcher.Model.Entity;
 using Ellen.Launcher.Model.Entity.Primitive;
 using Ellen.Launcher.Model.Intrinsic;
 using Ellen.Launcher.Model.Metadata.ZZZ;
@@ -27,7 +26,6 @@ using Ellen.Launcher.UI.Xaml.Control.AutoSuggestBox;
 using Ellen.Launcher.UI.Xaml.Data;
 using Ellen.Launcher.UI.Xaml.View.Dialog;
 using Ellen.Launcher.ViewModel.User;
-using Ellen.Launcher.Web.Endpoint.Upstream;
 using Ellen.Launcher.Web.Hoyolab.Takumi.Binding;
 using Ellen.Launcher.Web.Hoyolab.Takumi.Event.Calculate;
 using Ellen.Launcher.Web.Hoyolab.Takumi.GameRecord.ZZZ;
@@ -38,7 +36,6 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.Json;
 using CalculatorAvatarPromotionDelta = Ellen.Launcher.Web.Hoyolab.Takumi.Event.Calculate.AvatarPromotionDelta;
 using CalculatorBatchConsumption = Ellen.Launcher.Web.Hoyolab.Takumi.Event.Calculate.BatchConsumption;
 using CalculatorConsumption = Ellen.Launcher.Web.Hoyolab.Takumi.Event.Calculate.Consumption;
@@ -52,9 +49,18 @@ public sealed partial class AvatarPropertyViewModel : Abstraction.ViewModel, IRe
 {
     private readonly ExclusiveTokenProvider refreshTokenProvider = new();
     private readonly AvatarPropertyViewModelScopeContext scopeContext;
+    private readonly ILogger<AvatarPropertyViewModel> logger;
 
+    private readonly List<SearchToken> genshinFilterTokens = [];
+    private readonly List<SearchToken> zzzFilterTokens = [];
     private SummaryFactoryMetadataContext? metadataContext;
+    private SearchData? zzzEmptySearchData;
     private bool suppressZZZRoleChanged;
+    private bool wasZZZSummaryVisible;
+    private int zzzLoadGeneration;
+    private ImmutableArray<NameValue<AvatarPropertySortDescriptionKind>>? genshinSortDescriptionKinds;
+    private ImmutableArray<NameValue<AvatarPropertySortDescriptionKind>>? zzzSortDescriptionKinds;
+    private NameValue<AvatarPropertySortDescriptionKind>? sortDescriptionKind;
 
     [GeneratedConstructor]
     public partial AvatarPropertyViewModel(IServiceProvider serviceProvider);
@@ -101,17 +107,45 @@ public sealed partial class AvatarPropertyViewModel : Abstraction.ViewModel, IRe
 
     public string FormattedTotalAvatarCount { get => SH.FormatViewModelAvatarPropertyTotalAvatarCountHint(Summary?.Avatars.Count ?? 0); }
 
-    public ImmutableArray<NameValue<AvatarPropertySortDescriptionKind>> SortDescriptionKinds { get; } = ImmutableCollectionsNameValue.FromEnum<AvatarPropertySortDescriptionKind>(static type => type.GetLocalizedDescription(SH.ResourceManager, CultureInfo.CurrentCulture) ?? string.Empty);
+    /// <summary>
+    /// ZZZ 无数据时，把同一个搜索/筛选 token 框放到页面上方，保证空状态入口不丢。
+    /// </summary>
+    public bool IsZZZEmptySearchVisible => IsZZZMode && Summary is null;
+
+    public SearchData? ZZZEmptySearchData => zzzEmptySearchData;
+
+    public ObservableCollection<SearchToken>? ZZZEmptyFilterTokens => IsZZZMode && Summary is null ? zzzEmptySearchData?.FilterTokens : null;
+
+    public ImmutableArray<NameValue<AvatarPropertySortDescriptionKind>> SortDescriptionKinds
+    {
+        get => IsZZZMode
+            ? zzzSortDescriptionKinds ??= CreateZZZSortDescriptionKinds()
+            : genshinSortDescriptionKinds ??= CreateGenshinSortDescriptionKinds();
+    }
+
+    private string CurrentSortDescriptionSettingKey => IsZZZMode
+        ? SettingKeys.AvatarPropertySortDescriptionKindZZZ
+        : SettingKeys.AvatarPropertySortDescriptionKind;
 
     // TODO: Replace with IObservableProperty
     public NameValue<AvatarPropertySortDescriptionKind>? SortDescriptionKind
     {
-        get => field ??= Selection.Initialize(SortDescriptionKinds, UnsafeLocalSetting.Get(SettingKeys.AvatarPropertySortDescriptionKind, AvatarPropertySortDescriptionKind.Default));
+        get
+        {
+            if (sortDescriptionKind is null)
+            {
+                AvatarPropertySortDescriptionKind saved = UnsafeLocalSetting.Get(CurrentSortDescriptionSettingKey, AvatarPropertySortDescriptionKind.Default);
+                sortDescriptionKind = Selection.Initialize(SortDescriptionKinds, saved) ?? SortDescriptionKinds[0];
+            }
+
+            return sortDescriptionKind;
+        }
+
         set
         {
-            if (value is not null && SetProperty(ref field, value))
+            if (value is not null && SetProperty(ref sortDescriptionKind, value))
             {
-                UnsafeLocalSetting.Set(SettingKeys.AvatarPropertySortDescriptionKind, value.Value);
+                UnsafeLocalSetting.Set(CurrentSortDescriptionSettingKey, value.Value);
                 PrivateSortAvatars();
             }
         }
@@ -120,6 +154,111 @@ public sealed partial class AvatarPropertyViewModel : Abstraction.ViewModel, IRe
     partial void OnSelectedGameChanged(NameValue<GachaGameType> value)
     {
         SwitchGameAsync(value.Value).SafeForget();
+    }
+
+    partial void OnIsZZZModeChanged(bool value)
+    {
+        // 原神/绝区零使用各自的排序项与设置键，切换时丢弃缓存的选择，避免把
+        // 绝区零的「影画解锁层数」或已删除的「好感度」带到另一边。
+        sortDescriptionKind = null;
+        OnPropertyChanged(nameof(SortDescriptionKinds));
+        OnPropertyChanged(nameof(SortDescriptionKind));
+        OnPropertyChanged(nameof(IsZZZEmptySearchVisible));
+        OnPropertyChanged(nameof(ZZZEmptySearchData));
+        OnPropertyChanged(nameof(ZZZEmptyFilterTokens));
+    }
+
+    partial void OnSummaryChanged(Summary? value)
+    {
+        bool hasSummary = value is not null;
+        OnPropertyChanged(nameof(IsZZZEmptySearchVisible));
+        OnPropertyChanged(nameof(ZZZEmptyFilterTokens));
+
+        if (IsZZZMode && zzzEmptySearchData is not null && SearchData is not null)
+        {
+            // 空状态与内容区是两个 token 框，各自包装自己的集合；只在 null ↔ 有内容
+            // 的边界搬运已选 token，普通刷新（有内容 → 有内容）不能清掉用户筛选。
+            // 规则：当前可见框里已有 token 时以它为准；只有它是空的时候才从隐藏框补。
+            if (!hasSummary && wasZZZSummaryVisible)
+            {
+                if (zzzEmptySearchData.FilterTokens.Count is 0)
+                {
+                    ReplaceFilterTokens(zzzEmptySearchData.FilterTokens, SearchData.FilterTokens);
+                }
+
+                SearchData.FilterToken = null;
+                RemoveAllFilterTokens(SearchData.FilterTokens);
+            }
+            else if (hasSummary && !wasZZZSummaryVisible)
+            {
+                if (zzzEmptySearchData.FilterTokens.Count > 0)
+                {
+                    ReplaceFilterTokens(SearchData.FilterTokens, zzzEmptySearchData.FilterTokens);
+                    RemoveAllFilterTokens(zzzEmptySearchData.FilterTokens);
+                }
+
+                zzzEmptySearchData.FilterToken = null;
+            }
+        }
+
+        wasZZZSummaryVisible = hasSummary;
+    }
+
+    private static void ReplaceFilterTokens(ObservableCollection<SearchToken> target, IEnumerable<SearchToken> source)
+    {
+        if (ReferenceEquals(target, source))
+        {
+            return;
+        }
+
+        RemoveAllFilterTokens(target);
+        foreach (SearchToken token in source)
+        {
+            if (!target.Contains(token))
+            {
+                target.Add(token);
+            }
+        }
+    }
+
+    private static void RemoveAllFilterTokens(ObservableCollection<SearchToken> target)
+    {
+        while (target.Count > 0)
+        {
+            target.RemoveAt(target.Count - 1);
+        }
+    }
+
+    private static ImmutableArray<NameValue<AvatarPropertySortDescriptionKind>> CreateGenshinSortDescriptionKinds()
+    {
+        return
+        [
+            .. ImmutableCollectionsNameValue.FromEnum<AvatarPropertySortDescriptionKind>(
+                    static type => type.GetLocalizedDescription(SH.ResourceManager, CultureInfo.CurrentCulture) ?? string.Empty)
+                .Where(static option => option.Value is not (
+                    AvatarPropertySortDescriptionKind.ZZZActivatedConstellationCount
+                    or AvatarPropertySortDescriptionKind.ZZZElementMastery)),
+        ];
+    }
+
+    private static ImmutableArray<NameValue<AvatarPropertySortDescriptionKind>> CreateZZZSortDescriptionKinds()
+    {
+        ImmutableArray<NameValue<AvatarPropertySortDescriptionKind>> all = ImmutableCollectionsNameValue.FromEnum<AvatarPropertySortDescriptionKind>(
+            static type => type.GetLocalizedDescription(SH.ResourceManager, CultureInfo.CurrentCulture) ?? string.Empty);
+
+        AvatarPropertySortDescriptionKind[] order =
+        [
+            AvatarPropertySortDescriptionKind.Default,
+            AvatarPropertySortDescriptionKind.LevelNumber,
+            AvatarPropertySortDescriptionKind.Quality,
+            AvatarPropertySortDescriptionKind.ZZZActivatedConstellationCount,
+            AvatarPropertySortDescriptionKind.MaxHp,
+            AvatarPropertySortDescriptionKind.CurAttack,
+            AvatarPropertySortDescriptionKind.CurDefense,
+            AvatarPropertySortDescriptionKind.ZZZElementMastery,
+        ];
+
+        return [.. order.Select(kind => all.Single(option => option.Value == kind))];
     }
 
     partial void OnSelectedZZZRoleChanged(ZZZUserGameRole? value)
@@ -183,7 +322,6 @@ public sealed partial class AvatarPropertyViewModel : Abstraction.ViewModel, IRe
         }
 
         metadataContext = await scopeContext.MetadataService.GetContextAsync<SummaryFactoryMetadataContext>(token).ConfigureAwait(false);
-        SearchData searchData = SearchData.CreateForAvatarProperty();
 
         if (await scopeContext.UserService.GetCurrentUserAndUidAsync().ConfigureAwait(false) is { } userAndUid)
         {
@@ -192,95 +330,202 @@ public sealed partial class AvatarPropertyViewModel : Abstraction.ViewModel, IRe
         }
 
         await scopeContext.TaskContext.SwitchToMainThreadAsync();
-        SearchData = searchData;
+        SearchData ??= SearchData.CreateForAvatarProperty();
 
         return true;
     }
 
     private async Task SwitchGameAsync(GachaGameType game)
     {
-        IsZZZMode = game is GachaGameType.ZZZ;
-
-        if (!IsZZZMode)
+        bool isZZZ = game is GachaGameType.ZZZ;
+        SearchData ??= SearchData.CreateForAvatarProperty();
+        if (isZZZ)
         {
+            zzzEmptySearchData ??= SearchData.CreateForZZZAvatarProperty();
+        }
+
+        // SearchData/FilterTokens 始终是同一个对象：AutoSuggestTokenBox 包装过 ItemsSource 后
+        // 再替换整个 SearchData 不会重新绑定，所以这里只原地换 token 候选与已选 token。
+        List<SearchToken> currentTokens = IsZZZMode ? zzzFilterTokens : genshinFilterTokens;
+        currentTokens.Clear();
+        currentTokens.AddRange(SearchData.FilterTokens);
+
+        List<SearchToken> targetTokens = isZZZ ? zzzFilterTokens : genshinFilterTokens;
+        SearchData.SetAvailableTokens(isZZZ ? SearchTokens.GetForZZZAvatarProperty() : SearchTokens.GetForAvatarProperty());
+
+        // 不要用 Clear()：它会发 Reset，AutoSuggestTokenBox 的 InterspersedObservableCollection
+        // 对 Reset 有已知的 ListView 视觉树重复异常；逐项 Remove 走 Add/Remove 通知更安全。
+        while (SearchData.FilterTokens.Count > 0)
+        {
+            SearchData.FilterTokens.RemoveAt(SearchData.FilterTokens.Count - 1);
+        }
+
+        foreach (SearchToken token in targetTokens)
+        {
+            SearchData.FilterTokens.Add(token);
+        }
+
+        SearchData.FilterToken = null;
+        IsZZZMode = isZZZ;
+
+        if (!isZZZ)
+        {
+            // 让还在后台跑的 ZZZ 请求作废，避免它把原神的 Summary 覆盖掉。
+            Interlocked.Increment(ref zzzLoadGeneration);
+            IsZZZLoading = false;
             Summary = genshinSummary;
             IsInitialized = true;
+            ApplyFilter();
             return;
         }
 
         genshinSummary ??= Summary;
+        if (Summary is null && zzzEmptySearchData is not null)
+        {
+            // Summary 本来就是 null 时不会触发 OnSummaryChanged，这里补一次搬运。
+            // 空状态框是当前可见的权威来源：它已有 token 时不要用隐藏的主框覆盖。
+            if (zzzEmptySearchData.FilterTokens.Count is 0)
+            {
+                ReplaceFilterTokens(zzzEmptySearchData.FilterTokens, SearchData.FilterTokens);
+            }
+
+            RemoveAllFilterTokens(SearchData.FilterTokens);
+        }
+
         Summary = null;
         IsInitialized = false;
-        IsZZZLoading = true;
+        await LoadZZZRolesAsync().ConfigureAwait(false);
+    }
+
+    private async Task LoadZZZRolesAsync(bool forceRefresh = false)
+    {
+        int generation = Interlocked.Increment(ref zzzLoadGeneration);
+        await SetZZZLoadingAsync(true).ConfigureAwait(false);
+
         try
         {
-            await LoadZZZRolesAsync().ConfigureAwait(false);
+            UserAndUid? userAndUid = await scopeContext.UserService.GetCurrentUserAndUidAsync().ConfigureAwait(false);
+            if (userAndUid is null)
+            {
+                await ApplyZZZEmptyStateAsync(generation, InfoBarMessage.Warning(SH.ViewPageAvatarPropertyZZZNeedLogin)).ConfigureAwait(false);
+                return;
+            }
+
+            await scopeContext.TaskContext.SwitchToBackgroundAsync();
+            ZZZRoleCache? roleCache = scopeContext.ZZZAvatarCacheService.LoadRoles(userAndUid.User.InnerId);
+
+            // 角色列表也走缓存优先：断网/重启时仍能回到上次的角色与代理人缓存。
+            if (!forceRefresh && roleCache is { Roles.Count: > 0 })
+            {
+                ZZZUserGameRole cachedSelected = roleCache.Roles.FirstOrDefault(role => role.GameUid == roleCache.SelectedGameUid) ?? roleCache.Roles[0];
+                if (!await ApplyZZZRolesAsync(roleCache.Roles, cachedSelected, generation).ConfigureAwait(false))
+                {
+                    return;
+                }
+
+                await LoadZZZAgentsAsync(userAndUid, cachedSelected, forceRefresh: false, generation).ConfigureAwait(false);
+                return;
+            }
+
+            Response<ListWrapper<ZZZUserGameRole>> response = await scopeContext.BindingClient
+                .GetZZZUserGameRolesAsync(userAndUid.User, CancellationToken)
+                .ConfigureAwait(false);
+
+            if (!IsCurrentZZZLoad(generation))
+            {
+                return;
+            }
+
+            if (!ResponseValidator.TryValidateWithoutUINotification(response, scopeContext.ServiceProvider, out ListWrapper<ZZZUserGameRole>? roleWrapper))
+            {
+                logger.LogWarning("Failed to refresh ZZZ roles: {Code} {Message}", response.ReturnCode, response.Message);
+
+                if (roleCache is { Roles.Count: > 0 })
+                {
+                    ZZZUserGameRole cachedSelected = roleCache.Roles.FirstOrDefault(role => role.GameUid == roleCache.SelectedGameUid) ?? roleCache.Roles[0];
+                    if (!await ApplyZZZRolesAsync(roleCache.Roles, cachedSelected, generation).ConfigureAwait(false))
+                    {
+                        return;
+                    }
+
+                    await LoadZZZAgentsAsync(userAndUid, cachedSelected, forceRefresh, generation).ConfigureAwait(false);
+                }
+                else
+                {
+                    await ApplyZZZEmptyStateAsync(generation, InfoBarMessage.Error(SH.ViewPageAvatarPropertyZZZLoadFailed), preserveSummary: true).ConfigureAwait(false);
+                }
+
+                return;
+            }
+
+            ZZZUserGameRole[] roles = [.. roleWrapper.List];
+            string? preferredUid = SelectedZZZRole?.GameUid;
+            ZZZUserGameRole? selected = roles.FirstOrDefault(role => role.GameUid == preferredUid) ?? roles.FirstOrDefault();
+
+            if (!await ApplyZZZRolesAsync(roles, selected, generation).ConfigureAwait(false))
+            {
+                return;
+            }
+
+            if (selected is null)
+            {
+                await ApplyZZZEmptyStateAsync(generation, InfoBarMessage.Warning(SH.ViewPageAvatarPropertyZZZNoRole)).ConfigureAwait(false);
+                return;
+            }
+
+            await scopeContext.TaskContext.SwitchToBackgroundAsync();
+            if (!IsCurrentZZZLoad(generation))
+            {
+                return;
+            }
+
+            scopeContext.ZZZAvatarCacheService.SaveRoles(new ZZZRoleCache
+            {
+                UserInnerId = userAndUid.User.InnerId,
+                UpdatedAt = DateTimeOffset.UtcNow,
+                Roles = [.. roles],
+                SelectedGameUid = selected.GameUid,
+            });
+
+            await LoadZZZAgentsAsync(userAndUid, selected, forceRefresh, generation).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
         }
         catch (Exception ex)
         {
-            Summary = null;
-            scopeContext.Messenger.Send(InfoBarMessage.Error(ex));
-            IsInitialized = true;
+            logger.LogError(ex, "Failed to load ZZZ roles.");
+            await ApplyZZZEmptyStateAsync(generation, InfoBarMessage.Error(ex), preserveSummary: true).ConfigureAwait(false);
         }
         finally
         {
-            IsZZZLoading = false;
+            if (IsCurrentZZZLoad(generation))
+            {
+                await SetZZZLoadingAsync(false).ConfigureAwait(false);
+            }
         }
-    }
-
-    private async Task LoadZZZRolesAsync()
-    {
-        UserAndUid? userAndUid = await scopeContext.UserService.GetCurrentUserAndUidAsync().ConfigureAwait(false);
-        if (userAndUid is null)
-        {
-            Summary = null;
-            IsInitialized = true;
-            scopeContext.Messenger.Send(InfoBarMessage.Warning(SH.ViewPageAvatarPropertyZZZNeedLogin));
-            return;
-        }
-
-        await scopeContext.TaskContext.SwitchToBackgroundAsync();
-        Response<ListWrapper<ZZZUserGameRole>> response = await scopeContext.BindingClient
-            .GetZZZUserGameRolesAsync(userAndUid.User, CancellationToken)
-            .ConfigureAwait(false);
-
-        if (!ResponseValidator.TryValidate(response, scopeContext.ServiceProvider, out ListWrapper<ZZZUserGameRole>? roleWrapper))
-        {
-            Summary = null;
-            IsInitialized = true;
-            return;
-        }
-
-        ZZZUserGameRole[] roles = [.. roleWrapper.List];
-        await scopeContext.TaskContext.SwitchToMainThreadAsync();
-        ZZZRoles = new ObservableCollection<ZZZUserGameRole>(roles);
-
-        ZZZUserGameRole? selected = roles.FirstOrDefault();
-        suppressZZZRoleChanged = true;
-        SelectedZZZRole = selected;
-        suppressZZZRoleChanged = false;
-
-        if (selected is null)
-        {
-            Summary = null;
-            IsInitialized = true;
-            scopeContext.Messenger.Send(InfoBarMessage.Warning(SH.ViewPageAvatarPropertyZZZNoRole));
-            return;
-        }
-
-        await LoadZZZAgentsAsync(userAndUid, selected).ConfigureAwait(false);
     }
 
     private async Task LoadZZZAgentsAsync(ZZZUserGameRole role)
     {
+        int generation = Interlocked.Increment(ref zzzLoadGeneration);
         UserAndUid? userAndUid = await scopeContext.UserService.GetCurrentUserAndUidAsync().ConfigureAwait(false);
         if (userAndUid is null)
         {
-            IsInitialized = true;
+            await ApplyZZZEmptyStateAsync(generation, InfoBarMessage.Warning(SH.ViewPageAvatarPropertyZZZNeedLogin)).ConfigureAwait(false);
             return;
         }
 
-        await LoadZZZAgentsAsync(userAndUid, role).ConfigureAwait(false);
+        // 记住用户手动选择的角色，避免下次启动又跳回第一个。
+        await scopeContext.TaskContext.SwitchToBackgroundAsync();
+        ZZZRoleCache? roleCache = scopeContext.ZZZAvatarCacheService.LoadRoles(userAndUid.User.InnerId);
+        if (roleCache is not null && !string.Equals(roleCache.SelectedGameUid, role.GameUid, StringComparison.Ordinal))
+        {
+            roleCache.SelectedGameUid = role.GameUid;
+            scopeContext.ZZZAvatarCacheService.SaveRoles(roleCache);
+        }
+
+        await LoadZZZAgentsAsync(userAndUid, role, forceRefresh: false, generation).ConfigureAwait(false);
     }
 
     private static Uri? SelectCinemaImage(ImmutableArray<Uri> images, int rank)
@@ -294,20 +539,43 @@ public sealed partial class AvatarPropertyViewModel : Abstraction.ViewModel, IRe
         return images[Math.Min(index, images.Length - 1)];
     }
 
-    private async Task LoadZZZAgentsAsync(UserAndUid userAndUid, ZZZUserGameRole role, bool forceRefresh = false)
+    private async Task LoadZZZAgentsAsync(UserAndUid userAndUid, ZZZUserGameRole role, bool forceRefresh = false, int? generation = null)
     {
-        IsZZZLoading = true;
-        IsInitialized = false;
+        int loadGeneration = generation ?? Interlocked.Increment(ref zzzLoadGeneration);
+        await SetZZZLoadingAsync(true).ConfigureAwait(false);
+        await scopeContext.TaskContext.SwitchToMainThreadAsync();
+        if (!IsCurrentZZZLoad(loadGeneration))
+        {
+            return;
+        }
+
+        // 已有缓存/旧角色时保持内容可见，避免「同步角色信息」造成整页闪一下。
+        if (Summary is null)
+        {
+            IsInitialized = false;
+        }
+
         ZZZAvatarCache? cache = null;
+        bool cacheApplied = false;
+
         try
         {
             await scopeContext.TaskContext.SwitchToBackgroundAsync();
             cache = scopeContext.ZZZAvatarCacheService.Load(role.GameUid, role.Region);
-            if (!forceRefresh
-                && cache is not null
-                && DateTimeOffset.UtcNow - cache.UpdatedAt <= scopeContext.ZZZAvatarCacheService.MaxAge)
+            if (cache is not null)
             {
-                await ApplyZZZCacheAsync(cache).ConfigureAwait(false);
+                cacheApplied = await ApplyZZZCacheAsync(cache, loadGeneration).ConfigureAwait(false);
+            }
+
+            if (!IsCurrentZZZLoad(loadGeneration))
+            {
+                return;
+            }
+
+            // 缓存是持久数据：有缓存就直接显示并停止自动联网，
+            // 只有点击「同步角色信息」才会带 forceRefresh 强制更新。
+            if (!forceRefresh && cacheApplied)
+            {
                 return;
             }
 
@@ -315,21 +583,38 @@ public sealed partial class AvatarPropertyViewModel : Abstraction.ViewModel, IRe
                 .GetZZZAgentsAsync(userAndUid.User, role.GameUid, role.Region, CancellationToken)
                 .ConfigureAwait(false);
 
-            if (!ResponseValidator.TryValidate(response, scopeContext.ServiceProvider, out ZZZAvatarListWrapper<ZZZAvatarBasic>? basicWrapper))
+            if (!IsCurrentZZZLoad(loadGeneration))
             {
-                if (cache is not null)
+                return;
+            }
+
+            if (!ResponseValidator.TryValidateWithoutUINotification(response, scopeContext.ServiceProvider, out ZZZAvatarListWrapper<ZZZAvatarBasic>? basicWrapper))
+            {
+                logger.LogWarning("Failed to refresh ZZZ agents: {Code} {Message}", response.ReturnCode, response.Message);
+
+                if (!cacheApplied)
                 {
-                    await ApplyZZZCacheAsync(cache).ConfigureAwait(false);
+                    await ApplyZZZEmptyStateAsync(loadGeneration, InfoBarMessage.Error(SH.ViewPageAvatarPropertyZZZLoadFailed), preserveSummary: true).ConfigureAwait(false);
                 }
-                else
+                else if (forceRefresh)
                 {
-                    Summary = null;
+                    await ShowZZZRefreshFailedUsingCacheAsync(loadGeneration).ConfigureAwait(false);
                 }
 
                 return;
             }
 
             ZZZAvatarBasic[] basics = [.. basicWrapper.List];
+            if (basics.Length is 0)
+            {
+                if (!cacheApplied)
+                {
+                    await ApplyZZZEmptyStateAsync(loadGeneration, InfoBarMessage.Warning(SH.ViewPageAvatarPropertyZZZNoRole)).ConfigureAwait(false);
+                }
+
+                return;
+            }
+
             ConcurrentDictionary<int, string> detailsJson = [];
             ConcurrentDictionary<string, ZZZWikiAssetCache> wikiAssets = new(StringComparer.Ordinal);
             AvatarView[] views = new AvatarView[basics.Length];
@@ -393,51 +678,172 @@ public sealed partial class AvatarPropertyViewModel : Abstraction.ViewModel, IRe
                 }
             })).ConfigureAwait(false);
 
-            await scopeContext.TaskContext.SwitchToMainThreadAsync();
-            Summary summary = Summary.Create(views.Where(static view => view is not null).ToImmutableArray().AsAdvancedCollectionView());
-            Summary = summary;
-            summary.Avatars.MoveCurrentToFirst();
-            PrivateSortAvatars();
-            IsInitialized = true;
-
-            scopeContext.ZZZAvatarCacheService.Save(new ZZZAvatarCache
+            if (!IsCurrentZZZLoad(loadGeneration))
             {
-                GameUid = role.GameUid,
-                Region = role.Region,
-                UpdatedAt = DateTimeOffset.UtcNow,
-                Agents = [.. basics],
-                DetailsJson = detailsJson.ToDictionary(static pair => pair.Key, static pair => pair.Value),
-                WikiAssets = wikiAssets.ToDictionary(static pair => pair.Key, static pair => pair.Value, StringComparer.Ordinal),
-            });
+                return;
+            }
+
+            if (!await ApplyZZZViewsAsync(views, loadGeneration).ConfigureAwait(false))
+            {
+                return;
+            }
+
+            await scopeContext.TaskContext.SwitchToBackgroundAsync();
+            if (!IsCurrentZZZLoad(loadGeneration))
+            {
+                return;
+            }
+
+            SaveMergedZZZCache(cache, role, basics, detailsJson, wikiAssets);
+        }
+        catch (OperationCanceledException)
+        {
         }
         catch (Exception ex)
         {
-            if (cache is not null)
+            logger.LogError(ex, "Failed to load ZZZ agents for {Uid}.", role.GameUid);
+
+            if (!cacheApplied && cache is not null)
             {
-                await ApplyZZZCacheAsync(cache).ConfigureAwait(false);
+                cacheApplied = await ApplyZZZCacheAsync(cache, loadGeneration).ConfigureAwait(false);
             }
-            else
+
+            if (!cacheApplied)
             {
-                Summary = null;
-                IsInitialized = true;
-                scopeContext.Messenger.Send(InfoBarMessage.Error(ex));
+                await ApplyZZZEmptyStateAsync(loadGeneration, InfoBarMessage.Error(ex), preserveSummary: true).ConfigureAwait(false);
+            }
+            else if (forceRefresh)
+            {
+                await ShowZZZRefreshFailedUsingCacheAsync(loadGeneration).ConfigureAwait(false);
             }
         }
         finally
         {
-            IsZZZLoading = false;
+            if (IsCurrentZZZLoad(loadGeneration))
+            {
+                await SetZZZLoadingAsync(false).ConfigureAwait(false);
+            }
         }
     }
 
-    private async Task ApplyZZZCacheAsync(ZZZAvatarCache cache)
+    private async Task<bool> ApplyZZZCacheAsync(ZZZAvatarCache cache, int generation)
     {
         AvatarView[] views = [.. cache.Agents.Select(basic => CreateViewFromCache(basic, cache))];
+        return await ApplyZZZViewsAsync(views, generation).ConfigureAwait(false);
+    }
+
+    private async Task<bool> ApplyZZZViewsAsync(AvatarView[] views, int generation)
+    {
         await scopeContext.TaskContext.SwitchToMainThreadAsync();
+        if (!IsCurrentZZZLoad(generation))
+        {
+            return false;
+        }
+
         Summary summary = Summary.Create(views.Where(static view => view is not null).ToImmutableArray().AsAdvancedCollectionView());
         Summary = summary;
-        summary.Avatars.MoveCurrentToFirst();
         PrivateSortAvatars();
+        ApplyFilter();
+        summary.Avatars.MoveCurrentToFirst();
         IsInitialized = true;
+        return true;
+    }
+
+    private void SaveMergedZZZCache(
+        ZZZAvatarCache? previous,
+        ZZZUserGameRole role,
+        ZZZAvatarBasic[] basics,
+        ConcurrentDictionary<int, string> detailsJson,
+        ConcurrentDictionary<string, ZZZWikiAssetCache> wikiAssets)
+    {
+        Dictionary<int, string> mergedDetails = previous?.DetailsJson is { } oldDetails ? new(oldDetails) : [];
+        foreach ((int id, string json) in detailsJson)
+        {
+            mergedDetails[id] = json;
+        }
+
+        Dictionary<string, ZZZWikiAssetCache> mergedWikiAssets = previous?.WikiAssets is { } oldAssets
+            ? new(oldAssets, StringComparer.Ordinal)
+            : new(StringComparer.Ordinal);
+
+        foreach ((string name, ZZZWikiAssetCache assets) in wikiAssets)
+        {
+            mergedWikiAssets[name] = assets;
+        }
+
+        scopeContext.ZZZAvatarCacheService.Save(new ZZZAvatarCache
+        {
+            GameUid = role.GameUid,
+            Region = role.Region,
+            UpdatedAt = DateTimeOffset.UtcNow,
+            Agents = [.. basics],
+            DetailsJson = mergedDetails,
+            WikiAssets = mergedWikiAssets,
+        });
+    }
+
+    private async Task<bool> ApplyZZZRolesAsync(IReadOnlyList<ZZZUserGameRole> roles, ZZZUserGameRole? selected, int generation)
+    {
+        await scopeContext.TaskContext.SwitchToMainThreadAsync();
+        if (!IsCurrentZZZLoad(generation))
+        {
+            return false;
+        }
+
+        ZZZRoles = new ObservableCollection<ZZZUserGameRole>(roles);
+        suppressZZZRoleChanged = true;
+        try
+        {
+            SelectedZZZRole = selected;
+        }
+        finally
+        {
+            suppressZZZRoleChanged = false;
+        }
+
+        return true;
+    }
+
+    private async Task ApplyZZZEmptyStateAsync(int generation, InfoBarMessage? message, bool preserveSummary = false)
+    {
+        await scopeContext.TaskContext.SwitchToMainThreadAsync();
+        if (!IsCurrentZZZLoad(generation))
+        {
+            return;
+        }
+
+        if (!preserveSummary)
+        {
+            Summary = null;
+        }
+
+        IsInitialized = true;
+        if (message is not null)
+        {
+            scopeContext.Messenger.Send(message);
+        }
+    }
+
+    private async Task ShowZZZRefreshFailedUsingCacheAsync(int generation)
+    {
+        await scopeContext.TaskContext.SwitchToMainThreadAsync();
+        if (!IsCurrentZZZLoad(generation))
+        {
+            return;
+        }
+
+        scopeContext.Messenger.Send(InfoBarMessage.Warning(SH.ViewPageAvatarPropertyZZZRefreshFailedUsingCache));
+    }
+
+    private async Task SetZZZLoadingAsync(bool value)
+    {
+        await scopeContext.TaskContext.SwitchToMainThreadAsync();
+        IsZZZLoading = value;
+    }
+
+    private bool IsCurrentZZZLoad(int generation)
+    {
+        return IsZZZMode && generation == Volatile.Read(ref zzzLoadGeneration);
     }
 
     private static AvatarView CreateViewFromCache(ZZZAvatarBasic basic, ZZZAvatarCache cache)
@@ -512,16 +918,8 @@ public sealed partial class AvatarPropertyViewModel : Abstraction.ViewModel, IRe
 
         if (IsZZZMode)
         {
-            if (SelectedZZZRole is { } role
-                && await scopeContext.UserService.GetCurrentUserAndUidAsync().ConfigureAwait(false) is { } zzzUserAndUid)
-            {
-                await LoadZZZAgentsAsync(zzzUserAndUid, role, forceRefresh: true).ConfigureAwait(false);
-            }
-            else
-            {
-                await LoadZZZRolesAsync().ConfigureAwait(false);
-            }
-
+            // 同步同时刷新角色列表与代理人；LoadZZZRolesAsync 内部会用 forceRefresh 传给代理人。
+            await LoadZZZRolesAsync(forceRefresh: true).ConfigureAwait(false);
             return;
         }
 
@@ -983,17 +1381,20 @@ public sealed partial class AvatarPropertyViewModel : Abstraction.ViewModel, IRe
     {
         SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateUI("Filter", "AvatarPropertyViewModel.Command"));
 
-        if (Summary is null)
+        if (Summary is not { Avatars: { } avatars })
         {
             return;
         }
 
-        Summary.Avatars.Filter = AvatarViewFilter.Compile(SearchData);
+        // 原神/绝区零共用同一个 AutoSuggestTokenBox；SearchData 按游戏切换，
+        // 绝区零的“职业/属性”就是普通搜索 token，和角色名关键词一起生效。
+        avatars.Filter = AvatarViewFilter.Compile(SearchData);
+
         OnPropertyChanged(nameof(FormattedTotalAvatarCount));
 
-        if (Summary.Avatars.CurrentItem is null)
+        if (avatars.CurrentItem is null)
         {
-            Summary.Avatars.MoveCurrentToFirst();
+            avatars.MoveCurrentToFirst();
         }
     }
 }

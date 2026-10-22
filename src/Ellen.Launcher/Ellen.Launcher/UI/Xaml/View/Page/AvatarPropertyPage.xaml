@@ -591,6 +591,42 @@
                 </Grid>
             </DataTemplate>
 
+            <!--
+                绝区零职业/属性 token：属性保留原色，职业图标原图为白色，统一放在深色圆底上，
+                保证浅色/深色主题下都能看清；原神 token 仍使用 TokenTemplate。
+            -->
+            <DataTemplate x:Key="ZZZTokenTemplate" x:DataType="shuxca:SearchToken">
+                <Grid Height="22" VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="26"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Border
+                        Grid.Column="0"
+                        Width="22"
+                        Height="22"
+                        Background="#66000000"
+                        CornerRadius="11">
+                        <shuxci:CachedImage
+                            Width="16"
+                            Height="16"
+                            ShowAsMonoChrome="False"
+                            Source="{Binding IconUri, Mode=OneWay}"
+                            Visibility="{Binding IconUri, Converter={StaticResource EmptyObjectToVisibilityConverter}}"/>
+                    </Border>
+                    <TextBlock
+                        Grid.Column="1"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        Text="{Binding Value}"/>
+                </Grid>
+            </DataTemplate>
+
+            <shva:AvatarSearchTokenTemplateSelector
+                x:Key="AvatarSearchTokenTemplateSelector"
+                DefaultTemplate="{StaticResource TokenTemplate}"
+                ZZZTemplate="{StaticResource ZZZTokenTemplate}"/>
+
             <DataTemplate x:Key="PromoteArrayTemplate" x:DataType="x:Boolean">
                 <Grid>
                     <BitmapIcon
@@ -608,7 +644,41 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <shuxc:StandardView HideCondition="{Binding IsInitialized, Converter={StaticResource BoolNegationConverter}}" ShowCondition="{Binding Summary, Converter={StaticResource EmptyObjectToBoolConverter}}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!--
+            绝区零空状态（未登录/无数据/首次加载）时，搜索与筛选仍然使用同一个 token 框；
+            有内容后这个框折叠，由 CommandBar 里的 token 框接管。
+        -->
+        <Border
+            Grid.Row="0"
+            Margin="16,12,16,0"
+            Style="{ThemeResource AcrylicSecondaryBorderCardStyle}"
+            Visibility="{Binding IsZZZEmptySearchVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+            <shuxca:AutoSuggestTokenBox
+                Height="44"
+                Margin="12"
+                AvailableTokens="{Binding ZZZEmptySearchData.AvailableTokens}"
+                FilterCommand="{Binding FilterCommand}"
+                ItemsSource="{Binding ZZZEmptyFilterTokens, Mode=OneWay}"
+                MaximumTokens="5"
+                PlaceholderText="{shuxm:ResourceString Name=ViewPageWiKiAvatarAutoSuggestBoxPlaceHolder}"
+                QueryIcon="{cw:FontIconSource Glyph=&#xE721;}"
+                Style="{StaticResource DefaultAutoSuggestTokenBoxStyle}"
+                SuggestedItemTemplateSelector="{StaticResource AvatarSearchTokenTemplateSelector}"
+                SuggestedItemsSource="{Binding ZZZEmptySearchData.AvailableTokens.Values}"
+                Text="{Binding ZZZEmptySearchData.FilterToken, Mode=TwoWay}"
+                TokenItemTemplateSelector="{StaticResource AvatarSearchTokenTemplateSelector}"/>
+        </Border>
+
+        <shuxc:StandardView
+            Grid.Row="1"
+            HideCondition="{Binding IsInitialized, Converter={StaticResource BoolNegationConverter}}"
+            ShowCondition="{Binding Summary, Converter={StaticResource EmptyObjectToBoolConverter}}">
         <shuxc:StandardView.EmptyContent>
             <Border
                 HorizontalAlignment="Center"
@@ -732,10 +802,10 @@
                                 PlaceholderText="{shuxm:ResourceString Name=ViewPageWiKiAvatarAutoSuggestBoxPlaceHolder}"
                                 QueryIcon="{cw:FontIconSource Glyph=&#xE721;}"
                                 Style="{StaticResource DefaultAutoSuggestTokenBoxStyle}"
-                                SuggestedItemTemplate="{StaticResource TokenTemplate}"
+                                SuggestedItemTemplateSelector="{StaticResource AvatarSearchTokenTemplateSelector}"
                                 SuggestedItemsSource="{Binding SearchData.AvailableTokens.Values}"
                                 Text="{Binding SearchData.FilterToken, Mode=TwoWay}"
-                                TokenItemTemplate="{StaticResource TokenTemplate}"/>
+                                TokenItemTemplateSelector="{StaticResource AvatarSearchTokenTemplateSelector}"/>
                         </AppBarElementContainer>
                         <AppBarButton
                             Icon="{shuxm:FontIcon Glyph=&#xEDE1;}"
@@ -1036,14 +1106,21 @@
                                                             Background="{ThemeResource ControlAltFillColorSecondaryBrush}"
                                                             BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
                                                             BorderThickness="0,0,0,1"
+                                                            Checked="AvatarPropertyToggle_Checked"
                                                             CornerRadius="{ThemeResource ControlCornerRadius}"
-                                                            IsChecked="True">
+                                                            IsChecked="True"
+                                                            Unchecked="AvatarPropertyToggle_Unchecked">
                                                             <Grid>
                                                                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{Binding PropertyHeader}"/>
                                                                 <FontIcon
                                                                     HorizontalAlignment="Right"
                                                                     FontSize="12"
-                                                                    Glyph="&#xE70D;"/>
+                                                                    Glyph="&#xE70D;"
+                                                                    RenderTransformOrigin="0.5,0.5">
+                                                                    <FontIcon.RenderTransform>
+                                                                        <RotateTransform x:Name="AvatarPropertyArrowRotation" Angle="180"/>
+                                                                    </FontIcon.RenderTransform>
+                                                                </FontIcon>
                                                             </Grid>
                                                         </ToggleButton>
                                                         <Border
@@ -1203,5 +1280,6 @@
                 </Border>
             </Border>
         </Grid>
-    </shuxc:StandardView>
+        </shuxc:StandardView>
+    </Grid>
 </shuxc:ScopedPage>

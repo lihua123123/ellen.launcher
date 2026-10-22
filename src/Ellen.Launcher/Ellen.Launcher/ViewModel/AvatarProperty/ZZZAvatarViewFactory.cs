@@ -8,6 +8,7 @@ using Ellen.Launcher.Web.Endpoint.Upstream;
 using Ellen.Launcher.Web.Hoyolab.Takumi.GameRecord.ZZZ;
 using System.Collections.Immutable;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Ellen.Launcher.ViewModel.AvatarProperty;
 
@@ -17,6 +18,33 @@ namespace Ellen.Launcher.ViewModel.AvatarProperty;
 /// </summary>
 public static class ZZZAvatarViewFactory
 {
+    private static readonly Regex ZzzColorSpanRegex = new(
+        @"<span\s+style\s*=\s*[""']color\s*:\s*(#[0-9a-fA-F]{3,8})\s*[""']\s*>",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private static readonly Regex ZzzColorShorthandRegex = new(
+        @"<color=#([0-9a-fA-F]{3})>",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private static readonly Regex ZzzBreakRegex = new(
+        @"<br\s*/?>",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private static readonly Regex ZzzUnsupportedTagRegex = new(
+        @"<(?!color=|/color>|i>|/i>)[^>]*>",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    /// <summary>
+    /// 常驻 S 级代理人。其余 S 级按限定处理；当前标准池为 6 人。
+    /// </summary>
+    private static readonly ImmutableHashSet<int> StandardSIds = ImmutableHashSet.Create(
+        1021, // 猫又
+        1041, // 「11号」
+        1101, // 珂蕾妲
+        1141, // 莱卡恩
+        1181, // 格莉丝
+        1211); // 丽娜
+
     public static AvatarView Create(ZZZFullAgent agent, ImmutableArray<Uri> skillIcons = default)
     {
         Uri icon = ToUri(agent.RoleSquareUrl, StaticResourcesEndpoints.UIIconNone);
@@ -33,6 +61,10 @@ public static class ZZZAvatarViewFactory
             NameCard = banner,
             Quality = quality,
             Element = ToElement(agent.ElementType),
+            ZZZElement = ToZZZElement(agent.ElementType),
+            ZZZProfession = ToZZZProfession(agent.Profession),
+            ZZZRank = agent.Rank,
+            IsZZZLimited = IsLimitedS(agent.Id, agent.Rarity),
             LevelNumber = (uint)agent.Level,
             FetterLevel = 0,
             PromoteArray = [],
@@ -72,6 +104,10 @@ public static class ZZZAvatarViewFactory
             NameCard = icon,
             Quality = ToQuality(agent.Rarity),
             Element = ToElement(agent.ElementType),
+            ZZZElement = ToZZZElement(agent.ElementType),
+            ZZZProfession = ToZZZProfession(agent.Profession),
+            ZZZRank = agent.Rank,
+            IsZZZLimited = IsLimitedS(agent.Id, agent.Rarity),
             LevelNumber = (uint)agent.Level,
             FetterLevel = 0,
             PromoteArray = [],
@@ -105,14 +141,14 @@ public static class ZZZAvatarViewFactory
         {
             Id = (uint)weapon.Id,
             Name = weapon.Name,
-            Description = weapon.TalentContent,
+            Description = NormalizeRichText(weapon.TalentContent),
             Icon = icon,
             Quality = ToQuality(weapon.Rarity),
             Level = weapon.Level.ToString(System.Globalization.CultureInfo.CurrentCulture),
             LevelNumber = (uint)weapon.Level,
             AffixLevelNumber = (uint)weapon.Star,
             AffixName = weapon.TalentTitle,
-            AffixDescription = weapon.TalentContent,
+            AffixDescription = NormalizeRichText(weapon.TalentContent),
             MainProperty = weapon.MainProperties.FirstOrDefault() is { } main
                 ? new NameValue<string>(main.Name, PropertyValue(main))
                 : null,
@@ -167,7 +203,7 @@ public static class ZZZAvatarViewFactory
         return new ConstellationView
         {
             Name = rank.Name,
-            Description = rank.Description,
+            Description = NormalizeRichText(rank.Description),
             Icon = StaticResourcesEndpoints.UIIconNone,
             IsActivated = rank.IsUnlocked,
             Number = index + 1,
@@ -203,7 +239,7 @@ public static class ZZZAvatarViewFactory
     private static SkillView ToSkillView(ZZZSkill skill, Uri icon)
     {
         string name = skill.Items.FirstOrDefault()?.Title ?? skill.SkillType.ToString(System.Globalization.CultureInfo.InvariantCulture);
-        string description = string.Join("\n", skill.Items.Select(static item => item.Text));
+        string description = NormalizeRichText(string.Join("\n", skill.Items.Select(static item => item.Text)));
         return new SkillView
         {
             Name = name,
@@ -233,14 +269,18 @@ public static class ZZZAvatarViewFactory
             3 or 13101 or 13102 or 13103 => FightProperty.FIGHT_PROP_CUR_DEFENSE,
             5 or 20103 => FightProperty.FIGHT_PROP_CRITICAL,
             6 or 21103 => FightProperty.FIGHT_PROP_CRITICAL_HURT,
-            7 or 31203 => FightProperty.FIGHT_PROP_ELEMENT_MASTERY,
+
+            // 米游社战绩：7 = 异常掌控，8 = 异常精通。
+            // 原神 ElementMastery 只对应「异常精通」，用于 ZZZ 的异常精通排序/图标；
+            // 异常掌控不要复用这个字段，否则排序会读到错误的值。
+            8 or 31203 => FightProperty.FIGHT_PROP_ELEMENT_MASTERY,
+
             11 or 30502 => FightProperty.FIGHT_PROP_CHARGE_EFFICIENCY,
-            31503 => FightProperty.FIGHT_PROP_PHYSICAL_ADD_HURT,
-            31603 => FightProperty.FIGHT_PROP_FIRE_ADD_HURT,
-            31703 => FightProperty.FIGHT_PROP_ICE_ADD_HURT,
-            31803 => FightProperty.FIGHT_PROP_ELEC_ADD_HURT,
-            31903 => FightProperty.FIGHT_PROP_WATER_ADD_HURT,
-            32303 => FightProperty.FIGHT_PROP_WIND_ADD_HURT,
+            315 or 31503 => FightProperty.FIGHT_PROP_PHYSICAL_ADD_HURT,
+            316 or 31603 => FightProperty.FIGHT_PROP_FIRE_ADD_HURT,
+            317 or 31703 => FightProperty.FIGHT_PROP_ICE_ADD_HURT,
+            318 or 31803 => FightProperty.FIGHT_PROP_ELEC_ADD_HURT,
+            323 or 32303 => FightProperty.FIGHT_PROP_WIND_ADD_HURT,
             _ => null,
         };
     }
@@ -266,8 +306,8 @@ public static class ZZZAvatarViewFactory
             4 or 12202 => "冲击力",
             5 => "暴击率",
             6 => "暴击伤害",
-            7 => "异常精通",
-            8 => "异常掌控",
+            7 => "异常掌控",
+            8 => "异常精通",
             9 or 23103 => "穿透率",
             11 => "能量自动回复",
             232 or 23203 => "穿透值",
@@ -368,6 +408,8 @@ public static class ZZZAvatarViewFactory
 
     private static ElementType ToElement(int elementType)
     {
+        // 只映射与原神元素语义接近的项，供通用排序/旧 UI 使用；
+        // ZZZ 自己的属性一律走 ZZZElement，避免把以太/烈霜/玄墨等误映射成风。
         return elementType switch
         {
             201 => ElementType.Fire,
@@ -376,6 +418,21 @@ public static class ZZZAvatarViewFactory
             204 => ElementType.Wind,
             _ => ElementType.None,
         };
+    }
+
+    private static ZZZElementType ToZZZElement(int elementType)
+    {
+        return elementType is >= 200 and <= 209 ? (ZZZElementType)elementType : ZZZElementType.None;
+    }
+
+    private static ZZZProfessionType ToZZZProfession(int profession)
+    {
+        return profession is >= 1 and <= 7 ? (ZZZProfessionType)profession : ZZZProfessionType.None;
+    }
+
+    private static bool IsLimitedS(int agentId, string rarity)
+    {
+        return rarity is "S" && !StandardSIds.Contains(agentId);
     }
 
     private static EquipType ToEquipType(int equipmentType)
@@ -389,6 +446,52 @@ public static class ZZZAvatarViewFactory
             5 => EquipType.EQUIP_DRESS,
             6 => EquipType.EQUIP_WEAPON,
             _ => EquipType.EQUIP_NONE,
+        };
+    }
+
+    /// <summary>
+    /// 米游社 ZZZ 的影画/技能描述混有 HTML：&lt;span style="color: #fff"&gt;、
+    /// &lt;/Term&gt;、字面量 \n 等。DescriptionTextBlock 只认识米哈游语法，
+    /// 这里先归一成 &lt;color=#RRGGBB&gt; 与真实换行，避免解析器卡死或显示 "\n"。
+    /// </summary>
+    private static string NormalizeRichText(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return text;
+        }
+
+        string normalized = text
+            .Replace("\\r\\n", "\n", StringComparison.Ordinal)
+            .Replace("\\n", "\n", StringComparison.Ordinal)
+            .Replace("\\r", "\n", StringComparison.Ordinal);
+
+        normalized = ZzzBreakRegex.Replace(normalized, "\n");
+        normalized = ZzzColorSpanRegex.Replace(
+            normalized,
+            static match => $"<color={NormalizeColor(match.Groups[1].Value)}>");
+        normalized = normalized.Replace("</span>", "</color>", StringComparison.OrdinalIgnoreCase);
+        normalized = normalized.Replace("</Term>", string.Empty, StringComparison.OrdinalIgnoreCase);
+        normalized = ZzzColorShorthandRegex.Replace(
+            normalized,
+            static match => $"<color={NormalizeColor(match.Groups[1].Value)}>");
+        normalized = ZzzUnsupportedTagRegex.Replace(normalized, string.Empty);
+
+        return normalized
+            .Replace("&nbsp;", " ", StringComparison.Ordinal)
+            .Replace("&amp;", "&", StringComparison.Ordinal)
+            .Replace("&lt;", "<", StringComparison.Ordinal)
+            .Replace("&gt;", ">", StringComparison.Ordinal);
+    }
+
+    private static string NormalizeColor(string value)
+    {
+        string hex = value.TrimStart('#');
+        return hex.Length switch
+        {
+            3 => $"#{hex[0]}{hex[0]}{hex[1]}{hex[1]}{hex[2]}{hex[2]}",
+            4 => $"#{hex[0]}{hex[0]}{hex[1]}{hex[1]}{hex[2]}{hex[2]}{hex[3]}{hex[3]}",
+            _ => $"#{hex}",
         };
     }
 

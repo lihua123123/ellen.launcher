@@ -79,6 +79,14 @@ public ref struct MiHoYoSyntaxLexer
             position++;
         }
 
+        // Unknown '<' or '{' must still advance one character. Otherwise Next() keeps
+        // returning a zero-length Text token and the parser loops forever on malformed
+        // rich text (for example ZZZ descriptions containing HTML <span> tags).
+        if (position == start)
+        {
+            position++;
+        }
+
         return new(MiHoYoSyntaxTokenKind.Text, new(start, position));
     }
 

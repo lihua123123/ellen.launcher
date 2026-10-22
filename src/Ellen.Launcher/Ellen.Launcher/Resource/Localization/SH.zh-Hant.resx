@@ -1588,6 +1588,12 @@
   <data name="ViewModelAvatarPropertySortDescriptionKindQuality" xml:space="preserve">
     <value>品質順序</value>
   </data>
+  <data name="ViewModelAvatarPropertySortDescriptionKindZZZActivatedConstellationCount" xml:space="preserve">
+    <value>影畫解鎖層數順序</value>
+  </data>
+  <data name="ViewModelAvatarPropertySortDescriptionKindZZZElementMastery" xml:space="preserve">
+    <value>異常精通順序</value>
+  </data>
   <data name="ViewModelAvatarPropertyTotalAvatarCountHint" xml:space="preserve">
     <value>共 {0} 位角色</value>
   </data>
@@ -2071,6 +2077,57 @@
   <data name="ViewPageAvatarPropertyDefaultDescription" xml:space="preserve">
     <value>尚未獲取任何角色資訊</value>
   </data>
+  <data name="ModelIntrinsicZZZElementPhysical" xml:space="preserve">
+    <value>物理</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementFire" xml:space="preserve">
+    <value>火</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementIce" xml:space="preserve">
+    <value>冰</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementElectric" xml:space="preserve">
+    <value>電</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementWind" xml:space="preserve">
+    <value>風</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementEther" xml:space="preserve">
+    <value>以太</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementFrost" xml:space="preserve">
+    <value>烈霜</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementInk" xml:space="preserve">
+    <value>玄墨</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementRime" xml:space="preserve">
+    <value>凜刃</value>
+  </data>
+  <data name="ModelIntrinsicZZZElementLumen" xml:space="preserve">
+    <value>流明</value>
+  </data>
+  <data name="ModelIntrinsicZZZProfessionAttack" xml:space="preserve">
+    <value>強攻</value>
+  </data>
+  <data name="ModelIntrinsicZZZProfessionStun" xml:space="preserve">
+    <value>擊破</value>
+  </data>
+  <data name="ModelIntrinsicZZZProfessionAnomaly" xml:space="preserve">
+    <value>異常</value>
+  </data>
+  <data name="ModelIntrinsicZZZProfessionSupport" xml:space="preserve">
+    <value>支援</value>
+  </data>
+  <data name="ModelIntrinsicZZZProfessionDefense" xml:space="preserve">
+    <value>防護</value>
+  </data>
+  <data name="ModelIntrinsicZZZProfessionRupture" xml:space="preserve">
+    <value>命破</value>
+  </data>
+  <data name="ModelIntrinsicZZZProfessionVanguard" xml:space="preserve">
+    <value>鋒御</value>
+  </data>
   <data name="ViewPageAvatarPropertyZZZAgentHeader" xml:space="preserve">
     <value>代理人</value>
   </data>
@@ -2091,6 +2148,12 @@
   </data>
   <data name="ViewPageAvatarPropertyZZZRollSummary" xml:space="preserve">
     <value>詞條數統計</value>
+  </data>
+  <data name="ViewPageAvatarPropertyZZZLoadFailed" xml:space="preserve">
+    <value>絕區零角色資訊取得失敗，請稍後再試</value>
+  </data>
+  <data name="ViewPageAvatarPropertyZZZRefreshFailedUsingCache" xml:space="preserve">
+    <value>重新整理失敗，已顯示本機快取</value>
   </data>
       <data name="ViewPageAvatarPropertyExportToTextLabel" xml:space="preserve">
     <value>匯出文字到剪貼簿</value>

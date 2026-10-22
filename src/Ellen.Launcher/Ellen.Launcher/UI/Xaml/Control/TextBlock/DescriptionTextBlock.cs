@@ -77,12 +77,23 @@ public sealed partial class DescriptionTextBlock : ContentControl
         }
 
         string content = SpecialNameHandling.Handle(text);
-        MiHoYoSyntaxLexer lexer = new(content);
-        MiHoYoSyntaxParser parser = new(lexer);
-        ImmutableArray<MiHoYoSyntaxElement> elements = parser.Parse();
-        foreach (ref readonly MiHoYoSyntaxElement element in elements.AsSpan())
+
+        try
         {
-            AppendNode(textBlock, textBlock.Inlines, element, content);
+            MiHoYoSyntaxLexer lexer = new(content);
+            MiHoYoSyntaxParser parser = new(lexer);
+            ImmutableArray<MiHoYoSyntaxElement> elements = parser.Parse();
+            foreach (ref readonly MiHoYoSyntaxElement element in elements.AsSpan())
+            {
+                AppendNode(textBlock, textBlock.Inlines, element, content);
+            }
+        }
+        catch
+        {
+            // Rich-text syntax is external data. Never let a malformed tag crash the
+            // page; fall back to plain text (the lexer fallback keeps this readable).
+            textBlock.Inlines.Clear();
+            textBlock.Inlines.Add(new Run { Text = content });
         }
     }
 

@@ -9,8 +9,10 @@ using Ellen.Launcher.Model.Metadata.Avatar;
 using Ellen.Launcher.Model.Metadata.Converter;
 using Ellen.Launcher.Model.Metadata.Monster;
 using Ellen.Launcher.Model.Metadata.Weapon;
+using Ellen.Launcher.ViewModel.AvatarProperty;
 using System.Collections.Frozen;
 using System.Collections.Immutable;
+using System.Globalization;
 
 namespace Ellen.Launcher.UI.Xaml.Control.AutoSuggestBox;
 
@@ -31,9 +33,36 @@ public static class SearchTokens
     private static readonly LazySlim<FrozenDictionary<string, SearchToken>> CultivationTokens = new(() => WinRTAdaptive.ToFrozenDictionary(
     [.. CultivateTypeTokens, .. ElementTokens, .. ItemQualityAllTokens, .. WeaponTypeTokens]));
 
+    private static readonly LazySlim<FrozenDictionary<string, SearchToken>> ZZZAvatarPropertyTokens = new(() =>
+    {
+        ZZZProfessionType[] professions = [.. Enum.GetValues<ZZZProfessionType>().Where(static profession => profession is not ZZZProfessionType.None)];
+        ZZZElementType[] elements = [.. Enum.GetValues<ZZZElementType>().Where(static element => element is not ZZZElementType.None)];
+
+        return WinRTAdaptive.ToFrozenDictionary(
+        [
+            .. professions.Select((profession, index) =>
+            {
+                string name = profession.GetLocalizedDescription(SH.ResourceManager, CultureInfo.CurrentCulture) ?? profession.ToString();
+                return KeyValuePair.Create(name, new SearchToken(SearchTokenKind.ZZZProfession, name, index, iconUri: ZZZFilterIcons.ForProfession(profession)));
+            }),
+            .. elements.Select((element, index) =>
+            {
+                string name = element.GetLocalizedDescription(SH.ResourceManager, CultureInfo.CurrentCulture) ?? element.ToString();
+                return KeyValuePair.Create(name, new SearchToken(SearchTokenKind.ZZZElement, name, index, iconUri: ZZZFilterIcons.ForElement(element)));
+            }),
+            // 与原神一致：四星 / 五星 / 限定五星。
+            .. ItemQuality45Tokens,
+        ]);
+    });
+
     public static FrozenDictionary<string, SearchToken> GetForAvatarProperty()
     {
         return AvatarPropertyTokens.Value;
+    }
+
+    public static FrozenDictionary<string, SearchToken> GetForZZZAvatarProperty()
+    {
+        return ZZZAvatarPropertyTokens.Value;
     }
 
     public static FrozenDictionary<string, SearchToken> GetForCultivation()

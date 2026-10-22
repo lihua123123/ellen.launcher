@@ -1,4 +1,4 @@
-﻿// Copyright (c) DGP Studio. All rights reserved.
+// Copyright (c) DGP Studio. All rights reserved.
 // Licensed under the MIT license.
 // Copyright (c) Millennium-Science-Technology-R-D-Inst. All rights reserved.
 // Licensed under the MIT license.
@@ -64,7 +64,8 @@ public static class SettingKeys
     public const string LowLevelKeyboardOverlayHide              = "Ellen::HotKey::LowLevel::Overlay::Hide";
 
     // AvatarProperty
-    public const string AvatarPropertySortDescriptionKind = "Ellen::AvatarProperty::SortDescriptionKind";
+    public const string AvatarPropertySortDescriptionKind    = "Ellen::AvatarProperty::SortDescriptionKind";
+    public const string AvatarPropertySortDescriptionKindZZZ = "Ellen::AvatarProperty::SortDescriptionKind::ZZZ";
 
     // Cultivation
     public const string CultivationAvatarLevelCurrent           = "Ellen::Cultivation::Avatar::Level::Current";

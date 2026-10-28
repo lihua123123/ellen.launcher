@@ -5,8 +5,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mxi="using:Microsoft.Xaml.Interactivity"
+    xmlns:shux="using:Ellen.Launcher.UI.Xaml"
     xmlns:shuxb="using:Ellen.Launcher.UI.Xaml.Behavior"
     xmlns:shuxc="using:Ellen.Launcher.UI.Xaml.Control"
+    xmlns:shuxci="using:Ellen.Launcher.UI.Xaml.Control.Image"
     xmlns:shuxm="using:Ellen.Launcher.UI.Xaml.Markup"
     xmlns:shvs="using:Ellen.Launcher.ViewModel.SignIn"
     Height="{ThemeResource HomeAdaptiveCardHeight}"
@@ -72,30 +74,91 @@
                 HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto"
                 Visibility="{Binding HasEntries, Converter={StaticResource BoolToVisibilityConverter}}">
-                <ItemsControl ItemsSource="{Binding Entries}">
+                <ItemsControl ItemsSource="{Binding AccountGroups}">
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="shvs:SignInEntry">
-                            <Grid Margin="0,2" ColumnSpacing="6">
+                        <DataTemplate x:DataType="shvs:SignInAccountGroup">
+                            <Grid Margin="0,2" MinHeight="36" ColumnSpacing="8">
                                 <Grid.ColumnDefinitions>
+                                    <!--  固定宽度：多行之间物品图标才能对齐  -->
+                                    <ColumnDefinition Width="112"/>
                                     <ColumnDefinition/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <StackPanel Grid.Column="0">
-                                    <TextBlock Text="{Binding Attribution}" TextTrimming="CharacterEllipsis"/>
-                                    <TextBlock
-                                        Opacity="0.7"
-                                        Style="{StaticResource CaptionTextBlockStyle}"
-                                        Text="{Binding TotalSignDayText}"/>
-                                </StackPanel>
-
                                 <TextBlock
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding AccountName}"
+                                    TextTrimming="CharacterEllipsis"/>
+
+                                <!--  本次签到获得的物品：一款游戏一件  -->
+                                <ItemsControl
                                     Grid.Column="1"
+                                    Margin="0,0,4,0"
+                                    VerticalAlignment="Center"
+                                    ItemsSource="{Binding Awards}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="4"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="shvs:SignInAward">
+                                            <Grid
+                                                Width="32"
+                                                Height="32"
+                                                ToolTipService.ToolTip="{Binding DisplayName}">
+                                                <shuxci:CachedImage
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    shux:FrameworkElementHelper.SquareLength="32"
+                                                    Source="{Binding Icon}"/>
+                                                <Border
+                                                    Padding="3,0"
+                                                    HorizontalAlignment="Right"
+                                                    VerticalAlignment="Bottom"
+                                                    Background="#B3000000"
+                                                    CornerRadius="3">
+                                                    <TextBlock
+                                                        FontSize="10"
+                                                        Foreground="White"
+                                                        Text="{Binding Count}"/>
+                                                </Border>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <!--  进度，悬浮展开该账号下每个游戏的签到明细  -->
+                                <TextBlock
+                                    Grid.Column="2"
                                     VerticalAlignment="Center"
                                     Opacity="0.7"
                                     Style="{StaticResource CaptionTextBlockStyle}"
-                                    Text="{shuxm:ResourceString Name=ViewCardSignInSigned}"
-                                    Visibility="{Binding IsSign, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                    Text="{Binding ProgressText}">
+                                    <ToolTipService.ToolTip>
+                                        <ToolTip>
+                                            <ItemsControl ItemsSource="{Binding Games}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="shvs:SignInEntry">
+                                                        <Grid ColumnSpacing="8">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Grid.Column="0" Text="{Binding Role.GameName}"/>
+                                                            <TextBlock
+                                                                Grid.Column="1"
+                                                                Opacity="0.7"
+                                                                Style="{StaticResource CaptionTextBlockStyle}"
+                                                                Text="{Binding StatusText}"/>
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ToolTip>
+                                    </ToolTipService.ToolTip>
+                                </TextBlock>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

@@ -180,7 +180,8 @@ public sealed partial class App : Application
 
             logger.LogInformation($"{ConsoleBanner}");
 
-            FrameworkTheming.SetTheme(ThemeHelper.ElementToFramework(serviceProvider.GetRequiredService<AppOptions>().ElementTheme.Value));
+            // 界面主题已固定为深色：忽略用户保存的 ElementTheme 选项，强制以深色框架主题启动。
+            FrameworkTheming.SetTheme(ThemeHelper.ElementToFramework(ElementTheme.Dark));
 
             // Manually invoke
             SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateInfo("Activate and Initialize", "Application"));

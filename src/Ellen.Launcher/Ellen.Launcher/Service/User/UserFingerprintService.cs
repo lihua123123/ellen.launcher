@@ -16,7 +16,7 @@ public sealed partial class UserFingerprintService : IUserFingerprintService
     [GeneratedConstructor]
     public partial UserFingerprintService(IServiceProvider serviceProvider);
 
-    public async ValueTask TryInitializeAsync(ViewModel.User.User user, CancellationToken token = default)
+    public async ValueTask TryInitializeAsync(ViewModel.User.User user, CancellationToken token = default, bool forceRefresh = false)
     {
         if (user.IsOversea)
         {
@@ -24,12 +24,14 @@ public sealed partial class UserFingerprintService : IUserFingerprintService
             return;
         }
 
-        if (user.Entity.FingerprintLastUpdateTime >= DateTimeOffset.UtcNow - TimeSpan.FromDays(7))
+        // 实测（2026-10-29）：getFp 新签发的指纹有一段「成熟期」（分钟级～小时级），
+        // 期间战绩接口（ZZZ avatar/basic|info 返回 10041、原神 index 返回 5003）会拒绝它；
+        // 而已注册且用过的旧指纹始终可用。因此绝不能按 7 天定时轮换——那会用未成熟的新
+        // 指纹顶掉可用的旧指纹，导致「我的角色 / 实时便笺」在此期间全部获取失败。
+        // 只在指纹为空（新账号 / 从未签发）时才申请。
+        if (!forceRefresh && !string.IsNullOrEmpty(user.Fingerprint))
         {
-            if (!string.IsNullOrEmpty(user.Fingerprint))
-            {
-                return;
-            }
+            return;
         }
 
         string device = Core.Random.GetUpperAndNumberString(12);
@@ -111,9 +113,13 @@ public sealed partial class UserFingerprintService : IUserFingerprintService
             Response<DeviceFpWrapper> response = await deviceFpClient.GetFingerprintAsync(data, token).ConfigureAwait(false);
 
             ResponseValidator.TryValidate(response, scope.ServiceProvider, out DeviceFpWrapper? wrapper);
-            user.TryUpdateFingerprint(wrapper?.DeviceFp ?? string.Empty);
 
-            user.NeedDbUpdateAfterResume = true;
+            // 刷新失败时保留旧指纹（TryUpdateFingerprint 对空值是 no-op）：
+            // ZZZ 战绩接口强依赖 x-rpc-device_fp，缺失或未注册一律 10041。
+            if (user.TryUpdateFingerprint(wrapper?.DeviceFp))
+            {
+                user.NeedDbUpdateAfterResume = true;
+            }
         }
     }
 }

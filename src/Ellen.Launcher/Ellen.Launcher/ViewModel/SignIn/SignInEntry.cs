@@ -54,6 +54,19 @@ public sealed partial class SignInEntry : ObservableObject
         get => SH.FormatViewCardSignInMonthDays(TotalSignDay);
     }
 
+    /// <summary>
+    /// 今日（尚未签到时则是下一次）签到的奖励物品。
+    /// </summary>
+    public SignInAward? Award { get; private set; }
+
+    /// <summary>
+    /// 用于悬浮提示：「游戏名 今日已签/未签」。
+    /// </summary>
+    public string StatusText
+    {
+        get => IsSign ? SH.ViewCardSignInSigned : SH.ViewCardSignInUnsigned;
+    }
+
     public async Task UpdateAsync(CancellationToken token = default)
     {
         Response<SignInRewardInfo> response = await signInClient.GetInfoAsync(user, Role, token).ConfigureAwait(false);
@@ -67,6 +80,33 @@ public sealed partial class SignInEntry : ObservableObject
         IsSign = info.IsSign;
         TotalSignDay = info.TotalSignDay;
         OnPropertyChanged(nameof(TotalSignDayText));
+        OnPropertyChanged(nameof(StatusText));
+
+        await UpdateAwardAsync(token).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// 拉取本月奖励列表，取出今天（未签时取下一次）的那件物品。
+    /// </summary>
+    private async Task UpdateAwardAsync(CancellationToken token)
+    {
+        Response<Reward> response = await signInClient.GetRewardAsync(user, Role, token).ConfigureAwait(false);
+
+        if (!ResponseValidator.TryValidateWithoutUINotification(response, out Reward? reward))
+        {
+            return;
+        }
+
+        // 已签到时今天领到的是第 TotalSignDay 件（下标 -1）；未签到时下一个可领的是第 TotalSignDay + 1 件（下标 TotalSignDay）。
+        int index = IsSign ? TotalSignDay - 1 : TotalSignDay;
+        if (index < 0 || index >= reward.Awards.Length)
+        {
+            return;
+        }
+
+        await taskContext.SwitchToMainThreadAsync();
+        Award = SignInAward.From(reward.Awards[index]);
+        OnPropertyChanged(nameof(Award));
     }
 
     /// <summary>

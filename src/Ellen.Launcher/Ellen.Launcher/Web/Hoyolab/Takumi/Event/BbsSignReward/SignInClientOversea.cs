@@ -39,6 +39,21 @@ public sealed partial class SignInClientOversea : ISignInClient
         return Response.Response.DefaultIfNull(resp);
     }
 
+    public async ValueTask<Response<Reward>> GetRewardAsync(Model.Entity.User user, SignInGameRole role, CancellationToken token = default)
+    {
+        HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()
+            .SetRequestUri(GetHomeUri(role))
+            .SetUserCookieAndFpHeader(user, CookieType.CookieToken)
+            .SetHeader("x-rpc-signgame", role.SignGameHeader)
+            .Get();
+
+        Response<Reward>? resp = await builder
+            .SendAsync<Response<Reward>>(httpClient, token)
+            .ConfigureAwait(false);
+
+        return Response.Response.DefaultIfNull(resp);
+    }
+
     public async ValueTask<Response<SignInResult>> SignAsync(Model.Entity.User user, SignInGameRole role, CancellationToken token = default)
     {
         HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()
@@ -81,6 +96,16 @@ public sealed partial class SignInClientOversea : ISignInClient
             SignInGame.StarRail => apiEndpoints.LunaActivityIdStarRail(),
             SignInGame.ZenlessZoneZero => apiEndpoints.LunaActivityIdZenlessZoneZero(),
             _ => apiEndpoints.LunaActivityIdGenshin(),
+        };
+    }
+
+    private string GetHomeUri(SignInGameRole role)
+    {
+        return role.Game switch
+        {
+            SignInGame.StarRail => apiEndpoints.LunaHomeStarRail(cultureOptions.LanguageCode),
+            SignInGame.ZenlessZoneZero => apiEndpoints.LunaHomeZenlessZoneZero(cultureOptions.LanguageCode),
+            _ => apiEndpoints.LunaHomeGenshin(cultureOptions.LanguageCode),
         };
     }
 }

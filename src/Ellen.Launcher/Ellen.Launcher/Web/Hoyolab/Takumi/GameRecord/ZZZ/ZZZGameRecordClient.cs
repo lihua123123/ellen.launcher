@@ -71,4 +71,26 @@ public sealed partial class ZZZGameRecordClient : IZZZGameRecordClient
 
         return Response.Response.DefaultIfNull(response);
     }
+
+    public async ValueTask<Response<Zenless.ZenlessDailyNote>> GetZZZNoteAsync(
+        User user,
+        string uid,
+        string server,
+        CancellationToken token = default)
+    {
+        IApiEndpoints apiEndpoints = apiEndpointsFactory.Create(user.IsOversea);
+        HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()
+            .SetRequestUri(apiEndpoints.GameRecordZenlessNote(uid, server))
+            .SetUserCookieAndFpHeader(user, CookieType.Cookie)
+            .SetReferer(apiEndpoints.WebStaticReferer())
+            .Get();
+
+        await builder.SignDataAsync(DataSignAlgorithmVersion.Gen2, user.IsOversea ? SaltType.OSX4 : SaltType.X4, false).ConfigureAwait(false);
+
+        Response<Zenless.ZenlessDailyNote>? response = await builder
+            .SendAsync<Response<Zenless.ZenlessDailyNote>>(httpClient, token)
+            .ConfigureAwait(false);
+
+        return Response.Response.DefaultIfNull(response);
+    }
 }

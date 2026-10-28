@@ -34,6 +34,12 @@ public sealed partial class SignInViewModelSlim : Abstraction.ViewModelSlim
     [ObservableProperty]
     public partial List<SignInEntry>? Entries { get; set; }
 
+    /// <summary>
+    /// 按账号分组的签到展示：一行一个账号，后面跟该账号各游戏本次签到获得的物品图标。
+    /// </summary>
+    [ObservableProperty]
+    public partial List<SignInAccountGroup>? AccountGroups { get; set; }
+
     [ObservableProperty]
     public partial string? Summary { get; set; }
 
@@ -71,6 +77,7 @@ public sealed partial class SignInViewModelSlim : Abstraction.ViewModelSlim
             AdvancedDbCollectionView<BindingUser, EntityUser> users = await userService.GetUsersAsync().ConfigureAwait(false);
 
             List<SignInEntry> entries = [];
+            List<SignInAccountGroup> groups = [];
             foreach (BindingUser user in users.Source)
             {
                 // 该账号下的所有已注册游戏：原神 / 崩坏：星穹铁道 / 绝区零
@@ -81,14 +88,20 @@ public sealed partial class SignInViewModelSlim : Abstraction.ViewModelSlim
                 }
 
                 ISignInClient signInClient = signInClientFactory.Create(user.IsOversea);
+                List<SignInEntry> userEntries = new(roles.Length);
                 foreach (SignInGameRole role in roles)
                 {
-                    entries.Add(new(signInClient, taskContext, messenger, user.Entity, role));
+                    SignInEntry entry = new(signInClient, taskContext, messenger, user.Entity, role);
+                    entries.Add(entry);
+                    userEntries.Add(entry);
                 }
+
+                groups.Add(new(GetAccountName(user, roles), userEntries));
             }
 
             await taskContext.SwitchToMainThreadAsync();
             Entries = entries;
+            AccountGroups = groups;
             HasEntries = entries.Count > 0;
             UpdateSummary();
 
@@ -133,6 +146,24 @@ public sealed partial class SignInViewModelSlim : Abstraction.ViewModelSlim
             IsSigningAll = false;
             UpdateSummary();
         }
+    }
+
+    /// <summary>
+    /// 账号名优先取米游社通行证昵称，其次取原神角色昵称，最后用首个角色的展示名兜底。
+    /// </summary>
+    private static string GetAccountName(BindingUser user, ImmutableArray<SignInGameRole> roles)
+    {
+        if (!string.IsNullOrEmpty(user.UserInfo?.Nickname))
+        {
+            return user.UserInfo.Nickname;
+        }
+
+        return roles
+            .Where(static role => role.Game is SignInGame.Genshin)
+            .Concat(roles)
+            .Select(static role => role.Nickname)
+            .FirstOrDefault(static nickname => !string.IsNullOrEmpty(nickname))
+            ?? roles[0].DisplayName;
     }
 
     partial void OnIsSigningAllChanged(bool value)

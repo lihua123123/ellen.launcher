@@ -66,6 +66,23 @@ public sealed partial class DailyNoteEntry : ObservableObject, IAppDbEntity
     [NotMapped]
     public DailyNoteArchonQuestView? ArchonQuestView { get; set; }
 
+    /// <summary>
+    /// 卡片里这一列的标题：「昵称 | 区服 | Lv.等级」，拿不到角色信息时回退为 UID。
+    /// </summary>
+    [NotMapped]
+    public string RoleDisplay
+    {
+        get
+        {
+            if (UserGameRole is { } role)
+            {
+                return $"{role.Nickname} | {role.RegionName} | Lv.{role.Level}";
+            }
+
+            return Uid;
+        }
+    }
+
     [NotMapped]
     public string RefreshTimeFormatted
     {

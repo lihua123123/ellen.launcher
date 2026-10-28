@@ -92,13 +92,6 @@ public sealed partial class MainViewModel : Abstraction.ViewModel, IDisposable
         return true;
     }
 
-    [Command("InvertAppThemeCommand")]
-    private void InvertAppTheme()
-    {
-        SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateUI("Invert app theme", "MainViewModel.Command"));
-        FrameworkTheming.SetTheme(ThemeHelper.ApplicationToFrameworkInvert(app.RequestedTheme));
-    }
-
     private void ShowUpdateLogWindowAfterUpdate()
     {
         // Ellen.Launcher 有意不弹「更新日志」窗口：本 fork 已禁用在线更新（见 CheckUpdateAsync），

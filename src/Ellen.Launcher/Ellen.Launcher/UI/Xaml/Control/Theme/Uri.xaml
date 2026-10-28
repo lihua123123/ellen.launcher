@@ -30,6 +30,8 @@
     <x:String x:Key="UI_ItemIcon_204">https://api.snaphutaorp.org/static/raw/ItemIcon/UI_ItemIcon_204.png</x:String>
     <x:String x:Key="UI_ItemIcon_210">https://api.snaphutaorp.org/static/raw/ItemIcon/UI_ItemIcon_210.png</x:String>
     <x:String x:Key="UI_ItemIcon_220021">https://api.snaphutaorp.org/static/raw/ItemIcon/UI_ItemIcon_220021.png</x:String>
+    <!--  无主的命星（砺行修远奖励）  -->
+    <x:String x:Key="UI_ItemIcon_104300">https://api.snaphutaorp.org/static/raw/ItemIcon/UI_ItemIcon_104300.png</x:String>
 
     <!--  EmotionIcon  -->
     <x:String x:Key="UI_EmotionIcon52">https://api.snaphutaorp.org/static/raw/EmotionIcon/UI_EmotionIcon52.png</x:String>

@@ -13,6 +13,11 @@ public interface ISignInClient
     ValueTask<Response<SignInRewardInfo>> GetInfoAsync(Model.Entity.User user, SignInGameRole role, CancellationToken token = default);
 
     /// <summary>
+    /// 查询本月的签到奖励列表（用于展示签到获得的物品图标）。
+    /// </summary>
+    ValueTask<Response<Reward>> GetRewardAsync(Model.Entity.User user, SignInGameRole role, CancellationToken token = default);
+
+    /// <summary>
     /// 为某个游戏角色执行签到。
     /// </summary>
     ValueTask<Response<SignInResult>> SignAsync(Model.Entity.User user, SignInGameRole role, CancellationToken token = default);

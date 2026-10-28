@@ -1210,6 +1210,9 @@
   <data name="ViewCardSignInSigned" xml:space="preserve">
     <value>今日已签</value>
   </data>
+  <data name="ViewCardSignInUnsigned" xml:space="preserve">
+    <value>今日未签</value>
+  </data>
   <data name="ViewCardSignInSummary" xml:space="preserve">
     <value>已签到 {0}/{1}</value>
   </data>
@@ -2443,6 +2446,9 @@
   <data name="ViewPageCultivationWikiWeaponDescription" xml:space="preserve">
     <value>添加任意武器到养成计划</value>
   </data>
+  <data name="ViewPageDailyNoteAccountGroupNoId" xml:space="preserve">
+    <value>米游社账号</value>
+  </data>
   <data name="ViewPageDailyNoteAddEntry" xml:space="preserve">
     <value>添加实时便笺</value>
   </data>
@@ -2508,6 +2514,108 @@
   </data>
   <data name="ViewPageDailyNoteVerify" xml:space="preserve">
     <value>验证当前用户与角色</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessBounty" xml:space="preserve">
+    <value>悬赏委托</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessCurrencyWeekly" xml:space="preserve">
+    <value>百通宝 · 本周获取</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessDailyLottery" xml:space="preserve">
+    <value>饼铺盲盒 / 刮刮卡 / 占卜</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessEnergy" xml:space="preserve">
+    <value>电量</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessEnergyFull" xml:space="preserve">
+    <value>已满</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessEnergyRecovering" xml:space="preserve">
+    <value>将于 {0:MM.dd HH:mm} 恢复满值</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessLoadFailed" xml:space="preserve">
+    <value>暂时无法获取绝区零便笺，请稍后点「刷新」重试</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessMemberCard" xml:space="preserve">
+    <value>绳网会员</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessMemberCardClaimed" xml:space="preserve">
+    <value>今日菲林已领取</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessMemberCardNotOpened" xml:space="preserve">
+    <value>未开通</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessMemberCardRemaining" xml:space="preserve">
+    <value>剩余 {0} 天</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessMemberCardUnclaimed" xml:space="preserve">
+    <value>今日菲林未领取</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessSectionHeader" xml:space="preserve">
+    <value>绝区零 · 实时便笺</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTaskDone" xml:space="preserve">
+    <value>已完成</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTaskUndone" xml:space="preserve">
+    <value>未完成</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleBench" xml:space="preserve">
+    <value>制造</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleBenchCanProduce" xml:space="preserve">
+    <value>可制造</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleBenchDone" xml:space="preserve">
+    <value>可收取</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleBenchProducing" xml:space="preserve">
+    <value>制造中</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleExpedition" xml:space="preserve">
+    <value>游历</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleExpeditionCanSend" xml:space="preserve">
+    <value>可派遣</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleExpeditionDoing" xml:space="preserve">
+    <value>游历中</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleExpeditionDone" xml:space="preserve">
+    <value>可收取</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleHeader" xml:space="preserve">
+    <value>随便观 Lv.{0}</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleShelve" xml:space="preserve">
+    <value>售卖</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleShelveCanSell" xml:space="preserve">
+    <value>可售卖</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleShelveRestock" xml:space="preserve">
+    <value>待补货</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleShelveSelling" xml:space="preserve">
+    <value>售卖中</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleStateUnknown" xml:space="preserve">
+    <value>—</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessVhsSale" xml:space="preserve">
+    <value>录像店经营</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessVhsSaleOpen" xml:space="preserve">
+    <value>正在营业</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessVhsSaleSettling" xml:space="preserve">
+    <value>待结算</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessVitality" xml:space="preserve">
+    <value>今日活跃度</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessWeeklyTask" xml:space="preserve">
+    <value>丽都周纪</value>
   </data>
         <data name="ViewPageFeedbackCurrentProxyNoProxyDescription" xml:space="preserve">
     <value>无代理</value>

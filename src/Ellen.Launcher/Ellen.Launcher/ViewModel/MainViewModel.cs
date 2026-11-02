@@ -13,6 +13,7 @@ using Ellen.Launcher.Core.Logging;
 using Ellen.Launcher.Core.Setting;
 using Ellen.Launcher.Service;
 using Ellen.Launcher.Service.BackgroundActivity;
+using Ellen.Launcher.Service.GachaLog;
 using Ellen.Launcher.Service.Metadata;
 using Ellen.Launcher.Service.Notification;
 using Ellen.Launcher.Service.Network;
@@ -39,6 +40,7 @@ public sealed partial class MainViewModel : Abstraction.ViewModel, IDisposable
     private readonly IUpdateService updateService;
     private readonly IUserService userService;
     private readonly IAutoSignInService autoSignInService;
+    private readonly IGachaEventAutoUpdater gachaEventAutoUpdater;
     private readonly INetworkRetryCoordinator networkRetryCoordinator;
     private readonly IMessenger messenger;
     private readonly App app;
@@ -188,6 +190,9 @@ public sealed partial class MainViewModel : Abstraction.ViewModel, IDisposable
             // Auto sign-in runs silently, only failures surface a dialog. It must not block the
             // startup path, and it is not tied to this view's lifetime.
             autoSignInService.SignInAllAsync().SafeForget();
+
+            // 新版本卡池的数据与图片在后台自动补齐，不能让网络拖慢首屏，失败也不影响现有数据。
+            gachaEventAutoUpdater.UpdateInBackgroundAsync().SafeForget();
 
             // The update check is not required for the window to become usable. Run it without
             // blocking the startup path so a slow network never delays the first paint.

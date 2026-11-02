@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using Ellen.Launcher.Core;
+using Ellen.Launcher.Model.EnemyArchive;
 using Ellen.Launcher.Model.Entity.Primitive.Converter;
 using Ellen.Launcher.Model.Intrinsic;
 using Ellen.Launcher.Model.Intrinsic.Frozen;
@@ -93,11 +94,11 @@ public static class SearchTokens
             .. WeaponTypeTokens,
         ]);
     }
-    public static FrozenDictionary<string, SearchToken> GetForWikiMonster(ImmutableArray<Monster> array)
+    public static FrozenDictionary<string, SearchToken> GetForWikiMonster(ImmutableArray<MonsterCatalogEntry> array)
     {
         return WinRTAdaptive.ToFrozenDictionary(
         [
-            .. array.Select((monster, index) => KeyValuePair.Create(monster.Name!, new SearchToken(SearchTokenKind.Monster, monster.Name!, index, sideIconUri: MonsterIconConverter.IconNameToUri(monster.Icon)))),
+            .. array.Select((entry, index) => KeyValuePair.Create(entry.Name, new SearchToken(SearchTokenKind.Monster, entry.Name, index, sideIconUri: MonsterIconConverter.IconNameToUri(entry.Icon)))),
         ]);
     }
 

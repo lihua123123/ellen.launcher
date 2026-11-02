@@ -15,8 +15,9 @@ namespace Ellen.Launcher.UI.Xaml.Control;
 /// </para>
 /// <para>
 /// 中文关键词取自 ellen-wiki 内容里实际使用的写法（<c>月感电</c> / <c>月绽放</c> / <c>月结晶</c> /
-/// <c>星超导</c> / <c>…属性星扩散</c>），配合单字元素名，供
-/// <see cref="GuideRichText"/> 的自动着色与后续功能复用。
+/// <c>星超导</c> / <c>…属性星扩散</c>），加上七系元素全称（<c>火元素</c>…<c>岩元素</c>）与
+/// <c>物理</c>。只对整词着色，单字（<c>火</c> / <c>草</c>）不再单独染色，
+/// 避免「草史莱姆」「2草」这类非元素语境的字被误标色。
 /// </para>
 /// </summary>
 public static class ElementPalette
@@ -47,29 +48,11 @@ public static class ElementPalette
         .ToFrozenDictionary(pair => pair.Key, pair => (Brush)CreateBrush(pair.Value), StringComparer.Ordinal);
 
     /// <summary>
-    /// 多字关键词（长词优先，避免「星超导」被拆成「星」+「超导」）。
+    /// 多字关键词：按首字建索引，桶内按长度降序（长词优先）。
+    /// 「风」开头同时有 6 字的「风属性星扩散」与 3 字的「风元素」，必须长的先试；
+    /// 「星超导」同理不能被拆成「星」+「超导」。
     /// </summary>
-    private static readonly (string Keyword, string Key)[] MultiCharKeywords =
-    [
-        ("风属性星扩散", "stellar-swirl-anemo"),
-        ("冰属性星扩散", "stellar-swirl-cryo"),
-        ("月感电", "lunar-charged-electro"),
-        ("月绽放", "lunar-bloom-dendro"),
-        ("月结晶", "lunar-crystallize-geo"),
-        ("星超导", "stellar-conduct-cryo"),
-        ("物理", "physical"),
-    ];
-
-    private static readonly FrozenDictionary<char, string> SingleCharKeywords = new Dictionary<char, string>
-    {
-        ['火'] = "pyro",
-        ['水'] = "hydro",
-        ['草'] = "dendro",
-        ['雷'] = "electro",
-        ['风'] = "anemo",
-        ['冰'] = "cryo",
-        ['岩'] = "geo",
-    }.ToFrozenDictionary();
+    private static readonly FrozenDictionary<char, (string Keyword, string Key)[]> PhraseKeywords = BuildPhraseKeywords();
 
     /// <summary>取配色画刷（常驻缓存，可安全重复取用）。</summary>
     public static bool TryGetBrush(string key, [NotNullWhen(true)] out Brush? brush)
@@ -79,30 +62,61 @@ public static class ElementPalette
 
     /// <summary>
     /// 尝试在 <paramref name="text"/> 的 <paramref name="index"/> 处匹配关键词。
+    /// <para>
+    /// 只认整词：单字（「火」「草」）不参与着色，未命中即返回 <see langword="false"/>，
+    /// 调用方按普通文字推进一个字符。
+    /// </para>
     /// </summary>
     public static bool TryMatchKeyword(string text, int index, out string key, out int length)
     {
-        foreach ((string keyword, string mapped) in MultiCharKeywords)
+        if (PhraseKeywords.TryGetValue(text[index], out (string Keyword, string Key)[]? phrases))
         {
-            if (index + keyword.Length <= text.Length
-                && string.CompareOrdinal(text, index, keyword, 0, keyword.Length) == 0)
+            foreach ((string keyword, string mapped) in phrases)
             {
-                key = mapped;
-                length = keyword.Length;
-                return true;
+                if (index + keyword.Length <= text.Length
+                    && string.CompareOrdinal(text, index, keyword, 0, keyword.Length) == 0)
+                {
+                    key = mapped;
+                    length = keyword.Length;
+                    return true;
+                }
             }
-        }
-
-        if (SingleCharKeywords.TryGetValue(text[index], out string? single))
-        {
-            key = single;
-            length = 1;
-            return true;
         }
 
         key = string.Empty;
         length = 0;
         return false;
+    }
+
+    /// <summary>
+    /// 关键词表：七系元素全称与「物理」同级，反应词沿用既有写法。
+    /// 建表时按首字分组、桶内长度降序，<see cref="TryMatchKeyword"/> 只需查一次字典。
+    /// </summary>
+    private static FrozenDictionary<char, (string Keyword, string Key)[]> BuildPhraseKeywords()
+    {
+        (string Keyword, string Key)[] phrases =
+        [
+            ("风属性星扩散", "stellar-swirl-anemo"),
+            ("冰属性星扩散", "stellar-swirl-cryo"),
+            ("月感电", "lunar-charged-electro"),
+            ("月绽放", "lunar-bloom-dendro"),
+            ("月结晶", "lunar-crystallize-geo"),
+            ("星超导", "stellar-conduct-cryo"),
+            ("火元素", "pyro"),
+            ("水元素", "hydro"),
+            ("草元素", "dendro"),
+            ("雷元素", "electro"),
+            ("风元素", "anemo"),
+            ("冰元素", "cryo"),
+            ("岩元素", "geo"),
+            ("物理", "physical"),
+        ];
+
+        return phrases
+            .GroupBy(phrase => phrase.Keyword[0])
+            .ToFrozenDictionary(
+                group => group.Key,
+                group => group.OrderByDescending(phrase => phrase.Keyword.Length).ToArray());
     }
 
     private static Color CreateColor(string hex)

@@ -87,29 +87,32 @@ public static partial class Bootstrap
             return;
         }
 
-        if (EventWaitHandle.TryOpenExisting(LockName, out _))
+        if (!SingleInstanceBypass())
         {
-            // Another instance is already running. Try a lightweight named pipe
-            // redirect and exit quickly; otherwise fall through to full startup
-            // (the pipe server may not be ready yet during first instance init).
-            if (PrivateNamedPipeClient.TryLightweightRedirect(args))
+            if (EventWaitHandle.TryOpenExisting(LockName, out _))
             {
-                return;
+                // Another instance is already running. Try a lightweight named pipe
+                // redirect and exit quickly; otherwise fall through to full startup
+                // (the pipe server may not be ready yet during first instance init).
+                if (PrivateNamedPipeClient.TryLightweightRedirect(args))
+                {
+                    return;
+                }
             }
-        }
-        else
-        {
-            try
+            else
             {
-                instanceHandle = new EventWaitHandle(false, EventResetMode.ManualReset, LockName, out bool created);
-                Debug.Assert(created);
-                EventWaitHandleSecurity handleSecurity = new();
-                handleSecurity.AddAccessRule(new(SecurityIdentifiers.Everyone, EventWaitHandleRights.FullControl, AccessControlType.Allow));
-                instanceHandle.SetAccessControl(handleSecurity);
-            }
-            catch (WaitHandleCannotBeOpenedException)
-            {
-                return;
+                try
+                {
+                    instanceHandle = new EventWaitHandle(false, EventResetMode.ManualReset, LockName, out bool created);
+                    Debug.Assert(created);
+                    EventWaitHandleSecurity handleSecurity = new();
+                    handleSecurity.AddAccessRule(new(SecurityIdentifiers.Everyone, EventWaitHandleRights.FullControl, AccessControlType.Allow));
+                    instanceHandle.SetAccessControl(handleSecurity);
+                }
+                catch (WaitHandleCannotBeOpenedException)
+                {
+                    return;
+                }
             }
         }
 
@@ -169,8 +172,22 @@ public static partial class Bootstrap
         return principal.IsInRole(WindowsBuiltInRole.Administrator);
     }
 
+    /// <summary>
+    /// 开发用：设置环境变量 ELLEN_DISABLE_SINGLE_INSTANCE=1 可跳过单实例互斥，
+    /// 允许 Debug 版独立运行（用于截图/多开验证）。不影响正式发布行为。
+    /// </summary>
+    internal static bool SingleInstanceBypass()
+        => string.Equals(Environment.GetEnvironmentVariable("ELLEN_DISABLE_SINGLE_INSTANCE"), "1", StringComparison.Ordinal);
+
     private static bool ShouldRestartAsAdmin()
     {
+        // 开发用旁路：ELLEN_DISABLE_SINGLE_INSTANCE=1 时同时跳过自动提权重启，
+        // 避免在无交互（无法弹出 UAC）的环境里启动即退出。
+        if (SingleInstanceBypass())
+        {
+            return false;
+        }
+
         try
         {
             if (IsRunningAsAdministrator())

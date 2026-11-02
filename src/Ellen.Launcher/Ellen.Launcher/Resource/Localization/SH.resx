@@ -2890,6 +2890,9 @@
   <data name="ViewPageWikiMonsterArchiveResistanceDefault" xml:space="preserve">
     <value>常态</value>
   </data>
+  <data name="ViewPageWikiMonsterCategoryAll" xml:space="preserve">
+    <value>全部</value>
+  </data>
   <data name="ViewPageWikiMonsterArchiveEnergy" xml:space="preserve">
     <value>元素能量</value>
   </data>
@@ -2913,6 +2916,9 @@
   </data>
   <data name="ViewPageWikiMonsterArchiveSource" xml:space="preserve">
     <value>@Csxylic 米游社</value>
+  </data>
+  <data name="ViewPageWikiMonsterArchiveShield" xml:space="preserve">
+    <value>护盾</value>
   </data>
   <data name="ViewPageWiKiMonsterAutoSuggestBoxPlaceHolder" xml:space="preserve">
     <value>筛选怪物</value>

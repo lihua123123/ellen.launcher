@@ -93,7 +93,8 @@ public sealed partial class App : Application
                 // E_INVALIDARG E_OUTOFMEMORY
                 activatedEventArgs = AppInstance.GetCurrent().GetActivatedEventArgs();
 
-                if (serviceProvider.GetRequiredService<PrivateNamedPipeClient>().TryRedirectActivationTo(activatedEventArgs))
+                PrivateNamedPipeClient packagePipeClient = serviceProvider.GetRequiredService<PrivateNamedPipeClient>();
+                if (!Bootstrap.SingleInstanceBypass() && packagePipeClient.TryRedirectActivationTo(activatedEventArgs))
                 {
                     SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateInfo("Application exiting on RedirectActivationTo", "Ellen"));
                     XamlApplicationLifetime.ActivationAndInitializationCompleted = true;
@@ -142,7 +143,8 @@ public sealed partial class App : Application
                 if (unpackagedArgs is not null)
                 {
                     // Try to redirect activation to the already running instance
-                    if (serviceProvider.GetRequiredService<PrivateNamedPipeClient>().TryRedirectActivationTo(unpackagedArgs))
+                    PrivateNamedPipeClient unpackagedPipeClient = serviceProvider.GetRequiredService<PrivateNamedPipeClient>();
+                    if (!Bootstrap.SingleInstanceBypass() && unpackagedPipeClient.TryRedirectActivationTo(unpackagedArgs))
                     {
                         SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateInfo("Application exiting on RedirectActivationTo", "Ellen"));
                         XamlApplicationLifetime.ActivationAndInitializationCompleted = true;

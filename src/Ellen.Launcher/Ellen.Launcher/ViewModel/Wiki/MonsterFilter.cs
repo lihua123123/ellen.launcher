@@ -1,7 +1,7 @@
 // Copyright (c) DGP Studio. All rights reserved.
 // Licensed under the MIT license.
 
-using Ellen.Launcher.Model.Metadata.Monster;
+using Ellen.Launcher.Model.EnemyArchive;
 using Ellen.Launcher.UI.Xaml.Control.AutoSuggestBox;
 
 namespace Ellen.Launcher.ViewModel.Wiki;
@@ -9,18 +9,18 @@ namespace Ellen.Launcher.ViewModel.Wiki;
 // ReSharper disable PossibleMultipleEnumeration
 public static class MonsterFilter
 {
-    public static Predicate<Monster>? Compile(SearchData? searchData)
+    public static Predicate<MonsterCatalogEntry>? Compile(SearchData? searchData)
     {
         return searchData is { FilterTokens.Count: > 0 } ? CompileTokens(searchData.FilterTokens) : default;
     }
 
-    private static Predicate<Monster> CompileTokens(IEnumerable<SearchToken> input)
+    private static Predicate<MonsterCatalogEntry> CompileTokens(IEnumerable<SearchToken> input)
     {
         ILookup<SearchTokenKind, string> lookup = input.ToLookup(token => token.Kind, token => token.Value);
-        return monster => CompileTokenLookup(lookup, monster);
+        return entry => CompileTokenLookup(lookup, entry);
     }
 
-    private static bool CompileTokenLookup(ILookup<SearchTokenKind, string> lookup, Monster monster)
+    private static bool CompileTokenLookup(ILookup<SearchTokenKind, string> lookup, MonsterCatalogEntry entry)
     {
         List<bool> matches = [];
 
@@ -29,10 +29,10 @@ public static class MonsterFilter
             switch (kind)
             {
                 case SearchTokenKind.Monster:
-                    matches.Add(tokens.Contains(monster.Name));
+                    matches.Add(tokens.Contains(entry.Name));
                     break;
                 case SearchTokenKind.None:
-                    matches.Add(tokens.Any(token => monster.Name?.Contains(token, StringComparison.OrdinalIgnoreCase) == true));
+                    matches.Add(tokens.Any(token => entry.Name.Contains(token, StringComparison.OrdinalIgnoreCase)));
                     break;
                 default:
                     matches.Add(false);
@@ -42,5 +42,4 @@ public static class MonsterFilter
 
         return matches.Count > 0 && matches.All(r => r);
     }
-
 }

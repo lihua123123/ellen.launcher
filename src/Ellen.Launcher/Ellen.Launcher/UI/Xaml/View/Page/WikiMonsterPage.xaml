@@ -48,23 +48,52 @@
             </Grid>
         </DataTemplate>
 
-        <DataTemplate x:Key="MonsterListTemplate" x:DataType="shmmm:Monster">
-            <Grid>
+        <DataTemplate x:Key="MonsterListTemplate" x:DataType="shma:MonsterCatalogEntry">
+            <!--  MinHeight 与「48 头像 + 6*2 外边距」对齐；头像列固定 48，缺头像的条目文字才不会左移 -->
+            <Grid MinHeight="60" ColumnSpacing="12">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="48"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <shuxci:CachedImage
                     Grid.Column="0"
                     Width="48"
                     Height="48"
-                    Margin="0,6,12,6"
-                    Source="{Binding Icon, Converter={StaticResource MonsterIconConverter}, Mode=OneWay}"/>
+                    Margin="0,6"
+                    Source="{Binding Icon, Converter={StaticResource MonsterCatalogIconConverter}, Mode=OneWay}"
+                    Visibility="{Binding HasIcon, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <StackPanel
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Spacing="2">
+                    <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock
+                        FontSize="11"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Text="{Binding CategoryName}"
+                        TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!--  侧边栏一级：分类（「全部」+ 各 Category），右侧带条目数  -->
+        <DataTemplate x:Key="MonsterCategoryTemplate" x:DataType="shma:MonsterCategoryGroup">
+            <Grid MinHeight="36" ColumnSpacing="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    Text="{Binding Name}"
+                    TextTrimming="CharacterEllipsis"/>
                 <TextBlock
                     Grid.Column="1"
-                    Margin="12,0,0,0"
                     VerticalAlignment="Center"
-                    Text="{Binding Name}"/>
+                    FontSize="11"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Text="{Binding CountText}"/>
             </Grid>
         </DataTemplate>
 
@@ -106,10 +135,13 @@
             </shuxcc:HorizontalCard>
         </DataTemplate>
 
-        <DataTemplate x:Key="MonsterGridTemplate" x:DataType="shmmm:Monster">
+        <DataTemplate x:Key="MonsterGridTemplate" x:DataType="shma:MonsterCatalogEntry">
             <shuxcc:VerticalCard Width="82">
                 <shuxcc:VerticalCard.Top>
-                    <shuxc:ItemIcon Icon="{Binding Icon, Converter={StaticResource MonsterIconConverter}, Mode=OneWay}" Quality="QUALITY_NONE"/>
+                    <shuxc:ItemIcon
+                        Icon="{Binding Icon, Converter={StaticResource MonsterCatalogIconConverter}, Mode=OneWay}"
+                        Quality="QUALITY_NONE"
+                        Visibility="{Binding HasIcon, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 </shuxcc:VerticalCard.Top>
                 <shuxcc:VerticalCard.Bottom>
                     <TextBlock
@@ -187,6 +219,7 @@
                     Visibility="{Binding HasTitle, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 <TextBlock
                     shuxc:GuideRichText.AutoElementColor="True"
+                    shuxc:GuideRichText.StatColor="True"
                     shuxc:GuideRichText.Source="{Binding Text}"
                     TextWrapping="Wrap"/>
             </StackPanel>
@@ -203,6 +236,12 @@
                 CornerRadius="8">
                 <StackPanel Spacing="6">
                     <StackPanel Orientation="Horizontal" Spacing="8">
+                        <shuxci:CachedImage
+                            Width="28"
+                            Height="28"
+                            VerticalAlignment="Center"
+                            Source="{Binding IconUri}"
+                            Visibility="{Binding HasIcon, Converter={StaticResource BoolToVisibilityConverter}}"/>
                         <TextBlock
                             VerticalAlignment="Center"
                             Style="{StaticResource BodyStrongTextBlockStyle}"
@@ -221,11 +260,14 @@
                     </StackPanel>
                     <TextBlock
                         shuxc:GuideRichText.AutoElementColor="True"
+                        shuxc:GuideRichText.StatColor="True"
                         shuxc:GuideRichText.Source="{Binding Description}"
                         TextWrapping="Wrap"/>
                     <TextBlock
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        Text="{Binding Tips}"
+                        shuxc:GuideRichText.AutoElementColor="True"
+                        shuxc:GuideRichText.StatColor="True"
+                        shuxc:GuideRichText.Source="{Binding Tips}"
                         TextWrapping="Wrap"
                         Visibility="{Binding HasTips, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     <StackPanel
@@ -238,7 +280,31 @@
                 </StackPanel>
             </Border>
         </DataTemplate>
-    </Page.Resources>
+            <!--  档案：护盾（XML 图鉴源独有字段）  -->
+        <DataTemplate x:Key="MonsterArchiveShieldTemplate" x:DataType="shma:EnemyArchiveShield">
+            <Border
+                Margin="0,0,0,8"
+                Padding="14,12"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <StackPanel Spacing="6">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                        Text="{Binding Name}"/>
+                    <TextBlock
+                        shuxc:GuideRichText.AutoElementColor="True"
+                        shuxc:GuideRichText.Bold="True"
+                        shuxc:GuideRichText.StatColor="True"
+                        shuxc:GuideRichText.StatElement="{Binding ElementKey}"
+                        shuxc:GuideRichText.Source="{Binding Description}"
+                        TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+</Page.Resources>
 
     <shuxc:StandardView ShowCondition="{Binding Monsters, Converter={StaticResource EmptyObjectToBoolConverter}}">
         <shuxc:StandardView.EmptyContent>
@@ -294,20 +360,34 @@
                             <SplitView
                                 DisplayMode="Inline"
                                 IsPaneOpen="True"
-                                OpenPaneLength="{StaticResource CompatSplitViewOpenPaneLength2}"
+                                OpenPaneLength="{StaticResource CompatSplitViewOpenPaneLength4}"
                                 PaneBackground="{ThemeResource CardBackgroundFillColorSecondaryBrush}">
                                 <SplitView.Pane>
-                                    <ListView
-                                        Grid.Row="1"
-                                        Padding="{ThemeResource ListViewInSplitPanePadding}"
-                                        ItemTemplate="{StaticResource MonsterListTemplate}"
-                                        ItemsSource="{Binding Monsters}"
-                                        SelectedItem="{Binding Monsters.CurrentItem, Mode=TwoWay}"
-                                        SelectionMode="Single">
-                                        <mxi:Interaction.Behaviors>
-                                            <shuxb:SelectedItemInViewBehavior/>
-                                        </mxi:Interaction.Behaviors>
-                                    </ListView>
+                                    <!--  两级侧边栏：左「分类」/ 右「该分类下的敌人」  -->
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="132"/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <ListView
+                                            Grid.Column="0"
+                                            Padding="4,12,4,12"
+                                            ItemTemplate="{StaticResource MonsterCategoryTemplate}"
+                                            ItemsSource="{Binding Categories}"
+                                            SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                                            SelectionMode="Single"/>
+                                        <ListView
+                                            Grid.Column="1"
+                                            Padding="{ThemeResource ListViewInSplitPanePadding}"
+                                            ItemTemplate="{StaticResource MonsterListTemplate}"
+                                            ItemsSource="{Binding Monsters}"
+                                            SelectedItem="{Binding Monsters.CurrentItem, Mode=TwoWay}"
+                                            SelectionMode="Single">
+                                            <mxi:Interaction.Behaviors>
+                                                <shuxb:SelectedItemInViewBehavior/>
+                                            </mxi:Interaction.Behaviors>
+                                        </ListView>
+                                    </Grid>
                                 </SplitView.Pane>
                                 <SplitView.Content>
                                     <ScrollViewer shuxc:ScrollViewerHelper.ScrollToTopAssociatedObject="{Binding Monsters.CurrentItem}">
@@ -321,20 +401,27 @@
                                                     <EntranceThemeTransition FromVerticalOffset="50"/>
                                                     <RepositionThemeTransition IsStaggeringEnabled="False"/>
                                                 </StackPanel.ChildrenTransitions>
-                                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                                <!--  长标题（如「历经百战的暝视龙·霜雪苛念」）要能换行：放 * 列并开 Wrap，行高才不会被压重叠  -->
+                                                <Grid ColumnSpacing="12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
                                                     <TextBlock
                                                         Margin="1,0,0,0"
                                                         VerticalAlignment="Center"
                                                         Style="{StaticResource SubtitleTextBlockStyle}"
+                                                        TextWrapping="Wrap"
                                                         Text="{Binding Monsters.CurrentItem.Title}"/>
                                                     <!--  补全过档案的敌人：标注数据来源（图鉴卡制图 @Csxylic）  -->
                                                     <HyperlinkButton
+                                                        Grid.Column="1"
                                                         Padding="2,0"
                                                         VerticalAlignment="Center"
                                                         Content="{shuxm:ResourceString Name=ViewPageWikiMonsterArchiveSource}"
                                                         NavigateUri="https://www.miyoushe.com/ys/accountCenter/collectionList?id=258229537"
                                                         Visibility="{Binding Monsters.CurrentItem.Archive, Converter={StaticResource EmptyObjectToVisibilityConverter}}"/>
-                                                </StackPanel>
+                                                </Grid>
                                                 <shuxct:DescriptionTextBlock
                                                     Margin="1,0,0,0"
                                                     HorizontalAlignment="Stretch"
@@ -352,7 +439,7 @@
                                                     ItemTemplate="{StaticResource MonsterBaseValueTemplate}"
                                                     ItemsPanel="{StaticResource UniformGridColumns2Spacing4Template}"
                                                     ItemsSource="{Binding Monsters.CurrentItem.BaseValue.SubHurts}"
-                                                    Visibility="{Binding Monsters.CurrentItem.HasArchiveResistances, Converter={StaticResource BoolToVisibilityRevertConverter}}">
+                                                    Visibility="{Binding Monsters.CurrentItem.ShowFallbackResistances, Converter={StaticResource BoolToVisibilityConverter}}">
                                                     <ItemsControl.Resources>
                                                         <!--  ReSharper disable Xaml.RedundantResource  -->
                                                         <x:Double x:Key="SettingsCardMinHeight">0</x:Double>
@@ -365,7 +452,7 @@
                                                 <Border
                                                     Padding="16"
                                                     Style="{ThemeResource BorderShimmerStyle}"
-                                                    Visibility="{Binding Monsters.CurrentItem.Archive.HasResistances, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    Visibility="{Binding Monsters.CurrentItem.HasArchiveResistances, Converter={StaticResource BoolToVisibilityConverter}}">
                                                     <StackPanel Spacing="12">
                                                         <StackPanel Orientation="Horizontal" Spacing="12">
                                                             <TextBlock
@@ -419,7 +506,7 @@
                                                 <Border
                                                     Padding="16"
                                                     Style="{ThemeResource BorderShimmerStyle}"
-                                                    Visibility="{Binding Monsters.CurrentItem.Archive.HasMechanics, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    Visibility="{Binding Monsters.CurrentItem.HasArchiveMechanics, Converter={StaticResource BoolToVisibilityConverter}}">
                                                     <StackPanel Spacing="12">
                                                         <TextBlock
                                                             Style="{StaticResource BaseTextBlockStyle}"
@@ -430,10 +517,25 @@
                                                     </StackPanel>
                                                 </Border>
 
+                                                                                                <!--  档案：护盾（XML 图鉴源独有字段）  -->
                                                 <Border
                                                     Padding="16"
                                                     Style="{ThemeResource BorderShimmerStyle}"
-                                                    Visibility="{Binding Monsters.CurrentItem.Archive.HasEnergy, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    Visibility="{Binding Monsters.CurrentItem.HasArchiveShield, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    <StackPanel Spacing="12">
+                                                        <TextBlock
+                                                            Style="{StaticResource BaseTextBlockStyle}"
+                                                            Text="{shuxm:ResourceString Name=ViewPageWikiMonsterArchiveShield}"/>
+                                                        <ItemsControl
+                                                            ItemTemplate="{StaticResource MonsterArchiveShieldTemplate}"
+                                                            ItemsSource="{Binding Monsters.CurrentItem.Archive.Shield}"/>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <Border
+                                                    Padding="16"
+                                                    Style="{ThemeResource BorderShimmerStyle}"
+                                                    Visibility="{Binding Monsters.CurrentItem.HasArchiveEnergy, Converter={StaticResource BoolToVisibilityConverter}}">
                                                     <StackPanel Spacing="12">
                                                         <TextBlock
                                                             Style="{StaticResource BaseTextBlockStyle}"
@@ -469,7 +571,7 @@
                                                 <Border
                                                     Padding="16"
                                                     Style="{ThemeResource BorderShimmerStyle}"
-                                                    Visibility="{Binding Monsters.CurrentItem.Archive.HasSkills, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    Visibility="{Binding Monsters.CurrentItem.HasArchiveSkills, Converter={StaticResource BoolToVisibilityConverter}}">
                                                     <StackPanel Spacing="12">
                                                         <TextBlock
                                                             Style="{StaticResource BaseTextBlockStyle}"
@@ -479,28 +581,7 @@
                                                             ItemsSource="{Binding Monsters.CurrentItem.Archive.Skills}"/>
                                                     </StackPanel>
                                                 </Border>
-
-                                                <Border Padding="16" Style="{ThemeResource BorderShimmerStyle}">
-                                                    <StackPanel Spacing="16">
-                                                        <TextBlock
-                                                            Style="{StaticResource BaseTextBlockStyle}"
-                                                            Text="{shuxm:ResourceString Name=ViewPageWikiMonsterDropItems}"
-                                                            Visibility="{Binding Monsters.CurrentItem.DropsView, Converter={StaticResource EmptyObjectToVisibilityConverter}}"/>
-                                                        <ItemsControl
-                                                            ItemTemplate="{StaticResource MonsterDropTemplate}"
-                                                            ItemsSource="{Binding Monsters.CurrentItem.DropsView}"
-                                                            Visibility="{Binding Monsters.CurrentItem.DropsView, Converter={StaticResource EmptyObjectToVisibilityConverter}}">
-                                                            <ItemsControl.ItemsPanel>
-                                                                <ItemsPanelTemplate>
-                                                                    <cwc:UniformGrid
-                                                                        ColumnSpacing="8"
-                                                                        Columns="3"
-                                                                        RowSpacing="8"/>
-                                                                </ItemsPanelTemplate>
-                                                            </ItemsControl.ItemsPanel>
-                                                        </ItemsControl>
-                                                    </StackPanel>
-                                                </Border>
+                                                <!--  上游 GIEnemyChartXML 没有掉落物数据，掉落区整块不渲染（DropsView 恒为空）  -->
                                             </StackPanel>
                                         </Grid>
                                     </ScrollViewer>

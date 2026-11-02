@@ -273,6 +273,16 @@ public sealed class ZenlessDailyNote
     }
 
     /// <summary>
+    /// 绳网会员进度条：今日菲林已领取填满，未领取或未开通为空。
+    /// 带上 <see cref="IsMemberCardOpen"/> 是为了避免 member_card_state 字段缺失时被判定成「已领取」。
+    /// </summary>
+    [JsonIgnore]
+    public int MemberCardProgress
+    {
+        get => IsMemberCardOpen && MemberCard.IsClaimed ? 1 : 0;
+    }
+
+    /// <summary>
     /// 是否解锁了随便观经营（未解锁时不显示百通宝与游历/制造/售卖）。
     /// </summary>
     [JsonIgnore]

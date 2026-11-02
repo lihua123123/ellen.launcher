@@ -56,9 +56,15 @@ public static class SettingKeys
 
     // SignIn
     /// <summary>
-    /// 上次「自动签到」全部成功的 Unix 毫秒时间戳，用于 12 小时内不再重复自动签到。
+    /// 上次「自动签到」全部成功的 Unix 毫秒时间戳，仅用于诊断。
     /// </summary>
     public const string SignInAutoSignInLastSuccessTime    = "Ellen::SignIn::AutoSignIn::LastSuccessTime";
+
+    /// <summary>
+    /// 当天「哪些账号、哪些角色已经确认签过」的账本，跨天后自动作废，
+    /// 等价于签到成功后冷却到当天 23:59:59。格式见 <c>AutoSignInLedger</c>。
+    /// </summary>
+    public const string SignInAutoSignInLedger           = "Ellen::SignIn::AutoSignIn::Ledger";
     public const string HomeCardTravelersDiaryOrder        = "Ellen::UI::Home::Card::TravelersDiary::Order";
     public const string IsHomeCardTravelersDiaryPresented  = "Ellen::UI::Home::Card::TravelersDiary::Presented";
     public const string HomeAnnouncementActPreviewEnabled  = "Ellen::UI::Home::Announcement::ActPreviewEnabled";

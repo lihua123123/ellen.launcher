@@ -27,6 +27,7 @@
     <shmmc:GachaAvatarIconConverter x:Key="GachaAvatarIconConverter"/>
     <shmmc:GachaEquipIconConverter x:Key="GachaEquipIconConverter"/>
     <shmmc:ItemIconConverter x:Key="ItemIconConverter"/>
+    <shmmc:MonsterCatalogIconConverter x:Key="MonsterCatalogIconConverter"/>
     <shmmc:MonsterIconConverter x:Key="MonsterIconConverter"/>
     <shmmc:QualityColorConverter x:Key="QualityColorConverter"/>
     <shmmc:QualityToBrushConverter x:Key="QualityToBrushConverter"/>

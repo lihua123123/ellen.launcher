@@ -90,7 +90,10 @@ public sealed partial class DailyNoteViewModel : Abstraction.ViewModel
         {
             await taskContext.SwitchToBackgroundAsync();
             AdvancedDbCollectionView<User.User, Model.Entity.User> users = await userService.GetUsersAsync().ConfigureAwait(false);
-            ObservableCollection<DailyNoteEntry> entries = await dailyNoteService.GetDailyNoteEntryCollectionAsync(metadataContext, false, token).ConfigureAwait(false);
+
+            // 与原神便笺的旧行为不同：不再依赖「自动刷新」开关，每次进入便笺页都强制联网刷新一次，
+            // 和下方绝区零便笺「进页面即拉取」的表现保持一致。
+            ObservableCollection<DailyNoteEntry> entries = await dailyNoteService.GetDailyNoteEntryCollectionAsync(metadataContext, true, token).ConfigureAwait(false);
 
             // 绝区零便笺只在内存里，失败不影响原神部分
             ObservableCollection<ZenlessNoteEntry> zenlessEntries = await CreateZenlessNoteEntriesAsync(users.Source, token).ConfigureAwait(false);

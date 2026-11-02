@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using Ellen.Launcher.Model.EnemyArchive;
 using Ellen.Launcher.Model.Metadata.Avatar;
 using Ellen.Launcher.Model.Metadata.Monster;
 using Ellen.Launcher.Model.Metadata.Weapon;
@@ -60,7 +61,7 @@ public sealed partial class SearchData : ObservableObject
         return new(SearchTokens.GetForWikiWeapon(array));
     }
 
-    public static SearchData CreateForWikiMonster(ImmutableArray<Monster> array)
+    public static SearchData CreateForWikiMonster(ImmutableArray<MonsterCatalogEntry> array)
     {
         return new(SearchTokens.GetForWikiMonster(array));
     }

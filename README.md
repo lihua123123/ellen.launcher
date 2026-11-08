@@ -158,13 +158,15 @@ python tools\EllenWikiSync\sync.py --list     # 列出数据集
 新增数据集只需在 `tools/EllenWikiSync/ellenwiki/datasets.py` 的 `DATASETS` 里加一条
 （API 路径 → 仓库内目标文件）。同步后需重新构建。
 
-应用侧还会在启动时从同一 API 重新拉取「元素附着及产球」快照并缓存到数据目录
-（`Core/EllenRuntime.cs → GetDataEllenWikiDirectory()`），失败或离线时回退到随包快照；
-相关实现见 `Service/EllenWiki/EllenWikiDataService.cs`、`Model/Combat/AvatarCombatNoteConverter.cs`。
+应用侧不再单独维护一套拉取逻辑：「元素附着及产球」跟着元数据快照一起同步
+（快照里的 `Attachment.json`，落到 `LocalCache/Metadata/Wiki/Genshin/<locale>/`，
+由 `Service/Metadata/WikiMetadataSyncService.cs` 管理），
+读取顺序为 **同步快照 → 随包快照**，离线或格式错误时回退，不影响角色页其它功能。
+相关实现见 `Service/Combat/AvatarCombatNoteService.cs`、`Model/Combat/AvatarCombatNoteConverter.cs`。
 
 | 数据 | 来源 | 生成方式 |
 | --- | --- | --- |
-| 角色「元素附着/产球」战斗备注 | ellen.wiki `GET /api/attachment` | `python tools/EllenWikiSync/sync.py attachment` → `Resource/CombatNotes/AvatarCombatNotes.json`（运行期由 `AvatarCombatNoteConverter` 转换） |
+| 角色「元素附着/产球」战斗备注 | ellen.wiki `GET /api/attachment`（与 `src/data/characters.js` 同源） | 随包快照：`python tools/EllenWikiSync/sync.py attachment` → `Resource/CombatNotes/AvatarCombatNotes.json`；运行期：随 Launcher 元数据快照下发 `Attachment.json`，由 `AvatarCombatNoteConverter` 转换 |
 | 绝区零调频物品（代理人 / 音擎 / 邦布）图标与名称 | Starward 公共元数据镜像 `https://starward-static.scighost.com/metadata/v1/zzz/ZZZGachaInfo.nap_cn.zh-cn.json` | `python tools/ZZZGachaInfoGen/generate.py`（先 `--check` 看差异）→ `Resource/Metadata/ZZZ/GachaItem.json` |
 | 绝区零调频档期（计时页「上次 UP」/ 历史卡池图） | HoYo.Gacha 公共元数据 v2（`lgou2w/HoYo.Gacha`）+ 米游社官方「X版本限时频段」「XXX调频说明」公告 | `python tools/ZZZGachaBannerGen/generate.py`（先 `--check` 看差异）→ `Resource/Metadata/ZZZ/GachaBanner.json`；同期双频段拆成独立记录，卡池图只存 URL，运行期下载 |
 | 伤害计算公式 | `ellen-wiki` 仓库的 `content/formulas/genshin.md` | `node tools/FormulasGen/gen.mjs` → `Resource/Formulas/GenshinFormulas.json` + `Resource/Formulas/Genshin/{light,dark}/*.png`；行内公式保留 `$...$`，由随包的 KaTeX 字体渲染（`Resource/Font/KaTeX_Main-Regular.ttf`，与 ellen-wiki 的公式字体一致） |

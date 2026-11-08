@@ -276,6 +276,8 @@
 		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	</PackageReference>
     <ProjectReference Include="..\..\SourceGeneration\SourceGeneration.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <!-- P2：ellen.wiki 只读数据层（Domain/WikiSource）。纯 net10.0 类库，供 VM/Service/DI 复用。 -->
+    <ProjectReference Include="..\Ellen.Launcher.Domain\Ellen.Launcher.Domain.csproj" />
     <PackageReference Include="Snap.LibGit2Sharp" Version="0.31.1-preview.0.4" />
     <PackageReference Include="Snap.Hutao.FileUnlocker" Version="1.2.0" />
     <PackageReference Include="Snap.ZStandard" Version="1.5.7" />

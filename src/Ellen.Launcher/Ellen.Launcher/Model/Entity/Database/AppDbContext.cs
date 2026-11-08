@@ -79,8 +79,13 @@ public sealed partial class AppDbContext : DbContext
 
     public static AppDbContext Create(IServiceProvider serviceProvider, string sqlConnectionString)
     {
+        // 用编译模型：不传 UseModel 时每次进程首启要反射构建整个模型（实测 1058ms）。
+        // 生成命令：dotnet ef dbcontext optimize --context AppDbContext --output-dir Migrations/CompiledModels --namespace Ellen.Launcher.DbCompiled
+        // 命名空间必须**不要**嵌在 Ellen.Launcher.Migrations 下：迁移类里也有 UidProfilePicture 等同名类型，
+        // 嵌套命名空间会让生成代码里的 typeof(...) 绑到迁移类上，运行时 DbSet<T> 直接抛类型不匹配。
         DbContextOptions<AppDbContext> options = new DbContextOptionsBuilder<AppDbContext>()
             .UseSqlite(sqlConnectionString)
+            .UseModel(Ellen.Launcher.DbCompiled.AppDbContextModel.Instance)
             .Options;
 
         return new(options);

@@ -1,8 +1,9 @@
-// Copyright (c) DGP Studio. All rights reserved.
+﻿// Copyright (c) DGP Studio. All rights reserved.
 // Licensed under the MIT license.
 
 using Ellen.Launcher.Core.DependencyInjection.Annotation.HttpClient;
 using Ellen.Launcher.Core.IO;
+using Ellen.Launcher.Service.EnemyArchive;
 using Ellen.Launcher.ViewModel.Guide;
 using Ellen.Launcher.Web.Request.Builder;
 using Ellen.Launcher.Web.Request.Builder.Abstraction;
@@ -26,21 +27,46 @@ public sealed partial class ImageCacheDownloadOperation : IImageCacheDownloadOpe
 
     public async ValueTask DownloadFileAsync(Uri uri, ValueFile baseFile)
     {
-        using (HttpClient httpClient = httpClientFactory.CreateClient(nameof(ImageCacheDownloadOperation)))
+        /* 敌人图鉴图源的下载单独计数：CachedImage 的失败路径只降级占位图，
+           旧实现既不进 metrics 也不进 Sentry（Sentry 默认未启用）—— 见 WikiImageDownloadCounter。 */
+        bool isWikiImage = WikiImageDownloadCounter.IsDownloadableWikiImage(uri);
+        if (isWikiImage)
         {
-            try
-            {
-                await DownloadFileUsingHttpClientAsync(httpClient, uri, baseFile).ConfigureAwait(false);
-            }
-            catch (HttpRequestException)
-            {
-                // Ignore
-            }
+            WikiImageDownloadCounter.ReportAttempt();
         }
 
-        if (!File.Exists(baseFile))
+        try
         {
-            throw publicImageCacheException.Throw($"'{uri.OriginalString}': File not exists after download attempt.");
+            using (HttpClient httpClient = httpClientFactory.CreateClient(nameof(ImageCacheDownloadOperation)))
+            {
+                try
+                {
+                    await DownloadFileUsingHttpClientAsync(httpClient, uri, baseFile).ConfigureAwait(false);
+                }
+                catch (HttpRequestException)
+                {
+                    // Ignore
+                }
+            }
+
+            if (!File.Exists(baseFile))
+            {
+                throw publicImageCacheException.Throw($"'{uri.OriginalString}': File not exists after download attempt.");
+            }
+
+            if (isWikiImage)
+            {
+                WikiImageDownloadCounter.ReportSuccess();
+            }
+        }
+        catch
+        {
+            if (isWikiImage)
+            {
+                WikiImageDownloadCounter.ReportFailure();
+            }
+
+            throw;
         }
     }
 

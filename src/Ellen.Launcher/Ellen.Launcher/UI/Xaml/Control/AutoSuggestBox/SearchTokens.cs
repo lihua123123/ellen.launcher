@@ -102,4 +102,27 @@ public static class SearchTokens
         ]);
     }
 
+    /// <summary>
+    /// P2：753 条网页版候选 token。除主名外把 nameEn / aliases / tags / categoryLabel /
+    /// 旧中文分类 / 旧 InternalName 全部收进候选，保证新旧叫法都能搜到。
+    /// 键去重（FrozenDictionary 需要唯一键），值相同只留第一次出现。
+    /// </summary>
+    public static FrozenDictionary<string, SearchToken> GetForWikiMonsterWeb(IReadOnlyList<Domain.WikiSource.WikiEnemyViewItem> items)
+    {
+        Dictionary<string, SearchToken> tokens = new(StringComparer.Ordinal);
+        for (int index = 0; index < items.Count; index++)
+        {
+            Domain.WikiSource.WikiEnemyViewItem item = items[index];
+            foreach (string token in item.SearchTokens)
+            {
+                if (!string.IsNullOrWhiteSpace(token) && !tokens.ContainsKey(token))
+                {
+                    tokens.Add(token, new SearchToken(SearchTokenKind.Monster, token, index));
+                }
+            }
+        }
+
+        return WinRTAdaptive.ToFrozenDictionary([.. tokens]);
+    }
+
 }

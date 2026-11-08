@@ -21,10 +21,17 @@ public sealed class CookBonusView
             return null;
         }
 
+        /* 新角色可能引用当前数据源里还没有的材料 id，缺了就整块不显示，别让页面炸掉 */
+        if (!idMaterialMap.TryGetValue(cookBonus.OriginItemId, out Material? originItem)
+            || !idMaterialMap.TryGetValue(cookBonus.ItemId, out Material? item))
+        {
+            return null;
+        }
+
         CookBonusView view = new()
         {
-            OriginItem = idMaterialMap[cookBonus.OriginItemId],
-            Item = idMaterialMap[cookBonus.ItemId],
+            OriginItem = originItem,
+            Item = item,
         };
 
         return view;

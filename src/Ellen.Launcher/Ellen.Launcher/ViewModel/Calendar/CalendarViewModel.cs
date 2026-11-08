@@ -85,6 +85,12 @@ public sealed partial class CalendarViewModel : Abstraction.ViewModelSlim<Cultiv
 
         foreach (ref readonly Avatar avatar in metadataContext.Avatars.AsSpan())
         {
+            /* 培养材料不足 6 槽（数据源还没收录的新角色）时跳过，避免越界 */
+            if (avatar.CultivationItems.Length < 5)
+            {
+                continue;
+            }
+
             ref List<CalendarItem>? group = ref CollectionsMarshal.GetValueRefOrAddDefault(results, avatar.CultivationItems[4], out bool exist);
             if (!exist)
             {
@@ -97,6 +103,11 @@ public sealed partial class CalendarViewModel : Abstraction.ViewModelSlim<Cultiv
 
         foreach (ref readonly Weapon weapon in metadataContext.Weapons.AsSpan())
         {
+            if (weapon.CultivationItems.Length < 1)
+            {
+                continue;
+            }
+
             ref List<CalendarItem>? group = ref CollectionsMarshal.GetValueRefOrAddDefault(results, weapon.CultivationItems[0], out bool exist);
             if (!exist)
             {

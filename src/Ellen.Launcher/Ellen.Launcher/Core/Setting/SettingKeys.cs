@@ -27,6 +27,16 @@ public static class SettingKeys
     public const string PrimaryLanguage              = "Ellen::Globalization::PrimaryLanguage";
     public const string AnnouncementRegion           = "Ellen::Globalization::Region::Announcement";
 
+    // Metadata
+    /// <summary>
+    /// 自建数据站地址（默认 https://ellen.wiki），用于同步角色/武器元数据快照。
+    /// 留空或填错时自动回退到默认值。
+    /// </summary>
+    public const string WikiMetadataEndpoint         = "Ellen::Metadata::Wiki::Endpoint";
+
+    /// <summary>P3：敌人图鉴 feature flag 持久化（重启保持）。值只能是 legacy-722-bundled / enemy-web-753。</summary>
+    public const string WikiEnemyUiSource             = "Ellen::Wiki::Enemy::UiSource";
+
     // UI
     public const string BackgroundImageType          = "Ellen::UI::BackgroundImage::Type";
     public const string BackgroundImagePath          = "Ellen::UI::BackgroundImage::Path";

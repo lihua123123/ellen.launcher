@@ -66,6 +66,12 @@ public sealed partial class SearchData : ObservableObject
         return new(SearchTokens.GetForWikiMonster(array));
     }
 
+    /// <summary>P2：753 条网页版，候选 token 含 nameEn/aliases/tags/categoryLabel/旧分类/旧 InternalName。</summary>
+    public static SearchData CreateForWikiMonsterWeb(IReadOnlyList<Domain.WikiSource.WikiEnemyViewItem> items)
+    {
+        return new(SearchTokens.GetForWikiMonsterWeb(items));
+    }
+
     public static SearchData Create(FrozenDictionary<string, SearchToken> availableTokens)
     {
         return new(availableTokens);

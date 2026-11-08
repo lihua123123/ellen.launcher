@@ -167,6 +167,14 @@ public sealed partial class CachedImage : Microsoft.UI.Xaml.Controls.Control
             return;
         }
 
+        // P5a 灰度指标：只统计敌人图鉴图源（ellen.wiki 远程图 / Wiki 缓存本地文件）的解码失败，
+        // 全应用其它图片的失败不计入，避免污染「图片解析失败率」。
+        if (image.Source is BitmapImage bitmap
+            && Ellen.Launcher.Service.EnemyArchive.WikiImageDecodeCounter.IsWikiImage(bitmap.UriSource))
+        {
+            Ellen.Launcher.Service.EnemyArchive.WikiImageDecodeCounter.Report();
+        }
+
         AnimationBuilder
             .Create()
             .Opacity(
@@ -359,7 +367,15 @@ public sealed partial class CachedImage : Microsoft.UI.Xaml.Controls.Control
                     }
 
                     int decodeLength = ResolveDecodeLength();
-                    Uri? targetUri = uri.Scheme is "ms-appx" ? ResolveAppxUriForUnpackaged(uri) : await ProvideCachedResourceAsync(uri, token).ConfigureAwait(true);
+                    /* 本地文件（随包图片 / 内容寻址缓存）已经是磁盘上的成品，不能再走「下载→缓存」：
+                       file:// 的 Host 为空，ProvideCachedResourceAsync 会判成非法 URI 直接降级占位图，
+                       表现为「缓存命中率 100% 但界面全是空白图」。 */
+                    Uri? targetUri = uri.Scheme switch
+                    {
+                        "ms-appx" => ResolveAppxUriForUnpackaged(uri),
+                        "file" => uri,
+                        _ => await ProvideCachedResourceAsync(uri, token).ConfigureAwait(true),
+                    };
                     if (!token.IsCancellationRequested)
                     {
                         // Only attach our image if we still have a valid request.

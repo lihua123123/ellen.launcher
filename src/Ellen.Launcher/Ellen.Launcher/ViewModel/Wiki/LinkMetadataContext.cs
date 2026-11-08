@@ -27,22 +27,42 @@ public sealed class LinkMetadataContext
         switch (kind)
         {
             case MiHoYoSyntaxLinkKind.Name:
-                HyperLinkName hyperLinkName = IdNameMap[id];
+                /* 名字表来自数据源，新内容可能引用了尚未收录的 id —— Try* 方法不该抛异常 */
+                if (!IdNameMap.TryGetValue(id, out HyperLinkName? hyperLinkName))
+                {
+                    return false;
+                }
+
                 name = hyperLinkName.Name;
                 description = hyperLinkName.Description;
                 break;
             case MiHoYoSyntaxLinkKind.Inherent:
-                ProudSkill inherent = Inherents.Single(s => s.Id == id);
+                ProudSkill? inherent = Inherents.FirstOrDefault(s => s.Id == id);
+                if (inherent is null)
+                {
+                    return false;
+                }
+
                 name = inherent.Name;
                 description = inherent.Description;
                 break;
             case MiHoYoSyntaxLinkKind.Skill:
-                ProudSkill skill = Skills.Single(s => s.Id == id);
+                ProudSkill? skill = Skills.FirstOrDefault(s => s.Id == id);
+                if (skill is null)
+                {
+                    return false;
+                }
+
                 name = skill.Name;
                 description = skill.Description;
                 break;
             case MiHoYoSyntaxLinkKind.Talent:
-                Skill talent = Talents.Single(s => s.Id == id);
+                Skill? talent = Talents.FirstOrDefault(s => s.Id == id);
+                if (talent is null)
+                {
+                    return false;
+                }
+
                 name = talent.Name;
                 description = talent.Description;
                 break;

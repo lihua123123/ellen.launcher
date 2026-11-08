@@ -49,7 +49,7 @@ public sealed partial class ToastNotificationService : IToastNotificationService
             Process.Start(new ProcessStartInfo
             {
                 FileName = "explorer.exe",
-                Arguments = $"\"{exePath}\"",
+                Arguments = $"\"{exePath}\" {Bootstrap.ToastHelperArgument}",
                 UseShellExecute = true,
             });
 

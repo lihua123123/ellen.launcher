@@ -3,6 +3,7 @@
 
 using Ellen.Launcher.Core;
 using Ellen.Launcher.Model.Combat;
+using Ellen.Launcher.Service.Metadata;
 using System.Collections.Frozen;
 using System.IO;
 using MetadataAvatar = Ellen.Launcher.Model.Metadata.Avatar.Avatar;
@@ -14,8 +15,9 @@ namespace Ellen.Launcher.Service.Combat;
 /// <summary>
 /// 「元素附着及产球」战斗备注的只读查询。
 /// <para>
-/// 数据来自随应用发布的 <c>Resource/CombatNotes/AvatarCombatNotes.json</c>
-/// （由 ellen.wiki 的 <c>GET /api/attachment</c> 离线同步生成，运行期不发起任何网络请求）。
+/// 数据随元数据快照一起下发（<c>Attachment.json</c>，由 ellen.wiki 生成，与 <c>GET /api/attachment</c>
+/// 同源），优先读同步目录；尚未同步时退回随包快照
+/// <c>Resource/CombatNotes/AvatarCombatNotes.json</c>。运行期不单独发起网络请求。
 /// 该功能是纯附加信息：资源缺失或
 /// 格式错误时只记录日志并返回空表，不影响角色资料页的既有功能。
 /// </para>
@@ -23,8 +25,12 @@ namespace Ellen.Launcher.Service.Combat;
 [Service(ServiceLifetime.Singleton, typeof(IAvatarCombatNoteService))]
 public sealed partial class AvatarCombatNoteService : IAvatarCombatNoteService
 {
+    /// <summary>同步快照里的文件名（与 ellen-wiki 的 build-launcher-metadata.mjs 对应）。</summary>
+    private const string SyncedFileName = "Attachment.json";
+
     private const string ResourceRelativePath = "Resource/CombatNotes/AvatarCombatNotes.json";
 
+    private readonly MetadataOptions metadataOptions;
     private readonly ILogger<AvatarCombatNoteService> logger;
 
     private readonly Lock gate = new();
@@ -128,6 +134,12 @@ public sealed partial class AvatarCombatNoteService : IAvatarCombatNoteService
 
     private FrozenDictionary<string, AvatarCombatNote> LoadNotes()
     {
+        /* 同步快照优先：它与角色 / 武器元数据一起更新，新角色的附着数据不会滞后到下次发版 */
+        if (TryLoad(metadataOptions.GetLocalizedLocalPath(SyncedFileName), out FrozenDictionary<string, AvatarCombatNote> synced))
+        {
+            return synced;
+        }
+
         if (TryLoad(InstalledLocation.GetAbsolutePath(ResourceRelativePath), out FrozenDictionary<string, AvatarCombatNote> bundled))
         {
             return bundled;

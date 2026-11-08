@@ -8,6 +8,7 @@ using Ellen.Launcher.Core.LifeCycle.InterProcess;
 using Ellen.Launcher.Core.Logging;
 using Ellen.Launcher.Core.Setting;
 using Ellen.Launcher.Factory.Process;
+using Ellen.Launcher.Service.EnemyArchive;
 using Ellen.Launcher.Service.Metadata;
 using Ellen.Launcher.Service.Navigation;
 using Ellen.Launcher.Service.Notification;
@@ -86,6 +87,7 @@ public sealed partial class AppActivation : IAppActivation
             return;
         }
 
+        StartupProbe.Mark("activation-call");
         PrivateActivateAndInitializeAsync().SafeForget();
 
         async ValueTask PrivateActivateAndInitializeAsync()
@@ -99,8 +101,11 @@ public sealed partial class AppActivation : IAppActivation
                         return;
                     }
 
+                    StartupProbe.Mark("activation-lock");
                     await UnsynchronizedHandleActivationAsync(args).ConfigureAwait(false);
+                    StartupProbe.Mark("activation-handled");
                     await UnsynchronizedHandleInitializationAsync().ConfigureAwait(false);
+                    StartupProbe.Mark("activation-init");
                 }
             }
             catch (Exception ex)
@@ -313,7 +318,9 @@ public sealed partial class AppActivation : IAppActivation
     private async ValueTask<Window?> WaitWindowAsync<TWindow>()
         where TWindow : Window
     {
+        StartupProbe.Mark("window-wait-enter");
         await taskContext.SwitchToMainThreadAsync();
+        StartupProbe.Mark("window-main-thread");
 
         if (currentXamlWindowReference.Window is not { } window)
         {
@@ -334,6 +341,7 @@ public sealed partial class AppActivation : IAppActivation
             currentXamlWindowReference.Window = window;
         }
 
+        StartupProbe.Mark("window-created");
         window.SwitchTo();
         window.AppWindow?.MoveInZOrderAtTop();
         return window;

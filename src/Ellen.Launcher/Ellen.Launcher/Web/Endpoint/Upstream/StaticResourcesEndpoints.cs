@@ -15,6 +15,15 @@ public static class StaticResourcesEndpoints
 
     public static string StaticRaw(string category, string fileName)
     {
+        /* 自建数据站补了 Snap CDN 没有的资源（新角色的侧头像 / 名片 / 天赋 / 技能等），
+           索引命中就走镜像；未命中会回退 Snap，但**必须记账**（P4：不允许静默回退），
+           诊断页按分类展示回退次数。 */
+        if (LauncherAssetMirror.TryResolve(category, fileName, out string? mirrored) && mirrored is not null)
+        {
+            return mirrored;
+        }
+
+        LauncherAssetMirror.RecordFallback(category);
         return string.Intern($"{Root}/static/raw/{category}/{fileName}");
     }
 

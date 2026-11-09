@@ -215,9 +215,23 @@ public sealed class EnemyLeylineDto
     [JsonPropertyName("category")] public string? Category { get; set; }
     [JsonPropertyName("categoryLabel")] public string? CategoryLabel { get; set; }
     [JsonPropertyName("portrait")] public string? Portrait { get; set; }
+    [JsonPropertyName("difficulties")] public List<EnemyLeylineDifficultyDto> Difficulties { get; set; } = [];
+    [JsonPropertyName("resistances")] public List<EnemyResistanceStateDto> Resistances { get; set; } = [];
+    [JsonPropertyName("skills")] public List<EnemySkillDto> Skills { get; set; } = [];
+    [JsonPropertyName("notes")] public List<EnemyNoteDto> Notes { get; set; } = [];
 
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? Extra { get; set; }
+}
+
+public sealed class EnemyLeylineDifficultyDto
+{
+    [JsonPropertyName("key")] public string? Key { get; set; }
+    [JsonPropertyName("name")] public string? Name { get; set; }
+    [JsonPropertyName("level")] public int? Level { get; set; }
+    [JsonPropertyName("hp")] public long? Hp { get; set; }
+    [JsonPropertyName("atk")] public long? Atk { get; set; }
+    [JsonPropertyName("advantage")] public string? Advantage { get; set; }
 }
 
 public sealed class EnemyStateDto

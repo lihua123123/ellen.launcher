@@ -899,12 +899,68 @@
                                             Source="{Binding WebCurrentItem.ArtUri}"
                                             Stretch="Uniform"/>
                                     </Border>
-                                    <TextBlock
-                                        FontSize="12"
-                                        Opacity="0.7"
-                                        Text="{Binding WebCurrentItem.ArtNote}"
-                                        TextWrapping="Wrap"
-                                        Visibility="{Binding WebCurrentItem.ArtNote, Converter={StaticResource EmptyObjectToVisibilityConverter}}"/>
+                                    <!--  幽境挑战：源里把「母体 + 幽境变体」合成一条（leyline 子对象），这里跟 ellen.wiki 一样
+                                          挂在母体详情里，不再单列一条记录。随包没有 leyline 立绘，所以只出文字与数值。  -->
+                                    <Border
+                                        Padding="16,12,16,12"
+                                        Style="{ThemeResource BorderShimmerStyle}"
+                                        Visibility="{Binding WebCurrentItem.HasLeyline, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <StackPanel Spacing="8">
+                                            <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="幽境挑战"/>
+                                            <TextBlock
+                                                FontWeight="SemiBold"
+                                                Text="{Binding WebCurrentItem.LeylineName}"
+                                                TextWrapping="Wrap"/>
+                                            <ItemsControl
+                                                ItemsSource="{Binding WebCurrentItem.LeylineDifficulties}"
+                                                Visibility="{Binding WebCurrentItem.HasLeylineDifficulties, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Grid Margin="0,2,0,2" ColumnSpacing="12">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="56"/>
+                                                                <ColumnDefinition/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Label}"/>
+                                                            <TextBlock
+                                                                Grid.Column="1"
+                                                                Text="{Binding Detail}"
+                                                                TextWrapping="Wrap"/>
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                            <ItemsControl ItemsSource="{Binding WebCurrentItem.LeylineSkills}" Visibility="{Binding WebCurrentItem.HasLeylineSkills, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Margin="0,4,0,4" Spacing="2">
+                                                            <TextBlock FontWeight="SemiBold" Text="{Binding Name}" TextWrapping="Wrap"/>
+                                                            <TextBlock
+                                                                FontSize="12"
+                                                                Opacity="0.8"
+                                                                Text="{Binding DescriptionText}"
+                                                                TextWrapping="Wrap"
+                                                                Visibility="{Binding HasDescription, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                            <ItemsControl ItemsSource="{Binding WebCurrentItem.LeylineNotes}" Visibility="{Binding WebCurrentItem.HasLeylineNotes, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Margin="0,3,0,3" Spacing="2">
+                                                            <TextBlock FontWeight="SemiBold" Text="{Binding Title}" TextWrapping="Wrap" Visibility="{Binding HasTitle, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                            <TextBlock
+                                                                FontSize="12"
+                                                                Opacity="0.8"
+                                                                Text="{Binding Text}"
+                                                                TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </Border>
                                 </StackPanel>
                             </Border>
                         </StackPanel>

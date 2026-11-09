@@ -57,8 +57,8 @@ public static class WikiBenchRunner
         // M5：分类 + 关键词筛选
         IReadOnlyList<WikiEnemyViewItem> items = catalog?.Items ?? [];
         string? category = catalog?.Categories.Skip(1).FirstOrDefault()?.Key;
-        double filterCategoryMs = MeasureAverage(() => WikiEnemyCatalog.Filter(items, category, []), 10);
-        double filterSearchMs = MeasureAverage(() => WikiEnemyCatalog.Filter(items, null, ["火"]), 10);
+        double filterCategoryMs = MeasureAverage(() => WikiEnemyCatalog.Filter(items, category, null, []), 10);
+        double filterSearchMs = MeasureAverage(() => WikiEnemyCatalog.Filter(items, null, null, ["火"]), 10);
 
         // M6：深链（全部旧 ID）
         IReadOnlyList<AliasRecord> aliases = catalogService.Aliases;

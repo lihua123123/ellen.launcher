@@ -566,7 +566,8 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
 
         IReadOnlyList<string> tokens = WebSearchData?.FilterTokens.Select(static t => t.Value).ToArray() ?? [];
         string? category = WebSelectedCategory?.Key;
-        IReadOnlyList<WikiEnemyViewItem> filtered = WikiEnemyCatalog.Filter(allWebItems, string.IsNullOrEmpty(category) ? null : category, tokens);
+        string? categoryLabel = WebSelectedCategory?.Name;
+        IReadOnlyList<WikiEnemyViewItem> filtered = WikiEnemyCatalog.Filter(allWebItems, string.IsNullOrEmpty(category) ? null : category, categoryLabel, tokens);
         WebMonsters = filtered;
         CatalogRebuilds++;
         // 当前项若已被筛掉，回落到第一条；否则保持不变（避免每次筛选都跳回首项）。

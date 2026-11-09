@@ -36,9 +36,19 @@ public sealed class WikiEnemyViewItem
     public string ArtUri { get; init; } = string.Empty;
     public bool HasArt => !string.IsNullOrEmpty(ArtUri);
 
-    /// <summary>大图是否是降质的随包缩略图预览（离线兜底），UI 需要显式说明，不能假装是原图。</summary>
+    /// <summary>大图是否是降质的随包缩略图预览（离线兜底）。</summary>
     public bool ArtIsPreview { get; init; }
-    public string? ArtNote => ArtIsPreview ? "随包 256px 预览（安装包内不含原图）" : null;
+
+    /* 幽境挑战：源里把「母体 + 幽境变体」合成一条（leyline 子对象），和 ellen.wiki 一样只占一条记录。
+       变体名/难度档/技能/机制都挂在母体下面，列表按 tag「幽境危战」筛出来。 */
+    public string? LeylineName { get; init; }
+    public bool HasLeyline => !string.IsNullOrEmpty(LeylineName);
+    public IReadOnlyList<WikiLeylineDifficultyView> LeylineDifficulties { get; init; } = [];
+    public bool HasLeylineDifficulties => LeylineDifficulties.Count > 0;
+    public IReadOnlyList<WikiSkillView> LeylineSkills { get; init; } = [];
+    public bool HasLeylineSkills => LeylineSkills.Count > 0;
+    public IReadOnlyList<WikiNoteView> LeylineNotes { get; init; } = [];
+    public bool HasLeylineNotes => LeylineNotes.Count > 0;
 
     public IReadOnlyList<string> Aliases { get; init; } = [];
     public IReadOnlyList<string> Tags { get; init; } = [];
@@ -101,6 +111,13 @@ public sealed class WikiSkillView
 }
 
 /// <summary>特殊机制的一行：标题可空，正文已由 <see cref="WikiRichText"/> 去标记。</summary>
+public sealed class WikiLeylineDifficultyView
+{
+    public string Label { get; init; } = string.Empty;
+    public string Detail { get; init; } = string.Empty;
+    public bool HasDetail => !string.IsNullOrEmpty(Detail);
+}
+
 public sealed class WikiNoteView
 {
     public string? Title { get; init; }
@@ -454,6 +471,16 @@ public static class WikiEnemyCatalog
                 IconUri = icon,
                 ArtUri = artUri,
                 ArtIsPreview = artIsPreview,
+                LeylineName = enemy.Leyline?.Name,
+                LeylineDifficulties = BuildLeylineDifficulties(enemy.Leyline),
+                LeylineSkills = BuildLeylineSkills(enemy.Leyline),
+                LeylineNotes = (enemy.Leyline?.Notes ?? [])
+                    .Select(static note => new WikiNoteView
+                    {
+                        Title = note.Text,
+                        Text = string.Concat(note.Description.Select(static span => span.Text)),
+                    })
+                    .ToList(),
                 Aliases = enemy.Aliases,
                 Tags = enemy.Tags,
                 SearchTokens = [.. tokens.Where(t => !string.IsNullOrWhiteSpace(t)).Distinct(StringComparer.OrdinalIgnoreCase)],
@@ -489,22 +516,47 @@ public static class WikiEnemyCatalog
         imageWatch.Stop();
         total.Stop();
 
-        // 分类分组：以网页 categoryLabel 为准，首项「全部」。
+        /* 分类分组：主分类按网页 categoryLabel 建组，首项「全部」。
+           再把源里多出来的跨分类标签（幽境危战 / 历经百战 这类）补成独立分类项 ——
+           它们的条目主分类是别的（比如幽境 boss 仍归「自律机关」），只能按 tags 命中。
+           不补的话下拉里根本没有「幽境危战」，用户会直接说「缺了整类敌人」。 */
         List<WikiEnemyCategoryGroup> categories = [new() { Key = string.Empty, Name = categoryAllText ?? "全部", Count = items.Count }];
+        HashSet<string> knownLabels = new(StringComparer.Ordinal);
         foreach (IGrouping<string, WikiEnemyViewItem> group in items.GroupBy(i => i.CategoryKey))
         {
+            string label = group.First().CategoryLabel;
+            knownLabels.Add(label);
             categories.Add(new WikiEnemyCategoryGroup
             {
                 Key = group.Key,
-                Name = group.First().CategoryLabel,
+                Name = label,
                 Count = group.Count(),
             });
         }
 
+        foreach (EnemyCategoryDto extra in web.Index?.Categories ?? [])
+        {
+            if (string.IsNullOrEmpty(extra.Label) || !knownLabels.Add(extra.Label))
+            {
+                continue;
+            }
+
+            int count = items.Count(item => item.Tags.Contains(extra.Label, StringComparer.Ordinal));
+            if (count > 0)
+            {
+                categories.Add(new WikiEnemyCategoryGroup
+                {
+                    Key = extra.Key,
+                    Name = extra.Label,
+                    Count = count,
+                });
+            }
+        }
+
         // 真实计时：筛选一次全量 + 一次分类，供性能报告。
         Stopwatch filterWatch = Stopwatch.StartNew();
-        _ = Filter(items, string.Empty, ["丘丘"]).Count;
-        _ = Filter(items, categories.Count > 1 ? categories[1].Key : string.Empty, []).Count;
+        _ = Filter(items, string.Empty, null, ["丘丘"]).Count;
+        _ = Filter(items, categories.Count > 1 ? categories[1].Key : string.Empty, categories.Count > 1 ? categories[1].Name : null, []).Count;
         filterWatch.Stop();
 
         string stampText = $"source={web.Stamp.Source} contract={web.Stamp.Contract} digest={snapshot?.Manifest.Digest ?? "-"} generatedAt={snapshot?.Manifest.GeneratedAt ?? "-"}";
@@ -539,13 +591,68 @@ public static class WikiEnemyCatalog
     public static IReadOnlyList<WikiEnemyViewItem> Filter(
         IEnumerable<WikiEnemyViewItem> items,
         string? categoryKey,
+        string? categoryLabel,
         IEnumerable<string> tokens)
     {
         string[] words = [.. tokens.Where(t => !string.IsNullOrWhiteSpace(t)).Select(t => t.Trim())];
         bool all = string.IsNullOrEmpty(categoryKey);
+
+        /* 分类有两套语义：category 是主分类（一个敌人只有一个），tags 里还有「幽境危战」「历经百战」这类
+           跨分类标签。ellen.wiki 的筛选是按 tag 走的；这里两边都认，否则「幽境危战」永远筛不出东西
+           （分类项有 29，item 的 category 却全是别的主分类）。 */
         return [.. items.Where(item =>
-            (all || string.Equals(item.CategoryKey, categoryKey, StringComparison.Ordinal))
+            (all
+                || string.Equals(item.CategoryKey, categoryKey, StringComparison.Ordinal)
+                || (!string.IsNullOrEmpty(categoryLabel) && item.Tags.Contains(categoryLabel, StringComparer.Ordinal)))
             && words.All(word => item.SearchTokens.Any(t => t.Contains(word, StringComparison.OrdinalIgnoreCase))))];
+    }
+
+    private static IReadOnlyList<WikiLeylineDifficultyView> BuildLeylineDifficulties(WikiLeyline? leyline)
+    {
+        if (leyline is not { Difficulties.Count: > 0 })
+        {
+            return [];
+        }
+
+        return [.. leyline.Difficulties.Select(static d =>
+        {
+            List<string> parts = [];
+            if (d.Level is > 0)
+            {
+                parts.Add($"Lv.{d.Level}");
+            }
+
+            if (d.Hp is > 0)
+            {
+                parts.Add($"生命 {d.Hp:N0}");
+            }
+
+            if (d.Atk is > 0)
+            {
+                parts.Add($"攻击 {d.Atk:N0}");
+            }
+
+            return new WikiLeylineDifficultyView
+            {
+                Label = d.Name ?? d.Key ?? string.Empty,
+                Detail = string.Join(" · ", parts),
+            };
+        })];
+    }
+
+    private static IReadOnlyList<WikiSkillView> BuildLeylineSkills(WikiLeyline? leyline)
+    {
+        if (leyline is not { Skills.Count: > 0 })
+        {
+            return [];
+        }
+
+        return [.. leyline.Skills.Select(static skill => new WikiSkillView
+        {
+            Name = skill.Name,
+            Tag = skill.Tag,
+            DescriptionText = skill.DescriptionText,
+        })];
     }
 
     private static void AddToken(List<string> tokens, string? value)

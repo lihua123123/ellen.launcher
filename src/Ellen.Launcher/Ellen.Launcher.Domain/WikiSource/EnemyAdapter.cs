@@ -254,7 +254,7 @@ public sealed class EnemyAdapter
         };
     }
 
-    private WikiSkill AdaptSkill(EnemySkillDto skill, string enemyId)
+    private static WikiSkill AdaptSkill(EnemySkillDto skill, string enemyId)
     {
         return new WikiSkill
         {
@@ -314,6 +314,21 @@ public sealed class EnemyAdapter
             Name = leyline.Name,
             CategoryLabel = leyline.CategoryLabel,
             Portrait = string.IsNullOrWhiteSpace(leyline.Portrait) ? null : ImageRef(enemyId, leyline.Portrait),
+            Difficulties = (leyline.Difficulties ?? []).Select(static d => new WikiLeylineDifficulty
+            {
+                Key = d.Key,
+                Name = d.Name,
+                Level = d.Level,
+                Hp = d.Hp,
+                Atk = d.Atk,
+                Advantage = d.Advantage,
+            }).ToList(),
+            Skills = (leyline.Skills ?? []).Select(skill => AdaptSkill(skill, enemyId)).ToList(),
+            Notes = (leyline.Notes ?? []).Select(static note => new WikiNote
+            {
+                Text = note.Text,
+                Description = WikiRichText.Parse(note.Desc),
+            }).ToList(),
         };
     }
 

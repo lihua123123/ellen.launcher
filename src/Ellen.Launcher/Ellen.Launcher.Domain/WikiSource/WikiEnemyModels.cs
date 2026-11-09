@@ -164,6 +164,20 @@ public sealed class WikiLeyline
     public string? Name { get; init; }
     public string? CategoryLabel { get; init; }
     public WikiImageRef? Portrait { get; init; }
+    public IReadOnlyList<WikiLeylineDifficulty> Difficulties { get; init; } = [];
+    public IReadOnlyList<WikiSkill> Skills { get; init; } = [];
+    public IReadOnlyList<WikiNote> Notes { get; init; } = [];
+}
+
+/// <summary>幽境难度档（困难 / 险恶 / …）：只带展示需要的三列，不做换算。</summary>
+public sealed class WikiLeylineDifficulty
+{
+    public string? Key { get; init; }
+    public string? Name { get; init; }
+    public int? Level { get; init; }
+    public long? Hp { get; init; }
+    public long? Atk { get; init; }
+    public string? Advantage { get; init; }
 }
 
 public sealed class WikiEnemyState

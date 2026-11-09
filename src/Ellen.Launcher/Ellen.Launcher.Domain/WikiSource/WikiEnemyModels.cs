@@ -191,6 +191,21 @@ public sealed class WikiEnemyState
     public string? Key { get; init; }
     public string? Label { get; init; }
     public string? Name { get; init; }
+    public string? NameEn { get; init; }
+    public string? Subtitle { get; init; }
+
+    /// <summary>该阶段自己的头像文件名（女士二阶段 state-p2-avatar.webp）。</summary>
+    public string? IconFile { get; init; }
+
+    /// <summary>该阶段的等级行（周本-第二阶段 Lv.90 / HP / ATK）。</summary>
+    public string? LevelLabel { get; init; }
+    public int? Level { get; init; }
+    public double? Hp { get; init; }
+    public double? Atk { get; init; }
+
+    public IReadOnlyList<WikiSkill> Skills { get; init; } = [];
+    public IReadOnlyList<WikiResistanceState> ResistanceStates { get; init; } = [];
+    public IReadOnlyList<WikiNote> Notes { get; init; } = [];
 }
 
 public sealed class WikiMechanic

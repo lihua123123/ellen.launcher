@@ -864,6 +864,13 @@
 
                                     <!--  ============ 本体 ============  -->
                                     <StackPanel Spacing="12" Visibility="{Binding WebIsBodyTab, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <!--  多阶段：女士一/二阶段、公子三形态、若陀九元素… 只有 1 个阶段时不显示。  -->
+                                        <cwc:Segmented
+                                            HorizontalAlignment="Left"
+                                            ItemsSource="{Binding WebStageTabs}"
+                                            SelectedIndex="{Binding WebSelectedStageIndex, Mode=TwoWay}"
+                                            Visibility="{Binding WebHasStages, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
                                         <Border Padding="16" Style="{ThemeResource BorderShimmerStyle}">
                                             <Grid ColumnSpacing="16">
                                                 <Grid.ColumnDefinitions>
@@ -875,18 +882,18 @@
                                                     Height="112"
                                                     VerticalAlignment="Top"
                                                     CornerRadius="{ThemeResource OverlayCornerRadius}"
-                                                    Visibility="{Binding WebCurrentItem.HasIcon, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    Visibility="{Binding WebBodyHasIcon, Converter={StaticResource BoolToVisibilityConverter}}">
                                                     <shuxci:CachedImage
                                                         FadeIn="False"
-                                                        Source="{Binding WebCurrentItem.IconUri}"
+                                                        Source="{Binding WebBodyIconUri}"
                                                         Stretch="UniformToFill"/>
                                                 </Border>
                                                 <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
-                                                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{Binding WebCurrentItem.Name}" TextWrapping="Wrap"/>
-                                                    <TextBlock Opacity="0.7" Text="{Binding WebCurrentItem.NameEn}" TextWrapping="Wrap"/>
+                                                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{Binding WebBodyName}" TextWrapping="Wrap"/>
+                                                    <TextBlock Opacity="0.7" Text="{Binding WebBodyNameEn}" TextWrapping="Wrap"/>
                                                     <StackPanel Orientation="Horizontal" Spacing="12">
                                                         <TextBlock Opacity="0.7" Text="{Binding WebCurrentItem.CategoryLabel}"/>
-                                                        <TextBlock Opacity="0.7" Text="{Binding WebCurrentItem.Subtitle}"/>
+                                                        <TextBlock Opacity="0.7" Text="{Binding WebBodySubtitle}"/>
                                                     </StackPanel>
                                                 </StackPanel>
                                             </Grid>
@@ -895,7 +902,7 @@
                                         <Border
                                             Padding="16"
                                             Style="{ThemeResource BorderShimmerStyle}"
-                                            Visibility="{Binding WebBaseValueInfo, Converter={StaticResource EmptyObjectToVisibilityConverter}}">
+                                            Visibility="{Binding WebShowBaseValueCard, Converter={StaticResource BoolToVisibilityConverter}}">
                                             <StackPanel Spacing="8">
                                                 <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="基础数值"/>
                                                 <shuxvs:BaseValueSlider
@@ -903,6 +910,30 @@
                                                     HorizontalContentAlignment="Stretch"
                                                     BaseValueInfo="{Binding WebBaseValueInfo, Mode=OneWay}"
                                                     IsPromoteVisible="False"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border
+                                            Padding="16"
+                                            Style="{ThemeResource BorderShimmerStyle}"
+                                            Visibility="{Binding WebBodyHasLevelInfo, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <StackPanel Spacing="8">
+                                                <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="阶段数值"/>
+                                                <TextBlock Opacity="0.7" Text="{Binding WebBodyLevelText}"/>
+                                                <Grid ColumnSpacing="8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0" Spacing="2">
+                                                        <TextBlock Opacity="0.7" Text="生命值"/>
+                                                        <TextBlock FontWeight="SemiBold" Text="{Binding WebBodyHpText}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="1" Spacing="2">
+                                                        <TextBlock Opacity="0.7" Text="攻击力"/>
+                                                        <TextBlock FontWeight="SemiBold" Text="{Binding WebBodyAtkText}"/>
+                                                    </StackPanel>
+                                                </Grid>
                                             </StackPanel>
                                         </Border>
 
@@ -930,24 +961,24 @@
                                         <Border
                                             Padding="16"
                                             Style="{ThemeResource BorderShimmerStyle}"
-                                            Visibility="{Binding WebCurrentItem.HasSkills, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            Visibility="{Binding WebBodyHasSkills, Converter={StaticResource BoolToVisibilityConverter}}">
                                             <StackPanel Spacing="10">
                                                 <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="技能"/>
                                                 <ItemsControl
                                                     ItemTemplate="{StaticResource WebSkillTemplate}"
-                                                    ItemsSource="{Binding WebCurrentItem.Skills}"/>
+                                                    ItemsSource="{Binding WebBodySkills}"/>
                                             </StackPanel>
                                         </Border>
 
                                         <Border
                                             Padding="16"
                                             Style="{ThemeResource BorderShimmerStyle}"
-                                            Visibility="{Binding WebCurrentItem.HasNotes, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            Visibility="{Binding WebBodyHasNotes, Converter={StaticResource BoolToVisibilityConverter}}">
                                             <StackPanel Spacing="10">
                                                 <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="特殊机制"/>
                                                 <ItemsControl
                                                     ItemTemplate="{StaticResource WebNoteTemplate}"
-                                                    ItemsSource="{Binding WebCurrentItem.Notes}"/>
+                                                    ItemsSource="{Binding WebBodyNotes}"/>
                                             </StackPanel>
                                         </Border>
 

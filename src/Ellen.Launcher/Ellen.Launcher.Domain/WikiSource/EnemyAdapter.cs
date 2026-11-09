@@ -102,7 +102,7 @@ public sealed class EnemyAdapter
             Aliases = item.Aliases,
             Tags = item.Tags,
             Leyline = item.Leyline is null ? null : AdaptLeyline(item.Leyline, id),
-            States = (item.States ?? new List<EnemyStateDto>()).Select(state => new WikiEnemyState { Key = state.Key, Label = state.Label, Name = state.Name }).ToList(),
+            States = (item.States ?? new List<EnemyStateDto>()).Select(state => AdaptState(state, id)).ToList(),
             DefaultState = item.DefaultState,
             Stamp = source,
 
@@ -147,17 +147,21 @@ public sealed class EnemyAdapter
     }
 
     private static IReadOnlyList<WikiResistanceState> BuildResistances(EnemyItemDto item)
+        => BuildResistances(item.Resistances, SelectDefaultIndex(item));
+
+    /// <summary>按抗性行列表构建（本体与多阶段 state 共用）。</summary>
+    private static IReadOnlyList<WikiResistanceState> BuildResistances(
+        List<EnemyResistanceStateDto> rows, int defaultIndex)
     {
-        if (item.Resistances.Count == 0)
+        if (rows.Count == 0)
         {
             return [];
         }
 
-        int defaultIndex = SelectDefaultIndex(item);
         List<WikiResistanceState> result = [];
-        for (int i = 0; i < item.Resistances.Count; i++)
+        for (int i = 0; i < rows.Count; i++)
         {
-            EnemyResistanceStateDto state = item.Resistances[i];
+            EnemyResistanceStateDto state = rows[i];
             result.Add(new WikiResistanceState
             {
                 Name = state.Name,
@@ -170,6 +174,32 @@ public sealed class EnemyAdapter
         }
 
         return result;
+    }
+
+    /// <summary>多阶段（女士一/二阶段、公子三形态、若陀九元素…）：技能、抗性、等级数值各自独立。</summary>
+    private static WikiEnemyState AdaptState(EnemyStateDto state, string enemyId)
+    {
+        EnemyLevelRowDto? row = state.LevelRows?.FirstOrDefault();
+        return new WikiEnemyState
+        {
+            Key = state.Key,
+            Label = state.Label,
+            Name = state.Name,
+            NameEn = state.NameEn,
+            Subtitle = state.Subtitle,
+            IconFile = state.Icon,
+            Level = row?.Level,
+            LevelLabel = row?.Label,
+            Hp = row?.Hp,
+            Atk = row?.Atk,
+            Skills = (state.Skills ?? []).Select(skill => AdaptSkill(skill, enemyId)).ToList(),
+            ResistanceStates = BuildResistances(state.Resistances ?? [], 0),
+            Notes = (state.Notes ?? []).Select(note => new WikiNote
+            {
+                Text = note.Text,
+                Description = WikiRichText.Parse(note.Desc),
+            }).ToList(),
+        };
     }
 
     /// <summary>幽境自己的抗性表（与本体分开：N5 满减 / N5 90% 这类只有幽境有）。</summary>
@@ -302,6 +332,23 @@ public sealed class EnemyAdapter
         files.AddRange(item.Images);
         files.AddRange(item.LeylineImages);
         files.AddRange(item.Skills.Where(s => !string.IsNullOrWhiteSpace(s.Icon)).Select(s => s.Icon!));
+
+        // 多阶段的图标：每个 state 自己的头像与技能图标（state-p2-avatar / state-p2-skill-N）。
+        foreach (EnemyStateDto state in item.States ?? [])
+        {
+            if (!string.IsNullOrWhiteSpace(state.Icon))
+            {
+                files.Add(state.Icon!);
+            }
+
+            foreach (EnemySkillDto skill in state.Skills ?? [])
+            {
+                if (!string.IsNullOrWhiteSpace(skill.Icon))
+                {
+                    files.Add(skill.Icon!);
+                }
+            }
+        }
         if (!string.IsNullOrWhiteSpace(item.Leyline?.Portrait))
         {
             files.Add(item.Leyline.Portrait);

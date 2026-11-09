@@ -94,6 +94,77 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
     /// <summary>详情页页签标题（Segmented 的数据源），与角色页技能分段控件同一套。</summary>
     public IReadOnlyList<string> WebDetailTabs { get; } = ["本体", "幽境"];
 
+    // ---------------- 多阶段（女士一/二阶段、公子三形态、若陀九元素…） ----------------
+
+    /// <summary>当前条目的阶段列表；只有 1 个时不显示切换器。</summary>
+    [ObservableProperty]
+    public partial IReadOnlyList<WikiEnemyStateView> WebStages { get; set; } = [];
+
+    [ObservableProperty]
+    public partial int WebSelectedStageIndex { get; set; }
+
+    [ObservableProperty]
+    public partial bool WebHasStages { get; set; }
+
+    /// <summary>阶段切换器的按钮文字（第一阶段 / 第二阶段 / 岩 / 水 …）。</summary>
+    public IReadOnlyList<string> WebStageTabs => [.. WebStages.Select(static stage => stage.Label)];
+
+    partial void OnWebStagesChanged(IReadOnlyList<WikiEnemyStateView> value)
+    {
+        OnPropertyChanged(nameof(WebStageTabs));
+    }
+
+    // 详情正文：本体与阶段共用一套绑定，切换阶段时整体换掉，避免到处写「有没有阶段」的判断。
+
+    [ObservableProperty]
+    public partial string WebBodyName { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string WebBodyNameEn { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string WebBodySubtitle { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string WebBodyIconUri { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool WebBodyHasIcon { get; set; }
+
+    [ObservableProperty]
+    public partial IReadOnlyList<WikiSkillView> WebBodySkills { get; set; } = [];
+
+    /// <summary>阶段自己的等级行（周本-第二阶段 · Lv.90 / HP / ATK）；本体为空。</summary>
+    [ObservableProperty]
+    public partial string WebBodyLevelText { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string WebBodyHpText { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string WebBodyAtkText { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool WebBodyHasLevelInfo { get; set; }
+
+    [ObservableProperty]
+    public partial bool WebBodyHasSkills { get; set; }
+
+    [ObservableProperty]
+    public partial IReadOnlyList<WikiNoteView> WebBodyNotes { get; set; } = [];
+
+    [ObservableProperty]
+    public partial bool WebBodyHasNotes { get; set; }
+
+    /// <summary>选中阶段时隐藏「按等级换算」的滑块卡：阶段数值来自源里的等级行，不该再被曲线换算覆盖。</summary>
+    [ObservableProperty]
+    public partial bool WebShowBaseValueCard { get; set; }
+
+    partial void OnWebSelectedStageIndexChanged(int value)
+    {
+        UpdateWebBody();
+    }
+
     public bool WebIsBodyTab => WebDetailTabIndex == 0;
     public bool WebIsLeylineTab => WebDetailTabIndex == 1;
 
@@ -509,9 +580,11 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
     {
         /* 抗性和等级一样，是「跟着当前条目走」的派生状态。
            以前只在 ApplyWebFilter 里算，切条目时不刷新 → 不管点哪个怪，抗性都还是第一条的值。 */
-        UpdateWebResistanceStates();
-        UpdateWebResistanceCells();
+        WebStages = value?.Stages ?? [];
+        WebHasStages = WebStages.Count > 1;
+        WebSelectedStageIndex = 0;   // 触发 UpdateWebBody 时 WebStages 已就位
         UpdateWebBaseValueInfo(value);
+        UpdateWebBody();
         WebLeylineStages = value?.LeylineStages ?? [];
         WebSelectedLeylineStageIndex = 0;
         UpdateWebLeylineStage();
@@ -657,6 +730,81 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
 
     /// <summary>诊断：列表被重建的次数（1 = 只有首屏那次）。给取证脚本确认后台同步没再动 UI。</summary>
     public int CatalogRebuilds { get; private set; }
+
+    /// <summary>
+    /// 重建详情正文：没选阶段（或该条目没有多阶段）用本体数据，
+    /// 选了阶段就用阶段自己的名字/头像/技能/抗性/等级行。抗性与数值一起换，避免串台。
+    /// </summary>
+    private void UpdateWebBody()
+    {
+        WikiEnemyViewItem? item = WebCurrentItem;
+        if (item is null)
+        {
+            WebBodyName = string.Empty;
+            WebBodyNameEn = string.Empty;
+            WebBodySubtitle = string.Empty;
+            WebBodyIconUri = string.Empty;
+            WebBodyHasIcon = false;
+            WebBodySkills = [];
+            WebBodyLevelText = string.Empty;
+            WebBodyHpText = string.Empty;
+            WebBodyAtkText = string.Empty;
+            WebBodyHasLevelInfo = false;
+            WebShowBaseValueCard = false;
+            WebBodyHasSkills = false;
+            WebBodyNotes = [];
+            WebBodyHasNotes = false;
+            WebResistanceStates = [];
+            WebHasResistanceStates = false;
+            WebResistanceCells = [];
+            return;
+        }
+
+        WikiEnemyStateView? stage = WebHasStages
+            && WebSelectedStageIndex >= 0
+            && WebSelectedStageIndex < WebStages.Count
+                ? WebStages[WebSelectedStageIndex]
+                : null;
+
+        if (stage is null)
+        {
+            WebBodyName = item.Name;
+            WebBodyNameEn = item.NameEn ?? string.Empty;
+            WebBodySubtitle = item.Subtitle ?? string.Empty;
+            WebBodyIconUri = item.IconUri;
+            WebBodyHasIcon = item.HasIcon;
+            WebBodySkills = item.Skills;
+            WebBodyLevelText = string.Empty;
+            WebBodyHpText = string.Empty;
+            WebBodyAtkText = string.Empty;
+            WebBodyHasLevelInfo = false;
+            WebShowBaseValueCard = WebBaseValueInfo is not null;
+            WebResistanceStates = item.ResistanceStates;
+        }
+        else
+        {
+            WebBodyName = string.IsNullOrEmpty(stage.Name) ? item.Name : stage.Name;
+            WebBodyNameEn = stage.NameEn;
+            WebBodySubtitle = stage.Subtitle;
+            WebBodyIconUri = stage.HasIcon ? stage.IconUri : item.IconUri;
+            WebBodyHasIcon = !string.IsNullOrEmpty(WebBodyIconUri);
+            WebBodySkills = stage.Skills.Count > 0 ? stage.Skills : item.Skills;
+            WebBodyLevelText = stage.LevelText;
+            WebBodyHpText = stage.HpText;
+            WebBodyAtkText = stage.AtkText;
+            WebBodyHasLevelInfo = stage.HasLevelInfo;
+            WebShowBaseValueCard = false;
+            WebResistanceStates = stage.ResistanceStates.Count > 0 ? stage.ResistanceStates : item.ResistanceStates;
+        }
+
+        WebBodyHasSkills = WebBodySkills.Count > 0;
+        WebBodyNotes = stage?.Notes is { Count: > 0 } stageNotes ? stageNotes : item.Notes;
+        WebBodyHasNotes = WebBodyNotes.Count > 0;
+
+        WebHasResistanceStates = WebResistanceStates.Count > 1;
+        WebSelectedResistanceStateIndex = 0;
+        UpdateWebResistanceCells();
+    }
 
     private void UpdateWebResistanceStates()
     {

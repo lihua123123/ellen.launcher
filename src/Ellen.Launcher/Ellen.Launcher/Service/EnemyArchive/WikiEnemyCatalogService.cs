@@ -111,6 +111,11 @@ public sealed partial class WikiEnemyCatalogService : IWikiEnemyCatalogService
             foreach (string f in dto.Images) AddRef(allowed, id, f);
             foreach (string f in dto.LeylineImages) AddRef(allowed, id, f);
             foreach (EnemySkillDto skill in dto.Skills) AddRef(allowed, id, skill.Icon);
+            foreach (EnemyStateDto state in dto.States ?? [])
+            {
+                AddRef(allowed, id, state.Icon);
+                foreach (EnemySkillDto skill in state.Skills ?? []) AddRef(allowed, id, skill.Icon);
+            }
             if (dto.Leyline is { Portrait: { } portrait }) AddRef(allowed, id, portrait);
         }
         StartupProbe.Mark("assemble-refs");

@@ -196,6 +196,11 @@ public sealed partial class App : Application
         }
         catch (Exception ex)
         {
+            /* 启动期异常以前只发 Sentry（DSN 为空时等于静默），进程直接 Kill：
+               表现成「双击后闪一下就没了、startup-error.log 里什么都没有」。
+               必须落盘，否则只能靠猜。 */
+            Bootstrap.WriteStartupErrorLog(ex, "Application.OnLaunched");
+
             SentrySdk.CaptureException(ex);
             SentrySdk.Flush();
 

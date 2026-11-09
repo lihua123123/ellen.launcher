@@ -240,6 +240,17 @@ public sealed class EnemyStateDto
     [JsonPropertyName("key")] public string? Key { get; set; }
     [JsonPropertyName("label")] public string? Label { get; set; }
     [JsonPropertyName("name")] public string? Name { get; set; }
+    [JsonPropertyName("nameEn")] public string? NameEn { get; set; }
+    [JsonPropertyName("subtitle")] public string? Subtitle { get; set; }
+
+    /// <summary>该阶段自己的头像（女士二阶段是 state-p2-avatar.webp）。</summary>
+    [JsonPropertyName("icon")] public string? Icon { get; set; }
+
+    [JsonPropertyName("defaultLevel")] public int? DefaultLevel { get; set; }
+    [JsonPropertyName("levelRows")] public List<EnemyLevelRowDto>? LevelRows { get; set; }
+    [JsonPropertyName("resistances")] public List<EnemyResistanceStateDto>? Resistances { get; set; }
+    [JsonPropertyName("skills")] public List<EnemySkillDto>? Skills { get; set; }
+    [JsonPropertyName("notes")] public List<EnemyNoteDto>? Notes { get; set; }
 
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? Extra { get; set; }

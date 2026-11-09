@@ -41,6 +41,10 @@ public sealed class WikiEnemyViewItem
 
     /* 幽境挑战：源里把「母体 + 幽境变体」合成一条（leyline 子对象），和 ellen.wiki 一样只占一条记录。
        变体名/难度档/技能/机制都挂在母体下面，列表按 tag「幽境危战」筛出来。 */
+    /// <summary>多阶段（女士一/二阶段、公子三形态、若陀九元素…）；只有 1 个时不显示切换器。</summary>
+    public IReadOnlyList<WikiEnemyStateView> Stages { get; init; } = [];
+    public bool HasStages => Stages.Count > 1;
+
     public string? LeylineName { get; init; }
     public bool HasLeyline => !string.IsNullOrEmpty(LeylineName);
     public string LeylineNameEn { get; init; } = string.Empty;
@@ -103,6 +107,30 @@ public sealed class WikiEnemyCategoryGroup
 }
 
 /// <summary>技能卡片：图标 URI 已由 <see cref="WikiImageCache"/> 解析（随包 → 缓存 → 在线），说明是纯文本。</summary>
+/// <summary>多阶段一页：阶段自己的名字/头像/等级数值/技能/抗性/机制。</summary>
+public sealed class WikiEnemyStateView
+{
+    public string Key { get; init; } = string.Empty;
+    public string Label { get; init; } = string.Empty;
+    public string Name { get; init; } = string.Empty;
+    public string NameEn { get; init; } = string.Empty;
+    public bool HasNameEn => !string.IsNullOrEmpty(NameEn);
+    public string Subtitle { get; init; } = string.Empty;
+    public bool HasSubtitle => !string.IsNullOrEmpty(Subtitle);
+
+    public string IconUri { get; init; } = string.Empty;
+    public bool HasIcon => !string.IsNullOrEmpty(IconUri);
+
+    public string LevelText { get; init; } = string.Empty;
+    public string HpText { get; init; } = string.Empty;
+    public string AtkText { get; init; } = string.Empty;
+    public bool HasLevelInfo => !string.IsNullOrEmpty(LevelText);
+
+    public IReadOnlyList<WikiSkillView> Skills { get; init; } = [];
+    public IReadOnlyList<WikiResistanceState> ResistanceStates { get; init; } = [];
+    public IReadOnlyList<WikiNoteView> Notes { get; init; } = [];
+}
+
 public sealed class WikiSkillView
 {
     public string Name { get; init; } = string.Empty;
@@ -441,29 +469,36 @@ public static class WikiEnemyCatalog
 
             /* 技能图标：复用 images 里已解析的结果（随包原图 → 内容缓存 → 在线），
                解析失败落在占位图时按「没有图标」处理，UI 不显示空白方框。 */
-            List<WikiSkillView> skills = [];
-            foreach (WikiSkill skill in enemy.Skills)
+            List<WikiSkillView> BuildSkillViews(IReadOnlyList<WikiSkill> source)
             {
-                string skillIconUri = string.Empty;
-                if (skill.Icon is { } skillRef)
+                List<WikiSkillView> views = [];
+                foreach (WikiSkill skill in source)
                 {
-                    skillIconUri = resolvedByFile.TryGetValue(skillRef.File, out string? resolvedIcon)
-                        ? resolvedIcon
-                        : imageCache.Resolve(skillRef);
-                    if (string.Equals(skillIconUri, WikiImageCache.PlaceholderUri, StringComparison.Ordinal))
+                    string skillIconUri = string.Empty;
+                    if (skill.Icon is { } skillRef)
                     {
-                        skillIconUri = string.Empty;
+                        skillIconUri = resolvedByFile.TryGetValue(skillRef.File, out string? resolvedIcon)
+                            ? resolvedIcon
+                            : imageCache.Resolve(skillRef);
+                        if (string.Equals(skillIconUri, WikiImageCache.PlaceholderUri, StringComparison.Ordinal))
+                        {
+                            skillIconUri = string.Empty;
+                        }
                     }
+
+                    views.Add(new WikiSkillView
+                    {
+                        Name = skill.Name,
+                        Tag = skill.Tag,
+                        DescriptionText = skill.DescriptionText,
+                        IconUri = skillIconUri,
+                    });
                 }
 
-                skills.Add(new WikiSkillView
-                {
-                    Name = skill.Name,
-                    Tag = skill.Tag,
-                    DescriptionText = skill.DescriptionText,
-                    IconUri = skillIconUri,
-                });
+                return views;
             }
+
+            List<WikiSkillView> skills = BuildSkillViews(enemy.Skills);
 
             resistanceStates += enemy.ResistanceStates.Count;
 
@@ -527,6 +562,29 @@ public static class WikiEnemyCatalog
                 IconUri = icon,
                 ArtUri = artUri,
                 ArtIsPreview = artIsPreview,
+                Stages = [.. enemy.States.Select(state => new WikiEnemyStateView
+                {
+                    Key = state.Key ?? string.Empty,
+                    Label = string.IsNullOrWhiteSpace(state.Label) ? (state.Name ?? string.Empty) : state.Label!,
+                    Name = state.Name ?? string.Empty,
+                    NameEn = state.NameEn ?? string.Empty,
+                    Subtitle = state.Subtitle ?? string.Empty,
+                    IconUri = ResolveFile(state.IconFile),
+                    LevelText = state.Level is > 0
+                        ? (string.IsNullOrWhiteSpace(state.LevelLabel)
+                            ? $"Lv.{state.Level}"
+                            : $"{state.LevelLabel} · Lv.{state.Level}")
+                        : string.Empty,
+                    HpText = state.Hp is > 0 ? $"{state.Hp:N0}" : string.Empty,
+                    AtkText = state.Atk is > 0 ? $"{state.Atk:N0}" : string.Empty,
+                    Skills = BuildSkillViews(state.Skills),
+                    ResistanceStates = state.ResistanceStates,
+                    Notes = [.. state.Notes.Select(static note => new WikiNoteView
+                    {
+                        Title = note.Text,
+                        Text = string.Concat(note.Description.Select(static span => span.Text)),
+                    })],
+                })],
                 LeylineName = enemy.Leyline?.Name,
                 LeylineNameEn = enemy.Leyline?.NameEn ?? string.Empty,
                 LeylinePortraitUri = ResolveFile(enemy.Leyline?.Portrait?.File),

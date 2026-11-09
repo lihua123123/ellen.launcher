@@ -38,7 +38,7 @@ public sealed class WikiEnemyViewItem
 
     /// <summary>大图是否是降质的随包缩略图预览（离线兜底），UI 需要显式说明，不能假装是原图。</summary>
     public bool ArtIsPreview { get; init; }
-    public string? ArtNote => ArtIsPreview ? "离线：显示随包 256px 预览（原图需联网或缓存后查看）" : null;
+    public string? ArtNote => ArtIsPreview ? "随包 256px 预览（安装包内不含原图）" : null;
 
     public IReadOnlyList<string> Aliases { get; init; } = [];
     public IReadOnlyList<string> Tags { get; init; } = [];

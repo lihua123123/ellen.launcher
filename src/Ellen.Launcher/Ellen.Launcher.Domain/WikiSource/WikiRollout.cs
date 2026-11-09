@@ -92,7 +92,7 @@ public static class WikiFirstRunPolicy
         {
             Mode = WikiFirstRunMode.LegacyFallback,
             Reason = "no-cache-offline",
-            Banner = $"随包 753 条图鉴读取失败（{detail}），当前显示内置 722 图鉴；重新安装可恢复",
+            Banner = $"内置 753 条图鉴读取失败（{detail}），当前显示内置 722 图鉴；重新安装可恢复",
         };
     }
 }

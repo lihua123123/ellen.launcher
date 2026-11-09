@@ -659,14 +659,20 @@
                     SelectedItem="{Binding WebSelectedCategory, Mode=TwoWay}"/>
                 <shuxca:AutoSuggestTokenBox
                     Grid.Column="1"
-                    Height="36"
+                    Height="44"
+                    VerticalContentAlignment="Center"
                     AvailableTokens="{Binding WebSearchData.AvailableTokens}"
                     FilterCommand="{Binding WebFilterCommand}"
                     ItemsSource="{Binding WebSearchData.FilterTokens, Mode=TwoWay}"
                     MaximumTokens="5"
+                    PlaceholderText="{shuxm:ResourceString Name=ViewPageWiKiMonsterAutoSuggestBoxPlaceHolder}"
+                    QueryIcon="{cw:FontIconSource Glyph=&#xE721;}"
                     ShowTokenCounter="False"
+                    Style="{StaticResource DefaultAutoSuggestTokenBoxStyle}"
                     SuggestedItemTemplate="{StaticResource TokenTemplate}"
-                    SuggestedItemsSource="{Binding WebSearchData.AvailableTokens.Values}"/>
+                    SuggestedItemsSource="{Binding WebSearchData.AvailableTokens.Values}"
+                    Text="{Binding WebSearchData.FilterToken, Mode=TwoWay}"
+                    TokenItemTemplate="{StaticResource TokenTemplate}"/>
             </Grid>
 
             <!--  列表 + 详情  -->

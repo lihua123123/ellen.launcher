@@ -200,14 +200,10 @@ public static class DependencyInjection
             inner = new HttpEnemyWebSource(options, cache, log, snapshot);
         }
 
-        // P5 753 条目 JSON 随包：离线首屏基线（方案 B 地基）。仅当随包目录就绪时包裹，
-        // 否则透明透传内层源（保持旧行为：首屏靠 HTTP 缓存 / 回退 legacy）。
-        if (paths.HasBundled753)
-        {
-            return new BundledEnemyWebSource(paths.BundledWebRoot, inner, cache, log);
-        }
-
-        return inner;
+        /* 753 条数据已经内置进程序集（Resource/EnemyArchives/Web753/bundled-all.json 的 EmbeddedResource），
+           随包目录只负责图片与逐条 json 回退 —— 所以这里**无条件**包裹：
+           目录缺失/被杀软清掉时依然能读到 753 条，不会再退回内置 722。 */
+        return new BundledEnemyWebSource(paths.BundledWebRoot, inner, cache, log);
     }
 
     private static ILauncherSnapshotSource CreateSnapshotSource(IServiceProvider sp)

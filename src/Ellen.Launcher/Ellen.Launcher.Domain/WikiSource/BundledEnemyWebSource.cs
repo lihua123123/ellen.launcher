@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,6 +30,9 @@ public sealed class BundledEnemyWebSource : IEnemyWebSource, ICachedEnemyWebSour
     /// 设 <c>ELLEN_WIKI_BUNDLE_SEED=1</c> 可恢复旧行为（仅用于排查缓存相关问题时对齐数据）。
     /// </summary>
     public const string SeedEnvironmentVariable = "ELLEN_WIKI_BUNDLE_SEED";
+
+    /// <summary>内置 753 条数据的程序集资源名（csproj 里的 LogicalName，改一处必须改两处）。</summary>
+    private const string EmbeddedMergedResource = "Ellen.Launcher.Resource.EnemyArchives.Web753.bundled-all.json";
 
     private readonly string bundleRoot;
     private readonly IEnemyWebSource inner;
@@ -59,6 +63,18 @@ public sealed class BundledEnemyWebSource : IEnemyWebSource, ICachedEnemyWebSour
     /// </summary>
     public async ValueTask<EnemyWebReadResult> ReadCachedAsync(CancellationToken token = default)
     {
+        /* 数据内置：753 条合并包嵌在程序集里，优先于 HTTP 缓存与安装目录里那 753 个 json。
+           「数据只随安装包更新」因此是硬保证 —— 旧缓存挡不住新包，目录被清也不会退化成 722。
+           图片仍然走外部 assets（随包）与缓存。 */
+        if (!SeedCacheEnabled
+            && TryReadEmbeddedMerged(
+                WikiSourceStamp.FromBundledWeb753("内置 753 基线"),
+                [.. (log?.Records ?? [])],
+                token) is { } baked)
+        {
+            return baked;
+        }
+
         EnemyWebReadResult innerCached = inner is ICachedEnemyWebSource cachedSource
             ? await cachedSource.ReadCachedAsync(token).ConfigureAwait(false)
             : await inner.ReadAsync(token).ConfigureAwait(false);
@@ -179,11 +195,46 @@ public sealed class BundledEnemyWebSource : IEnemyWebSource, ICachedEnemyWebSour
 
         try
         {
-            byte[] bytes = File.ReadAllBytes(path);
+            return ParseMerged(File.ReadAllBytes(path), path, stamp, diagnostics, token);
+        }
+        catch (IOException ex)
+        {
+            log?.Add("bundle-merged-read", stamp, $"{path}: {ex.Message}", "合并包读取失败，回退逐条扫描");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// 内置数据：合并包直接嵌在程序集里。安装目录里的 Resource/EnemyArchives/Web753 只是图片与回退用的副本，
+    /// 少了/被杀软清掉也不影响 753 条本身 —— 不会再退化成内置 722。
+    /// </summary>
+    private EnemyWebReadResult? TryReadEmbeddedMerged(WikiSourceStamp stamp, List<WikiDiagnostic> diagnostics, CancellationToken token)
+    {
+        /* 资源嵌在**应用**程序集里（Ellen.Launcher.dll），而这个类在 Ellen.Launcher.Domain.dll，
+           所以必须先找入口程序集，再退回自己的程序集（单测里两者相等时也能工作）。 */
+        Stream? stream = Assembly.GetEntryAssembly()?.GetManifestResourceStream(EmbeddedMergedResource)
+            ?? typeof(BundledEnemyWebSource).Assembly.GetManifestResourceStream(EmbeddedMergedResource);
+        if (stream is null)
+        {
+            return null;
+        }
+
+        using (stream)
+        {
+            using MemoryStream buffer = new();
+            stream.CopyTo(buffer);
+            return ParseMerged(buffer.ToArray(), "内置 bundled-all.json", stamp, diagnostics, token);
+        }
+    }
+
+    private EnemyWebReadResult? ParseMerged(byte[] bytes, string origin, WikiSourceStamp stamp, List<WikiDiagnostic> diagnostics, CancellationToken token)
+    {
+        try
+        {
             MergedBundleDto? merged = JsonSerializer.Deserialize<MergedBundleDto>(bytes, Json);
             if (merged?.Items is not { Count: > 0 } || merged.Index is null)
             {
-                log?.Add("bundle-merged-empty", stamp, $"{path} 反序列化为空", "合并包不可用，回退逐条扫描");
+                log?.Add("bundle-merged-empty", stamp, $"{origin} 反序列化为空", "合并包不可用，回退逐条扫描");
                 return null;
             }
 
@@ -217,12 +268,12 @@ public sealed class BundledEnemyWebSource : IEnemyWebSource, ICachedEnemyWebSour
         }
         catch (JsonException ex)
         {
-            log?.Add("bundle-merged-parse", stamp, $"{path}: {ex.Message}", "合并包 JSON 非法，回退逐条扫描");
+            log?.Add("bundle-merged-parse", stamp, $"{origin}: {ex.Message}", "合并包 JSON 非法，回退逐条扫描");
             return null;
         }
         catch (IOException ex)
         {
-            log?.Add("bundle-merged-read", stamp, $"{path}: {ex.Message}", "合并包读取失败，回退逐条扫描");
+            log?.Add("bundle-merged-read", stamp, $"{origin}: {ex.Message}", "合并包读取失败，回退逐条扫描");
             return null;
         }
     }

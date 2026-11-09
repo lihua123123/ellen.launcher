@@ -34,6 +34,10 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SOURCE = REPO_ROOT.parents[0] / "ellen-wiki" / "src" / "data" / "enemies"
 OUT_DIR = REPO_ROOT / "Installer" / "Publish" / "Resource" / "EnemyArchives" / "Web753"
+# 同一份合并包还要写进项目资源目录：客户端把它作为 EmbeddedResource 编进程序集（内置 753 条），
+# 只嵌这一个文件，逐条 json 仍只随安装包发。两边必须同源，否则内置数据会悄悄落后于随包副本。
+EMBED_COPY = (REPO_ROOT / "src" / "Ellen.Launcher" / "Ellen.Launcher" / "Resource"
+              / "EnemyArchives" / "Web753" / "bundled-all.json")
 MANIFEST_SCHEMA = "ellen-wiki-bundle-v1"
 MERGED_SCHEMA = "ellen-enemy-bundle-v1"
 TOOL_VERSION = "1.1.0"
@@ -123,6 +127,7 @@ def write_bundle(out_dir: Path, index: dict, items: list[tuple[str, dict]], sour
     merged_text = json.dumps(merged, ensure_ascii=False, separators=(",", ":"))
     merged_sha = sha256_bytes(merged_text.encode("utf-8"))
     writes.append((out_dir / "bundled-all.json", merged_text))
+    writes.append((EMBED_COPY, merged_text))
 
     if check:
         print(f"  [check] 将写入 {len(writes)} 个文件到 {out_dir}")

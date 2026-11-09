@@ -155,7 +155,19 @@ public static class WikiUiBench
             if (web && vm.WebMonsters is { Count: > 1 } benchMonsters)
             {
                 Stopwatch dw = Stopwatch.StartNew();
-                vm.WebCurrentItem = benchMonsters[Math.Min(1, benchMonsters.Count - 1)];
+                // ELLEN_WIKI_UI_BENCH_ITEM=<name>：按名字选中（取证特定敌人，比如「女士」）
+                int pickIndex = Math.Min(1, benchMonsters.Count - 1);
+                string? wanted = Environment.GetEnvironmentVariable("ELLEN_WIKI_UI_BENCH_ITEM");
+                if (!string.IsNullOrWhiteSpace(wanted))
+                {
+                    int hit = benchMonsters.ToList().FindIndex(m => m.Name == wanted);
+                    if (hit >= 0)
+                    {
+                        pickIndex = hit;
+                    }
+                }
+
+                vm.WebCurrentItem = benchMonsters[pickIndex];
                 await WaitFramesAsync(taskContext, 2);
                 deepLinkMs = dw.Elapsed.TotalMilliseconds;
                 deepLinkResult = vm.WebBaseValueInfo?.CurrentLevelFormatted ?? string.Empty;

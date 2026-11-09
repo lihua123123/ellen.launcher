@@ -43,8 +43,15 @@ public sealed class WikiEnemyViewItem
        变体名/难度档/技能/机制都挂在母体下面，列表按 tag「幽境危战」筛出来。 */
     public string? LeylineName { get; init; }
     public bool HasLeyline => !string.IsNullOrEmpty(LeylineName);
-    public IReadOnlyList<WikiLeylineDifficultyView> LeylineDifficulties { get; init; } = [];
-    public bool HasLeylineDifficulties => LeylineDifficulties.Count > 0;
+    public string LeylineNameEn { get; init; } = string.Empty;
+    public bool HasLeylineNameEn => !string.IsNullOrEmpty(LeylineNameEn);
+    public string LeylinePortraitUri { get; init; } = string.Empty;
+    public bool HasLeylinePortrait => !string.IsNullOrEmpty(LeylinePortraitUri);
+    public string LeylineArtUri { get; init; } = string.Empty;
+    public bool HasLeylineArt => !string.IsNullOrEmpty(LeylineArtUri);
+    /// <summary>幽境「难度 + 抗性状态」合并切换项（N3 正常 / N4 正常 / N5 正常 / N5 满减），数值随选择联动。</summary>
+    public IReadOnlyList<WikiLeylineStageView> LeylineStages { get; init; } = [];
+    public bool HasLeylineStages => LeylineStages.Count > 0;
     public IReadOnlyList<WikiSkillView> LeylineSkills { get; init; } = [];
     public bool HasLeylineSkills => LeylineSkills.Count > 0;
     public IReadOnlyList<WikiNoteView> LeylineNotes { get; init; } = [];
@@ -111,11 +118,17 @@ public sealed class WikiSkillView
 }
 
 /// <summary>特殊机制的一行：标题可空，正文已由 <see cref="WikiRichText"/> 去标记。</summary>
-public sealed class WikiLeylineDifficultyView
+public sealed class WikiLeylineStageView
 {
+    public string Key { get; init; } = string.Empty;
     public string Label { get; init; } = string.Empty;
-    public string Detail { get; init; } = string.Empty;
-    public bool HasDetail => !string.IsNullOrEmpty(Detail);
+    public string LevelText { get; init; } = string.Empty;
+    public string HpText { get; init; } = string.Empty;
+    public string AtkText { get; init; } = string.Empty;
+    public string MultiplierText { get; init; } = string.Empty;
+    public string AdvantageText { get; init; } = string.Empty;
+    public bool HasAdvantage => !string.IsNullOrEmpty(AdvantageText);
+    public IReadOnlyList<WikiResistanceCell> Cells { get; init; } = [];
 }
 
 public sealed class WikiNoteView
@@ -411,6 +424,21 @@ public static class WikiEnemyCatalog
                 });
             }
 
+            string ResolveFile(string? file)
+            {
+                if (string.IsNullOrEmpty(file))
+                {
+                    return string.Empty;
+                }
+
+                if (!resolvedByFile.TryGetValue(file, out string? resolved))
+                {
+                    return string.Empty;
+                }
+
+                return string.Equals(resolved, WikiImageCache.PlaceholderUri, StringComparison.Ordinal) ? string.Empty : resolved;
+            }
+
             /* 技能图标：复用 images 里已解析的结果（随包原图 → 内容缓存 → 在线），
                解析失败落在占位图时按「没有图标」处理，UI 不显示空白方框。 */
             List<WikiSkillView> skills = [];
@@ -440,21 +468,49 @@ public static class WikiEnemyCatalog
             resistanceStates += enemy.ResistanceStates.Count;
 
             /* 列表头像只认源里的 icon 文件（avatar.webp）。上游没给头像 → 留空，
-               绝不拿 images[0]（= 一图流 reference*.png）顶替：那是详情大图，不是头像。 */
-            string icon = string.IsNullOrEmpty(enemy.IconFile)
-                ? string.Empty
-                : images.FirstOrDefault(i =>
-                        string.Equals(i.File, enemy.IconFile, StringComparison.OrdinalIgnoreCase)
-                        && !string.Equals(i.Uri, WikiImageCache.PlaceholderUri, StringComparison.Ordinal))?.Uri
-                    ?? string.Empty;
+               绝不拿 images[0]（一图流大图）顶替：那是详情大图，不是头像。
+
+               ⚠️ 必须走 resolvedByFile（随包原图 → 内容缓存 → 本地缓存 → 在线），
+               不能直接取 WikiImageRef.Uri —— 那是 ellen.wiki 的在线地址，
+               离线/未缓存时整个列表会变成「一排没有头像的纯文字」。 */
+            string icon = string.Empty;
+            if (!string.IsNullOrEmpty(enemy.IconFile))
+            {
+                icon = ResolveFile(enemy.IconFile);
+                if (string.IsNullOrEmpty(icon))
+                {
+                    WikiImageRef? iconRef = images.FirstOrDefault(i =>
+                        string.Equals(i.File, enemy.IconFile, StringComparison.OrdinalIgnoreCase));
+                    if (iconRef is not null)
+                    {
+                        icon = imageCache.Resolve(iconRef);
+                        if (string.Equals(icon, WikiImageCache.PlaceholderUri, StringComparison.Ordinal))
+                        {
+                            icon = string.Empty;
+                        }
+                    }
+                }
+            }
+
+            /* 一图流：先认 chart*.webp（2026-11 起 1600px webp 的新命名），
+               再兼容旧的 reference*，最后才退幽境图（排除立绘 leyline-portrait 与 leyline-skill-*）。 */
             WikiImageRef? artRef = images.FirstOrDefault(i =>
-                    i.File.StartsWith("reference", StringComparison.OrdinalIgnoreCase)
-                    && !string.Equals(i.Uri, WikiImageCache.PlaceholderUri, StringComparison.Ordinal))
+                    i.File.StartsWith("chart", StringComparison.OrdinalIgnoreCase)
+                    || i.File.StartsWith("reference", StringComparison.OrdinalIgnoreCase))
                 ?? images.FirstOrDefault(i =>
                     i.File.StartsWith("leyline", StringComparison.OrdinalIgnoreCase)
-                    && !string.Equals(i.Uri, WikiImageCache.PlaceholderUri, StringComparison.Ordinal));
-            string artUri = artRef?.Uri ?? string.Empty;
+                    && !i.File.Contains("portrait", StringComparison.OrdinalIgnoreCase)
+                    && !i.File.Contains("skill", StringComparison.OrdinalIgnoreCase));
+            string artUri = artRef is null ? string.Empty : ResolveFile(artRef.File);
             bool artIsPreview = artUri.Contains("thumb-", StringComparison.OrdinalIgnoreCase);
+
+            /* 明确规则：**没有头像就留空**，绝不拿一图流（chart*.webp）顶到头像位上。
+               一图流是详情页的整图，塞进 40×40 的头像格里既看不清也不是同一种东西；
+               上游没给头像的条目（目前只有「命运」）宁可空着。 */
+            if (!string.IsNullOrEmpty(icon) && string.Equals(icon, artUri, StringComparison.OrdinalIgnoreCase))
+            {
+                icon = string.Empty;
+            }
 
             items.Add(new WikiEnemyViewItem
             {
@@ -472,8 +528,11 @@ public static class WikiEnemyCatalog
                 ArtUri = artUri,
                 ArtIsPreview = artIsPreview,
                 LeylineName = enemy.Leyline?.Name,
-                LeylineDifficulties = BuildLeylineDifficulties(enemy.Leyline),
-                LeylineSkills = BuildLeylineSkills(enemy.Leyline),
+                LeylineNameEn = enemy.Leyline?.NameEn ?? string.Empty,
+                LeylinePortraitUri = ResolveFile(enemy.Leyline?.Portrait?.File),
+                LeylineArtUri = enemy.LeylineImages.Select(ResolveFile).FirstOrDefault(static u => !string.IsNullOrEmpty(u)) ?? string.Empty,
+                LeylineStages = BuildLeylineStages(enemy.Leyline),
+                LeylineSkills = BuildLeylineSkills(enemy.Leyline, resolvedByFile),
                 LeylineNotes = (enemy.Leyline?.Notes ?? [])
                     .Select(static note => new WikiNoteView
                     {
@@ -607,51 +666,106 @@ public static class WikiEnemyCatalog
             && words.All(word => item.SearchTokens.Any(t => t.Contains(word, StringComparison.OrdinalIgnoreCase))))];
     }
 
-    private static IReadOnlyList<WikiLeylineDifficultyView> BuildLeylineDifficulties(WikiLeyline? leyline)
+    /// <summary>
+    /// 幽境的「难度 + 抗性状态」合并成一组切换项：
+    /// 每个难度先取 diffNote == 难度键的抗性行，没有就退回不带 diffNote 的通用行；
+    /// 同一难度有多个状态就各列一项（N5 正常 / N5 满减），只有一个状态也写成「N3 正常」。
+    /// 选中项同时携带该档的等级 / 生命 / 攻击 / 倍率，UI 的数值卡直接绑它，保证联动。
+    /// </summary>
+    private static IReadOnlyList<WikiLeylineStageView> BuildLeylineStages(WikiLeyline? leyline)
     {
         if (leyline is not { Difficulties.Count: > 0 })
         {
             return [];
         }
 
-        return [.. leyline.Difficulties.Select(static d =>
+        List<WikiLeylineStageView> stages = [];
+        foreach (WikiLeylineDifficulty d in leyline.Difficulties)
         {
-            List<string> parts = [];
-            if (d.Level is > 0)
+            List<WikiResistanceState> matched = [.. leyline.Resistances.Where(state =>
+                !string.IsNullOrEmpty(state.DiffNote)
+                && string.Equals(state.DiffNote, d.Key, StringComparison.OrdinalIgnoreCase))];
+            if (matched.Count == 0)
             {
-                parts.Add($"Lv.{d.Level}");
+                matched = [.. leyline.Resistances.Where(static state => string.IsNullOrEmpty(state.DiffNote))];
             }
 
-            if (d.Hp is > 0)
+            if (matched.Count == 0 && leyline.Resistances.Count > 0)
             {
-                parts.Add($"生命 {d.Hp:N0}");
+                matched = [leyline.Resistances[0]];
             }
 
-            if (d.Atk is > 0)
+            if (matched.Count == 0)
             {
-                parts.Add($"攻击 {d.Atk:N0}");
+                matched = [new WikiResistanceState { Name = "正常" }];
             }
 
-            return new WikiLeylineDifficultyView
+            foreach (WikiResistanceState state in matched)
             {
-                Label = d.Name ?? d.Key ?? string.Empty,
-                Detail = string.Join(" · ", parts),
-            };
-        })];
+                string stateName = string.IsNullOrWhiteSpace(state.Name) ? "正常" : state.Name;
+                stages.Add(new WikiLeylineStageView
+                {
+                    Key = d.Key ?? string.Empty,
+                    Label = $"{d.Key} {stateName}",
+                    LevelText = d.Level is > 0 ? $"Lv.{d.Level}" : "—",
+                    HpText = d.Hp is > 0 ? $"{d.Hp:N0}" : "—",
+                    AtkText = d.Atk is > 0 ? $"{d.Atk:N0}" : "—",
+                    MultiplierText = d.Multiplier is { } multiplier ? $"{multiplier:0.##}×" : "—",
+                    AdvantageText = d.Advantage ?? string.Empty,
+                    Cells = state.Cells,
+                });
+            }
+        }
+
+        return stages;
     }
 
-    private static IReadOnlyList<WikiSkillView> BuildLeylineSkills(WikiLeyline? leyline)
+    /// <summary>该难度适用的抗性表：先取 diffNote == 难度键 的行，没有就用不带 diffNote 的「正常」行。</summary>
+    private static IReadOnlyList<WikiResistanceState> MatchLeylineResistances(
+        IReadOnlyList<WikiResistanceState> all, string? key)
+    {
+        if (all.Count == 0)
+        {
+            return [];
+        }
+
+        List<WikiResistanceState> exact = [.. all.Where(state =>
+            !string.IsNullOrEmpty(state.DiffNote)
+            && !string.IsNullOrEmpty(key)
+            && string.Equals(state.DiffNote, key, StringComparison.OrdinalIgnoreCase))];
+        if (exact.Count > 0)
+        {
+            return exact;
+        }
+
+        return [.. all.Where(static state => string.IsNullOrEmpty(state.DiffNote))];
+    }
+
+    private static IReadOnlyList<WikiSkillView> BuildLeylineSkills(
+        WikiLeyline? leyline, Dictionary<string, string> resolvedByFile)
     {
         if (leyline is not { Skills.Count: > 0 })
         {
             return [];
         }
 
-        return [.. leyline.Skills.Select(static skill => new WikiSkillView
+        return [.. leyline.Skills.Select(skill =>
         {
-            Name = skill.Name,
-            Tag = skill.Tag,
-            DescriptionText = skill.DescriptionText,
+            string iconUri = string.Empty;
+            if (skill.Icon is { } iconRef
+                && resolvedByFile.TryGetValue(iconRef.File, out string? resolved)
+                && !string.Equals(resolved, WikiImageCache.PlaceholderUri, StringComparison.Ordinal))
+            {
+                iconUri = resolved;
+            }
+
+            return new WikiSkillView
+            {
+                Name = skill.Name,
+                Tag = skill.Tag,
+                DescriptionText = skill.DescriptionText,
+                IconUri = iconUri,
+            };
         })];
     }
 

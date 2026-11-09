@@ -42,6 +42,9 @@ public sealed class WikiEnemy
     public WikiEnergy? Energy { get; init; }
     public IReadOnlyList<WikiLevelRow> LevelRows { get; init; } = [];
     public IReadOnlyList<WikiImageRef> Images { get; init; } = [];
+
+    /// <summary>幽境形态的一图流文件名（leyline.png / leyline-2.png…），本体 images 另算。</summary>
+    public IReadOnlyList<string> LeylineImages { get; init; } = [];
     public IReadOnlyList<string> Aliases { get; init; } = [];
     public IReadOnlyList<string> Tags { get; init; } = [];
     public WikiLeyline? Leyline { get; init; }
@@ -162,8 +165,10 @@ public sealed class WikiImageRef
 public sealed class WikiLeyline
 {
     public string? Name { get; init; }
+    public string? NameEn { get; init; }
     public string? CategoryLabel { get; init; }
     public WikiImageRef? Portrait { get; init; }
+    public IReadOnlyList<WikiResistanceState> Resistances { get; init; } = [];
     public IReadOnlyList<WikiLeylineDifficulty> Difficulties { get; init; } = [];
     public IReadOnlyList<WikiSkill> Skills { get; init; } = [];
     public IReadOnlyList<WikiNote> Notes { get; init; } = [];
@@ -177,6 +182,7 @@ public sealed class WikiLeylineDifficulty
     public int? Level { get; init; }
     public long? Hp { get; init; }
     public long? Atk { get; init; }
+    public double? Multiplier { get; init; }
     public string? Advantage { get; init; }
 }
 

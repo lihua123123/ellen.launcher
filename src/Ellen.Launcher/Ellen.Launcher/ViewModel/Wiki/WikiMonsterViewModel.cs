@@ -84,6 +84,25 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
     [ObservableProperty]
     public partial SearchData? WebSearchData { get; set; }
 
+    /// <summary>
+    /// 详情页一级页签：0 = 本体，1 = 幽境（只有带 leyline 的 29 条才有第二个页签）。
+    /// 幽境那块原先挤在「一图流」卡片里，用户要求按角色/武器图鉴的做法拆成独立页面。
+    /// </summary>
+    [ObservableProperty]
+    public partial int WebDetailTabIndex { get; set; }
+
+    /// <summary>详情页页签标题（Segmented 的数据源），与角色页技能分段控件同一套。</summary>
+    public IReadOnlyList<string> WebDetailTabs { get; } = ["本体", "幽境"];
+
+    public bool WebIsBodyTab => WebDetailTabIndex == 0;
+    public bool WebIsLeylineTab => WebDetailTabIndex == 1;
+
+    partial void OnWebDetailTabIndexChanged(int value)
+    {
+        OnPropertyChanged(nameof(WebIsBodyTab));
+        OnPropertyChanged(nameof(WebIsLeylineTab));
+    }
+
     [ObservableProperty]
     public partial IReadOnlyList<WikiResistanceState>? WebResistanceStates { get; set; }
 
@@ -129,6 +148,30 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
         {
             ApplyWebFilter();
         }
+    }
+
+    /// <summary>幽境「难度 + 抗性状态」切换项：N3 正常 / N4 正常 / N5 正常 / N5 满减。</summary>
+    [ObservableProperty]
+    public partial IReadOnlyList<WikiLeylineStageView> WebLeylineStages { get; set; } = [];
+
+    [ObservableProperty]
+    public partial int WebSelectedLeylineStageIndex { get; set; }
+
+    /// <summary>当前选中的幽境档位：数值卡与抗性网格都绑它，切一项两边一起变。</summary>
+    [ObservableProperty]
+    public partial WikiLeylineStageView? WebLeylineCurrentStage { get; set; }
+
+    partial void OnWebSelectedLeylineStageIndexChanged(int value)
+    {
+        UpdateWebLeylineStage();
+    }
+
+    private void UpdateWebLeylineStage()
+    {
+        IReadOnlyList<WikiLeylineStageView> stages = WebCurrentItem?.LeylineStages ?? [];
+        WebLeylineCurrentStage = WebSelectedLeylineStageIndex >= 0 && WebSelectedLeylineStageIndex < stages.Count
+            ? stages[WebSelectedLeylineStageIndex]
+            : stages.FirstOrDefault();
     }
 
     partial void OnWebSelectedResistanceStateIndexChanged(int value)
@@ -401,6 +444,34 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
         rolloutMetrics.RecordBundledImageStats(catalog.BundledImageHits, catalog.BundledThumbPreviews);
         // M1（web 视图）：StartupProbe 开启时记录「753 web 列表就绪」时间点；未开启时为 no-op。
         StartupProbe.Mark("enemy-web-loaded");
+
+        /* 取证用：设了 ELLEN_WIKI_DUMP 就把本次装配的图片解析结果落盘一次。
+           「列表没有头像 / 一图流没了」这类问题只能靠运行时事实判断，别靠猜。 */
+        if (Environment.GetEnvironmentVariable("ELLEN_WIKI_DUMP") is { Length: > 0 } dumpPath)
+        {
+            try
+            {
+                System.Text.StringBuilder sb = new();
+                sb.AppendLine($"BaseDirectory={AppContext.BaseDirectory}");
+                sb.AppendLine($"items={catalog.Items.Count} noIcon={catalog.Items.Count(static i => !i.HasIcon)} noArt={catalog.Items.Count(static i => !i.HasArt)}");
+                sb.AppendLine($"imageRefs={catalog.ImageRefCount} bundledHits={catalog.BundledImageHits} thumbs={catalog.BundledThumbPreviews} misses={catalog.ImageCacheMisses} orphans={catalog.OrphanSkippedCount}");
+                foreach (WikiEnemyViewItem sample in catalog.Items.Take(3))
+                {
+                    sb.AppendLine($"  SAMPLE {sample.Name} icon={sample.IconUri} art={sample.ArtUri}");
+                }
+
+                foreach (WikiEnemyViewItem missing in catalog.Items.Where(static i => !i.HasIcon).Take(20))
+                {
+                    sb.AppendLine($"  NOICON {missing.Name} id={missing.Id}");
+                }
+
+                System.IO.File.WriteAllText(dumpPath, sb.ToString());
+            }
+            catch
+            {
+                // 诊断写不出去不影响功能。
+            }
+        }
     }
 
     // ---------------- 等级换算（拖动滑块看具体血量） ----------------
@@ -441,6 +512,10 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
         UpdateWebResistanceStates();
         UpdateWebResistanceCells();
         UpdateWebBaseValueInfo(value);
+        WebLeylineStages = value?.LeylineStages ?? [];
+        WebSelectedLeylineStageIndex = 0;
+        UpdateWebLeylineStage();
+        WebDetailTabIndex = 0;   // 换敌人回「本体」页，别停在上一条的幽境页
     }
 
     /// <summary>

@@ -78,20 +78,25 @@ def plan(wiki: Path) -> tuple[dict, list[tuple[Path, Path, str]], list[tuple[Pat
         enemy_id = entry["id"]
         file = entry["file"]
         thumb = entry.get("thumb")
+
+        # 原图：**所有条目都随包**（含声明了缩略图的一图流）。
+        # 以前带 thumb 的大图只拷 256px 预览，详情页的一图流永远看不清技能名；
+        # 一图流已改成 1600px webp（单张 100~320 KB），原图随包的代价可以接受。
+        src = originals_root / enemy_id / file
+        dst = Path(ORIGINALS_DIR) / enemy_id / file
+        if not src.exists():
+            missing.append(f"{enemy_id}/{file}")
+        else:
+            originals.append((src, dst, entry["sha256"]))
+
+        # 缩略图：列表/卡片与「原图缺失时降级」都用它，照旧拷。
         if thumb:
-            src = thumbs_root / enemy_id / thumb["file"]
-            dst = Path(THUMBS_DIR) / enemy_id / thumb["file"]
-            if not src.exists():
+            thumb_src = thumbs_root / enemy_id / thumb["file"]
+            thumb_dst = Path(THUMBS_DIR) / enemy_id / thumb["file"]
+            if not thumb_src.exists():
                 missing.append(f"{enemy_id}/{thumb['file']}")
                 continue
-            thumbs.append((src, dst, thumb["sha256"]))
-        else:
-            src = originals_root / enemy_id / file
-            dst = Path(ORIGINALS_DIR) / enemy_id / file
-            if not src.exists():
-                missing.append(f"{enemy_id}/{file}")
-                continue
-            originals.append((src, dst, entry["sha256"]))
+            thumbs.append((thumb_src, thumb_dst, thumb["sha256"]))
 
     if missing:
         raise FileNotFoundError(f"{len(missing)} 个清单条目在磁盘上找不到，样例：{', '.join(missing[:5])}")

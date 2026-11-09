@@ -98,6 +98,7 @@ public sealed class EnemyAdapter
                 Tenacity = row.Tenacity,
             }).ToList(),
             Images = images,
+            LeylineImages = item.LeylineImages,
             Aliases = item.Aliases,
             Tags = item.Tags,
             Leyline = item.Leyline is null ? null : AdaptLeyline(item.Leyline, id),
@@ -161,6 +162,27 @@ public sealed class EnemyAdapter
             {
                 Name = state.Name,
                 IsDefault = i == defaultIndex,
+                DiffNote = state.DiffNote,
+                Evidence = state.Evidence,
+                Condition = state.Condition,
+                Cells = ElementOrder.Select(pair => BuildCell(pair, GetValue(state, pair.Key))).ToList(),
+            });
+        }
+
+        return result;
+    }
+
+    /// <summary>幽境自己的抗性表（与本体分开：N5 满减 / N5 90% 这类只有幽境有）。</summary>
+    private static IReadOnlyList<WikiResistanceState> BuildLeylineResistances(EnemyLeylineDto leyline)
+    {
+        List<WikiResistanceState> result = [];
+        for (int i = 0; i < leyline.Resistances.Count; i++)
+        {
+            EnemyResistanceStateDto state = leyline.Resistances[i];
+            result.Add(new WikiResistanceState
+            {
+                Name = state.Name,
+                IsDefault = i == 0,
                 DiffNote = state.DiffNote,
                 Evidence = state.Evidence,
                 Condition = state.Condition,
@@ -312,7 +334,9 @@ public sealed class EnemyAdapter
         return new WikiLeyline
         {
             Name = leyline.Name,
+            NameEn = leyline.NameEn,
             CategoryLabel = leyline.CategoryLabel,
+            Resistances = BuildLeylineResistances(leyline),
             Portrait = string.IsNullOrWhiteSpace(leyline.Portrait) ? null : ImageRef(enemyId, leyline.Portrait),
             Difficulties = (leyline.Difficulties ?? []).Select(static d => new WikiLeylineDifficulty
             {
@@ -321,6 +345,7 @@ public sealed class EnemyAdapter
                 Level = d.Level,
                 Hp = d.Hp,
                 Atk = d.Atk,
+                Multiplier = d.Multiplier,
                 Advantage = d.Advantage,
             }).ToList(),
             Skills = (leyline.Skills ?? []).Select(skill => AdaptSkill(skill, enemyId)).ToList(),

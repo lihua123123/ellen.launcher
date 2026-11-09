@@ -231,6 +231,7 @@ public sealed class EnemyLeylineDifficultyDto
     [JsonPropertyName("level")] public int? Level { get; set; }
     [JsonPropertyName("hp")] public long? Hp { get; set; }
     [JsonPropertyName("atk")] public long? Atk { get; set; }
+    [JsonPropertyName("multiplier")] public double? Multiplier { get; set; }
     [JsonPropertyName("advantage")] public string? Advantage { get; set; }
 }
 

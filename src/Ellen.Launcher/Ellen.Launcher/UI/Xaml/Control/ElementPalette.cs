@@ -135,4 +135,19 @@ public static class ElementPalette
     {
         return new SolidColorBrush(CreateColor(hex));
     }
+
+    /* 行内 `<c=#RRGGBB>…</c>` 标记的画刷：颜色值直接来自 ellen-wiki 的敌人技能文本，
+       与线上实际渲染色一致，不做任何换算。常驻缓存避免每个 Run 新建画刷。 */
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, Brush> HexBrushes = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>按 <c>#RRGGBB</c> 取画刷；非法值返回 null，调用方沿用当前颜色。</summary>
+    public static Brush? BrushFromHex(string? hex)
+    {
+        if (string.IsNullOrEmpty(hex) || hex.Length != 7 || hex[0] != '#')
+        {
+            return null;
+        }
+
+        return HexBrushes.GetOrAdd(hex, static value => CreateBrush(value));
+    }
 }

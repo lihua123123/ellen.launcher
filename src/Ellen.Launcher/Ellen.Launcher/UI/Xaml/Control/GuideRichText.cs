@@ -37,6 +37,10 @@ public static class GuideRichText
         + "|\\*\\*(?<strong>.+?)\\*\\*"
         + "|(?<spanOpen><span\\s+class=\"(?<cls>[^\"]+)\"\\s*>)"
         + "|(?<spanClose></span\\s*>)"
+        // 敌人图鉴技能描述用的是行内颜色标记（与 ellen-wiki richtext.js 同源）：
+        // <c=#FF9999>火</c> / <color=#FF9999>火</color>。必须放在通用 tag 之前，否则会被当 HTML 丢掉。
+        + "|(?<cOpen><(?:c|color)=(?<hex>#[0-9a-fA-F]{6})>)"
+        + "|(?<cClose></(?:c|color)>)"
         + "|(?<tag><[^>]+>)",
         RegexOptions.Compiled | RegexOptions.Singleline);
 
@@ -310,6 +314,18 @@ public static class GuideRichText
                 }
             }
             else if (match.Groups["spanClose"].Success && brushStack.Count > 0)
+            {
+                brush = brushStack.Pop();
+            }
+            else if (match.Groups["cOpen"].Success)
+            {
+                brushStack.Push(brush);
+                if (ElementPalette.BrushFromHex(match.Groups["hex"].Value) is { } hexBrush)
+                {
+                    brush = hexBrush;
+                }
+            }
+            else if (match.Groups["cClose"].Success && brushStack.Count > 0)
             {
                 brush = brushStack.Pop();
             }

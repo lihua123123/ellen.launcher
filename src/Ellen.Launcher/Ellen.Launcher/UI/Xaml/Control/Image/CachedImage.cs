@@ -266,7 +266,24 @@ public sealed partial class CachedImage : Microsoft.UI.Xaml.Controls.Control
             // https://learn.microsoft.com/en-us/windows/uwp/debug-test-perf/optimize-animations-and-media#right-sized-decoding
             // UriSource should be set after the Image is connected to live XAML tree
             target.Source = source;
-            source.UriSource = uri;
+
+            if (uri.IsFile)
+            {
+                /* 本地文件直接喂流，**不要走 UriSource**。
+                   敌人图鉴有 224 个条目的 id 是中文（以索忒/科西霍/蟹沙皇/拉斯科尔尼科夫…），
+                   file:// 形式的 URI 会把路径转义成 %E4%BB%A5%E7%B4%A2%E5%BF%92 这种形式，
+                   BitmapImage 按转义后的路径取文件 → 取不到、ImageOpened 不触发、控件一直透明，
+                   表现就是「ASCII id 的全有头像，中文 id 的头像和一图流整片空白」。 */
+                Windows.Storage.StorageFile file = await Windows.Storage.StorageFile.GetFileFromPathAsync(uri.LocalPath);
+                using (IRandomAccessStreamWithContentType stream = await file.OpenReadAsync())
+                {
+                    await source.SetSourceAsync(stream);
+                }
+            }
+            else
+            {
+                source.UriSource = uri;
+            }
         }
     }
 

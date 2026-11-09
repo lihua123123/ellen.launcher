@@ -160,6 +160,23 @@ public static class WikiUiBench
                 deepLinkResult = vm.WebBaseValueInfo?.CurrentLevelFormatted ?? string.Empty;
             }
 
+            /* 取证用截图②-早：切完选中项立刻截（约 60ms），用来复现「点开敌人闪一下」。
+               ELLEN_WIKI_UI_BENCH_SHOT_DETAIL_EARLY=<png>；和 1.6s 后那张对比就知道闪的是哪块。 */
+            string? shotDetailEarlyPath = Environment.GetEnvironmentVariable("ELLEN_WIKI_UI_BENCH_SHOT_DETAIL_EARLY");
+            if (!string.IsNullOrWhiteSpace(shotDetailEarlyPath))
+            {
+                try
+                {
+                    await Task.Delay(60);
+                    await CaptureAsync(window, shotDetailEarlyPath).ConfigureAwait(true);
+                    marks.Add(("shot-detail-early", watch.Elapsed.TotalMilliseconds));
+                }
+                catch (Exception ex)
+                {
+                    marks.Add(($"shot-detail-early-failed:{ex.GetType().Name}", watch.Elapsed.TotalMilliseconds));
+                }
+            }
+
             /* 取证用截图②：详情页（深链之后）。ELLEN_WIKI_UI_BENCH_SHOT_DETAIL=<png>。
                离线且未缓存时这里应是随包 256px 预览 + 一行「离线：显示随包 256px 预览」说明。 */
             string? shotDetailPath = Environment.GetEnvironmentVariable("ELLEN_WIKI_UI_BENCH_SHOT_DETAIL");
@@ -202,6 +219,27 @@ public static class WikiUiBench
                 }
             }
 
+            /* 静置观察：ELLEN_WIKI_UI_BENCH_SETTLE_MS=6000
+               用来确认「后台同步完成」不会再重建列表 —— 重建会让 ListView 重实现、当前项换实例，
+               用户看到的就是点开敌人后闪一下。增量必须是 0；>0 说明防抖判据失效。 */
+            int rebuildsBeforeSettle = vm.CatalogRebuilds;
+            int constSettleMs = 0;
+            if (int.TryParse(Environment.GetEnvironmentVariable("ELLEN_WIKI_UI_BENCH_SETTLE_MS"), out int parsedSettle) && parsedSettle > 0)
+            {
+                // 等后台同步真的落地（最多 parsedSettle 毫秒），再看它有没有动列表。
+                Stopwatch settleWatch = Stopwatch.StartNew();
+                while (settleWatch.ElapsedMilliseconds < parsedSettle && vm.SyncCompletions == 0)
+                {
+                    await Task.Delay(100);
+                    await taskContext.SwitchToMainThreadAsync();
+                }
+
+                constSettleMs = (int)settleWatch.ElapsedMilliseconds;
+                marks.Add(("settled", watch.Elapsed.TotalMilliseconds));
+            }
+
+            int rebuildsAfterSettle = vm.CatalogRebuilds;
+
             var payload = new
             {
                 schema = "wiki-ui-bench-v1",
@@ -210,8 +248,15 @@ public static class WikiUiBench
                 ok = true,
                 webMode = vm.IsWebMode,
                 itemCount,
+                catalogRebuildsBeforeSettle = rebuildsBeforeSettle,
+                catalogRebuildsAfterSettle = rebuildsAfterSettle,
+                catalogRebuildsDelta = rebuildsAfterSettle - rebuildsBeforeSettle,
+                syncCompletions = vm.SyncCompletions,
+                syncSkippedNoChange = vm.SyncSkippedNoChange,
+                settleMs = constSettleMs,
                 // 详情取证：技能图标是否真的解析出 URI（{} 绑定错了不会报错，只能靠这个字段核对）
                 currentItem = web ? vm.WebCurrentItem?.Name : null,
+                catalogRebuilds = vm.CatalogRebuilds,
                 skillCount = web ? vm.WebCurrentItem?.Skills.Count ?? 0 : 0,
                 skillIconCount = web ? vm.WebCurrentItem?.Skills.Count(static s => s.HasIcon) ?? 0 : 0,
                 skillIconSample = web ? vm.WebCurrentItem?.Skills.FirstOrDefault(static s => s.HasIcon)?.IconUri : null,

@@ -319,6 +319,7 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
             IsFallbackBannerVisible = false;
             FallbackBannerText = null;
             ApplyWebFilter();
+            appliedCatalogIdentity = CatalogIdentity(catalog);
             RecordWebCatalogMetrics(catalog);
         }
 
@@ -339,16 +340,28 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
             _ = await wikiSync.SyncNowAsync().ConfigureAwait(false);
             wikiEnemyCatalogService.Invalidate();
             WikiEnemyCatalogResult? catalog = await wikiEnemyCatalogService.LoadAsync().ConfigureAwait(false);
-            if (catalog is not null)
-            {
-                rolloutMetrics.RecordWebLoad(catalog.LoadMilliseconds, catalog.TotalCount, catalog.IsOfflineBundled);
-            }
 
             using (await EnterCriticalSectionAsync().ConfigureAwait(false))
             {
                 await taskContext.SwitchToMainThreadAsync();
                 if (catalog is not null)
                 {
+                    /* 关键：数据没变就**什么都别动**。
+                       每次进页面都会跑一次后台同步，同步完把 ItemsSource 整个换成新 List，
+                       列表会重新实现一遍、当前项也换成新实例 → 用户看到的就是「点了某个敌人突然闪一下」。
+                       指纹相同（条目数 + 来源戳）说明这次同步没带回新数据，直接跳过 UI 重建，
+                       顺带也不再记 WebLoad / 图片分母 —— 那是空装配，记了只会把 G6/G7b 的分母灌水。 */
+                    string identity = CatalogIdentity(catalog);
+                    SyncCompletions++;
+                    if (!switchToWebOnSuccess && string.Equals(identity, appliedCatalogIdentity, StringComparison.Ordinal))
+                    {
+                        SyncSkippedNoChange++;
+                        RecordNewImageFailures();
+                        return;
+                    }
+
+                    rolloutMetrics.RecordWebLoad(catalog.LoadMilliseconds, catalog.TotalCount, catalog.IsOfflineBundled);
+
                     if (switchToWebOnSuccess)
                     {
                         // 首次启动无缓存但同步成功：从 builtin 回退切到 753 视图，并清掉横幅。
@@ -362,6 +375,7 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
                     WebEmptyStateText = null;
                     WebSearchData = SearchData.CreateForWikiMonsterWeb(catalog.Items);
                     ApplyWebFilter();
+                    appliedCatalogIdentity = identity;
                     RecordWebCatalogMetrics(catalog);
                     RecordNewImageFailures();
                 }
@@ -646,7 +660,6 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
         {
             return;
         }
-
         if (allWebItems.Count == 0)
         {
             return;
@@ -656,6 +669,7 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
         string? category = WebSelectedCategory?.Key;
         IReadOnlyList<WikiEnemyViewItem> filtered = WikiEnemyCatalog.Filter(allWebItems, string.IsNullOrEmpty(category) ? null : category, tokens);
         WebMonsters = filtered;
+        CatalogRebuilds++;
         // 当前项若已被筛掉，回落到第一条；否则保持不变（避免每次筛选都跳回首项）。
         WebCurrentItem = filtered.Count == 0
             ? null
@@ -665,6 +679,24 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
     }
 
     private IReadOnlyList<WikiEnemyViewItem> allWebItems = [];
+
+    /// <summary>
+    /// 当前已经画到界面上的目录指纹（条目数 + 来源戳）。后台同步回来先比它：
+    /// 一样就说明没新数据，不重建列表 —— 重建会让 ListView 重实现、当前项换实例，表现为闪一下。
+    /// </summary>
+    private string appliedCatalogIdentity = string.Empty;
+
+    /// <summary>诊断：列表被重建的次数（1 = 只有首屏那次）。给取证脚本确认后台同步没再动 UI。</summary>
+    public int CatalogRebuilds { get; private set; }
+
+    /// <summary>诊断：后台同步成功拿到目录的次数。</summary>
+    public int SyncCompletions { get; private set; }
+
+    /// <summary>诊断：其中因「指纹没变」被跳过、没动 UI 的次数。</summary>
+    public int SyncSkippedNoChange { get; private set; }
+
+    private static string CatalogIdentity(WikiEnemyCatalogResult catalog)
+        => $"{catalog.TotalCount}|{catalog.SourceStampText}";
 
     private void UpdateWebResistanceStates()
     {

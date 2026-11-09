@@ -33,11 +33,21 @@ namespace Ellen.Launcher.UI.Xaml.Control.Image;
 [DependencyProperty<object>("Source", PropertyChangedCallbackName = nameof(OnSourceChanged))]
 [DependencyProperty<bool>("ShowAsMonoChrome", DefaultValue = false, NotNull = true)]
 [DependencyProperty<double>("DecodeWidth", DefaultValue = 0D, NotNull = true)]
+
+/// <summary>
+/// 图片出现时是否做 200ms 淡入。默认 true（列表滚动时观感更柔和）。
+/// 详情页那些「每次切换条目都会重建」的图片（技能图标、一图流）要设 false：
+/// 重建后整组图从透明淡入，看起来就是点开敌人闪一下。
+/// </summary>
+[DependencyProperty<bool>("FadeIn", DefaultValue = true, NotNull = true)]
 public sealed partial class CachedImage : Microsoft.UI.Xaml.Controls.Control
 {
     private const string PartImage = "Image";
 
     private static readonly ConditionalWeakTable<Microsoft.UI.Xaml.Controls.Image, object> IsPlaceholder = [];
+
+    /// <summary>FadeIn=False 的 Image：换源前保留旧图、新图解码完直接不透明，避免「清空→淡入」的闪。</summary>
+    private static readonly ConditionalWeakTable<Microsoft.UI.Xaml.Controls.Image, object> NoFadeImages = [];
 
     private readonly AsyncLock sourceLock = new();
 
@@ -145,6 +155,13 @@ public sealed partial class CachedImage : Microsoft.UI.Xaml.Controls.Control
             return;
         }
 
+        // FadeIn=False 的直接全不透明：图片解码完就出现，不做 0→1 淡入。
+        if (sender is Microsoft.UI.Xaml.Controls.Image image && NoFadeImages.TryGetValue(image, out _))
+        {
+            image.Opacity = 1;
+            return;
+        }
+
         AnimationBuilder
             .Create()
             .Opacity(
@@ -226,6 +243,12 @@ public sealed partial class CachedImage : Microsoft.UI.Xaml.Controls.Control
             // https://learn.microsoft.com/en-us/windows/uwp/debug-test-perf/optimize-animations-and-media#optimize-image-resources
             // Connecting the BitmapImage to the tree before setting its UriSource
             target.Visibility = Visibility.Visible;
+
+            // FadeIn=False：不透明度直接拉满，避免「先透明、再等解码、再淡入」的三段闪烁。
+            if (NoFadeImages.TryGetValue(target, out _))
+            {
+                target.Opacity = 1;
+            }
 
             BitmapImage source = new();
 
@@ -344,11 +367,33 @@ public sealed partial class CachedImage : Microsoft.UI.Xaml.Controls.Control
             {
                 using (await sourceLock.LockAsync().ConfigureAwait(true))
                 {
-                    // Remove old ImageSource from tree
-                    await ImageAttachUriSourceWithAnimationAsync(Image, default, placeholder, 0).ConfigureAwait(true);
+                    /* FadeIn=True：先把旧图淡出清空（列表滚动时的常规观感）。
+                       FadeIn=False：**不清空**，旧图留在原位，等新图解码完直接替换 —— 
+                       否则每次换源都会「先白一下再淡入」，详情页切条目就会闪。 */
+                    if (FadeIn)
+                    {
+                        if (Image is { } fadingImage)
+                        {
+                            NoFadeImages.Remove(fadingImage);
+                        }
+
+                        // Remove old ImageSource from tree
+                        await ImageAttachUriSourceWithAnimationAsync(Image, default, placeholder, 0).ConfigureAwait(true);
+                    }
+                    else if (Image is { } instantImage)
+                    {
+                        NoFadeImages.AddOrUpdate(instantImage, string.Empty);
+                    }
 
                     if (source is null)
                     {
+                        // FadeIn=False 时上面没清空旧图，这里必须显式清掉，否则换了没有图的条目会留着上一张。
+                        if (!FadeIn && Image is { } blankImage)
+                        {
+                            blankImage.Source = null;
+                            blankImage.Visibility = Visibility.Collapsed;
+                        }
+
                         return;
                     }
 

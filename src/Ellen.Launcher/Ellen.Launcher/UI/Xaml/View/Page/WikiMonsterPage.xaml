@@ -881,11 +881,15 @@
                                 Visibility="{Binding WebCurrentItem.HasArt, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <StackPanel Spacing="8">
                                     <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="一图流"/>
+                                    <!--  一图流：大图展示和角色图鉴的「名片」同一套（满宽 + 圆角裁剪，不设 MaxWidth）。
+                                          离线未缓存时是随包 256px 预览，ArtNote 显式说明，不冒充原图。
+                                          FadeIn=False：切换敌人时这张图会重建，淡入看起来就是闪一下。  -->
                                     <Border
                                         HorizontalAlignment="Stretch"
                                         CornerRadius="{ThemeResource OverlayCornerRadius}">
                                         <shuxci:CachedImage
                                             HorizontalAlignment="Stretch"
+                                            FadeIn="False"
                                             Source="{Binding WebCurrentItem.ArtUri}"
                                             Stretch="Uniform"/>
                                     </Border>
@@ -938,6 +942,7 @@
                                                             Height="32"
                                                             HorizontalAlignment="Center"
                                                             VerticalAlignment="Center"
+                                                            FadeIn="False"
                                                             Source="{Binding IconUri}"
                                                             Stretch="Uniform"/>
                                                     </Border>

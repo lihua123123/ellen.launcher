@@ -83,7 +83,7 @@ public static class WikiFirstRunPolicy
             {
                 Mode = WikiFirstRunMode.EmptyState,
                 Reason = "syncing",
-                Banner = "首次启动：正在从 ellen.wiki 同步 753 条图鉴，完成后自动刷新",
+                Banner = "首次启动：正在从 ellen.wiki 同步图鉴，完成后自动刷新",
             };
         }
 
@@ -92,7 +92,7 @@ public static class WikiFirstRunPolicy
         {
             Mode = WikiFirstRunMode.LegacyFallback,
             Reason = "no-cache-offline",
-            Banner = $"内置 753 条图鉴读取失败（{detail}），当前显示内置 722 图鉴；重新安装可恢复",
+            Banner = $"内置随包图鉴读取失败（{detail}），当前显示内置 722 图鉴；重新安装可恢复",
         };
     }
 }

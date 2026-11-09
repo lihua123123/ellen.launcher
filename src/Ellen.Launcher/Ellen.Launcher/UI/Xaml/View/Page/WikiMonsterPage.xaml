@@ -1020,11 +1020,11 @@
                                         <Border
                                             Padding="16"
                                             Style="{ThemeResource BorderShimmerStyle}"
-                                            Visibility="{Binding WebCurrentItem.HasArt, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            Visibility="{Binding WebBodyHasArt, Converter={StaticResource BoolToVisibilityConverter}}">
                                             <StackPanel Spacing="8">
                                                 <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="一图流"/>
                                                 <ContentControl
-                                                    Content="{Binding WebCurrentItem.ArtUri}"
+                                                    Content="{Binding WebBodyArtUri}"
                                                     ContentTemplate="{StaticResource WebArtTemplate}"/>
                                             </StackPanel>
                                         </Border>

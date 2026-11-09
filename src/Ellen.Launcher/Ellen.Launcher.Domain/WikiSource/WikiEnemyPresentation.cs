@@ -126,6 +126,10 @@ public sealed class WikiEnemyStateView
     public string AtkText { get; init; } = string.Empty;
     public bool HasLevelInfo => !string.IsNullOrEmpty(LevelText);
 
+    /// <summary>该阶段自己的一图流（chart.webp / chart-2.webp …）。</summary>
+    public string ArtUri { get; init; } = string.Empty;
+    public bool HasArt => !string.IsNullOrEmpty(ArtUri);
+
     public IReadOnlyList<WikiSkillView> Skills { get; init; } = [];
     public IReadOnlyList<WikiResistanceState> ResistanceStates { get; init; } = [];
     public IReadOnlyList<WikiNoteView> Notes { get; init; } = [];
@@ -547,6 +551,17 @@ public static class WikiEnemyCatalog
                 icon = string.Empty;
             }
 
+            /* 一图流按阶段排：chart.webp / chart-2.webp / chart-3.webp。
+               形态数比图多时（若陀 9 形态只有 1 张图）一律指向最后一张，不空着。 */
+            List<WikiImageRef> chartRefs = [.. images
+                .Where(static i => i.File.StartsWith("chart", StringComparison.OrdinalIgnoreCase)
+                                || i.File.StartsWith("reference", StringComparison.OrdinalIgnoreCase))
+                .OrderBy(static i => ChartOrder(i.File))];
+            string ChartUriAt(int index)
+                => chartRefs.Count == 0
+                    ? string.Empty
+                    : ResolveFile(chartRefs[Math.Min(index, chartRefs.Count - 1)].File);
+
             items.Add(new WikiEnemyViewItem
             {
                 Id = enemy.Id,
@@ -562,7 +577,7 @@ public static class WikiEnemyCatalog
                 IconUri = icon,
                 ArtUri = artUri,
                 ArtIsPreview = artIsPreview,
-                Stages = [.. enemy.States.Select(state => new WikiEnemyStateView
+                Stages = [.. enemy.States.Select((state, index) => new WikiEnemyStateView
                 {
                     Key = state.Key ?? string.Empty,
                     Label = string.IsNullOrWhiteSpace(state.Label) ? (state.Name ?? string.Empty) : state.Label!,
@@ -577,6 +592,7 @@ public static class WikiEnemyCatalog
                         : string.Empty,
                     HpText = state.Hp is > 0 ? $"{state.Hp:N0}" : string.Empty,
                     AtkText = state.Atk is > 0 ? $"{state.Atk:N0}" : string.Empty,
+                    ArtUri = ChartUriAt(index),
                     Skills = BuildSkillViews(state.Skills),
                     ResistanceStates = state.ResistanceStates,
                     Notes = [.. state.Notes.Select(static note => new WikiNoteView
@@ -825,6 +841,20 @@ public static class WikiEnemyCatalog
                 IconUri = iconUri,
             };
         })];
+    }
+
+    /// <summary>chart.webp=1 / chart-2.webp=2 …；解析不出来排最后。</summary>
+    private static int ChartOrder(string file)
+    {
+        int dash = file.IndexOf('-');
+        if (dash < 0)
+        {
+            return 1;
+        }
+
+        int dot = file.LastIndexOf('.');
+        string digits = dot > dash ? file[(dash + 1)..dot] : file[(dash + 1)..];
+        return int.TryParse(digits, out int n) ? n : 99;
     }
 
     private static void AddToken(List<string> tokens, string? value)

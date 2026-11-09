@@ -147,6 +147,13 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
     [ObservableProperty]
     public partial bool WebBodyHasLevelInfo { get; set; }
 
+    /// <summary>该阶段自己的一图流（chart.webp / chart-2.webp …）；本体用条目的第一张。</summary>
+    [ObservableProperty]
+    public partial string WebBodyArtUri { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool WebBodyHasArt { get; set; }
+
     [ObservableProperty]
     public partial bool WebBodyHasSkills { get; set; }
 
@@ -751,6 +758,8 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
             WebBodyAtkText = string.Empty;
             WebBodyHasLevelInfo = false;
             WebShowBaseValueCard = false;
+            WebBodyArtUri = string.Empty;
+            WebBodyHasArt = false;
             WebBodyHasSkills = false;
             WebBodyNotes = [];
             WebBodyHasNotes = false;
@@ -779,6 +788,8 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
             WebBodyAtkText = string.Empty;
             WebBodyHasLevelInfo = false;
             WebShowBaseValueCard = WebBaseValueInfo is not null;
+            WebBodyArtUri = item.ArtUri;
+            WebBodyHasArt = item.HasArt;
             WebResistanceStates = item.ResistanceStates;
         }
         else
@@ -794,6 +805,8 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
             WebBodyAtkText = stage.AtkText;
             WebBodyHasLevelInfo = stage.HasLevelInfo;
             WebShowBaseValueCard = false;
+            WebBodyArtUri = stage.HasArt ? stage.ArtUri : item.ArtUri;
+            WebBodyHasArt = !string.IsNullOrEmpty(WebBodyArtUri);
             WebResistanceStates = stage.ResistanceStates.Count > 0 ? stage.ResistanceStates : item.ResistanceStates;
         }
 

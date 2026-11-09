@@ -97,7 +97,8 @@ public static class WikiUiBench
 
             /* 取证用：先切到指定分类再截列表图。
                ELLEN_WIKI_UI_BENCH_CATEGORY=愚人众 → 用来验证「上游没有头像的条目直接留空」。 */
-            if (Environment.GetEnvironmentVariable("ELLEN_WIKI_UI_BENCH_CATEGORY") is { Length: > 0 } categoryName
+            string? pinnedCategory = Environment.GetEnvironmentVariable("ELLEN_WIKI_UI_BENCH_CATEGORY");
+            if (pinnedCategory is { Length: > 0 } categoryName
                 && vm.WebCategories is { Count: > 0 } benchCategories)
             {
                 var target = benchCategories.FirstOrDefault(c => c.Name == categoryName);
@@ -139,7 +140,7 @@ public static class WikiUiBench
             // M5（UI 层）：切换分类，等到列表内容变化 + 2 帧
             double categoryMs = 0;
             int categoryCount = 0;
-            if (web && vm.WebCategories is { Count: > 1 } categories)
+            if (web && pinnedCategory is null && vm.WebCategories is { Count: > 1 } categories)
             {
                 Stopwatch cw = Stopwatch.StartNew();
                 vm.WebSelectedCategory = categories[Math.Min(5, categories.Count - 1)];
@@ -226,15 +227,9 @@ public static class WikiUiBench
             int constSettleMs = 0;
             if (int.TryParse(Environment.GetEnvironmentVariable("ELLEN_WIKI_UI_BENCH_SETTLE_MS"), out int parsedSettle) && parsedSettle > 0)
             {
-                // 等后台同步真的落地（最多 parsedSettle 毫秒），再看它有没有动列表。
-                Stopwatch settleWatch = Stopwatch.StartNew();
-                while (settleWatch.ElapsedMilliseconds < parsedSettle && vm.SyncCompletions == 0)
-                {
-                    await Task.Delay(100);
-                    await taskContext.SwitchToMainThreadAsync();
-                }
-
-                constSettleMs = (int)settleWatch.ElapsedMilliseconds;
+                constSettleMs = parsedSettle;
+                await Task.Delay(parsedSettle);
+                await taskContext.SwitchToMainThreadAsync();
                 marks.Add(("settled", watch.Elapsed.TotalMilliseconds));
             }
 
@@ -251,8 +246,6 @@ public static class WikiUiBench
                 catalogRebuildsBeforeSettle = rebuildsBeforeSettle,
                 catalogRebuildsAfterSettle = rebuildsAfterSettle,
                 catalogRebuildsDelta = rebuildsAfterSettle - rebuildsBeforeSettle,
-                syncCompletions = vm.SyncCompletions,
-                syncSkippedNoChange = vm.SyncSkippedNoChange,
                 settleMs = constSettleMs,
                 // 详情取证：技能图标是否真的解析出 URI（{} 绑定错了不会报错，只能靠这个字段核对）
                 currentItem = web ? vm.WebCurrentItem?.Name : null,

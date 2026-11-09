@@ -33,7 +33,6 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
     private readonly ITaskContext taskContext;
     private readonly WikiSourceFeatureFlag wikiSourceFlag;
     private readonly IWikiEnemyCatalogService wikiEnemyCatalogService;
-    private readonly WikiSyncCoordinator wikiSync;
     private readonly WikiRolloutMetricsService rolloutMetrics;
 
     private WikiMonsterMetadataContext? metadataContext;
@@ -255,53 +254,27 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
 
     // ---------------- P2 web 分支 ----------------
 
-    private async ValueTask<bool> LoadWebAsync(CancellationToken token, bool triggerSync = true)
+    private async ValueTask<bool> LoadWebAsync(CancellationToken token)
     {
         WikiEnemyCatalogResult? catalog = await wikiEnemyCatalogService.LoadAsync(token).ConfigureAwait(false);
         if (catalog is null)
         {
-            // 无可用缓存：先按「首次运行策略」给出明确结论（回 legacy / 同步中空态），再后台同步。
-            // 任何分支都不允许返回空白页。
+            /* 数据只随安装包提供（后台同步已移除）：读不到随包 753 就显式回退内置 722，
+               不留「正在同步」的空态 —— 没有同步这回事了。 */
             WikiFirstRunDecision decision = WikiFirstRunPolicy.Decide(new WikiFirstRunInputs
             {
                 WebEnabled = true,
                 CachedItemCount = 0,
-
-                // 只区分「本机有没有网络」；上游是否可达由后台同步的真实结果回答。
-                // 有网 → 同步中空态；无网 → 立刻显式回退内置 722。
-                Online = System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable(),
+                Online = false,
                 FailureReason = wikiEnemyCatalogService.MirrorUnavailableReason,
             });
             rolloutMetrics.RecordDecision(decision);
 
             await taskContext.SwitchToMainThreadAsync();
             FallbackBannerText = decision.Banner;
-            IsFallbackBannerVisible = decision.Mode == WikiFirstRunMode.LegacyFallback;
-
-            if (decision.Mode == WikiFirstRunMode.LegacyFallback)
-            {
-                IsWebMode = false;
-                bool legacyLoaded = await LoadLegacyAsync(token).ConfigureAwait(false);
-                if (triggerSync)
-                {
-                    _ = SyncWebInBackgroundAsync(switchToWebOnSuccess: true);
-                }
-
-                return legacyLoaded;
-            }
-
-            using (await EnterCriticalSectionAsync().ConfigureAwait(false))
-            {
-                await taskContext.SwitchToMainThreadAsync();
-                WebEmptyStateText = decision.Banner ?? "正在同步…";
-            }
-
-            if (triggerSync)
-            {
-                _ = SyncWebInBackgroundAsync();
-            }
-
-            return true;
+            IsFallbackBannerVisible = true;
+            IsWebMode = false;
+            return await LoadLegacyAsync(token).ConfigureAwait(false);
         }
 
         rolloutMetrics.RecordWebLoad(catalog.LoadMilliseconds, catalog.TotalCount, catalog.IsOfflineBundled);
@@ -319,85 +292,14 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
             IsFallbackBannerVisible = false;
             FallbackBannerText = null;
             ApplyWebFilter();
-            appliedCatalogIdentity = CatalogIdentity(catalog);
             RecordWebCatalogMetrics(catalog);
         }
 
-        if (triggerSync)
-        {
-            _ = SyncWebInBackgroundAsync();
-        }
 
         return true;
     }
 
-    /// <summary>后台同步（不阻塞首屏）：完成后丢弃旧装配结果、用新缓存重建。</summary>
-    private async Task SyncWebInBackgroundAsync(bool switchToWebOnSuccess = false)
-    {
-        try
-        {
-            // 同步结果只用于「有没有成功」；界面不再展示 source/digest 诊断，成功后统一重载目录。
-            _ = await wikiSync.SyncNowAsync().ConfigureAwait(false);
-            wikiEnemyCatalogService.Invalidate();
-            WikiEnemyCatalogResult? catalog = await wikiEnemyCatalogService.LoadAsync().ConfigureAwait(false);
-
-            using (await EnterCriticalSectionAsync().ConfigureAwait(false))
-            {
-                await taskContext.SwitchToMainThreadAsync();
-                if (catalog is not null)
-                {
-                    /* 关键：数据没变就**什么都别动**。
-                       每次进页面都会跑一次后台同步，同步完把 ItemsSource 整个换成新 List，
-                       列表会重新实现一遍、当前项也换成新实例 → 用户看到的就是「点了某个敌人突然闪一下」。
-                       指纹相同（条目数 + 来源戳）说明这次同步没带回新数据，直接跳过 UI 重建，
-                       顺带也不再记 WebLoad / 图片分母 —— 那是空装配，记了只会把 G6/G7b 的分母灌水。 */
-                    string identity = CatalogIdentity(catalog);
-                    SyncCompletions++;
-                    if (!switchToWebOnSuccess && string.Equals(identity, appliedCatalogIdentity, StringComparison.Ordinal))
-                    {
-                        SyncSkippedNoChange++;
-                        RecordNewImageFailures();
-                        return;
-                    }
-
-                    rolloutMetrics.RecordWebLoad(catalog.LoadMilliseconds, catalog.TotalCount, catalog.IsOfflineBundled);
-
-                    if (switchToWebOnSuccess)
-                    {
-                        // 首次启动无缓存但同步成功：从 builtin 回退切到 753 视图，并清掉横幅。
-                        IsWebMode = true;
-                        IsFallbackBannerVisible = false;
-                        FallbackBannerText = null;
-                    }
-
-                    allWebItems = catalog.Items;
-                    WebCategories = catalog.Categories;
-                    WebEmptyStateText = null;
-                    WebSearchData = SearchData.CreateForWikiMonsterWeb(catalog.Items);
-                    ApplyWebFilter();
-                    appliedCatalogIdentity = identity;
-                    RecordWebCatalogMetrics(catalog);
-                    RecordNewImageFailures();
-                }
-            }
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            rolloutMetrics.RecordSyncFailure();
-            await taskContext.SwitchToMainThreadAsync();
-            WebEmptyStateText = $"后台同步失败（显式）：{ex.Message}";
-            if (IsFallbackBannerVisible)
-            {
-                FallbackBannerText = $"ellen.wiki 同步失败（{ex.Message}），继续显示内置 722 图鉴；恢复网络后点「立即同步」";
-            }
-            else if (!string.IsNullOrEmpty(WebEmptyStateText))
-            {
-                // 首次同步中失败：保留错误说明与重试入口，不留空白列表。
-                WebEmptyStateText = $"同步失败：{ex.Message}（点「立即同步」重试，或检查网络）";
-            }
-        }
-    }
-
+    // 图片失败记账游标：与 metrics 里的累计值比对，只记增量。
     private int recordedImageFailures;
     private int recordedImageNetworkFailures;
     private int recordedImageDecodeFailures;
@@ -411,8 +313,7 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
     /// 均仅 Wiki 图源），与 ImageAttempts（解析引用 + UI 下载尝试）同口径。
     /// 网络口径分子单列，= image-download-failure + UI 下载失败，避免与解析口径混算。
     /// </summary>
-    private void RecordNewImageFailures()
-    {
+    private void RecordNewImageFailures()    {
         int total = 0;
         int networkTotal = 0;
         foreach (WikiDiagnostic diagnostic in wikiEnemyCatalogService.Diagnostics)
@@ -535,6 +436,10 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
 
     partial void OnWebCurrentItemChanged(WikiEnemyViewItem? value)
     {
+        /* 抗性和等级一样，是「跟着当前条目走」的派生状态。
+           以前只在 ApplyWebFilter 里算，切条目时不刷新 → 不管点哪个怪，抗性都还是第一条的值。 */
+        UpdateWebResistanceStates();
+        UpdateWebResistanceCells();
         UpdateWebBaseValueInfo(value);
     }
 
@@ -617,12 +522,6 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
         return multiplier > 0 ? select(reference)!.Value / (baseValue * multiplier) : 1.0;
     }
 
-    [Command("WebSyncCommand")]
-    private void SyncWeb()
-    {
-        _ = SyncWebInBackgroundAsync();
-    }
-
     /// <summary>
     /// P5b「一键回滚」/ 切换数据源：**生产代码里唯一写持久化 UiSource 的入口**。
     /// <para>为什么必须有它：G7a 的「切换重启保持」要证明「用户手动选过 753，重启后还在」。
@@ -680,23 +579,8 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
 
     private IReadOnlyList<WikiEnemyViewItem> allWebItems = [];
 
-    /// <summary>
-    /// 当前已经画到界面上的目录指纹（条目数 + 来源戳）。后台同步回来先比它：
-    /// 一样就说明没新数据，不重建列表 —— 重建会让 ListView 重实现、当前项换实例，表现为闪一下。
-    /// </summary>
-    private string appliedCatalogIdentity = string.Empty;
-
     /// <summary>诊断：列表被重建的次数（1 = 只有首屏那次）。给取证脚本确认后台同步没再动 UI。</summary>
     public int CatalogRebuilds { get; private set; }
-
-    /// <summary>诊断：后台同步成功拿到目录的次数。</summary>
-    public int SyncCompletions { get; private set; }
-
-    /// <summary>诊断：其中因「指纹没变」被跳过、没动 UI 的次数。</summary>
-    public int SyncSkippedNoChange { get; private set; }
-
-    private static string CatalogIdentity(WikiEnemyCatalogResult catalog)
-        => $"{catalog.TotalCount}|{catalog.SourceStampText}";
 
     private void UpdateWebResistanceStates()
     {

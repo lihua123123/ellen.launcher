@@ -22,6 +22,17 @@ public static class SettingKeys
     public const string OverrideUpdateVersionComparison = "Ellen::Application::Update::VersionComparison::Override";
     public const string MirrorChyanCdk = "Ellen::Application::Update::MirrorChyanCdk";
 
+    /// <summary>
+    /// 启动时自动检查更新。默认关闭 —— 只在用户主动打开后才会在启动流程里联网比对版本。
+    /// 手动「立即检查」不受此开关限制。
+    /// </summary>
+    public const string UpdateAutoCheck                   = "Ellen::Update::AutoCheck";
+
+    /// <summary>
+    /// 上次检查到的新版本号，供设置页在重启后仍能显示「已有新版本」。
+    /// </summary>
+    public const string UpdateKnownLatestVersion          = "Ellen::Update::KnownLatestVersion";
+
     // Globalization
     public const string FirstDayOfWeek               = "Ellen::Globalization::FirstDayOfWeek";
     public const string PrimaryLanguage              = "Ellen::Globalization::PrimaryLanguage";

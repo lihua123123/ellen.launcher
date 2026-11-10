@@ -221,6 +221,84 @@
                         </cwc:SettingsCard>
                     </StackPanel>
                 </Border>
+
+                <!--  更新：只做版本比对与跳转，不在客户端内下载安装  -->
+                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="更新" />
+
+                <Border Style="{StaticResource SettingsGroupBorderStyle}">
+                    <StackPanel>
+                        <cwc:SettingsCard
+                            Margin="0"
+                            Padding="16,16"
+                            BorderThickness="0"
+                            Header="启动时自动检查更新">
+                            <cwc:SettingsCard.HeaderIcon>
+                                <FontIcon Glyph="&#xE895;" />
+                            </cwc:SettingsCard.HeaderIcon>
+                            <cwc:SettingsCard.Description>
+                                <TextBlock
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                    Text="每次启动联网比对一次版本号，有新版用右下角通知提醒，不弹窗。"
+                                    TextWrapping="Wrap" />
+                            </cwc:SettingsCard.Description>
+                            <ToggleSwitch x:Name="AutoCheckSwitch" Toggled="OnAutoCheckToggled" />
+                        </cwc:SettingsCard>
+
+                        <Border Style="{StaticResource SettingsGroupDividerStyle}" />
+
+                        <cwc:SettingsCard
+                            Margin="0"
+                            Padding="16,16"
+                            BorderThickness="0"
+                            Header="检查更新">
+                            <cwc:SettingsCard.HeaderIcon>
+                                <FontIcon Glyph="&#xE72C;" />
+                            </cwc:SettingsCard.HeaderIcon>
+                            <cwc:SettingsCard.Description>
+                                <TextBlock
+                                    x:Name="UpdateStatusText"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                    Text="尚未检查"
+                                    TextWrapping="Wrap" />
+                            </cwc:SettingsCard.Description>
+                            <Button
+                                x:Name="CheckNowButton"
+                                MinWidth="96"
+                                Click="OnCheckNow"
+                                Content="立即检查"
+                                Style="{StaticResource SettingButtonStyle}" />
+                        </cwc:SettingsCard>
+
+                        <Border
+                            x:Name="DownloadDivider"
+                            Style="{StaticResource SettingsGroupDividerStyle}"
+                            Visibility="Collapsed" />
+
+                        <cwc:SettingsCard
+                            x:Name="DownloadCard"
+                            Margin="0"
+                            Padding="16,16"
+                            BorderThickness="0"
+                            Click="OnOpenDownloadPage"
+                            Header="前往下载"
+                            IsClickEnabled="True"
+                            Visibility="Collapsed">
+                            <cwc:SettingsCard.HeaderIcon>
+                                <FontIcon Glyph="&#xE8A7;" />
+                            </cwc:SettingsCard.HeaderIcon>
+                            <cwc:SettingsCard.Description>
+                                <TextBlock
+                                    x:Name="DownloadHint"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                    Text="在浏览器里打开发布页"
+                                    TextWrapping="Wrap" />
+                            </cwc:SettingsCard.Description>
+                        </cwc:SettingsCard>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </ScrollViewer>
     </Grid>

@@ -5,6 +5,7 @@ using Ellen.Launcher.Core;
 using Ellen.Launcher.Core.Setting;
 using Ellen.Launcher.Factory.ContentDialog;
 using Ellen.Launcher.Factory.Picker;
+using Ellen.Launcher.Service.Update;
 using Ellen.Launcher.UI.Content;
 using Ellen.Launcher.UI.Xaml.Control;
 using Ellen.Launcher.ViewModel.Setting;
@@ -31,6 +32,8 @@ public sealed partial class SettingPage : ScopedPage
 
     private bool initialized;
     private bool migrating;
+    private bool checkingUpdate;
+    private CheckUpdateResult? updateResult;
 
     public SettingPage()
     {
@@ -75,6 +78,108 @@ public sealed partial class SettingPage : ScopedPage
             MigrateCard.IsEnabled = false;
             MigrateHint.Text = "便携模式：数据存放在安装目录下的 Data 子目录，跟随安装位置。要换位置请重新安装到目标目录。";
         }
+
+        // 更新：记住上次检查到的新版本，重启后仍能在设置页看到「有新版本」。
+        AutoCheckSwitch.IsOn = LocalSetting.Get(SettingKeys.UpdateAutoCheck, false);
+
+        string known = LocalSetting.Get(SettingKeys.UpdateKnownLatestVersion, string.Empty);
+        if (!string.IsNullOrWhiteSpace(known)
+            && System.Version.TryParse(known, out System.Version? knownVersion)
+            && knownVersion > EllenRuntime.Version)
+        {
+            UpdateStatusText.Text = $"上次检查发现有新版本 {knownVersion}（当前 {EllenRuntime.Version}）。";
+            DownloadHint.Text = $"在浏览器里打开发布页，手动下载 {knownVersion} 的安装包。";
+            DownloadCard.Visibility = Visibility.Visible;
+            DownloadDivider.Visibility = Visibility.Visible;
+        }
+    }
+
+    private void OnAutoCheckToggled(object sender, RoutedEventArgs e)
+    {
+        // 初始化时赋值 IsOn 也会触发一次 Toggled，值没变就不要写设置
+        if (LocalSetting.Get(SettingKeys.UpdateAutoCheck, false) == AutoCheckSwitch.IsOn)
+        {
+            return;
+        }
+
+        LocalSetting.Set(SettingKeys.UpdateAutoCheck, AutoCheckSwitch.IsOn);
+    }
+
+    private async void OnCheckNow(object sender, RoutedEventArgs e)
+    {
+        if (checkingUpdate)
+        {
+            return;
+        }
+
+        IServiceProvider? serviceProvider = XamlRoot.XamlContext()?.ServiceProvider;
+        if (serviceProvider is null)
+        {
+            UpdateStatusText.Text = "检查失败：应用服务尚未就绪。";
+            return;
+        }
+
+        checkingUpdate = true;
+        CheckNowButton.IsEnabled = false;
+        UpdateStatusText.Text = "正在检查…";
+
+        try
+        {
+            IUpdateService updateService = serviceProvider.GetRequiredService<IUpdateService>();
+            CheckUpdateResult result = await updateService.CheckUpdateAsync().ConfigureAwait(true);
+            updateResult = result;
+
+            switch (result.Kind)
+            {
+                case CheckUpdateResultKind.UpdateAvailable:
+                    UpdateStatusText.Text = $"发现新版本 {result.LatestVersion}（当前 {EllenRuntime.Version}）。";
+                    DownloadHint.Text = $"在浏览器里打开发布页，手动下载 {result.LatestVersion} 的安装包。";
+                    DownloadCard.Visibility = Visibility.Visible;
+                    DownloadDivider.Visibility = Visibility.Visible;
+                    break;
+
+                case CheckUpdateResultKind.AlreadyUpdated:
+                    UpdateStatusText.Text = $"已是最新版本（{EllenRuntime.Version}）。";
+                    DownloadCard.Visibility = Visibility.Collapsed;
+                    DownloadDivider.Visibility = Visibility.Collapsed;
+                    break;
+
+                default:
+                    UpdateStatusText.Text = string.IsNullOrWhiteSpace(result.Error)
+                        ? "检查失败：所有更新源都不可达。"
+                        : $"检查失败：{result.Error}";
+                    DownloadCard.Visibility = Visibility.Collapsed;
+                    DownloadDivider.Visibility = Visibility.Collapsed;
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            UpdateStatusText.Text = $"检查失败：{ex.GetType().Name}";
+        }
+        finally
+        {
+            checkingUpdate = false;
+            CheckNowButton.IsEnabled = true;
+        }
+    }
+
+    private async void OnOpenDownloadPage(object sender, RoutedEventArgs e)
+    {
+        if (updateResult is null)
+        {
+            return;
+        }
+
+        IServiceProvider? serviceProvider = XamlRoot.XamlContext()?.ServiceProvider;
+        if (serviceProvider is null)
+        {
+            return;
+        }
+
+        await serviceProvider.GetRequiredService<IUpdateService>()
+            .OpenDownloadPageAsync(updateResult)
+            .ConfigureAwait(true);
     }
 
     private static void UpdateGamePathText(TextBlock target, string settingKey)

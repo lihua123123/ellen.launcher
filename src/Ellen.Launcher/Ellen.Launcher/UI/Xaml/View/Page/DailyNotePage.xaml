@@ -40,400 +40,924 @@
             FalseValue="{StaticResource UI_MarkQuest_Main_Start}"
             TrueValue="{StaticResource UI_MarkQuest_Main_Proce}"/>
 
-        <DataTemplate x:Key="DailyNoteEntryTemplate" x:DataType="shme:DailyNoteEntry">
-            <ItemContainer cw:Effects.Shadow="{ThemeResource CompatCardShadow}">
-                <ItemContainer.Resources>
-                    <!--  ReSharper disable Xaml.RedundantResource  -->
-                    <SolidColorBrush x:Key="ItemContainerPointerOverBackground" Color="Transparent"/>
-                    <SolidColorBrush x:Key="ItemContainerPressedBackground" Color="Transparent"/>
-                    <!--  ReSharper restore Xaml.RedundantResource  -->
-                </ItemContainer.Resources>
-                <Border Padding="8" Style="{ThemeResource AcrylicBorderCardStyle}">
-                    <StackPanel Spacing="8">
-                        <Grid MinHeight="40" HorizontalAlignment="Stretch">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition Width="auto"/>
-                            </Grid.ColumnDefinitions>
+        <!--  原神角色一列（不含卡片外框，整张卡片按米游社账号合并）  -->
+        <DataTemplate x:Key="GenshinNoteColumnTemplate" x:DataType="shme:DailyNoteEntry">
+            <StackPanel
+                Width="308"
+                Spacing="8">
+                <Grid MinHeight="40">
+                    <TextBlock
+                        Margin="4,2,0,4"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource BaseTextBlockStyle}"
+                        Text="{Binding RoleDisplay}"
+                        TextTrimming="CharacterEllipsis"
+                        TextWrapping="NoWrap"/>
+                </Grid>
+
+                <StackPanel Spacing="6">
+                    <Grid Style="{ThemeResource GridShimmerStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <ProgressBar
+                            Grid.ColumnSpan="2"
+                            Height="40"
+                            MinHeight="48"
+                            Margin="-1"
+                            Background="{x:Null}"
+                            BorderBrush="{x:Null}"
+                            BorderThickness="0"
+                            CornerRadius="{ThemeResource ControlCornerRadius}"
+                            Maximum="{Binding ArchonQuestView.Ids.Length, Mode=OneWay}"
+                            Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
+                            Value="{Binding ArchonQuestView.ProgressValue, Mode=OneWay}"/>
+                        <shuxci:CachedImage
+                            Grid.Column="0"
+                            Margin="4"
+                            VerticalAlignment="Center"
+                            shux:FrameworkElementHelper.SquareLength="32"
+                            Source="{Binding DailyNote.IsArchonQuestFinished, Converter={StaticResource ArchonQuestIconConverter}}"/>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center">
                             <TextBlock
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="{Binding ArchonQuestView.FormattedProgress, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                            <TextBlock
+                                Opacity="0.6"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{Binding ArchonQuestView.FormattedChapter, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Style="{ThemeResource GridShimmerStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <ProgressBar
+                            Grid.ColumnSpan="2"
+                            Height="40"
+                            MinHeight="48"
+                            Margin="-1"
+                            Background="{x:Null}"
+                            BorderBrush="{x:Null}"
+                            BorderThickness="0"
+                            CornerRadius="{ThemeResource ControlCornerRadius}"
+                            Maximum="{Binding DailyNote.MaxResin, Mode=OneWay}"
+                            Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
+                            Value="{Binding DailyNote.CurrentResin, Mode=OneWay}"/>
+                        <shuxci:CachedImage
+                            Grid.Column="0"
+                            Margin="4"
+                            VerticalAlignment="Center"
+                            shux:FrameworkElementHelper.SquareLength="32"
+                            Source="{StaticResource UI_ItemIcon_106}"/>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="{Binding DailyNote.FormattedResin, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                            <TextBlock
+                                Opacity="0.6"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{Binding DailyNote.ResinRecoveryTargetTime, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Style="{ThemeResource GridShimmerStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <ProgressBar
+                            Grid.ColumnSpan="2"
+                            Height="40"
+                            MinHeight="48"
+                            Margin="-1"
+                            Background="{x:Null}"
+                            BorderBrush="{x:Null}"
+                            BorderThickness="0"
+                            CornerRadius="{ThemeResource ControlCornerRadius}"
+                            Maximum="{Binding DailyNote.MaxHomeCoin, Mode=OneWay}"
+                            Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
+                            Value="{Binding DailyNote.CurrentHomeCoin, Mode=OneWay}"/>
+                        <shuxci:CachedImage
+                            Grid.Column="0"
+                            Margin="4"
+                            VerticalAlignment="Center"
+                            shux:FrameworkElementHelper.SquareLength="32"
+                            Source="{StaticResource UI_ItemIcon_204}"/>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="{Binding DailyNote.FormattedHomeCoin, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                            <TextBlock
+                                Opacity="0.6"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{Binding DailyNote.FormattedHomeCoinRecoveryTargetTime, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Style="{ThemeResource GridShimmerStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ProgressBar
+                            Grid.ColumnSpan="3"
+                            Height="40"
+                            MinHeight="48"
+                            Margin="-1"
+                            Background="{x:Null}"
+                            BorderBrush="{x:Null}"
+                            BorderThickness="0"
+                            CornerRadius="{ThemeResource ControlCornerRadius}"
+                            Maximum="{Binding DailyNote.TotalTaskNum, Mode=OneWay}"
+                            Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
+                            Value="{Binding DailyNote.FinishedTaskNum, Mode=OneWay}"/>
+                        <shuxci:CachedImage
+                            Grid.Column="0"
+                            Margin="4"
+                            VerticalAlignment="Center"
+                            shux:FrameworkElementHelper.SquareLength="32"
+                            Source="{Binding DailyNote.DailyTask.IsExtraTaskRewardReceived, Converter={StaticResource DailyTaskIconConverter}}"/>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="{Binding DailyNote.FormattedTask, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                            <TextBlock
+                                Opacity="0.6"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{Binding DailyNote.ExtraTaskRewardDescription, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Column="2"
+                            Margin="0,0,8,0"
+                            Orientation="Horizontal"
+                            Spacing="8">
+                            <Button
+                                Width="32"
+                                Height="32"
+                                Padding="6"
+                                Style="{ThemeResource ShimmerButtonStyle}"
+                                ToolTipService.ToolTip="{shuxm:ResourceString Name=ViewPageDailyNoteAttendanceStatusInfo}"
+                                Visibility="{Binding DailyNote.DailyTask.AttendanceVisible, Mode=OneWay}">
+                                <shuxm:BitmapIconExtension ShowAsMonochrome="True" Source="ms-appx:///Resource/Icon/UI_IconSmall_EP.png"/>
+                                <Button.Flyout>
+                                    <Flyout FlyoutPresenterStyle="{StaticResource FlyoutPresenterPadding6Style}" Placement="BottomEdgeAlignedRight">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="auto"/>
+                                                <RowDefinition Height="auto"/>
+                                                <RowDefinition/>
+                                            </Grid.RowDefinitions>
+                                            <Grid ColumnSpacing="6">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{shuxm:ResourceString Name=ViewPageDailyNoteStoredAttendance}"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding DailyNote.DailyTask.StoredAttendance}"/>
+                                            </Grid>
+                                            <MenuFlyoutSeparator Grid.Row="1" Margin="-3,4,-3,6"/>
+                                            <ItemsControl
+                                                Grid.Row="2"
+                                                ItemsPanel="{ThemeResource StackPanelSpacing3Template}"
+                                                ItemsSource="{Binding DailyNote.DailyTask.AttendanceRewards}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <shuxcc:CardProgressBar
+                                                            MinWidth="120"
+                                                            MinHeight="32"
+                                                            Description="{Binding Progress}"
+                                                            Header="{Binding StatusFormatted}"
+                                                            Maximum="2000"
+                                                            ProgressForeground="{ThemeResource HyperlinkButtonForeground}"
+                                                            Value="{Binding Progress}"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </Grid>
+
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Style="{ThemeResource GridShimmerStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <ProgressBar
+                            Grid.ColumnSpan="2"
+                            Height="40"
+                            MinHeight="48"
+                            Margin="-1"
+                            Background="{x:Null}"
+                            BorderBrush="{x:Null}"
+                            BorderThickness="0"
+                            CornerRadius="{ThemeResource ControlCornerRadius}"
+                            Maximum="{Binding DailyNote.ResinDiscountNumLimit, Mode=OneWay}"
+                            Opacity="{ThemeResource LargeBackgroundProgressBarOpacity}"
+                            Value="{Binding DailyNote.ResinDiscountUsedNum, Mode=OneWay}"/>
+                        <shuxci:CachedImage
+                            Grid.Column="0"
+                            Margin="4"
+                            VerticalAlignment="Center"
+                            shux:FrameworkElementHelper.SquareLength="32"
+                            Source="{StaticResource UI_MarkTower}"/>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="{Binding DailyNote.FormattedResinDiscount, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                            <TextBlock
+                                Opacity="0.6"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{shuxm:ResourceString Name=ViewPageDailyNoteResinDiscountUsed}"
+                                TextWrapping="NoWrap"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Style="{ThemeResource GridShimmerStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <ProgressBar
+                            Grid.ColumnSpan="2"
+                            Height="40"
+                            MinHeight="48"
+                            Margin="-1"
+                            Background="{x:Null}"
+                            BorderBrush="{x:Null}"
+                            BorderThickness="0"
+                            CornerRadius="{ThemeResource ControlCornerRadius}"
+                            Maximum="604800"
+                            Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
+                            Value="{Binding DailyNote.Transformer.RecoveryTime.TotalSeconds, Mode=OneWay}"/>
+                        <shuxci:CachedImage
+                            Grid.Column="0"
+                            Margin="4"
+                            VerticalAlignment="Center"
+                            shux:FrameworkElementHelper.SquareLength="32"
+                            Source="{StaticResource UI_ItemIcon_220021}"/>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="{Binding DailyNote.Transformer.ObtainedAndReachedFormatted, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                            <TextBlock
+                                Opacity="0.6"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{Binding DailyNote.Transformer.ObtainedAndTimeFormatted, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+
+                <ItemsControl ItemsSource="{Binding DailyNote.Expeditions, Mode=OneWay}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <shuxcp:UniformPanel
+                                ColumnSpacing="6"
+                                MinItemWidth="140"
+                                RowSpacing="6"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Style="{ThemeResource GridShimmerStyle}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <ProgressBar
+                                    Grid.ColumnSpan="2"
+                                    MinHeight="40"
+                                    Margin="-1"
+                                    HorizontalAlignment="Stretch"
+                                    Background="{x:Null}"
+                                    BorderBrush="{x:Null}"
+                                    BorderThickness="0"
+                                    CornerRadius="{ThemeResource ControlCornerRadius}"
+                                    Maximum="{Binding TotalTime, Mode=OneWay}"
+                                    Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
+                                    Value="{Binding PassedTime, Mode=OneWay}"/>
+                                <shuxci:CachedImage
+                                    Grid.Column="0"
+                                    Margin="0,0,0,8"
+                                    shux:FrameworkElementHelper.SquareLength="32"
+                                    Source="{Binding AvatarSideIcon, Mode=OneWay}"/>
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Margin="16,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Style="{StaticResource BaseTextBlockStyle}"
+                                    Text="{Binding RemainedTimeFormatted, Mode=OneWay}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </DataTemplate>
+
+        <!--  绝区零角色一列：与原神同款行高 / 字号，内容换成电量、绳网会员、活跃度等  -->
+        <DataTemplate x:Key="ZenlessNoteColumnTemplate" x:DataType="shvd:ZenlessNoteEntry">
+            <StackPanel
+                Width="308"
+                Spacing="8">
+                <Grid MinHeight="40">
+                    <TextBlock
+                        Margin="4,2,0,4"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource BaseTextBlockStyle}"
+                        Text="{Binding RoleDisplay}"
+                        TextTrimming="CharacterEllipsis"
+                        TextWrapping="NoWrap"/>
+                </Grid>
+
+                <StackPanel Spacing="6" Visibility="{Binding HasNote, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <!--  电量  -->
+                    <Grid Style="{ThemeResource GridShimmerStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <ProgressBar
+                            Grid.ColumnSpan="2"
+                            Height="40"
+                            MinHeight="48"
+                            Margin="-1"
+                            Background="{x:Null}"
+                            BorderBrush="{x:Null}"
+                            BorderThickness="0"
+                            CornerRadius="{ThemeResource ControlCornerRadius}"
+                            Maximum="{Binding Note.EnergyMax, Mode=OneWay}"
+                            Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
+                            Value="{Binding Note.EnergyCurrent, Mode=OneWay}"/>
+                        <Image
+                            Grid.Column="0"
+                            Width="28"
+                            Height="28"
+                            Margin="4,0,0,0"
+                            VerticalAlignment="Center"
+                            Source="ms-appx:///Resource/Icon/UI_GameIcon_Zenless.png"/>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="8,0,12,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="{Binding Note.FormattedEnergy, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                            <TextBlock
+                                Opacity="0.6"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{Binding Note.EnergyDescription, Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="NoWrap"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!--  绳网会员：剩余领取天数 + 今日菲林是否领取（已领取则进度条填满）  -->
+                    <Grid MinHeight="48" Style="{ThemeResource GridShimmerStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <ProgressBar
+                            Grid.ColumnSpan="2"
+                            Height="40"
+                            MinHeight="48"
+                            Margin="-1"
+                            Background="{x:Null}"
+                            BorderBrush="{x:Null}"
+                            BorderThickness="0"
+                            CornerRadius="{ThemeResource ControlCornerRadius}"
+                            Maximum="1"
+                            Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
+                            Value="{Binding Note.MemberCardProgress, Mode=OneWay}"/>
+                        <Border
+                            Grid.Column="0"
+                            Width="28"
+                            Height="28"
+                            Margin="4,0,0,0"
+                            VerticalAlignment="Center"/>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="8,0,12,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="{Binding Note.MemberCardValue, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                            <TextBlock
+                                Opacity="0.6"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{Binding Note.MemberCardDescription, Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="NoWrap"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!--  今日活跃度  -->
+                    <Grid Style="{ThemeResource GridShimmerStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <ProgressBar
+                            Grid.ColumnSpan="2"
+                            Height="40"
+                            MinHeight="48"
+                            Margin="-1"
+                            Background="{x:Null}"
+                            BorderBrush="{x:Null}"
+                            BorderThickness="0"
+                            CornerRadius="{ThemeResource ControlCornerRadius}"
+                            Maximum="{Binding Note.VitalityMax, Mode=OneWay}"
+                            Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
+                            Value="{Binding Note.VitalityCurrent, Mode=OneWay}"/>
+                        <Border
+                            Grid.Column="0"
+                            Width="28"
+                            Height="28"
+                            Margin="4,0,0,0"/>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="8,0,12,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="{Binding Note.FormattedVitality, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                            <TextBlock
+                                Opacity="0.6"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{Binding Note.VitalityLabel, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!--  丽都周纪  -->
+                    <Grid Style="{ThemeResource GridShimmerStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <ProgressBar
+                            Grid.ColumnSpan="2"
+                            Height="40"
+                            MinHeight="48"
+                            Margin="-1"
+                            Background="{x:Null}"
+                            BorderBrush="{x:Null}"
+                            BorderThickness="0"
+                            CornerRadius="{ThemeResource ControlCornerRadius}"
+                            Maximum="{Binding Note.WeeklyTaskMax, Mode=OneWay}"
+                            Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
+                            Value="{Binding Note.WeeklyTaskCurrent, Mode=OneWay}"/>
+                        <Border
+                            Grid.Column="0"
+                            Width="28"
+                            Height="28"
+                            Margin="4,0,0,0"/>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="8,0,12,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="{Binding Note.FormattedWeeklyTask, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                            <TextBlock
+                                Opacity="0.6"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{Binding Note.WeeklyTaskLabel, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!--  悬赏委托  -->
+                    <Grid Style="{ThemeResource GridShimmerStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <ProgressBar
+                            Grid.ColumnSpan="2"
+                            Height="40"
+                            MinHeight="48"
+                            Margin="-1"
+                            Background="{x:Null}"
+                            BorderBrush="{x:Null}"
+                            BorderThickness="0"
+                            CornerRadius="{ThemeResource ControlCornerRadius}"
+                            Maximum="{Binding Note.BountyTotal, Mode=OneWay}"
+                            Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
+                            Value="{Binding Note.BountyNum, Mode=OneWay}"/>
+                        <Border
+                            Grid.Column="0"
+                            Width="28"
+                            Height="28"
+                            Margin="4,0,0,0"/>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="8,0,12,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="{Binding Note.FormattedBountyCommission, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                            <TextBlock
+                                Opacity="0.6"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{Binding Note.BountyLabel, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!--  饼铺盲盒 / 刮刮卡 / 占卜：三者共享每日次数，故只有一个是非状态  -->
+                    <Grid Style="{ThemeResource GridShimmerStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <ProgressBar
+                            Grid.ColumnSpan="2"
+                            Height="40"
+                            MinHeight="48"
+                            Margin="-1"
+                            Background="{x:Null}"
+                            BorderBrush="{x:Null}"
+                            BorderThickness="0"
+                            CornerRadius="{ThemeResource ControlCornerRadius}"
+                            Maximum="1"
+                            Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
+                            Value="{Binding Note.CardSignProgress, Mode=OneWay}"/>
+                        <Border
+                            Grid.Column="0"
+                            Width="28"
+                            Height="28"
+                            Margin="4,0,0,0"/>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="8,0,12,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="{Binding Note.CardSignText, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                            <TextBlock
+                                Opacity="0.6"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{Binding Note.CardSignLabel, Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="NoWrap"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!--  录像店经营：正在营业 / 待结算  -->
+                    <Grid Style="{ThemeResource GridShimmerStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <ProgressBar
+                            Grid.ColumnSpan="2"
+                            Height="40"
+                            MinHeight="48"
+                            Margin="-1"
+                            Background="{x:Null}"
+                            BorderBrush="{x:Null}"
+                            BorderThickness="0"
+                            CornerRadius="{ThemeResource ControlCornerRadius}"
+                            Maximum="1"
+                            Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
+                            Value="{Binding Note.VhsSaleProgress, Mode=OneWay}"/>
+                        <Border
+                            Grid.Column="0"
+                            Width="28"
+                            Height="28"
+                            Margin="4,0,0,0"/>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="8,0,12,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="{Binding Note.VhsSaleText, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                            <TextBlock
+                                Opacity="0.6"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{Binding Note.VhsSaleLabel, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!--  百通宝：本周获取 / 周上限（未解锁随便观时不显示）  -->
+                    <Grid
+                        MinHeight="48"
+                        Style="{ThemeResource GridShimmerStyle}"
+                        Visibility="{Binding Note.HasTemple, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <ProgressBar
+                            Grid.ColumnSpan="2"
+                            Height="40"
+                            MinHeight="48"
+                            Margin="-1"
+                            Background="{x:Null}"
+                            BorderBrush="{x:Null}"
+                            BorderThickness="0"
+                            CornerRadius="{ThemeResource ControlCornerRadius}"
+                            Maximum="{Binding Note.CurrencyMax, Mode=OneWay}"
+                            Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
+                            Value="{Binding Note.CurrencyCurrent, Mode=OneWay}"/>
+                        <Border
+                            Grid.Column="0"
+                            Width="28"
+                            Height="28"
+                            Margin="4,0,0,0"/>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="8,0,12,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="{Binding Note.FormattedCurrency, Mode=OneWay}"
+                                TextWrapping="NoWrap"/>
+                            <TextBlock
+                                Opacity="0.6"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{Binding Note.CurrencyLabel, Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="NoWrap"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!--  随便观经营：游历 / 制造 / 售卖  -->
+                    <StackPanel Spacing="2" Visibility="{Binding Note.HasTemple, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <TextBlock
+                            Margin="40,0,12,0"
+                            Opacity="0.6"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="{Binding Note.TempleHeader, Mode=OneWay}"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="NoWrap"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Border
                                 Grid.Column="0"
-                                Margin="4,2,0,4"
+                                Width="28"
+                                Height="28"
+                                Margin="4,0,0,0"/>
+                            <Grid Grid.Column="1" Margin="8,0,12,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Spacing="2">
+                                    <TextBlock
+                                        Style="{StaticResource BaseTextBlockStyle}"
+                                        Text="{Binding Note.ExpeditionStateText, Mode=OneWay}"
+                                        TextTrimming="CharacterEllipsis"
+                                        TextWrapping="NoWrap"/>
+                                    <TextBlock
+                                        FontSize="11"
+                                        Opacity="0.6"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Text="{shuxm:ResourceString Name=ViewPageDailyNoteZenlessTempleExpedition}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="2">
+                                    <TextBlock
+                                        Style="{StaticResource BaseTextBlockStyle}"
+                                        Text="{Binding Note.BenchStateText, Mode=OneWay}"
+                                        TextTrimming="CharacterEllipsis"
+                                        TextWrapping="NoWrap"/>
+                                    <TextBlock
+                                        FontSize="11"
+                                        Opacity="0.6"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Text="{shuxm:ResourceString Name=ViewPageDailyNoteZenlessTempleBench}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Spacing="2">
+                                    <TextBlock
+                                        Style="{StaticResource BaseTextBlockStyle}"
+                                        Text="{Binding Note.ShelveStateText, Mode=OneWay}"
+                                        TextTrimming="CharacterEllipsis"
+                                        TextWrapping="NoWrap"/>
+                                    <TextBlock
+                                        FontSize="11"
+                                        Opacity="0.6"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Text="{shuxm:ResourceString Name=ViewPageDailyNoteZenlessTempleShelve}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+
+                <TextBlock
+                    Opacity="0.7"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="{shuxm:ResourceString Name=ViewPageDailyNoteZenlessLoadFailed}"
+                    TextWrapping="Wrap"
+                    Visibility="{Binding HasNote, Converter={StaticResource BoolToVisibilityRevertConverter}}"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <shvd:DailyNoteColumnTemplateSelector
+            x:Key="DailyNoteColumnTemplateSelector"
+            GenshinTemplate="{StaticResource GenshinNoteColumnTemplate}"
+            ZenlessTemplate="{StaticResource ZenlessNoteColumnTemplate}"/>
+
+        <!--  同一个米游社账号下的角色共用一张卡片  -->
+        <DataTemplate x:Key="DailyNoteAccountCardTemplate" x:DataType="shvd:DailyNoteAccountCard">
+            <Border
+                Width="{Binding CardWidth}"
+                Padding="8"
+                cw:Effects.Shadow="{ThemeResource CompatCardShadow}"
+                Style="{ThemeResource AcrylicBorderCardStyle}">
+                <StackPanel Spacing="4">
+                    <!--  账号标题行：头像 + 昵称 + UID，右侧整张卡共用的操作按钮  -->
+                    <Grid MinHeight="40">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <PersonPicture
+                            Grid.Column="0"
+                            Width="28"
+                            Height="28"
+                            Margin="4,0,0,0"
+                            VerticalAlignment="Center"
+                            DisplayName="{Binding AccountDisplayName}"
+                            ProfilePicture="{Binding AccountAvatarUri}"/>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal"
+                            Spacing="8">
+                            <TextBlock
                                 VerticalAlignment="Center"
                                 Style="{StaticResource BaseTextBlockStyle}"
-                                Text="{Binding UserGameRole}"
+                                Text="{Binding AccountDisplayName}"
+                                TextTrimming="CharacterEllipsis"
                                 TextWrapping="NoWrap"/>
-                            <StackPanel
-                                x:Name="ButtonPanel"
-                                Grid.Column="1"
-                                HorizontalAlignment="Right"
-                                Orientation="Horizontal">
-                                <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
-                                <Button
-                                    Margin="8,0,0,0"
-                                    HorizontalAlignment="Right"
-                                    VerticalAlignment="Stretch"
-                                    shux:FrameworkElementHelper.SquareLength="40"
-                                    Background="Transparent"
-                                    BorderBrush="{x:Null}"
-                                    BorderThickness="0"
-                                    Command="{Binding DataContext.RemoveDailyNoteCommand, Source={StaticResource ViewModelBindingProxy}}"
-                                    CommandParameter="{Binding}"
-                                    Content="{StaticResource FontIconContentDelete}"
-                                    FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                    ToolTipService.ToolTip="{shuxm:ResourceString Name=ViewPageDailyNoteRemoveToolTip}"/>
-                                <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
-                                <Button
-                                    Margin="8,0,0,0"
-                                    VerticalAlignment="Stretch"
-                                    shux:FrameworkElementHelper.SquareLength="40"
-                                    Background="Transparent"
-                                    BorderBrush="{x:Null}"
-                                    BorderThickness="0"
-                                    Command="{Binding DataContext.ModifyNotificationCommand, Source={StaticResource ViewModelBindingProxy}}"
-                                    CommandParameter="{Binding}"
-                                    Content="{StaticResource FontIconContentSetting}"
-                                    FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                    ToolTipService.ToolTip="{shuxm:ResourceString Name=ViewPageDailyNoteNotificationSetting}"/>
-                            </StackPanel>
-                        </Grid>
-
-                        <StackPanel Spacing="6">
-                            <Grid Style="{ThemeResource GridShimmerStyle}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto"/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <ProgressBar
-                                    Grid.ColumnSpan="2"
-                                    Height="40"
-                                    MinHeight="48"
-                                    Margin="-1"
-                                    Background="{x:Null}"
-                                    BorderBrush="{x:Null}"
-                                    BorderThickness="0"
-                                    CornerRadius="{ThemeResource ControlCornerRadius}"
-                                    Maximum="{Binding ArchonQuestView.Ids.Length, Mode=OneWay}"
-                                    Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
-                                    Value="{Binding ArchonQuestView.ProgressValue, Mode=OneWay}"/>
-                                <shuxci:CachedImage
-                                    Grid.Column="0"
-                                    Margin="4"
-                                    VerticalAlignment="Center"
-                                    shux:FrameworkElementHelper.SquareLength="32"
-                                    Source="{Binding DailyNote.IsArchonQuestFinished, Converter={StaticResource ArchonQuestIconConverter}}"/>
-                                <StackPanel
-                                    Grid.Column="1"
-                                    Margin="8,0,0,0"
-                                    VerticalAlignment="Center">
-                                    <TextBlock
-                                        Style="{StaticResource SubtitleTextBlockStyle}"
-                                        Text="{Binding ArchonQuestView.FormattedProgress, Mode=OneWay}"
-                                        TextWrapping="NoWrap"/>
-                                    <TextBlock
-                                        Opacity="0.6"
-                                        Style="{StaticResource CaptionTextBlockStyle}"
-                                        Text="{Binding ArchonQuestView.FormattedChapter, Mode=OneWay}"
-                                        TextWrapping="NoWrap"/>
-                                </StackPanel>
-                            </Grid>
-                            <Grid Style="{ThemeResource GridShimmerStyle}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto"/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <ProgressBar
-                                    Grid.ColumnSpan="2"
-                                    Height="40"
-                                    MinHeight="48"
-                                    Margin="-1"
-                                    Background="{x:Null}"
-                                    BorderBrush="{x:Null}"
-                                    BorderThickness="0"
-                                    CornerRadius="{ThemeResource ControlCornerRadius}"
-                                    Maximum="{Binding DailyNote.MaxResin, Mode=OneWay}"
-                                    Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
-                                    Value="{Binding DailyNote.CurrentResin, Mode=OneWay}"/>
-                                <shuxci:CachedImage
-                                    Grid.Column="0"
-                                    Margin="4"
-                                    VerticalAlignment="Center"
-                                    shux:FrameworkElementHelper.SquareLength="32"
-                                    Source="{StaticResource UI_ItemIcon_106}"/>
-                                <StackPanel
-                                    Grid.Column="1"
-                                    Margin="8,0,0,0"
-                                    VerticalAlignment="Center">
-                                    <TextBlock
-                                        Style="{StaticResource SubtitleTextBlockStyle}"
-                                        Text="{Binding DailyNote.FormattedResin, Mode=OneWay}"
-                                        TextWrapping="NoWrap"/>
-                                    <TextBlock
-                                        Opacity="0.6"
-                                        Style="{StaticResource CaptionTextBlockStyle}"
-                                        Text="{Binding DailyNote.ResinRecoveryTargetTime, Mode=OneWay}"
-                                        TextWrapping="NoWrap"/>
-                                </StackPanel>
-                            </Grid>
-                            <Grid Style="{ThemeResource GridShimmerStyle}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto"/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <ProgressBar
-                                    Grid.ColumnSpan="2"
-                                    Height="40"
-                                    MinHeight="48"
-                                    Margin="-1"
-                                    Background="{x:Null}"
-                                    BorderBrush="{x:Null}"
-                                    BorderThickness="0"
-                                    CornerRadius="{ThemeResource ControlCornerRadius}"
-                                    Maximum="{Binding DailyNote.MaxHomeCoin, Mode=OneWay}"
-                                    Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
-                                    Value="{Binding DailyNote.CurrentHomeCoin, Mode=OneWay}"/>
-                                <shuxci:CachedImage
-                                    Grid.Column="0"
-                                    Margin="4"
-                                    VerticalAlignment="Center"
-                                    shux:FrameworkElementHelper.SquareLength="32"
-                                    Source="{StaticResource UI_ItemIcon_204}"/>
-                                <StackPanel
-                                    Grid.Column="1"
-                                    Margin="8,0,0,0"
-                                    VerticalAlignment="Center">
-                                    <TextBlock
-                                        Style="{StaticResource SubtitleTextBlockStyle}"
-                                        Text="{Binding DailyNote.FormattedHomeCoin, Mode=OneWay}"
-                                        TextWrapping="NoWrap"/>
-                                    <TextBlock
-                                        Opacity="0.6"
-                                        Style="{StaticResource CaptionTextBlockStyle}"
-                                        Text="{Binding DailyNote.FormattedHomeCoinRecoveryTargetTime, Mode=OneWay}"
-                                        TextWrapping="NoWrap"/>
-                                </StackPanel>
-                            </Grid>
-                            <Grid Style="{ThemeResource GridShimmerStyle}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto"/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition Width="auto"/>
-                                </Grid.ColumnDefinitions>
-                                <ProgressBar
-                                    Grid.ColumnSpan="3"
-                                    Height="40"
-                                    MinHeight="48"
-                                    Margin="-1"
-                                    Background="{x:Null}"
-                                    BorderBrush="{x:Null}"
-                                    BorderThickness="0"
-                                    CornerRadius="{ThemeResource ControlCornerRadius}"
-                                    Maximum="{Binding DailyNote.TotalTaskNum, Mode=OneWay}"
-                                    Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
-                                    Value="{Binding DailyNote.FinishedTaskNum, Mode=OneWay}"/>
-                                <shuxci:CachedImage
-                                    Grid.Column="0"
-                                    Margin="4"
-                                    VerticalAlignment="Center"
-                                    shux:FrameworkElementHelper.SquareLength="32"
-                                    Source="{Binding DailyNote.DailyTask.IsExtraTaskRewardReceived, Converter={StaticResource DailyTaskIconConverter}}"/>
-                                <StackPanel
-                                    Grid.Column="1"
-                                    Margin="8,0,0,0"
-                                    VerticalAlignment="Center">
-                                    <TextBlock
-                                        Style="{StaticResource SubtitleTextBlockStyle}"
-                                        Text="{Binding DailyNote.FormattedTask, Mode=OneWay}"
-                                        TextWrapping="NoWrap"/>
-                                    <TextBlock
-                                        Opacity="0.6"
-                                        Style="{StaticResource CaptionTextBlockStyle}"
-                                        Text="{Binding DailyNote.ExtraTaskRewardDescription, Mode=OneWay}"
-                                        TextWrapping="NoWrap"/>
-                                </StackPanel>
-                                <StackPanel
-                                    Grid.Column="2"
-                                    Margin="0,0,8,0"
-                                    Orientation="Horizontal"
-                                    Spacing="8">
-                                    <Button
-                                        Width="32"
-                                        Height="32"
-                                        Padding="6"
-                                        Style="{ThemeResource ShimmerButtonStyle}"
-                                        ToolTipService.ToolTip="{shuxm:ResourceString Name=ViewPageDailyNoteAttendanceStatusInfo}"
-                                        Visibility="{Binding DailyNote.DailyTask.AttendanceVisible, Mode=OneWay}">
-                                        <shuxm:BitmapIconExtension ShowAsMonochrome="True" Source="ms-appx:///Resource/Icon/UI_IconSmall_EP.png"/>
-                                        <Button.Flyout>
-                                            <Flyout FlyoutPresenterStyle="{StaticResource FlyoutPresenterPadding6Style}" Placement="BottomEdgeAlignedRight">
-                                                <Grid>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="auto"/>
-                                                        <RowDefinition Height="auto"/>
-                                                        <RowDefinition/>
-                                                    </Grid.RowDefinitions>
-                                                    <Grid ColumnSpacing="6">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition/>
-                                                            <ColumnDefinition Width="auto"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Grid.Column="0" Text="{shuxm:ResourceString Name=ViewPageDailyNoteStoredAttendance}"/>
-                                                        <TextBlock Grid.Column="1" Text="{Binding DailyNote.DailyTask.StoredAttendance}"/>
-                                                    </Grid>
-                                                    <MenuFlyoutSeparator Grid.Row="1" Margin="-3,4,-3,6"/>
-                                                    <ItemsControl
-                                                        Grid.Row="2"
-                                                        ItemsPanel="{ThemeResource StackPanelSpacing3Template}"
-                                                        ItemsSource="{Binding DailyNote.DailyTask.AttendanceRewards}">
-                                                        <ItemsControl.ItemTemplate>
-                                                            <DataTemplate>
-                                                                <shuxcc:CardProgressBar
-                                                                    MinWidth="120"
-                                                                    MinHeight="32"
-                                                                    Description="{Binding Progress}"
-                                                                    Header="{Binding StatusFormatted}"
-                                                                    Maximum="2000"
-                                                                    ProgressForeground="{ThemeResource HyperlinkButtonForeground}"
-                                                                    Value="{Binding Progress}"/>
-                                                            </DataTemplate>
-                                                        </ItemsControl.ItemTemplate>
-                                                    </ItemsControl>
-                                                </Grid>
-
-                                            </Flyout>
-                                        </Button.Flyout>
-                                    </Button>
-                                </StackPanel>
-                            </Grid>
-                            <Grid Style="{ThemeResource GridShimmerStyle}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto"/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <ProgressBar
-                                    Grid.ColumnSpan="2"
-                                    Height="40"
-                                    MinHeight="48"
-                                    Margin="-1"
-                                    Background="{x:Null}"
-                                    BorderBrush="{x:Null}"
-                                    BorderThickness="0"
-                                    CornerRadius="{ThemeResource ControlCornerRadius}"
-                                    Maximum="{Binding DailyNote.ResinDiscountNumLimit, Mode=OneWay}"
-                                    Opacity="{ThemeResource LargeBackgroundProgressBarOpacity}"
-                                    Value="{Binding DailyNote.ResinDiscountUsedNum, Mode=OneWay}"/>
-                                <shuxci:CachedImage
-                                    Grid.Column="0"
-                                    Margin="4"
-                                    VerticalAlignment="Center"
-                                    shux:FrameworkElementHelper.SquareLength="32"
-                                    Source="{StaticResource UI_MarkTower}"/>
-                                <StackPanel
-                                    Grid.Column="1"
-                                    Margin="8,0,0,0"
-                                    VerticalAlignment="Center">
-                                    <TextBlock
-                                        Style="{StaticResource SubtitleTextBlockStyle}"
-                                        Text="{Binding DailyNote.FormattedResinDiscount, Mode=OneWay}"
-                                        TextWrapping="NoWrap"/>
-                                    <TextBlock
-                                        Opacity="0.6"
-                                        Style="{StaticResource CaptionTextBlockStyle}"
-                                        Text="{shuxm:ResourceString Name=ViewPageDailyNoteResinDiscountUsed}"
-                                        TextWrapping="NoWrap"/>
-                                </StackPanel>
-                            </Grid>
-                            <Grid Style="{ThemeResource GridShimmerStyle}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto"/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <ProgressBar
-                                    Grid.ColumnSpan="2"
-                                    Height="40"
-                                    MinHeight="48"
-                                    Margin="-1"
-                                    Background="{x:Null}"
-                                    BorderBrush="{x:Null}"
-                                    BorderThickness="0"
-                                    CornerRadius="{ThemeResource ControlCornerRadius}"
-                                    Maximum="604800"
-                                    Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
-                                    Value="{Binding DailyNote.Transformer.RecoveryTime.TotalSeconds, Mode=OneWay}"/>
-                                <shuxci:CachedImage
-                                    Grid.Column="0"
-                                    Margin="4"
-                                    VerticalAlignment="Center"
-                                    shux:FrameworkElementHelper.SquareLength="32"
-                                    Source="{StaticResource UI_ItemIcon_220021}"/>
-                                <StackPanel
-                                    Grid.Column="1"
-                                    Margin="8,0,0,0"
-                                    VerticalAlignment="Center">
-                                    <TextBlock
-                                        Style="{StaticResource SubtitleTextBlockStyle}"
-                                        Text="{Binding DailyNote.Transformer.ObtainedAndReachedFormatted, Mode=OneWay}"
-                                        TextWrapping="NoWrap"/>
-                                    <TextBlock
-                                        Opacity="0.6"
-                                        Style="{StaticResource CaptionTextBlockStyle}"
-                                        Text="{Binding DailyNote.Transformer.ObtainedAndTimeFormatted, Mode=OneWay}"
-                                        TextWrapping="NoWrap"/>
-                                </StackPanel>
-                            </Grid>
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Opacity="0.6"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{Binding AccountUidText}"
+                                Visibility="{Binding HasAccountUid, Converter={StaticResource BoolToVisibilityConverter}}"/>
                         </StackPanel>
+                        <StackPanel
+                            Grid.Column="2"
+                            HorizontalAlignment="Right"
+                            Orientation="Horizontal">
+                            <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
+                            <Button
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Stretch"
+                                shux:FrameworkElementHelper.SquareLength="40"
+                                Background="Transparent"
+                                BorderBrush="{x:Null}"
+                                BorderThickness="0"
+                                Command="{Binding DataContext.RemoveDailyNoteCardCommand, Source={StaticResource ViewModelBindingProxy}}"
+                                CommandParameter="{Binding}"
+                                Content="{StaticResource FontIconContentDelete}"
+                                FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                ToolTipService.ToolTip="{shuxm:ResourceString Name=ViewPageDailyNoteRemoveToolTip}"
+                                Visibility="{Binding HasGenshinEntries, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
+                            <Button
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Stretch"
+                                shux:FrameworkElementHelper.SquareLength="40"
+                                Background="Transparent"
+                                BorderBrush="{x:Null}"
+                                BorderThickness="0"
+                                Content="{StaticResource FontIconContentSetting}"
+                                FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                ToolTipService.ToolTip="{shuxm:ResourceString Name=ViewPageDailyNoteNotificationSetting}"
+                                Visibility="{Binding HasGenshinEntries, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <Button.Flyout>
+                                    <MenuFlyout>
+                                        <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
+                                        <MenuFlyoutItem
+                                            Command="{Binding DataContext.ModifyNotificationCommand, Source={StaticResource ViewModelBindingProxy}}"
+                                            CommandParameter="{Binding GenshinEntry0}"
+                                            Text="{Binding GenshinEntry0.RoleDisplay}"/>
+                                        <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
+                                        <MenuFlyoutItem
+                                            Command="{Binding DataContext.ModifyNotificationCommand, Source={StaticResource ViewModelBindingProxy}}"
+                                            CommandParameter="{Binding GenshinEntry1}"
+                                            Text="{Binding GenshinEntry1.RoleDisplay}"
+                                            Visibility="{Binding HasGenshinEntry1, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                        <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
+                                        <MenuFlyoutItem
+                                            Command="{Binding DataContext.ModifyNotificationCommand, Source={StaticResource ViewModelBindingProxy}}"
+                                            CommandParameter="{Binding GenshinEntry2}"
+                                            Text="{Binding GenshinEntry2.RoleDisplay}"
+                                            Visibility="{Binding HasGenshinEntry2, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                        <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
+                                        <MenuFlyoutItem
+                                            Command="{Binding DataContext.ModifyNotificationCommand, Source={StaticResource ViewModelBindingProxy}}"
+                                            CommandParameter="{Binding GenshinEntry3}"
+                                            Text="{Binding GenshinEntry3.RoleDisplay}"
+                                            Visibility="{Binding HasGenshinEntry3, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                    </MenuFlyout>
+                                </Button.Flyout>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
 
-                        <ItemsControl ItemsSource="{Binding DailyNote.Expeditions, Mode=OneWay}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <shuxcp:UniformPanel
-                                        ColumnSpacing="6"
-                                        MinItemWidth="140"
-                                        RowSpacing="6"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid Style="{ThemeResource GridShimmerStyle}">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="auto"/>
-                                            <ColumnDefinition/>
-                                        </Grid.ColumnDefinitions>
-                                        <ProgressBar
-                                            Grid.ColumnSpan="2"
-                                            MinHeight="40"
-                                            Margin="-1"
-                                            HorizontalAlignment="Stretch"
-                                            Background="{x:Null}"
-                                            BorderBrush="{x:Null}"
-                                            BorderThickness="0"
-                                            CornerRadius="{ThemeResource ControlCornerRadius}"
-                                            Maximum="{Binding TotalTime, Mode=OneWay}"
-                                            Opacity="{StaticResource LargeBackgroundProgressBarOpacity}"
-                                            Value="{Binding PassedTime, Mode=OneWay}"/>
-                                        <shuxci:CachedImage
-                                            Grid.Column="0"
-                                            Margin="0,0,0,8"
-                                            shux:FrameworkElementHelper.SquareLength="32"
-                                            Source="{Binding AvatarSideIcon, Mode=OneWay}"/>
-                                        <TextBlock
-                                            Grid.Column="1"
-                                            Margin="16,0,0,0"
-                                            VerticalAlignment="Center"
-                                            Style="{StaticResource BaseTextBlockStyle}"
-                                            Text="{Binding RemainedTimeFormatted, Mode=OneWay}"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <TextBlock
-                            Opacity="0.7"
-                            Style="{StaticResource CaptionTextBlockStyle}"
-                            Text="{Binding RefreshTimeFormatted}"
-                            TextWrapping="NoWrap"/>
+                    <!--  账号下每个角色横向并排一列，中间用竖分隔线隔开  -->
+                    <StackPanel Orientation="Horizontal">
+                        <ContentControl
+                            Width="308"
+                            HorizontalContentAlignment="Stretch"
+                            Content="{Binding Column0}"
+                            ContentTemplateSelector="{StaticResource DailyNoteColumnTemplateSelector}"/>
+                        <Border
+                            Width="1"
+                            Margin="12,0"
+                            Background="{ThemeResource CardStrokeColorDefaultBrush}"
+                            Visibility="{Binding HasColumn1, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        <ContentControl
+                            Width="308"
+                            HorizontalContentAlignment="Stretch"
+                            Content="{Binding Column1}"
+                            ContentTemplateSelector="{StaticResource DailyNoteColumnTemplateSelector}"
+                            Visibility="{Binding HasColumn1, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        <Border
+                            Width="1"
+                            Margin="12,0"
+                            Background="{ThemeResource CardStrokeColorDefaultBrush}"
+                            Visibility="{Binding HasColumn2, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        <ContentControl
+                            Width="308"
+                            HorizontalContentAlignment="Stretch"
+                            Content="{Binding Column2}"
+                            ContentTemplateSelector="{StaticResource DailyNoteColumnTemplateSelector}"
+                            Visibility="{Binding HasColumn2, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        <Border
+                            Width="1"
+                            Margin="12,0"
+                            Background="{ThemeResource CardStrokeColorDefaultBrush}"
+                            Visibility="{Binding HasColumn3, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        <ContentControl
+                            Width="308"
+                            HorizontalContentAlignment="Stretch"
+                            Content="{Binding Column3}"
+                            ContentTemplateSelector="{StaticResource DailyNoteColumnTemplateSelector}"
+                            Visibility="{Binding HasColumn3, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     </StackPanel>
-                </Border>
-            </ItemContainer>
+
+                    <!--  整张卡只有一条刷新时间，固定在左下角  -->
+                    <TextBlock
+                        Margin="4,4,0,0"
+                        Opacity="0.7"
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        Text="{Binding RefreshTimeFormatted}"
+                        TextWrapping="NoWrap"/>
+                </StackPanel>
+            </Border>
         </DataTemplate>
     </Page.Resources>
 
@@ -576,14 +1100,11 @@
         <ScrollView Grid.Row="1">
             <ItemsControl
                 Margin="16"
-                ItemTemplate="{StaticResource DailyNoteEntryTemplate}"
-                ItemsSource="{Binding DailyNoteEntries}">
+                ItemTemplate="{StaticResource DailyNoteAccountCardTemplate}"
+                ItemsSource="{Binding DailyNoteCards}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <shuxcp:UniformStaggeredPanel
-                            ColumnSpacing="12"
-                            MinItemWidth="300"
-                            RowSpacing="12"/>
+                        <shuxcp:WrapPanel HorizontalSpacing="12" VerticalSpacing="12"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>

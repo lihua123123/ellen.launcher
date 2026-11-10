@@ -181,10 +181,17 @@ public sealed partial class WikiAvatarViewModel : Abstraction.ViewModel
             return;
         }
 
+        /* 突破数据缺失时（新角色先于支持表落地）只放弃白值曲线，页面照常打开 */
+        if (!metadataContext.IdDictionaryAvatarLevelPromoteMap.TryGetValue(avatar.PromoteId, out var promoteMap))
+        {
+            BaseValueInfo = null;
+            return;
+        }
+
         BaseValueInfoMetadataContext context = new()
         {
             GrowCurveMap = metadataContext.LevelDictionaryAvatarGrowCurveMap,
-            PromoteMap = metadataContext.IdDictionaryAvatarLevelPromoteMap[avatar.PromoteId],
+            PromoteMap = promoteMap,
         };
 
         BaseValueInfo = new(avatar.MaxLevel, avatar.GrowCurves.ToPropertyCurveValues(avatar.BaseValue), context);

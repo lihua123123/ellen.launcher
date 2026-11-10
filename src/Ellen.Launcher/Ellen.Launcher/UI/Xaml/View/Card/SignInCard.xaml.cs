@@ -6,7 +6,7 @@ using Ellen.Launcher.ViewModel.Abstraction;
 
 namespace Ellen.Launcher.UI.Xaml.View.Card;
 
-public sealed partial class SignInCard : Button
+public sealed partial class SignInCard : UserControl
 {
     public SignInCard(IServiceProvider serviceProvider)
     {

@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using Ellen.Launcher.Core;
+using Ellen.Launcher.Model.EnemyArchive;
 using Ellen.Launcher.Model.Entity.Primitive.Converter;
 using Ellen.Launcher.Model.Intrinsic;
 using Ellen.Launcher.Model.Intrinsic.Frozen;
@@ -93,12 +94,35 @@ public static class SearchTokens
             .. WeaponTypeTokens,
         ]);
     }
-    public static FrozenDictionary<string, SearchToken> GetForWikiMonster(ImmutableArray<Monster> array)
+    public static FrozenDictionary<string, SearchToken> GetForWikiMonster(ImmutableArray<MonsterCatalogEntry> array)
     {
         return WinRTAdaptive.ToFrozenDictionary(
         [
-            .. array.Select((monster, index) => KeyValuePair.Create(monster.Name!, new SearchToken(SearchTokenKind.Monster, monster.Name!, index, sideIconUri: MonsterIconConverter.IconNameToUri(monster.Icon)))),
+            .. array.Select((entry, index) => KeyValuePair.Create(entry.Name, new SearchToken(SearchTokenKind.Monster, entry.Name, index, sideIconUri: MonsterIconConverter.IconNameToUri(entry.Icon)))),
         ]);
+    }
+
+    /// <summary>
+    /// P2：753 条网页版候选 token。除主名外把 nameEn / aliases / tags / categoryLabel /
+    /// 旧中文分类 / 旧 InternalName 全部收进候选，保证新旧叫法都能搜到。
+    /// 键去重（FrozenDictionary 需要唯一键），值相同只留第一次出现。
+    /// </summary>
+    public static FrozenDictionary<string, SearchToken> GetForWikiMonsterWeb(IReadOnlyList<Domain.WikiSource.WikiEnemyViewItem> items)
+    {
+        Dictionary<string, SearchToken> tokens = new(StringComparer.Ordinal);
+        for (int index = 0; index < items.Count; index++)
+        {
+            Domain.WikiSource.WikiEnemyViewItem item = items[index];
+            foreach (string token in item.SearchTokens)
+            {
+                if (!string.IsNullOrWhiteSpace(token) && !tokens.ContainsKey(token))
+                {
+                    tokens.Add(token, new SearchToken(SearchTokenKind.Monster, token, index));
+                }
+            }
+        }
+
+        return WinRTAdaptive.ToFrozenDictionary([.. tokens]);
     }
 
 }

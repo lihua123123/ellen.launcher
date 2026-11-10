@@ -20,4 +20,13 @@ public interface IZZZGameRecordClient
         string server,
         int agentId,
         CancellationToken token = default);
+
+    /// <summary>
+    /// 绝区零实时便笺。需要已注册的 x-rpc-device_fp，缺失会返回 10041。
+    /// </summary>
+    ValueTask<Response<Zenless.ZenlessDailyNote>> GetZZZNoteAsync(
+        User user,
+        string uid,
+        string server,
+        CancellationToken token = default);
 }

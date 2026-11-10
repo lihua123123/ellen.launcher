@@ -18,7 +18,7 @@ namespace Ellen.Launcher.Model.EnemyArchive;
 public sealed class EnemyArchiveEntry
 {
     /// <summary>
-    /// 匹配键，优先使用元数据的 <c>MonsterName</c>（如 <c>Slime_Fire_02</c>）。
+    /// 内码（如 <c>Slime_Fire_02</c>），仅供参考，不参与档案匹配。
     /// </summary>
     [JsonPropertyName("monsterName")]
     public string? MonsterName { get; set; }
@@ -53,6 +53,10 @@ public sealed class EnemyArchiveEntry
     [JsonPropertyName("skills")]
     public ImmutableArray<EnemyArchiveSkill> Skills { get; set; } = [];
 
+    /// <summary>护盾（XML 图鉴源独有字段；元数据与旧档案均无此信息）。</summary>
+    [JsonPropertyName("shield")]
+    public ImmutableArray<EnemyArchiveShield> Shield { get; set; } = [];
+
     public bool HasEnergy => Energy is { Rows.Length: > 0 };
 
     public bool HasVariants => !Variants.IsDefaultOrEmpty;
@@ -63,27 +67,21 @@ public sealed class EnemyArchiveEntry
 
     public bool HasSkills => !Skills.IsDefaultOrEmpty;
 
+    public bool HasShield => !Shield.IsDefaultOrEmpty;
+
     /// <summary>
     /// 是否与元数据条目匹配（用于把档案挂到正确的 <c>Monster</c> 上）。
+    /// <para>
+    /// 只认「完全同名」或「档案里显式声明的别名」，不再用元数据 <c>Title</c> 兜底：
+    /// Title 会把母体数据挂到召唤物 / 子体 / 场景物上，属于已知误配。
+    /// </para>
     /// </summary>
-    public bool Matches(string? monsterName, string? name, string? title)
+    public bool Matches(string? name)
     {
-        if (!string.IsNullOrWhiteSpace(MonsterName)
-            && !string.IsNullOrWhiteSpace(monsterName)
-            && string.Equals(MonsterName, monsterName, StringComparison.OrdinalIgnoreCase))
-        {
-            return true;
-        }
-
         foreach (string candidate in Aliases.IsDefaultOrEmpty ? [Name ?? string.Empty] : Aliases.Add(Name ?? string.Empty))
         {
-            if (string.IsNullOrWhiteSpace(candidate))
-            {
-                continue;
-            }
-
-            if (string.Equals(candidate, name, StringComparison.Ordinal)
-                || string.Equals(candidate, title, StringComparison.Ordinal))
+            if (!string.IsNullOrWhiteSpace(candidate)
+                && string.Equals(candidate, name, StringComparison.Ordinal))
             {
                 return true;
             }
@@ -438,7 +436,20 @@ public sealed class EnemyArchiveSkill
     [JsonPropertyName("dodge")]
     public int Dodge { get; set; }
 
+    /// <summary>
+    /// 技能图标，相对 <c>Resource/EnemySkillIcons</c> 的路径（如 <c>Elite/4d41e9fb71.png</c>）。
+    /// 来自上游 GIEnemyChartXML 的 <c>IconPath</c>，按像素哈希匹配；对不上时为空。
+    /// </summary>
+    [JsonPropertyName("icon")]
+    public string? Icon { get; set; }
+
+    public Uri? IconUri => string.IsNullOrWhiteSpace(Icon)
+        ? null
+        : new Uri($"ms-appx:///Resource/EnemySkillIcons/{Icon}");
+
     public bool HasTag => !string.IsNullOrWhiteSpace(Tag);
+
+    public bool HasIcon => IconUri is not null;
 
     public bool HasTips => !string.IsNullOrWhiteSpace(Tips);
 
@@ -448,4 +459,49 @@ public sealed class EnemyArchiveSkill
     public string ComboText => Combo.IsDefaultOrEmpty ? string.Empty : string.Join(" → ", Combo);
 
     public bool HasRating => Damage > 0 || Dodge > 0;
+}
+
+/// <summary>护盾（XML 图鉴源独有字段；元数据与旧档案均无此信息）。</summary>
+public sealed class EnemyArchiveShield
+{
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
+
+    [JsonPropertyName("description")]
+    public string? Description { get; set; }
+
+    [JsonPropertyName("elementType")]
+    public string? ElementType { get; set; }
+
+    /// <summary>元素配色键（如 <c>dendro</c>），供元素配色转换器取色。</summary>
+    public string? ElementKey => ElementKeyFromType(ElementType);
+
+    /// <summary>元素中文名（如「草」）。</summary>
+    public string? ElementName => ElementNameFromType(ElementType);
+
+    private static string? ElementKeyFromType(string? type) => type?.Trim().ToLowerInvariant() switch
+    {
+        "grass" or "dendro" => "dendro",
+        "fire" or "pyro" => "pyro",
+        "water" or "hydro" => "hydro",
+        "electric" or "electro" => "electro",
+        "anemo" or "wind" => "anemo",
+        "cryo" or "ice" or "frozen" => "cryo",
+        "geo" or "rock" => "geo",
+        "physical" => "physical",
+        _ => null,
+    };
+
+    private static string? ElementNameFromType(string? type) => type?.Trim().ToLowerInvariant() switch
+    {
+        "grass" or "dendro" => "草",
+        "fire" or "pyro" => "火",
+        "water" or "hydro" => "水",
+        "electric" or "electro" => "雷",
+        "anemo" or "wind" => "风",
+        "cryo" or "ice" or "frozen" => "冰",
+        "geo" or "rock" => "岩",
+        "physical" => "物理",
+        _ => null,
+    };
 }

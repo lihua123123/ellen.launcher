@@ -61,6 +61,8 @@ public sealed partial class ExceptionHandling
 
         // Record the failure before any handling path can fail on its own.
         Bootstrap.WriteStartupErrorLog(exception, "Application.UnhandledException");
+        // W2-1：UI 异常可能被 Handled 恢复，单独计数（UiExceptionCount），不计入致命 CrashCount。
+        Bootstrap.RecordCrash("Application.UnhandledException", fatal: false);
 
         if (XamlApplicationLifetime.Exiting || XamlApplicationLifetime.Exited)
         {

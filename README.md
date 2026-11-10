@@ -1,6 +1,22 @@
-# Ellen.Launcher
+﻿# Ellen.Launcher
 
 一个纯粹的生态类原神工具
+
+---
+
+# 使用说明
+
+## 启动游戏
+
+本启动器**不提供游戏本体下载**，也不提供预下载 / 资源更新等功能——游戏本体请自行通过官方启动器或其他方式安装，本程序只负责「启动游戏」和「查看数据」。
+
+1. 先用官方启动器（HoYoPlay / 原神启动器）或其他方式安装好《原神》《绝区零》。
+2. 首页右上角工具条点「设置原神路径」选择 `YuanShen.exe`（国服）或 `GenshinImpact.exe`（国际服）；点「设置绝区零路径」选择 `ZenlessZoneZero.exe`。
+   路径会被记住，下次自动识别，识别顺序为：启动器里保存过的路径 → 官方启动器卸载表登记的安装目录 + 其 `config.ini` 的 `game_install_path` → 原神再退回 Unity 输出日志。
+3. 首页「游戏启动」卡片显示当前米游社账号在该游戏下的 UID，点「启动」直接拉起游戏本体，不经过官方启动器。
+   账号在该游戏下没有角色时卡片会显示「需在游戏内登录」，照常启动、在游戏内登录即可。
+4. 切换账号后点「启动」会真的换号：游戏登录态存在注册表里，启动器会把**当前选中账号**的登录态快照写回对应游戏的注册表（《原神》/《绝区零》各一份），游戏就直接登录这个账号；本机还没有该账号快照时，退回通行证登录票据（`login_auth_ticket`），两者都不可用会提示「先在游戏内登录一次」。
+5. 权限说明：《原神》《绝区零》的可执行文件自带 `requireAdministrator` 清单，启动器以管理员身份运行时游戏直接继承权限；以普通权限运行时点「启动」会弹一次 UAC，确认即可。
 
 ---
 
@@ -142,13 +158,15 @@ python tools\EllenWikiSync\sync.py --list     # 列出数据集
 新增数据集只需在 `tools/EllenWikiSync/ellenwiki/datasets.py` 的 `DATASETS` 里加一条
 （API 路径 → 仓库内目标文件）。同步后需重新构建。
 
-应用侧还会在启动时从同一 API 重新拉取「元素附着及产球」快照并缓存到数据目录
-（`Core/EllenRuntime.cs → GetDataEllenWikiDirectory()`），失败或离线时回退到随包快照；
-相关实现见 `Service/EllenWiki/EllenWikiDataService.cs`、`Model/Combat/AvatarCombatNoteConverter.cs`。
+应用侧不再单独维护一套拉取逻辑：「元素附着及产球」跟着元数据快照一起同步
+（快照里的 `Attachment.json`，落到 `LocalCache/Metadata/Wiki/Genshin/<locale>/`，
+由 `Service/Metadata/WikiMetadataSyncService.cs` 管理），
+读取顺序为 **同步快照 → 随包快照**，离线或格式错误时回退，不影响角色页其它功能。
+相关实现见 `Service/Combat/AvatarCombatNoteService.cs`、`Model/Combat/AvatarCombatNoteConverter.cs`。
 
 | 数据 | 来源 | 生成方式 |
 | --- | --- | --- |
-| 角色「元素附着/产球」战斗备注 | ellen.wiki `GET /api/attachment` | `python tools/EllenWikiSync/sync.py attachment` → `Resource/CombatNotes/AvatarCombatNotes.json`（运行期由 `AvatarCombatNoteConverter` 转换） |
+| 角色「元素附着/产球」战斗备注 | ellen.wiki `GET /api/attachment`（与 `src/data/characters.js` 同源） | 随包快照：`python tools/EllenWikiSync/sync.py attachment` → `Resource/CombatNotes/AvatarCombatNotes.json`；运行期：随 Launcher 元数据快照下发 `Attachment.json`，由 `AvatarCombatNoteConverter` 转换 |
 | 绝区零调频物品（代理人 / 音擎 / 邦布）图标与名称 | Starward 公共元数据镜像 `https://starward-static.scighost.com/metadata/v1/zzz/ZZZGachaInfo.nap_cn.zh-cn.json` | `python tools/ZZZGachaInfoGen/generate.py`（先 `--check` 看差异）→ `Resource/Metadata/ZZZ/GachaItem.json` |
 | 绝区零调频档期（计时页「上次 UP」/ 历史卡池图） | HoYo.Gacha 公共元数据 v2（`lgou2w/HoYo.Gacha`）+ 米游社官方「X版本限时频段」「XXX调频说明」公告 | `python tools/ZZZGachaBannerGen/generate.py`（先 `--check` 看差异）→ `Resource/Metadata/ZZZ/GachaBanner.json`；同期双频段拆成独立记录，卡池图只存 URL，运行期下载 |
 | 伤害计算公式 | `ellen-wiki` 仓库的 `content/formulas/genshin.md` | `node tools/FormulasGen/gen.mjs` → `Resource/Formulas/GenshinFormulas.json` + `Resource/Formulas/Genshin/{light,dark}/*.png`；行内公式保留 `$...$`，由随包的 KaTeX 字体渲染（`Resource/Font/KaTeX_Main-Regular.ttf`，与 ellen-wiki 的公式字体一致） |
@@ -252,7 +270,10 @@ Copy-Item "$src\*" "Installer\Publish\" -Recurse -Force
 # 验收通过 -> 正式包（<Version> 已在 csproj 里写好）
 & "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe" "Installer\installer.iss"
 
-# 未通过验收 -> 预览包：只加 -preview / -preview2… 后缀，不动 csproj 的版本号
+# 未通过验收 -> 不再编预览包，直接构建并运行 Debug 版预览（与安装版共用 %LOCALAPPDATA% 的账号/设置/数据库）
+#   dotnet build "src\Ellen.Launcher\Ellen.Launcher\Ellen.Launcher.csproj" -c Debug
+#   src\Ellen.Launcher\Ellen.Launcher\bin\Debug\net10.0-windows10.0.26100.0\win-x64\Ellen.Launcher.exe
+# 只有要把未验收版本打包发给别人时，才加 -preview / -preview2… 后缀（不动 csproj 的版本号）
 & "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe" /DMyAppVersionSuffix=-preview "Installer\installer.iss"
 #   -> publish\Ellen.Launcher-7.1.0.2-preview-Setup.exe
 

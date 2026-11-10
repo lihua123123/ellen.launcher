@@ -54,7 +54,6 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
     private readonly IZZZGachaMetadataService zzzGachaMetadataService;
 
     private bool suppressCurrentItemChangedHandling;
-    private volatile bool isRefreshingZZZMetadata;
     private GachaLogServiceMetadataContext? metadataContext;
     private AppOptions? appOptions;
 
@@ -298,7 +297,7 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
 
     private void OnZZZGachaMetadataUpdated(object? sender, EventArgs e)
     {
-        if (!IsZZZMode || isRefreshingZZZMetadata)
+        if (!IsZZZMode)
         {
             return;
         }
@@ -612,24 +611,17 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
 
         if (archive.Game is GachaGameType.ZZZ)
         {
-            // 绝区零：先确保运行期元数据已加载（过期时会先拉取一次），
-            // 再用与原神相同的 StatisticsCard 管线产出总览。
-            isRefreshingZZZMetadata = true;
-            try
-            {
-                await zzzGachaMetadataService.EnsureInitializedAsync(CancellationToken).ConfigureAwait(false);
-            }
-            finally
-            {
-                isRefreshingZZZMetadata = false;
-            }
-
+            // 绝区零：本地快照（随包 / 缓存）在访问元数据服务时已同步加载，
+            // 据此先立即出统计，避免被首次网络刷新（最多 12s）卡住界面。
+            // 网络刷新在后台进行，完成后 OnZZZGachaMetadataUpdated 会重建统计以补全名称 / 图标 / 卡池图。
             GachaStatistics zzzStatistics = await BuildZZZStatisticsAsync(archive).ConfigureAwait(false);
             await taskContext.SwitchToMainThreadAsync();
             Statistics = zzzStatistics;
             UpdateCardVisibility();
             IsInitialized = true;
             await WishCountdownViewModel.UpdateAsync(archive).ConfigureAwait(false);
+
+            zzzGachaMetadataService.EnsureInitializedAsync(CancellationToken).SafeForget();
             return;
         }
 

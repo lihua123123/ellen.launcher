@@ -73,6 +73,23 @@ public sealed partial class BindingClient
     }
 
     /// <summary>
+    /// 按 game_biz 查询角色列表（星穹铁道等启动器里没有角色缓存的游戏用它）。
+    /// </summary>
+    public async ValueTask<Response<ListWrapper<GameRolePayload>>> GetGameRolesByCookieAsync(User user, string gameBiz, CancellationToken token = default)
+    {
+        HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()
+            .SetRequestUri(apiEndpointsFactory.Create(user.IsOversea).UserGameRolesByCookieBiz(gameBiz))
+            .SetUserCookieAndFpHeader(user, CookieType.LToken)
+            .Get();
+
+        Response<ListWrapper<GameRolePayload>>? resp = await builder
+            .SendAsync<Response<ListWrapper<GameRolePayload>>>(httpClient, token)
+            .ConfigureAwait(false);
+
+        return Response.Response.DefaultIfNull(resp);
+    }
+
+    /// <summary>
     /// 获取绝区零的游戏角色列表。
     /// 优先使用 cookie 方式（国际服/国服通用），失败时回退到 action_ticket（国服绑定接口的常规鉴权方式）。
     /// </summary>

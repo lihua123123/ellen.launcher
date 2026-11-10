@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <Version>7.1.0.8</Version>
+    <Version>7.2.0.3</Version>
     <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
     <LangVersion>preview</LangVersion>
@@ -110,6 +110,9 @@
 
   <!-- Resources Files -->
   <ItemGroup>
+    <!--  敌人图鉴 753 条内置进程序集：安装目录里那 753 个 json 被删/被杀软清掉也不会退化成 722。
+          只嵌合并包（~2 MB），逐条 json 仍作为外部回退；图片继续随包放 Resource/EnemyArchives/Web753/assets。  -->
+    <EmbeddedResource Include="Resource\EnemyArchives\Web753\bundled-all.json" LogicalName="Ellen.Launcher.Resource.EnemyArchives.Web753.bundled-all.json" />
     <Content Include="Resource\BlurBackground.png" />
     <Content Include="Resource\Font\CascadiaMono.ttf" />
     <Content Include="Resource\Font\MiSans-Regular.ttf" />
@@ -276,6 +279,8 @@
 		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	</PackageReference>
     <ProjectReference Include="..\..\SourceGeneration\SourceGeneration.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <!-- P2：ellen.wiki 只读数据层（Domain/WikiSource）。纯 net10.0 类库，供 VM/Service/DI 复用。 -->
+    <ProjectReference Include="..\Ellen.Launcher.Domain\Ellen.Launcher.Domain.csproj" />
     <PackageReference Include="Snap.LibGit2Sharp" Version="0.31.1-preview.0.4" />
     <PackageReference Include="Snap.Hutao.FileUnlocker" Version="1.2.0" />
     <PackageReference Include="Snap.ZStandard" Version="1.5.7" />

@@ -23,7 +23,7 @@ public sealed partial class HoyoPlayPassportClient : IHoyoPlayPassportClient
     [GeneratedConstructor]
     public partial HoyoPlayPassportClient(IServiceProvider serviceProvider, HttpClient httpClient);
 
-    public async ValueTask<Response<AuthTicketWrapper>> CreateAuthTicketAsync(User user, CancellationToken token = default)
+    public async ValueTask<Response<AuthTicketWrapper>> CreateAuthTicketAsync(User user, string gameBiz, CancellationToken token = default)
     {
         string? stoken = user.SToken?.GetValueOrDefault(Cookie.STOKEN);
         ArgumentException.ThrowIfNullOrEmpty(stoken);
@@ -32,7 +32,7 @@ public sealed partial class HoyoPlayPassportClient : IHoyoPlayPassportClient
 
         AuthTicketRequest data = new()
         {
-            GameBiz = "hk4e_cn",
+            GameBiz = gameBiz,
             Mid = user.Mid,
             SToken = stoken,
             Uid = int.Parse(user.Aid, CultureInfo.InvariantCulture),

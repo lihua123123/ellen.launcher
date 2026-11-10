@@ -17,6 +17,8 @@
 
   <ItemGroup>
     <None Include="..\Ellen.Launcher\Resource\Metadata\Genshin\CHS\Monster.json" Link="Fixtures\Monster.json" CopyToOutputDirectory="PreserveNewest" />
+    <!-- G7a 判定向量：与 gate 的 evaluateOfflineSessions 共用同一份，防两边逻辑漂移。 -->
+    <None Include="..\..\..\tools\offline-probe-vectors.json" Link="Fixtures\offline-probe-vectors.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

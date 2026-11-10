@@ -1,19 +1,24 @@
-// Copyright (c) DGP Studio. All rights reserved.
+﻿// Copyright (c) DGP Studio. All rights reserved.
 // Licensed under the MIT license.
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using Ellen.Launcher.Domain.WikiSource;
 using Ellen.Launcher.Model.EnemyArchive;
+using Ellen.Launcher.Model.Intrinsic;
 using Ellen.Launcher.Model.Metadata;
-using Ellen.Launcher.Model.Metadata.Item;
-using Ellen.Launcher.Model.Metadata.Monster;
+using Ellen.Launcher.Model.Primitive;
 using Ellen.Launcher.Service.EnemyArchive;
 using Ellen.Launcher.Service.Metadata;
 using Ellen.Launcher.Service.Metadata.ContextAbstraction;
 using Ellen.Launcher.UI.Xaml.Control.AutoSuggestBox;
 using Ellen.Launcher.UI.Xaml.Data;
+using Ellen.Launcher.Web.Endpoint.Upstream;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Ellen.Launcher.ViewModel.Wiki;
 
@@ -21,11 +26,17 @@ namespace Ellen.Launcher.ViewModel.Wiki;
 [Service(ServiceLifetime.Scoped)]
 public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
 {
+    private const uint MaxMonsterLevel = 110U;
+
+    private readonly IMonsterCatalogService monsterCatalogService;
     private readonly IMetadataService metadataService;
-    private readonly IEnemyArchiveService enemyArchiveService;
     private readonly ITaskContext taskContext;
+    private readonly WikiSourceFeatureFlag wikiSourceFlag;
+    private readonly IWikiEnemyCatalogService wikiEnemyCatalogService;
+    private readonly WikiRolloutMetricsService rolloutMetrics;
 
     private WikiMonsterMetadataContext? metadataContext;
+    private ImmutableArray<MonsterCatalogEntry> allMonsters = [];
 
     /// <summary>
     /// 证据等级（<c>EnemyArchives.json</c> 的 <c>evidence</c> 值）→ 胶囊的文案 / 底色 / 字色。
@@ -34,10 +45,6 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
     /// <para>文案与配色的分工：「双读一致」是正常基线所以用中性色；两头的极端才用彩色 ——
     /// <c>cal-gold</c>（最强，人眼复核过）用绿、<c>single-read</c>（最弱，没走过第二通道）用红。
     /// 红绿必须分开，否则 <c>single-read</c> 会与 <c>2geo</c> 混在一起被忽略。</para>
-    /// <para>⚠️ <c>single-read</c> 的文案是「<b>未双读</b>」而不是「单读」：这一档的成因是
-    /// <b>通道能力边界</b>而非值可疑 —— 卡片第 4 行以后没有对应的单行横条
-    /// （<c>extract_fast.MAX_ROWS = 3</c>），所以拿不到第二读。
-    /// 文案必须让人一眼看出「这是没比过」，而不是「这行有问题」。</para>
     /// </summary>
     private static readonly Dictionary<string, (string Text, string Background, string Foreground)> EvidenceStyles = new()
     {
@@ -48,14 +55,209 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
         // 两几何分歧，目视裁决
         ["eyeball"] = ("目视裁决", "SystemFillColorCautionBrush", "TextOnAccentFillColorPrimaryBrush"),
         // 没走过第二通道（**不是**「值有问题」）—— 用红而不是浅一点的中性色。
-        // 已知成因：① 卡上行位 >= 4，没有对应横条；② 两几何分歧但未目视裁决。
         ["single-read"] = ("未双读", "SystemFillColorCriticalBrush", "TextOnAccentFillColorPrimaryBrush"),
     };
 
     [GeneratedConstructor]
     public partial WikiMonsterViewModel(IServiceProvider serviceProvider);
 
-    public IAdvancedCollectionView<Monster>? Monsters
+    // ---------------- P2：ellen.wiki 753 条双视图 ----------------
+    // 默认 IsWebMode=false，旧 722 路径与 XAML 完全不变；切 enemy-web-753 才显示新视图。
+
+    [ObservableProperty]
+    public partial bool IsWebMode { get; set; }
+
+    public bool IsLegacyMode => !IsWebMode;
+
+    [ObservableProperty]
+    public partial IReadOnlyList<WikiEnemyViewItem>? WebMonsters { get; set; }
+
+    [ObservableProperty]
+    public partial IReadOnlyList<WikiEnemyCategoryGroup>? WebCategories { get; set; }
+
+    [ObservableProperty]
+    public partial WikiEnemyCategoryGroup? WebSelectedCategory { get; set; }
+
+    [ObservableProperty]
+    public partial WikiEnemyViewItem? WebCurrentItem { get; set; }
+
+    [ObservableProperty]
+    public partial SearchData? WebSearchData { get; set; }
+
+    /// <summary>
+    /// 详情页一级页签：0 = 本体，1 = 幽境（只有带 leyline 的 29 条才有第二个页签）。
+    /// 幽境那块原先挤在「一图流」卡片里，用户要求按角色/武器图鉴的做法拆成独立页面。
+    /// </summary>
+    [ObservableProperty]
+    public partial int WebDetailTabIndex { get; set; }
+
+    /// <summary>详情页页签标题（Segmented 的数据源），与角色页技能分段控件同一套。</summary>
+    public IReadOnlyList<string> WebDetailTabs { get; } = ["本体", "幽境"];
+
+    // ---------------- 多阶段（女士一/二阶段、公子三形态、若陀九元素…） ----------------
+
+    /// <summary>当前条目的阶段列表；只有 1 个时不显示切换器。</summary>
+    [ObservableProperty]
+    public partial IReadOnlyList<WikiEnemyStateView> WebStages { get; set; } = [];
+
+    [ObservableProperty]
+    public partial int WebSelectedStageIndex { get; set; }
+
+    [ObservableProperty]
+    public partial bool WebHasStages { get; set; }
+
+    /// <summary>阶段切换器的按钮文字（第一阶段 / 第二阶段 / 岩 / 水 …）。</summary>
+    public IReadOnlyList<string> WebStageTabs => [.. WebStages.Select(static stage => stage.Label)];
+
+    partial void OnWebStagesChanged(IReadOnlyList<WikiEnemyStateView> value)
+    {
+        OnPropertyChanged(nameof(WebStageTabs));
+    }
+
+    // 详情正文：本体与阶段共用一套绑定，切换阶段时整体换掉，避免到处写「有没有阶段」的判断。
+
+    [ObservableProperty]
+    public partial string WebBodyName { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string WebBodyNameEn { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string WebBodySubtitle { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string WebBodyIconUri { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool WebBodyHasIcon { get; set; }
+
+    [ObservableProperty]
+    public partial IReadOnlyList<WikiSkillView> WebBodySkills { get; set; } = [];
+
+    /// <summary>阶段自己的等级行（周本-第二阶段 · Lv.90 / HP / ATK）；本体为空。</summary>
+    [ObservableProperty]
+    public partial string WebBodyLevelText { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string WebBodyHpText { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string WebBodyAtkText { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool WebBodyHasLevelInfo { get; set; }
+
+    /// <summary>该阶段自己的一图流（chart.webp / chart-2.webp …）；本体用条目的第一张。</summary>
+    [ObservableProperty]
+    public partial string WebBodyArtUri { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool WebBodyHasArt { get; set; }
+
+    [ObservableProperty]
+    public partial bool WebBodyHasSkills { get; set; }
+
+    [ObservableProperty]
+    public partial IReadOnlyList<WikiNoteView> WebBodyNotes { get; set; } = [];
+
+    [ObservableProperty]
+    public partial bool WebBodyHasNotes { get; set; }
+
+    /// <summary>选中阶段时隐藏「按等级换算」的滑块卡：阶段数值来自源里的等级行，不该再被曲线换算覆盖。</summary>
+    [ObservableProperty]
+    public partial bool WebShowBaseValueCard { get; set; }
+
+    partial void OnWebSelectedStageIndexChanged(int value)
+    {
+        UpdateWebBody();
+    }
+
+    public bool WebIsBodyTab => WebDetailTabIndex == 0;
+    public bool WebIsLeylineTab => WebDetailTabIndex == 1;
+
+    partial void OnWebDetailTabIndexChanged(int value)
+    {
+        OnPropertyChanged(nameof(WebIsBodyTab));
+        OnPropertyChanged(nameof(WebIsLeylineTab));
+    }
+
+    [ObservableProperty]
+    public partial IReadOnlyList<WikiResistanceState>? WebResistanceStates { get; set; }
+
+    [ObservableProperty]
+    public partial int WebSelectedResistanceStateIndex { get; set; }
+
+    [ObservableProperty]
+    public partial IReadOnlyList<WikiResistanceCell>? WebResistanceCells { get; set; }
+
+    /// <summary>多于一个抗性状态时才显示状态下拉；单状态（只有「正常」）露一个下拉是噪声。</summary>
+    [ObservableProperty]
+    public partial bool WebHasResistanceStates { get; set; }
+
+    /// <summary>
+    /// 当前条目的等级换算结果（拖动滑块查看该等级的基础生命值 / 基础攻击力）。
+    /// 曲线倍率来自随包 <c>Resource/Metadata/.../MonsterCurve.json</c>；源里没有 baseStats 的条目为 null，UI 整块隐藏。
+    /// </summary>
+    [ObservableProperty]
+    public partial BaseValueInfo? WebBaseValueInfo { get; set; }
+
+    // ---------------- P5：首次断网显式回退 + 灰度诊断 ----------------
+
+    /// <summary>显式回退横幅（无缓存且不可达 → 回 builtin 722）。空表示不显示。</summary>
+    [ObservableProperty]
+    public partial string? FallbackBannerText { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsFallbackBannerVisible { get; set; }
+
+    /// <summary>web 视图空态文案（首次同步中）；不白屏。</summary>
+    [ObservableProperty]
+    public partial string? WebEmptyStateText { get; set; }
+
+
+    partial void OnIsWebModeChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsLegacyMode));
+    }
+
+    partial void OnWebSelectedCategoryChanged(WikiEnemyCategoryGroup? value)
+    {
+        if (allWebItems.Count > 0)
+        {
+            ApplyWebFilter();
+        }
+    }
+
+    /// <summary>幽境「难度 + 抗性状态」切换项：N3 正常 / N4 正常 / N5 正常 / N5 满减。</summary>
+    [ObservableProperty]
+    public partial IReadOnlyList<WikiLeylineStageView> WebLeylineStages { get; set; } = [];
+
+    [ObservableProperty]
+    public partial int WebSelectedLeylineStageIndex { get; set; }
+
+    /// <summary>当前选中的幽境档位：数值卡与抗性网格都绑它，切一项两边一起变。</summary>
+    [ObservableProperty]
+    public partial WikiLeylineStageView? WebLeylineCurrentStage { get; set; }
+
+    partial void OnWebSelectedLeylineStageIndexChanged(int value)
+    {
+        UpdateWebLeylineStage();
+    }
+
+    private void UpdateWebLeylineStage()
+    {
+        IReadOnlyList<WikiLeylineStageView> stages = WebCurrentItem?.LeylineStages ?? [];
+        WebLeylineCurrentStage = WebSelectedLeylineStageIndex >= 0 && WebSelectedLeylineStageIndex < stages.Count
+            ? stages[WebSelectedLeylineStageIndex]
+            : stages.FirstOrDefault();
+    }
+
+    partial void OnWebSelectedResistanceStateIndexChanged(int value)
+    {
+        UpdateWebResistanceCells();
+    }
+
+    public IAdvancedCollectionView<MonsterCatalogEntry>? Monsters
     {
         get;
         set
@@ -74,6 +276,18 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
         }
     }
 
+    /// <summary>
+    /// 侧边栏一级：分类（首项「全部」固定在最前，其余按上游 <c>Category</c> 顺序）。
+    /// </summary>
+    [ObservableProperty]
+    public partial ImmutableArray<MonsterCategoryGroup> Categories { get; set; }
+
+    /// <summary>
+    /// 当前选中的分类；<see langword="null"/> 表示尚未初始化（等同「全部」）。
+    /// </summary>
+    [ObservableProperty]
+    public partial MonsterCategoryGroup? SelectedCategory { get; set; }
+
     [ObservableProperty]
     public partial BaseValueInfo? BaseValueInfo { get; set; }
 
@@ -88,7 +302,6 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
 
     /// <summary>
     /// 抗性状态的选项：首项固定为「常态」，其余与 <c>Archive.Resistances.States</c> 一一对应。
-    /// <para>只有多套抗性的敌人才会填充，界面据此决定是否显示切换控件。</para>
     /// </summary>
     [ObservableProperty]
     public partial ImmutableArray<EnemyArchiveResistanceState> ResistanceStates { get; set; }
@@ -99,67 +312,567 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
     [ObservableProperty]
     public partial ImmutableArray<EnemyArchiveResistanceCell> ResistanceCells { get; set; }
 
-    /// <summary>
-    /// 当前选中抗性行的读值证据等级**文案**（如「已复核」）；<see langword="null"/> = 未评级，
-    /// 界面据此隐藏胶囊。
-    /// <para>⚠️ 「未评级」不等于「不可信」：它只表示这行**没走 VLM 第二通道**
-    /// （即来自本地通道的高置信行——校准批实测那批 48/48 = 100% 正确）。
-    /// 界面上「无胶囊」不应被理解为告警。</para>
-    /// </summary>
     [ObservableProperty]
     public partial string? ResistanceEvidenceText { get; set; }
 
-    /// <summary>胶囊底色；由 <see cref="EvidenceStyles"/> 映射而来，取不到时为 <see langword="null"/>。</summary>
     [ObservableProperty]
     public partial Brush? ResistanceEvidenceBackground { get; set; }
 
-    /// <summary>胶囊字色；与底色成对，避免出现低对比度组合。</summary>
     [ObservableProperty]
     public partial Brush? ResistanceEvidenceForeground { get; set; }
 
     protected override async ValueTask<bool> LoadOverrideAsync(CancellationToken token)
     {
+        // P2：feature flag 分流。默认 legacy-722-bundled，下面整段旧逻辑一字不改。
+        IsWebMode = wikiSourceFlag.IsWebMode;
+        OnPropertyChanged(nameof(IsLegacyMode));
+        if (IsWebMode)
+        {
+            return await LoadWebAsync(token).ConfigureAwait(false);
+        }
+
+        return await LoadLegacyAsync(token).ConfigureAwait(false);
+    }
+
+    /// <summary>内置 722 视图的装配（默认路径，也是 web 无缓存断网时的显式回退目标）。</summary>
+    private async ValueTask<bool> LoadLegacyAsync(CancellationToken token)
+    {
+        ImmutableArray<MonsterCatalogEntry> entries = await monsterCatalogService.GetEntriesAsync().ConfigureAwait(false);
+        if (entries.IsDefaultOrEmpty)
+        {
+            return false;
+        }
+
+        allMonsters = entries;
+
+        // 成长曲线表还是从元数据取（源里只有曲线名，没有逐级倍率）。
         if (await metadataService.InitializeAsync().ConfigureAwait(false))
         {
-            try
+            metadataContext = await metadataService.GetContextAsync<WikiMonsterMetadataContext>(token).ConfigureAwait(false);
+        }
+
+        ImmutableArray<MonsterCategoryGroup> categories = BuildCategories(entries);
+        SearchData searchData = SearchData.CreateForWikiMonster(entries);
+
+        using (await EnterCriticalSectionAsync().ConfigureAwait(false))
+        {
+            IAdvancedCollectionView<MonsterCatalogEntry> monstersView = entries.AsAdvancedCollectionView();
+
+            await taskContext.SwitchToMainThreadAsync();
+            SearchData = searchData;
+            Categories = categories;
+            SelectedCategory = categories[0];
+            Monsters = monstersView;
+            ApplyFilter();
+            Monsters.MoveCurrentToFirst();
+        }
+
+        // G7a：legacy 侧也要留证据，否则「并存 / 回滚」两项永远判不出来。
+        rolloutMetrics.RecordLegacyLoad(entries.Length);
+
+        return true;
+    }
+
+    // ---------------- P2 web 分支 ----------------
+
+    private async ValueTask<bool> LoadWebAsync(CancellationToken token)
+    {
+        WikiEnemyCatalogResult? catalog = await wikiEnemyCatalogService.LoadAsync(token).ConfigureAwait(false);
+        if (catalog is null)
+        {
+            /* 数据只随安装包提供（后台同步已移除）：读不到随包 753 就显式回退内置 722，
+               不留「正在同步」的空态 —— 没有同步这回事了。 */
+            WikiFirstRunDecision decision = WikiFirstRunPolicy.Decide(new WikiFirstRunInputs
             {
-                metadataContext = await metadataService.GetContextAsync<WikiMonsterMetadataContext>(token).ConfigureAwait(false);
+                WebEnabled = true,
+                CachedItemCount = 0,
+                Online = false,
+                FailureReason = wikiEnemyCatalogService.MirrorUnavailableReason,
+            });
+            rolloutMetrics.RecordDecision(decision);
 
-                foreach (Monster monster in metadataContext.Monsters)
-                {
-                    monster.DropsView ??= monster.Drops.EmptyIfDefault().SelectAsArray(static (i, context) => context.IdDisplayItemAndMaterialMap.GetValueOrDefault(i, Material.Default), metadataContext);
-                }
+            await taskContext.SwitchToMainThreadAsync();
+            FallbackBannerText = decision.Banner;
+            IsFallbackBannerVisible = true;
+            IsWebMode = false;
+            return await LoadLegacyAsync(token).ConfigureAwait(false);
+        }
 
-                List<Monster> ordered = [.. metadataContext.Monsters.OrderBy(m => m.DescribeId.Value)];
-                SearchData searchData = SearchData.CreateForWikiMonster([.. ordered]);
+        rolloutMetrics.RecordWebLoad(catalog.LoadMilliseconds, catalog.TotalCount, catalog.IsOfflineBundled);
+        await EnsureWebCurveMapAsync(token).ConfigureAwait(false);
 
-                ImmutableArray<EnemyArchiveEntry> archives = await enemyArchiveService.GetEntriesAsync().ConfigureAwait(false);
-                if (!archives.IsDefaultOrEmpty)
-                {
-                    foreach (Monster monster in ordered)
-                    {
-                        monster.Archive = archives.FirstOrDefault(a => a.Matches(monster.MonsterName, monster.Name, monster.Title));
-                    }
-                }
+        using (await EnterCriticalSectionAsync().ConfigureAwait(false))
+        {
+            await taskContext.SwitchToMainThreadAsync();
+            allWebItems = catalog.Items;
+            WebMonsters = catalog.Items;
+            WebCategories = catalog.Categories;
+            WebSelectedCategory = catalog.Categories.FirstOrDefault();
+            WebSearchData = SearchData.CreateForWikiMonsterWeb(catalog.Items);
+            WebEmptyStateText = null;
+            IsFallbackBannerVisible = false;
+            FallbackBannerText = null;
+            ApplyWebFilter();
+            RecordWebCatalogMetrics(catalog);
+        }
 
-                using (await EnterCriticalSectionAsync().ConfigureAwait(false))
-                {
-                    IAdvancedCollectionView<Monster> monstersView = ordered.AsAdvancedCollectionView();
 
-                    await taskContext.SwitchToMainThreadAsync();
-                    SearchData = searchData;
-                    Monsters = monstersView;
-                    Monsters.MoveCurrentToFirst();
-                }
+        return true;
+    }
 
-                return true;
-            }
-            catch (OperationCanceledException)
+    // 图片失败记账游标：与 metrics 里的累计值比对，只记增量。
+    private int recordedImageFailures;
+    private int recordedImageNetworkFailures;
+    private int recordedImageDecodeFailures;
+    private int recordedImageUiDownloads;
+    private int recordedImageUiDownloadFailures;
+
+    /// <summary>
+    /// 图片失败按增量累计到灰度指标，避免每次刷新重复计数。
+    /// 解析口径分子 = 下载失败 + hash 校验失败 + 同步异常 + 无 URL 占位 + UI 解码失败
+    /// （前四类来自诊断日志，解码失败来自 CachedImage.ImageFailed，UI 下载失败来自 WikiImageDownloadCounter，
+    /// 均仅 Wiki 图源），与 ImageAttempts（解析引用 + UI 下载尝试）同口径。
+    /// 网络口径分子单列，= image-download-failure + UI 下载失败，避免与解析口径混算。
+    /// </summary>
+    private void RecordNewImageFailures()    {
+        int total = 0;
+        int networkTotal = 0;
+        foreach (WikiDiagnostic diagnostic in wikiEnemyCatalogService.Diagnostics)
+        {
+            switch (diagnostic.Kind)
             {
+                case "image-download-failure":
+                    total++;
+                    networkTotal++;
+                    break;
+                case "image-hash-mismatch":
+                case "image-sync-failure":
+                case "image-fallback":
+                    total++;
+                    break;
             }
         }
 
-        return false;
+        int delta = total - recordedImageFailures;
+        if (delta > 0)
+        {
+            recordedImageFailures = total;
+        }
+
+        // UI 层解码失败（仅敌人图鉴图源）：单独游标，与诊断增量相加后一次性记账。
+        int decodeTotal = Service.EnemyArchive.WikiImageDecodeCounter.Count;
+        int decodeDelta = decodeTotal - recordedImageDecodeFailures;
+        if (decodeDelta > 0)
+        {
+            recordedImageDecodeFailures = decodeTotal;
+        }
+
+        /* UI 层真实下载（ImageCache 管线）：成功/失败各自增量记账。
+           失败同时计入 ImageFailures 与 ImageNetworkFailures —— 这条链路以前完全不入账
+           （CachedImage catch 后降级占位图，Sentry 默认未启用），G7b 的「图片失败率」因此在盲区里。
+           顺序有讲究：必须先把失败并进 networkTotal，再统一算 networkDelta；
+           先前写成「先 RecordImageNetworkFailures、后 networkTotal += uiFailureDelta」，
+           那句 += 是死代码，UI 下载失败其实没进网络口径。 */
+        int uiDownloadTotal = Service.EnemyArchive.WikiImageDownloadCounter.Successes;
+        int uiDownloadDelta = uiDownloadTotal - recordedImageUiDownloads;
+        if (uiDownloadDelta > 0)
+        {
+            recordedImageUiDownloads = uiDownloadTotal;
+        }
+
+        int uiDownloadFailureTotal = Service.EnemyArchive.WikiImageDownloadCounter.Failures;
+        int uiDownloadFailureDelta = uiDownloadFailureTotal - recordedImageUiDownloadFailures;
+        if (uiDownloadFailureDelta > 0)
+        {
+            recordedImageUiDownloadFailures = uiDownloadFailureTotal;
+            // 同一网络口径：解析层下载失败 + UI 层下载失败，都算「真实下载失败」。
+            networkTotal += uiDownloadFailureDelta;
+        }
+
+        // 网络口径分子在这之后统一落账（含 UI 下载失败）。
+        int networkDelta = networkTotal - recordedImageNetworkFailures;
+        if (networkDelta > 0)
+        {
+            recordedImageNetworkFailures = networkTotal;
+            rolloutMetrics.RecordImageNetworkFailures(networkDelta);
+        }
+
+        /* 一次调用同时更新：ImageUiDownloads / ImageUiDownloadFailures / ImageAttempts（分母扩容）。 */
+        rolloutMetrics.RecordImageUiDownloads(Math.Max(0, uiDownloadDelta), Math.Max(0, uiDownloadFailureDelta));
+
+        int add = Math.Max(0, delta) + Math.Max(0, decodeDelta) + Math.Max(0, uiDownloadFailureDelta);
+        if (add > 0)
+        {
+            rolloutMetrics.RecordImageFailures(add);
+        }
+    }
+
+    /// <summary>
+    /// 目录装配后的指标记账（图片分母 / 随包命中 / M1 打点）。
+    /// 界面不再展示诊断卡片，但灰度 gate 依赖这些计数，别连同 UI 一起删掉。
+    /// </summary>
+    private void RecordWebCatalogMetrics(WikiEnemyCatalogResult catalog)
+    {
+        int images = catalog.ImageCacheHits + catalog.ImageCacheMisses;
+        // 图片失败率分母：本次装配实际解析的图片引用数（命中+未命中），跨装配累计。
+        rolloutMetrics.RecordImageAttempts(images);
+        // 网络口径分母：只有 miss 才真正发起下载；单列避免「缓存命中稀释网络失败率」的争议。
+        rolloutMetrics.RecordImageNetworkAttempts(catalog.ImageCacheMisses);
+        // P6 随包口径：随包原图命中 / 离线缩略图预览分开记账，用于真机取证（不在 metrics 里就说不清）。
+        rolloutMetrics.RecordBundledImageStats(catalog.BundledImageHits, catalog.BundledThumbPreviews);
+        // M1（web 视图）：StartupProbe 开启时记录「753 web 列表就绪」时间点；未开启时为 no-op。
+        StartupProbe.Mark("enemy-web-loaded");
+
+        /* 取证用：设了 ELLEN_WIKI_DUMP 就把本次装配的图片解析结果落盘一次。
+           「列表没有头像 / 一图流没了」这类问题只能靠运行时事实判断，别靠猜。 */
+        if (Environment.GetEnvironmentVariable("ELLEN_WIKI_DUMP") is { Length: > 0 } dumpPath)
+        {
+            try
+            {
+                System.Text.StringBuilder sb = new();
+                sb.AppendLine($"BaseDirectory={AppContext.BaseDirectory}");
+                sb.AppendLine($"items={catalog.Items.Count} noIcon={catalog.Items.Count(static i => !i.HasIcon)} noArt={catalog.Items.Count(static i => !i.HasArt)}");
+                sb.AppendLine($"imageRefs={catalog.ImageRefCount} bundledHits={catalog.BundledImageHits} thumbs={catalog.BundledThumbPreviews} misses={catalog.ImageCacheMisses} orphans={catalog.OrphanSkippedCount}");
+                foreach (WikiEnemyViewItem sample in catalog.Items.Take(3))
+                {
+                    sb.AppendLine($"  SAMPLE {sample.Name} icon={sample.IconUri} art={sample.ArtUri}");
+                }
+
+                foreach (WikiEnemyViewItem missing in catalog.Items.Where(static i => !i.HasIcon).Take(20))
+                {
+                    sb.AppendLine($"  NOICON {missing.Name} id={missing.Id}");
+                }
+
+                System.IO.File.WriteAllText(dumpPath, sb.ToString());
+            }
+            catch
+            {
+                // 诊断写不出去不影响功能。
+            }
+        }
+    }
+
+    // ---------------- 等级换算（拖动滑块看具体血量） ----------------
+    // 源里给的是「基础值 + 曲线名」，逐级倍率只能从随包 MonsterCurve.json 取。
+
+    /// <summary>Level → 各曲线倍率。只读一次；缺文件时保持 null，滑块整块隐藏而不是崩列表。</summary>
+    private ImmutableDictionary<Level, TypeValueCollection<GrowCurveType, float>>? webCurveMap;
+
+    private ImmutableDictionary<int, TypeValueCollection<GrowCurveType, float>>? webCurveByLevel;
+
+    private async ValueTask EnsureWebCurveMapAsync(CancellationToken token)
+    {
+        if (webCurveMap is not null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (await metadataService.InitializeAsync().ConfigureAwait(false))
+            {
+                webCurveMap = await metadataService.GetLevelToMonsterCurveMapAsync(token).ConfigureAwait(false);
+                webCurveByLevel = webCurveMap.ToImmutableDictionary(static p => Convert.ToInt32(p.Key.Value), static p => p.Value);
+            }
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            // 元数据缺失只影响等级换算，不能让 753 列表打不开。
+            webCurveMap = null;
+            webCurveByLevel = null;
+        }
+    }
+
+    partial void OnWebCurrentItemChanged(WikiEnemyViewItem? value)
+    {
+        /* 抗性和等级一样，是「跟着当前条目走」的派生状态。
+           以前只在 ApplyWebFilter 里算，切条目时不刷新 → 不管点哪个怪，抗性都还是第一条的值。 */
+        WebStages = value?.Stages ?? [];
+        WebHasStages = WebStages.Count > 1;
+        WebSelectedStageIndex = 0;   // 触发 UpdateWebBody 时 WebStages 已就位
+        UpdateWebBaseValueInfo(value);
+        UpdateWebBody();
+        WebLeylineStages = value?.LeylineStages ?? [];
+        WebSelectedLeylineStageIndex = 0;
+        UpdateWebLeylineStage();
+        WebDetailTabIndex = 0;   // 换敌人回「本体」页，别停在上一条的幽境页
+    }
+
+    /// <summary>
+    /// 按当前条目重建等级滑块：数值 = 基础值 × 曲线倍率 × 该条目的实战系数。
+    /// <para>系数由源里 levelRows 的参考行反解（一部分敌人带 4x / 0.5x 之类的实战倍率），
+    /// 这样滑块停在参考等级时与源数据完全一致；没有参考行时系数记为 1。</para>
+    /// </summary>
+    private void UpdateWebBaseValueInfo(WikiEnemyViewItem? item)
+    {
+        if (item?.BaseValue is not { Hp: > 0 } baseValue || webCurveByLevel is not { Count: > 0 })
+        {
+            WebBaseValueInfo = null;
+            return;
+        }
+
+        GrowCurveType hpCurve = ResolveHpCurve(baseValue.HpCurve);
+        double hpScale = ResolveScale(baseValue.Hp, item.LevelRows, hpCurve, static row => row.Hp);
+        double atkScale = baseValue.Atk > 0
+            ? ResolveScale(baseValue.Atk, item.LevelRows, GrowCurveType.GROW_CURVE_ATTACK, static row => row.Atk)
+            : 0;
+
+        List<PropertyCurveValue> props =
+        [
+            new(FightProperty.FIGHT_PROP_BASE_HP, hpCurve, (float)(baseValue.Hp * hpScale)),
+        ];
+
+        if (atkScale > 0)
+        {
+            props.Add(new PropertyCurveValue(FightProperty.FIGHT_PROP_BASE_ATTACK, GrowCurveType.GROW_CURVE_ATTACK, (float)(baseValue.Atk * atkScale)));
+        }
+
+        // 防御力不展示：源里 def 只在 Lv.1 有意义（实战 def = 500 × 曲线），对玩家判断没帮助，2026-11-09 按要求整项去掉。
+
+        BaseValueInfoMetadataContext context = new()
+        {
+            GrowCurveMap = webCurveMap!,
+            PromoteMap = default,
+        };
+
+        BaseValueInfo info = new(MaxMonsterLevel, [.. props], context);
+
+        // 默认停在源里给出的参考等级（通常是 100）。CurrentLevel 与构造时的 MaxLevel 相同不会触发刷新，
+        // 所以 Refresh() 兜底一次，避免「滑块有等级、数值区是空的」。
+        int referenceLevel = item.LevelRows.FirstOrDefault(static row => row.Level > 0)?.Level ?? (int)MaxMonsterLevel;
+        info.CurrentLevel = (uint)Math.Clamp(referenceLevel, 1, (int)MaxMonsterLevel);
+        info.Refresh();
+
+        WebBaseValueInfo = info;
+    }
+
+    /// <summary>
+    /// ellen.wiki 曲线名 → 游戏曲线类型。映射是对 753 条实测反推的（不是猜）：
+    /// HP_1→HP(1) 147/156、HP_2→HP_2(23) 383/424、HP_3→HP_ENVIRONMENT(25) 22/23；
+    /// ATK_1 / ATK_2 都落到 ATTACK(2)。未识别的名字用标准 HP 曲线，系数会把参考等级拉回原值。
+    /// </summary>
+    private static GrowCurveType ResolveHpCurve(string? curveName) => curveName switch
+    {
+        "HP_2" => GrowCurveType.GROW_CURVE_HP_2,
+        "HP_3" => GrowCurveType.GROW_CURVE_HP_ENVIRONMENT,
+        "HP_0" => GrowCurveType.GROW_CURVE_HP_LITTLEMONSTER,
+        _ => GrowCurveType.GROW_CURVE_HP,
+    };
+
+    /// <summary>用 levelRows 的参考行反解「实战系数」：observed / (基础值 × 该等级曲线倍率)。</summary>
+    private double ResolveScale(double baseValue, IReadOnlyList<WikiLevelRow> rows, GrowCurveType type, Func<WikiLevelRow, double?> select)
+    {
+        WikiLevelRow? reference = rows.FirstOrDefault(static row => row.Level > 0);
+        if (reference is null || select(reference) is not > 0 || baseValue <= 0)
+        {
+            return 1.0;
+        }
+
+        if (!webCurveByLevel.TryGetValue(reference.Level, out TypeValueCollection<GrowCurveType, float>? curve))
+        {
+            return 1.0;
+        }
+
+        float multiplier = curve.GetValueOrDefault(type);
+        return multiplier > 0 ? select(reference)!.Value / (baseValue * multiplier) : 1.0;
+    }
+
+    /// <summary>
+    /// P5b「一键回滚」/ 切换数据源：**生产代码里唯一写持久化 UiSource 的入口**。
+    /// <para>为什么必须有它：G7a 的「切换重启保持」要证明「用户手动选过 753，重启后还在」。
+    /// 如果没有任何 UI 调 <see cref="WikiSourceFeatureFlag.Switch"/>，<c>persistedUiSource</c>
+    /// 永远为空，探针只能看到灰度放量，四项结论里这一项永远为 false —— G7a 不可能达标。</para>
+    /// </summary>
+    [Command("SwitchToWebCommand")]
+    private void SwitchToWeb()
+    {
+        SwitchSource(WikiSourceFeatureFlag.EnemyWeb753);
+    }
+
+    /// <summary>回滚到随包 722。与切换共用一条路径，保证两者写的是同一个持久化键。</summary>
+    [Command("RollbackToLegacyCommand")]
+    private void RollbackToLegacy()
+    {
+        SwitchSource(WikiSourceFeatureFlag.Legacy722Bundled);
+    }
+
+    private void SwitchSource(string source)
+    {
+        if (!wikiSourceFlag.Switch(source))
+        {
+            return;
+        }
+
+        // LoadCommand 的 initializing 闸门在 finally 里复位，可以重复执行。
+        LoadCommand.Execute(null);
+    }
+
+    [Command("WebFilterCommand")]
+    private void ApplyWebFilter()
+    {
+        if (WebMonsters is null)
+        {
+            return;
+        }
+        if (allWebItems.Count == 0)
+        {
+            return;
+        }
+
+        IReadOnlyList<string> tokens = WebSearchData?.FilterTokens.Select(static t => t.Value).ToArray() ?? [];
+        string? category = WebSelectedCategory?.Key;
+        string? categoryLabel = WebSelectedCategory?.Name;
+        IReadOnlyList<WikiEnemyViewItem> filtered = WikiEnemyCatalog.Filter(allWebItems, string.IsNullOrEmpty(category) ? null : category, categoryLabel, tokens);
+        WebMonsters = filtered;
+        CatalogRebuilds++;
+        // 当前项若已被筛掉，回落到第一条；否则保持不变（避免每次筛选都跳回首项）。
+        WebCurrentItem = filtered.Count == 0
+            ? null
+            : filtered.FirstOrDefault(i => string.Equals(i.Id, WebCurrentItem?.Id, StringComparison.Ordinal)) ?? filtered[0];
+        UpdateWebResistanceStates();
+        UpdateWebResistanceCells();
+    }
+
+    private IReadOnlyList<WikiEnemyViewItem> allWebItems = [];
+
+    /// <summary>诊断：列表被重建的次数（1 = 只有首屏那次）。给取证脚本确认后台同步没再动 UI。</summary>
+    public int CatalogRebuilds { get; private set; }
+
+    /// <summary>
+    /// 重建详情正文：没选阶段（或该条目没有多阶段）用本体数据，
+    /// 选了阶段就用阶段自己的名字/头像/技能/抗性/等级行。抗性与数值一起换，避免串台。
+    /// </summary>
+    private void UpdateWebBody()
+    {
+        WikiEnemyViewItem? item = WebCurrentItem;
+        if (item is null)
+        {
+            WebBodyName = string.Empty;
+            WebBodyNameEn = string.Empty;
+            WebBodySubtitle = string.Empty;
+            WebBodyIconUri = string.Empty;
+            WebBodyHasIcon = false;
+            WebBodySkills = [];
+            WebBodyLevelText = string.Empty;
+            WebBodyHpText = string.Empty;
+            WebBodyAtkText = string.Empty;
+            WebBodyHasLevelInfo = false;
+            WebShowBaseValueCard = false;
+            WebBodyArtUri = string.Empty;
+            WebBodyHasArt = false;
+            WebBodyHasSkills = false;
+            WebBodyNotes = [];
+            WebBodyHasNotes = false;
+            WebResistanceStates = [];
+            WebHasResistanceStates = false;
+            WebResistanceCells = [];
+            return;
+        }
+
+        WikiEnemyStateView? stage = WebHasStages
+            && WebSelectedStageIndex >= 0
+            && WebSelectedStageIndex < WebStages.Count
+                ? WebStages[WebSelectedStageIndex]
+                : null;
+
+        if (stage is null)
+        {
+            WebBodyName = item.Name;
+            WebBodyNameEn = item.NameEn ?? string.Empty;
+            WebBodySubtitle = item.Subtitle ?? string.Empty;
+            WebBodyIconUri = item.IconUri;
+            WebBodyHasIcon = item.HasIcon;
+            WebBodySkills = item.Skills;
+            WebBodyLevelText = string.Empty;
+            WebBodyHpText = string.Empty;
+            WebBodyAtkText = string.Empty;
+            WebBodyHasLevelInfo = false;
+            WebShowBaseValueCard = WebBaseValueInfo is not null;
+            WebBodyArtUri = item.ArtUri;
+            WebBodyHasArt = item.HasArt;
+            WebResistanceStates = item.ResistanceStates;
+        }
+        else
+        {
+            WebBodyName = string.IsNullOrEmpty(stage.Name) ? item.Name : stage.Name;
+            WebBodyNameEn = stage.NameEn;
+            WebBodySubtitle = stage.Subtitle;
+            WebBodyIconUri = stage.HasIcon ? stage.IconUri : item.IconUri;
+            WebBodyHasIcon = !string.IsNullOrEmpty(WebBodyIconUri);
+            WebBodySkills = stage.Skills.Count > 0 ? stage.Skills : item.Skills;
+            WebBodyLevelText = stage.LevelText;
+            WebBodyHpText = stage.HpText;
+            WebBodyAtkText = stage.AtkText;
+            WebBodyHasLevelInfo = stage.HasLevelInfo;
+            WebShowBaseValueCard = false;
+            WebBodyArtUri = stage.HasArt ? stage.ArtUri : item.ArtUri;
+            WebBodyHasArt = !string.IsNullOrEmpty(WebBodyArtUri);
+            WebResistanceStates = stage.ResistanceStates.Count > 0 ? stage.ResistanceStates : item.ResistanceStates;
+        }
+
+        WebBodyHasSkills = WebBodySkills.Count > 0;
+        WebBodyNotes = stage?.Notes is { Count: > 0 } stageNotes ? stageNotes : item.Notes;
+        WebBodyHasNotes = WebBodyNotes.Count > 0;
+
+        WebHasResistanceStates = WebResistanceStates.Count > 1;
+        WebSelectedResistanceStateIndex = 0;
+        UpdateWebResistanceCells();
+    }
+
+    private void UpdateWebResistanceStates()
+    {
+        WebResistanceStates = WebCurrentItem?.ResistanceStates ?? [];
+        WebHasResistanceStates = WebResistanceStates.Count > 1;
+        WebSelectedResistanceStateIndex = 0;
+    }
+
+    private void UpdateWebResistanceCells()
+    {
+        IReadOnlyList<WikiResistanceState>? states = WebResistanceStates;
+        if (states is null || states.Count == 0)
+        {
+            WebResistanceCells = [];
+            return;
+        }
+
+        int index = WebSelectedResistanceStateIndex;
+        if (index < 0 || index >= states.Count)
+        {
+            index = 0;
+        }
+
+        WebResistanceCells = states[index].Cells;
+    }
+
+    /// <summary>
+    /// 按「分类首次出现的顺序」建组，首项是「全部」。
+    /// <para>条目在 ETL 里已经按分类顺序排过一次，这里只做聚合，不再排序。</para>
+    /// </summary>
+    private static ImmutableArray<MonsterCategoryGroup> BuildCategories(ImmutableArray<MonsterCatalogEntry> entries)
+    {
+        ImmutableArray<MonsterCategoryGroup>.Builder builder = ImmutableArray.CreateBuilder<MonsterCategoryGroup>();
+        builder.Add(new MonsterCategoryGroup
+        {
+            Key = string.Empty,
+            Name = SH.ViewPageWikiMonsterCategoryAll,
+            Count = entries.Length,
+        });
+
+        foreach (IGrouping<string, MonsterCatalogEntry> group in entries
+            .Where(static e => !string.IsNullOrEmpty(e.Category))
+            .GroupBy(static e => e.Category!))
+        {
+            MonsterCatalogEntry first = group.First();
+            builder.Add(new MonsterCategoryGroup
+            {
+                Key = group.Key,
+                Name = first.CategoryName ?? group.Key,
+                Count = group.Count(),
+                Monsters = [.. group],
+            });
+        }
+
+        return builder.ToImmutable();
     }
 
     private void OnCurrentMonsterChanged(object? sender, object? e)
@@ -171,8 +884,17 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
     }
 
     /// <summary>
-    /// 切换抗性状态后重新展开单元格。
+    /// 切换分类后重设过滤条件（搜索 token 仍然生效）。
     /// </summary>
+    partial void OnSelectedCategoryChanged(MonsterCategoryGroup? value)
+    {
+        if (Monsters is not null)
+        {
+            ApplyFilter();
+            Monsters.MoveCurrentToFirst();
+        }
+    }
+
     partial void OnSelectedResistanceStateIndexChanged(int value)
     {
         if (value >= 0)
@@ -212,11 +934,6 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
         UpdateResistanceEvidence(evidence);
     }
 
-    /// <summary>
-    /// 把证据等级展开成胶囊的三项展示数据（文案 + 底色 + 字色）；未评级时三项置空。
-    /// 跟 <see cref="UpdateResistanceCells"/> 同步（含常态行与各状态行），
-    /// 所以切换状态时胶囊会跟着换。
-    /// </summary>
     private void UpdateResistanceEvidence(string? level)
     {
         if (level is null || !EvidenceStyles.TryGetValue(level, out (string Text, string Background, string Foreground) style))
@@ -232,7 +949,6 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
         ResistanceEvidenceForeground = ThemeBrush(style.Foreground);
     }
 
-    /// <summary>取主题刷子；键不存在时返回 <see langword="null"/>（宁可不显色，也不因缺键崩溃）。</summary>
     private static Brush? ThemeBrush(string key)
     {
         return Application.Current.Resources.TryGetValue(key, out object? value) ? value as Brush : null;
@@ -246,7 +962,17 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
             return;
         }
 
-        Monsters.Filter = MonsterFilter.Compile(SearchData);
+        Predicate<MonsterCatalogEntry>? search = MonsterFilter.Compile(SearchData);
+
+        // 有关键词时跨越分类搜索（否则在「地方传奇」里搜不到幽境危战那一条，
+        // 用户还得先自己切分类，反而更难找）。
+        bool searchActive = SearchData is { FilterTokens.Count: > 0 };
+        string? category = searchActive ? null : SelectedCategory?.Key;
+        bool all = string.IsNullOrEmpty(category);
+
+        Monsters.Filter = all && search is null
+            ? null
+            : entry => (all || entry.Category == category) && (search?.Invoke(entry) ?? true);
 
         if (Monsters.CurrentItem is null)
         {
@@ -254,9 +980,9 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
         }
     }
 
-    private void UpdateBaseValueInfo(Monster? monster)
+    private void UpdateBaseValueInfo(MonsterCatalogEntry? entry)
     {
-        if (metadataContext is null || monster is not { GrowCurves: not null, BaseValue: not null })
+        if (entry is not { GrowCurves: { } curves, BaseValue: { } baseValue })
         {
             BaseValueInfo = null;
             return;
@@ -264,10 +990,10 @@ public sealed partial class WikiMonsterViewModel : Abstraction.ViewModel
 
         BaseValueInfoMetadataContext context = new()
         {
-            GrowCurveMap = metadataContext.LevelDictionaryMonsterGrowCurveMap,
+            GrowCurveMap = metadataContext?.LevelDictionaryMonsterGrowCurveMap ?? default,
             PromoteMap = default,
         };
 
-        BaseValueInfo = new(Monster.MaxLevel, monster.GrowCurves.ToPropertyCurveValues(monster.BaseValue), context);
+        BaseValueInfo = new(MaxMonsterLevel, curves.ToPropertyCurveValues(baseValue), context);
     }
 }

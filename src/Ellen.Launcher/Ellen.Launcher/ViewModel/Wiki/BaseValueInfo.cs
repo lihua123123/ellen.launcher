@@ -43,6 +43,12 @@ public sealed partial class BaseValueInfo : ObservableObject
 
     public string CurrentLevelFormatted { get => LevelFormat.Format(CurrentLevel); }
 
+    /// <summary>
+    /// 构造后强制按当前等级算一遍。构造函数的 CurrentLevel 赋值与默认值相同不会触发 SetProperty，
+    /// 从外部把等级设成与默认一致时也需要手动刷新一次。
+    /// </summary>
+    public void Refresh() => UpdateValues(CurrentLevel, Promoted);
+
     public bool Promoted
     {
         get;

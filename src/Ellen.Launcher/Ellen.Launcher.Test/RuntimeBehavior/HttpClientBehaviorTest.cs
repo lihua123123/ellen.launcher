@@ -16,7 +16,9 @@ public sealed class HttpClientBehaviorTest
 {
     private const int MessageNotYetSent = 0;
 
+    /// <summary>真实请求 jsonplaceholder.typicode.com，网络不通即超时；已登记为 known-env-failure。</summary>
     [TestMethod]
+    [TestCategory("KnownEnvFailure")]
     public async Task RetrySendHttpRequestMessage()
     {
         foreach (Type nestType in typeof(HttpContent).GetNestedTypes(BindingFlags.NonPublic))

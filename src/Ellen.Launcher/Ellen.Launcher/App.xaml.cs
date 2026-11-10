@@ -77,6 +77,8 @@ public sealed partial class App : Application
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
+        Service.EnemyArchive.StartupProbe.Mark("onlaunched-enter");
+
         DebugPatchXamlDiagnosticsRemoveRootObjectFromLVT();
 
         try
@@ -93,7 +95,8 @@ public sealed partial class App : Application
                 // E_INVALIDARG E_OUTOFMEMORY
                 activatedEventArgs = AppInstance.GetCurrent().GetActivatedEventArgs();
 
-                if (serviceProvider.GetRequiredService<PrivateNamedPipeClient>().TryRedirectActivationTo(activatedEventArgs))
+                PrivateNamedPipeClient packagePipeClient = serviceProvider.GetRequiredService<PrivateNamedPipeClient>();
+                if (!Bootstrap.SingleInstanceBypass() && packagePipeClient.TryRedirectActivationTo(activatedEventArgs))
                 {
                     SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateInfo("Application exiting on RedirectActivationTo", "Ellen"));
                     XamlApplicationLifetime.ActivationAndInitializationCompleted = true;
@@ -126,6 +129,7 @@ public sealed partial class App : Application
 
                         AppNotificationManager.Default.Register(displayName, iconUri);
                         AppNotificationManager.Default.NotificationInvoked += activation.NotificationInvoked;
+                        Service.EnemyArchive.StartupProbe.Mark("notify-register-done");
                     }
                     catch
                     {
@@ -137,12 +141,15 @@ public sealed partial class App : Application
                 // AppInstance.GetCurrent() may also throw in some environments,
                 // and cannot reliably distinguish Launch from Protocol activation.
                 // We always check command-line args ourselves.
+                Service.EnemyArchive.StartupProbe.Mark("onlaunched-notify");
+
                 EllenActivationArguments? unpackagedArgs = TryDetectUnpackagedActivation();
 
                 if (unpackagedArgs is not null)
                 {
                     // Try to redirect activation to the already running instance
-                    if (serviceProvider.GetRequiredService<PrivateNamedPipeClient>().TryRedirectActivationTo(unpackagedArgs))
+                    PrivateNamedPipeClient unpackagedPipeClient = serviceProvider.GetRequiredService<PrivateNamedPipeClient>();
+                    if (!Bootstrap.SingleInstanceBypass() && unpackagedPipeClient.TryRedirectActivationTo(unpackagedArgs))
                     {
                         SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateInfo("Application exiting on RedirectActivationTo", "Ellen"));
                         XamlApplicationLifetime.ActivationAndInitializationCompleted = true;
@@ -180,7 +187,8 @@ public sealed partial class App : Application
 
             logger.LogInformation($"{ConsoleBanner}");
 
-            FrameworkTheming.SetTheme(ThemeHelper.ElementToFramework(serviceProvider.GetRequiredService<AppOptions>().ElementTheme.Value));
+            // 界面主题已固定为深色：忽略用户保存的 ElementTheme 选项，强制以深色框架主题启动。
+            FrameworkTheming.SetTheme(ThemeHelper.ElementToFramework(ElementTheme.Dark));
 
             // Manually invoke
             SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateInfo("Activate and Initialize", "Application"));
@@ -188,6 +196,11 @@ public sealed partial class App : Application
         }
         catch (Exception ex)
         {
+            /* 启动期异常以前只发 Sentry（DSN 为空时等于静默），进程直接 Kill：
+               表现成「双击后闪一下就没了、startup-error.log 里什么都没有」。
+               必须落盘，否则只能靠猜。 */
+            Bootstrap.WriteStartupErrorLog(ex, "Application.OnLaunched");
+
             SentrySdk.CaptureException(ex);
             SentrySdk.Flush();
 
@@ -255,11 +268,36 @@ public sealed partial class App : Application
                     Directory.CreateDirectory(directory);
                 }
             }
+            else if (LocalSetting.Get(SettingKeys.IsUnpackagedNotificationRegistered, false)
+                && ShortcutTargets(shortcutPath, exePath))
+            {
+                // 已经注册过且指向当前 exe：不再每启动重写一次（实测写快捷方式 ~55ms/次）。
+                Service.EnemyArchive.StartupProbe.Mark("notify-shortcut-reused");
+                return true;
+            }
+
+            Service.EnemyArchive.StartupProbe.Mark("notify-shortcut-start");
 
             // Always overwrite to ensure AUMID and target are up to date
             FileSystem.CreateLinkWithAppUserModelId(exePath, string.Empty, string.Empty, shortcutPath, EllenRuntime.FamilyName);
             LocalSetting.Set(SettingKeys.IsUnpackagedNotificationRegistered, true);
+            Service.EnemyArchive.StartupProbe.Mark("notify-shortcut-done");
             return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    /// <summary>快捷方式是否已指向当前 exe；解析失败一律返回 false（走重写路径，宁可慢也不留坏链）。</summary>
+    private static bool ShortcutTargets(string shortcutPath, string exePath)
+    {
+        try
+        {
+            string? target = FileSystem.ResolveLink(shortcutPath);
+            return target is { Length: > 0 }
+                && string.Equals(System.IO.Path.GetFullPath(target), System.IO.Path.GetFullPath(exePath), StringComparison.OrdinalIgnoreCase);
         }
         catch
         {

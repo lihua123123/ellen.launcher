@@ -22,6 +22,7 @@ public sealed partial class MetadataService : IMetadataService
     private readonly ILogger<MetadataService> logger;
     private readonly MetadataOptions metadataOptions;
     private readonly JsonSerializerOptions options;
+    private readonly IWikiMetadataSyncService wikiMetadataSyncService;
 
     private volatile bool isInitialized;
 
@@ -52,18 +53,28 @@ public sealed partial class MetadataService : IMetadataService
                 initializeCompletionSource = new();
             }
 
-            // Fast path: metadata for the current locale is already readable, either from the git
-            // repository or from the snapshot shipped with the application. Skip both the API
-            // round-trip and the fetch so that every page can load immediately, then refresh the
-            // repository in the background.
+            // Fast path: metadata for the current locale is already readable, either from the wiki
+            // snapshot, the git repository or the snapshot shipped with the application. Skip both
+            // the API round-trip and the fetch so that every page can load immediately, then refresh
+            // the snapshot in the background (applies on next launch).
             if (metadataOptions.HasUsableLocalizedData)
             {
                 isInitialized = true;
                 initializeCompletionSource.TrySetResult();
-                gitRepositoryService.EnsureRepositoryInBackground("Snap.Metadata");
+                wikiMetadataSyncService.SyncInBackground();
                 return true;
             }
 
+            // First run (or a cleared cache): try the wiki snapshot first — it is a single small
+            // archive and needs no repository authorization.
+            if (await wikiMetadataSyncService.SyncAsync(force: false, token).ConfigureAwait(false))
+            {
+                isInitialized = true;
+                initializeCompletionSource.TrySetResult();
+                return true;
+            }
+
+            // Last resort: the legacy Snap.Metadata git repository.
             (isInitialized, _) = await gitRepositoryService.EnsureRepositoryAsync("Snap.Metadata").ConfigureAwait(false);
 
             if (isInitialized)

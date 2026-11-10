@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using Ellen.Launcher.UI.Xaml.Control;
+using Microsoft.UI.Xaml;
 using Ellen.Launcher.ViewModel.Wiki;
 
 namespace Ellen.Launcher.UI.Xaml.View.Page;
@@ -17,4 +18,5 @@ public sealed partial class WikiMonsterPage : ScopedPage
     {
         InitializeDataContext<WikiMonsterViewModel>();
     }
+
 }

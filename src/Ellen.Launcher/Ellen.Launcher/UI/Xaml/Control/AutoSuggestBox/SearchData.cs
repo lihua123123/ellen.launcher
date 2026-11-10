@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using Ellen.Launcher.Model.EnemyArchive;
 using Ellen.Launcher.Model.Metadata.Avatar;
 using Ellen.Launcher.Model.Metadata.Monster;
 using Ellen.Launcher.Model.Metadata.Weapon;
@@ -60,9 +61,15 @@ public sealed partial class SearchData : ObservableObject
         return new(SearchTokens.GetForWikiWeapon(array));
     }
 
-    public static SearchData CreateForWikiMonster(ImmutableArray<Monster> array)
+    public static SearchData CreateForWikiMonster(ImmutableArray<MonsterCatalogEntry> array)
     {
         return new(SearchTokens.GetForWikiMonster(array));
+    }
+
+    /// <summary>P2：753 条网页版，候选 token 含 nameEn/aliases/tags/categoryLabel/旧分类/旧 InternalName。</summary>
+    public static SearchData CreateForWikiMonsterWeb(IReadOnlyList<Domain.WikiSource.WikiEnemyViewItem> items)
+    {
+        return new(SearchTokens.GetForWikiMonsterWeb(items));
     }
 
     public static SearchData Create(FrozenDictionary<string, SearchToken> availableTokens)

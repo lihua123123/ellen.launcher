@@ -29,6 +29,7 @@ namespace Ellen.Launcher.UI.Xaml.Control.AutoSuggestBox;
 [DependencyProperty<object>("SuggestedItemsSource")]
 [DependencyProperty<DataTemplate>("SuggestedItemTemplate")]
 [DependencyProperty<DataTemplateSelector>("SuggestedItemTemplateSelector")]
+[DependencyProperty<bool>("ShowTokenCounter", DefaultValue = true, NotNull = true)]
 [DependencyProperty<Style>("SuggestedItemContainerStyle")]
 [DependencyProperty<bool>("TabNavigateBackOnArrow", DefaultValue = false, NotNull = true)]
 [DependencyProperty<string>("Text", PropertyChangedCallbackName = nameof(OnTextPropertyChanged))]
@@ -199,8 +200,17 @@ public sealed partial class AutoSuggestTokenBox : ListViewBase
         int currentTokens = innerItemsSource.ItemsSource.Count;
         int maxTokens = MaximumTokens;
 
-        maxTokensCounter.Text = $"{currentTokens}/{maxTokens}";
-        maxTokensCounter.Visibility = Visibility.Visible;
+        /* 计数器（0/5）默认显示；敌人图鉴页嫌它噪音大，ShowTokenCounter=False 关掉。
+           关掉只是不显示数字，MaximumTokens 的上限仍然生效。 */
+        if (ShowTokenCounter)
+        {
+            maxTokensCounter.Text = $"{currentTokens}/{maxTokens}";
+            maxTokensCounter.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            maxTokensCounter.Visibility = Visibility.Collapsed;
+        }
 
         string targetState = IsTokenLimitReached()
             ? MaxReachedState

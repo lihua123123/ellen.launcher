@@ -132,6 +132,12 @@ public static class OfflineCalculator
 
     private static void CalculateAvatarAscension(AvatarPromotionDelta delta, MetadataAvatar avatar, Dictionary<uint, uint> itemCounts)
     {
+        /* 培养材料是 6 槽契约；新角色可能还没被数据源收录，缺槽时跳过材料而不是越界 */
+        if (avatar.CultivationItems.Length < 6)
+        {
+            return;
+        }
+
         ImmutableArray<int> requiredAscensions = Ascension.GetRequiredLevels(AscensionLevels, delta);
         if (requiredAscensions.IsEmpty)
         {
@@ -215,6 +221,12 @@ public static class OfflineCalculator
 
     private static void CalculateWeaponAscension(PromotionDelta delta, MetadataWeapon weapon, Dictionary<uint, uint> itemCounts)
     {
+        /* 同上：武器是 3 槽契约 */
+        if (weapon.CultivationItems.Length < 3)
+        {
+            return;
+        }
+
         QualityType quality = weapon.RankLevel;
 
         ImmutableArray<int> requiredAscensions = Ascension.GetRequiredLevels(AscensionLevels, delta);

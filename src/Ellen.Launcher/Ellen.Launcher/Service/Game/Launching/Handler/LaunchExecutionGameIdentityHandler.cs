@@ -82,7 +82,7 @@ public sealed class LaunchExecutionGameIdentityHandler : AbstractLaunchExecution
                 .GetRequiredService<IOverseaSupportFactory<IHoyoPlayPassportClient>>()
                 .CreateFor(userAndUid);
             Response<AuthTicketWrapper> resp = await client
-                .CreateAuthTicketAsync(userAndUid.User)
+                .CreateAuthTicketAsync(userAndUid.User, userAndUid.IsOversea ? "hk4e_global" : "hk4e_cn")
                 .ConfigureAwait(false);
 
             if (ResponseValidator.TryValidate(resp, scope.ServiceProvider, out AuthTicketWrapper? wrapper))

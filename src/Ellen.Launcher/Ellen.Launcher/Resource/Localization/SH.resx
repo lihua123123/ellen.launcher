@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -1018,6 +1018,15 @@
   <data name="ServicePackageAdvancedExecuteOperationCanceledTitle" xml:space="preserve">
     <value>游戏资源操作已取消</value>
   </data>
+  <data name="ServiceSignInGameGenshin" xml:space="preserve">
+    <value>原神</value>
+  </data>
+  <data name="ServiceSignInGameStarRail" xml:space="preserve">
+    <value>崩坏：星穹铁道</value>
+  </data>
+  <data name="ServiceSignInGameZenlessZoneZero" xml:space="preserve">
+    <value>绝区零</value>
+  </data>
   <data name="ServiceSignInAutoSignInFailedDialogContent" xml:space="preserve">
     <value>以下账号签到失败，请检查网络或重新登录后重试：</value>
   </data>
@@ -1111,6 +1120,81 @@
   <data name="ViewCardGachaStatisticsTitle" xml:space="preserve">
     <value>保底计数</value>
   </data>
+  <data name="ViewCardLaunchGameAccountFallback" xml:space="preserve">
+    <value>已登录账号</value>
+  </data>
+  <data name="ViewCardLaunchGameActionLaunch" xml:space="preserve">
+    <value>启动</value>
+  </data>
+  <data name="ViewCardLaunchGameActionLaunching" xml:space="preserve">
+    <value>启动中</value>
+  </data>
+  <data name="ViewCardLaunchGameActionRunning" xml:space="preserve">
+    <value>运行中</value>
+  </data>
+  <data name="ViewCardLaunchGameAccountNotSaved" xml:space="preserve">
+    <value>该账号还没在本机登录过这个游戏，先在游戏内登录一次，之后就能直接切换</value>
+  </data>
+  <data name="ViewCardLaunchGameActionSetPath" xml:space="preserve">
+    <value>设置路径</value>
+  </data>
+  <data name="ViewCardLaunchGameElevationCancelled" xml:space="preserve">
+    <value>未获得管理员授权，游戏未启动（在 UAC 弹窗里点「是」即可）</value>
+  </data>
+  <data name="ViewCardLaunchGameGenshinTitle" xml:space="preserve">
+    <value>原神</value>
+  </data>
+  <data name="ViewCardLaunchGameLaunchFailed" xml:space="preserve">
+    <value>启动失败，请检查游戏路径是否有效</value>
+  </data>
+  <data name="ViewCardLaunchGameNeedsInGameLogin" xml:space="preserve">
+    <value>需在游戏内登录</value>
+  </data>
+  <data name="ViewCardLaunchGameNotLogin" xml:space="preserve">
+    <value>未登录米游社账号，可在左侧边栏底部头像处登录</value>
+  </data>
+  <data name="ViewCardLaunchGamePathNotSet" xml:space="preserve">
+    <value>尚未设置游戏路径</value>
+  </data>
+  <data name="ViewCardLaunchGameRefreshToolTip" xml:space="preserve">
+    <value>鼠标移入卡片可刷新游戏状态</value>
+  </data>
+  <data name="ViewCardLaunchGameSetPathSuccess" xml:space="preserve">
+    <value>已设置「{0}」的游戏路径</value>
+  </data>
+  <data name="ViewCardLaunchGameStartedMessage" xml:space="preserve">
+    <value>正在启动「{0}」</value>
+  </data>
+  <data name="ViewCardLaunchGameStartedTitle" xml:space="preserve">
+    <value>游戏启动</value>
+  </data>
+  <data name="ViewCardLaunchGameStatusInstalled" xml:space="preserve">
+    <value>已安装</value>
+  </data>
+  <data name="ViewCardLaunchGameStatusNotInstalled" xml:space="preserve">
+    <value>未检测到游戏</value>
+  </data>
+  <data name="ViewCardLaunchGameStatusRunning" xml:space="preserve">
+    <value>运行中</value>
+  </data>
+  <data name="ViewCardLaunchGameSummary" xml:space="preserve">
+    <value>{0}/{1} 款游戏可启动</value>
+  </data>
+  <data name="ViewCardLaunchGameSummaryNoGame" xml:space="preserve">
+    <value>未检测到已安装的游戏</value>
+  </data>
+  <data name="ViewCardLaunchGameSummaryRunning" xml:space="preserve">
+    <value>游戏运行中</value>
+  </data>
+  <data name="ViewCardLaunchGameTitle" xml:space="preserve">
+    <value>游戏启动</value>
+  </data>
+  <data name="ViewCardLaunchGameUid" xml:space="preserve">
+    <value>UID {0}</value>
+  </data>
+  <data name="ViewCardLaunchGameZenlessZoneZeroTitle" xml:space="preserve">
+    <value>绝区零</value>
+  </data>
   <data name="ViewCardSignInAction" xml:space="preserve">
     <value>签到</value>
   </data>
@@ -1120,8 +1204,14 @@
   <data name="ViewCardSignInMonthDays" xml:space="preserve">
     <value>本月已签 {0} 天</value>
   </data>
+  <data name="ViewCardSignInSignAll" xml:space="preserve">
+    <value>一键全签</value>
+  </data>
   <data name="ViewCardSignInSigned" xml:space="preserve">
     <value>今日已签</value>
+  </data>
+  <data name="ViewCardSignInUnsigned" xml:space="preserve">
+    <value>今日未签</value>
   </data>
   <data name="ViewCardSignInSummary" xml:space="preserve">
     <value>已签到 {0}/{1}</value>
@@ -2135,7 +2225,7 @@
     <value>兑换码复制成功</value>
   </data>
   <data name="ViewPageAnnouncementSetGamePathLabel" xml:space="preserve">
-    <value>设置游戏路径</value>
+    <value>设置原神路径</value>
   </data>
   <data name="ViewPageAnnouncementSetZZZGamePathLabel" xml:space="preserve">
     <value>设置绝区零路径</value>
@@ -2356,6 +2446,9 @@
   <data name="ViewPageCultivationWikiWeaponDescription" xml:space="preserve">
     <value>添加任意武器到养成计划</value>
   </data>
+  <data name="ViewPageDailyNoteAccountGroupNoId" xml:space="preserve">
+    <value>米游社账号</value>
+  </data>
   <data name="ViewPageDailyNoteAddEntry" xml:space="preserve">
     <value>添加实时便笺</value>
   </data>
@@ -2421,6 +2514,108 @@
   </data>
   <data name="ViewPageDailyNoteVerify" xml:space="preserve">
     <value>验证当前用户与角色</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessBounty" xml:space="preserve">
+    <value>悬赏委托</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessCurrencyWeekly" xml:space="preserve">
+    <value>百通宝 · 本周获取</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessDailyLottery" xml:space="preserve">
+    <value>饼铺盲盒 / 刮刮卡 / 占卜</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessEnergy" xml:space="preserve">
+    <value>电量</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessEnergyFull" xml:space="preserve">
+    <value>已满</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessEnergyRecovering" xml:space="preserve">
+    <value>将于 {0:MM.dd HH:mm} 恢复满值</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessLoadFailed" xml:space="preserve">
+    <value>暂时无法获取绝区零便笺，请稍后点「刷新」重试</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessMemberCard" xml:space="preserve">
+    <value>绳网会员</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessMemberCardClaimed" xml:space="preserve">
+    <value>今日菲林已领取</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessMemberCardNotOpened" xml:space="preserve">
+    <value>未开通</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessMemberCardRemaining" xml:space="preserve">
+    <value>剩余 {0} 天</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessMemberCardUnclaimed" xml:space="preserve">
+    <value>今日菲林未领取</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessSectionHeader" xml:space="preserve">
+    <value>绝区零 · 实时便笺</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTaskDone" xml:space="preserve">
+    <value>已完成</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTaskUndone" xml:space="preserve">
+    <value>未完成</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleBench" xml:space="preserve">
+    <value>制造</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleBenchCanProduce" xml:space="preserve">
+    <value>可制造</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleBenchDone" xml:space="preserve">
+    <value>可收取</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleBenchProducing" xml:space="preserve">
+    <value>制造中</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleExpedition" xml:space="preserve">
+    <value>游历</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleExpeditionCanSend" xml:space="preserve">
+    <value>可派遣</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleExpeditionDoing" xml:space="preserve">
+    <value>游历中</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleExpeditionDone" xml:space="preserve">
+    <value>可收取</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleHeader" xml:space="preserve">
+    <value>随便观 Lv.{0}</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleShelve" xml:space="preserve">
+    <value>售卖</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleShelveCanSell" xml:space="preserve">
+    <value>可售卖</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleShelveRestock" xml:space="preserve">
+    <value>待补货</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleShelveSelling" xml:space="preserve">
+    <value>售卖中</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessTempleStateUnknown" xml:space="preserve">
+    <value>—</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessVhsSale" xml:space="preserve">
+    <value>录像店经营</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessVhsSaleOpen" xml:space="preserve">
+    <value>正在营业</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessVhsSaleSettling" xml:space="preserve">
+    <value>待结算</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessVitality" xml:space="preserve">
+    <value>今日活跃度</value>
+  </data>
+  <data name="ViewPageDailyNoteZenlessWeeklyTask" xml:space="preserve">
+    <value>丽都周纪</value>
   </data>
         <data name="ViewPageFeedbackCurrentProxyNoProxyDescription" xml:space="preserve">
     <value>无代理</value>
@@ -2695,6 +2890,9 @@
   <data name="ViewPageWikiMonsterArchiveResistanceDefault" xml:space="preserve">
     <value>常态</value>
   </data>
+  <data name="ViewPageWikiMonsterCategoryAll" xml:space="preserve">
+    <value>全部</value>
+  </data>
   <data name="ViewPageWikiMonsterArchiveEnergy" xml:space="preserve">
     <value>元素能量</value>
   </data>
@@ -2718,6 +2916,9 @@
   </data>
   <data name="ViewPageWikiMonsterArchiveSource" xml:space="preserve">
     <value>@Csxylic 米游社</value>
+  </data>
+  <data name="ViewPageWikiMonsterArchiveShield" xml:space="preserve">
+    <value>护盾</value>
   </data>
   <data name="ViewPageWiKiMonsterAutoSuggestBoxPlaceHolder" xml:space="preserve">
     <value>筛选怪物</value>

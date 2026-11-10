@@ -48,23 +48,52 @@
             </Grid>
         </DataTemplate>
 
-        <DataTemplate x:Key="MonsterListTemplate" x:DataType="shmmm:Monster">
-            <Grid>
+        <DataTemplate x:Key="MonsterListTemplate" x:DataType="shma:MonsterCatalogEntry">
+            <!--  MinHeight 与「48 头像 + 6*2 外边距」对齐；头像列固定 48，缺头像的条目文字才不会左移 -->
+            <Grid MinHeight="60" ColumnSpacing="12">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="48"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <shuxci:CachedImage
                     Grid.Column="0"
                     Width="48"
                     Height="48"
-                    Margin="0,6,12,6"
-                    Source="{Binding Icon, Converter={StaticResource MonsterIconConverter}, Mode=OneWay}"/>
+                    Margin="0,6"
+                    Source="{Binding Icon, Converter={StaticResource MonsterCatalogIconConverter}, Mode=OneWay}"
+                    Visibility="{Binding HasIcon, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <StackPanel
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Spacing="2">
+                    <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock
+                        FontSize="11"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Text="{Binding CategoryName}"
+                        TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!--  侧边栏一级：分类（「全部」+ 各 Category），右侧带条目数  -->
+        <DataTemplate x:Key="MonsterCategoryTemplate" x:DataType="shma:MonsterCategoryGroup">
+            <Grid MinHeight="36" ColumnSpacing="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    Text="{Binding Name}"
+                    TextTrimming="CharacterEllipsis"/>
                 <TextBlock
                     Grid.Column="1"
-                    Margin="12,0,0,0"
                     VerticalAlignment="Center"
-                    Text="{Binding Name}"/>
+                    FontSize="11"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Text="{Binding CountText}"/>
             </Grid>
         </DataTemplate>
 
@@ -106,10 +135,13 @@
             </shuxcc:HorizontalCard>
         </DataTemplate>
 
-        <DataTemplate x:Key="MonsterGridTemplate" x:DataType="shmmm:Monster">
+        <DataTemplate x:Key="MonsterGridTemplate" x:DataType="shma:MonsterCatalogEntry">
             <shuxcc:VerticalCard Width="82">
                 <shuxcc:VerticalCard.Top>
-                    <shuxc:ItemIcon Icon="{Binding Icon, Converter={StaticResource MonsterIconConverter}, Mode=OneWay}" Quality="QUALITY_NONE"/>
+                    <shuxc:ItemIcon
+                        Icon="{Binding Icon, Converter={StaticResource MonsterCatalogIconConverter}, Mode=OneWay}"
+                        Quality="QUALITY_NONE"
+                        Visibility="{Binding HasIcon, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 </shuxcc:VerticalCard.Top>
                 <shuxcc:VerticalCard.Bottom>
                     <TextBlock
@@ -187,6 +219,7 @@
                     Visibility="{Binding HasTitle, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 <TextBlock
                     shuxc:GuideRichText.AutoElementColor="True"
+                    shuxc:GuideRichText.StatColor="True"
                     shuxc:GuideRichText.Source="{Binding Text}"
                     TextWrapping="Wrap"/>
             </StackPanel>
@@ -203,6 +236,12 @@
                 CornerRadius="8">
                 <StackPanel Spacing="6">
                     <StackPanel Orientation="Horizontal" Spacing="8">
+                        <shuxci:CachedImage
+                            Width="28"
+                            Height="28"
+                            VerticalAlignment="Center"
+                            Source="{Binding IconUri}"
+                            Visibility="{Binding HasIcon, Converter={StaticResource BoolToVisibilityConverter}}"/>
                         <TextBlock
                             VerticalAlignment="Center"
                             Style="{StaticResource BodyStrongTextBlockStyle}"
@@ -221,11 +260,14 @@
                     </StackPanel>
                     <TextBlock
                         shuxc:GuideRichText.AutoElementColor="True"
+                        shuxc:GuideRichText.StatColor="True"
                         shuxc:GuideRichText.Source="{Binding Description}"
                         TextWrapping="Wrap"/>
                     <TextBlock
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        Text="{Binding Tips}"
+                        shuxc:GuideRichText.AutoElementColor="True"
+                        shuxc:GuideRichText.StatColor="True"
+                        shuxc:GuideRichText.Source="{Binding Tips}"
                         TextWrapping="Wrap"
                         Visibility="{Binding HasTips, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     <StackPanel
@@ -238,18 +280,59 @@
                 </StackPanel>
             </Border>
         </DataTemplate>
-    </Page.Resources>
+            <!--  档案：护盾（XML 图鉴源独有字段）  -->
+        <DataTemplate x:Key="MonsterArchiveShieldTemplate" x:DataType="shma:EnemyArchiveShield">
+            <Border
+                Margin="0,0,0,8"
+                Padding="14,12"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <StackPanel Spacing="6">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                        Text="{Binding Name}"/>
+                    <TextBlock
+                        shuxc:GuideRichText.AutoElementColor="True"
+                        shuxc:GuideRichText.Bold="True"
+                        shuxc:GuideRichText.StatColor="True"
+                        shuxc:GuideRichText.StatElement="{Binding ElementKey}"
+                        shuxc:GuideRichText.Source="{Binding Description}"
+                        TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+</Page.Resources>
 
-    <shuxc:StandardView ShowCondition="{Binding Monsters, Converter={StaticResource EmptyObjectToBoolConverter}}">
+    <!--  P2 双视图：默认 IsLegacyMode=true，下面这段 legacy 722 视图与绑定一字不改；
+          切 enemy-web-753 时显示并列 Web 视图，一键回滚只需把 flag 切回 legacy。  -->
+    <Grid x:Name="PageRoot">
+    <shuxc:StandardView
+        ShowCondition="{Binding Monsters, Converter={StaticResource EmptyObjectToBoolConverter}}"
+        Visibility="{Binding IsLegacyMode, Converter={StaticResource BoolToVisibilityConverter}}">
         <shuxc:StandardView.EmptyContent>
             <shuxc:Loading IsLoading="{Binding Monsters, Converter={StaticResource EmptyObjectToBoolRevertConverter}}" Style="{ThemeResource DefaultLoadingViewStyle}"/>
         </shuxc:StandardView.EmptyContent>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Border Margin="16" cw:Effects.Shadow="{ThemeResource CompatCardShadow}">
+
+            <!--  P5：首次无缓存且不可达 → 显式回退内置 722，横幅说明原因（不是白屏）  -->
+            <InfoBar
+                Grid.Row="0"
+                Margin="16,8,16,0"
+                IsClosable="False"
+                IsOpen="{Binding IsFallbackBannerVisible}"
+                Message="{Binding FallbackBannerText}"
+                Severity="Warning"
+                Title="ellen.wiki 数据不可用"/>
+
+            <Border Grid.Row="1" Margin="16" cw:Effects.Shadow="{ThemeResource CompatCardShadow}">
                 <Border Style="{ThemeResource AcrylicSecondaryBorderCardStyle}">
                     <CommandBar
                         BorderBrush="{x:Null}"
@@ -280,12 +363,18 @@
                                 Text="{Binding SearchData.FilterToken, Mode=TwoWay}"
                                 TokenItemTemplate="{StaticResource TokenTemplate}"/>
                         </AppBarElementContainer>
+                        <!--  P5b：切换到 ellen.wiki 753 视图。这是生产代码里唯一写持久化的入口，
+                              没有它 persistedUiSource 永远为空，G7a 的「切换重启保持」判不出来。  -->
+                        <AppBarButton
+                            Command="{Binding SwitchToWebCommand}"
+                            Icon="{shuxm:FontIcon Glyph=&#xE8AB;}"
+                            Label="切换到 753"/>
                     </CommandBar>
                 </Border>
             </Border>
 
             <cwc:SwitchPresenter
-                Grid.Row="1"
+                Grid.Row="2"
                 ContentTransitions="{ThemeResource EntranceThemeTransitions}"
                 Value="{Binding ElementName=ItemsPanelSelector, Path=Current}">
                 <cwc:Case Value="List">
@@ -294,20 +383,34 @@
                             <SplitView
                                 DisplayMode="Inline"
                                 IsPaneOpen="True"
-                                OpenPaneLength="{StaticResource CompatSplitViewOpenPaneLength2}"
+                                OpenPaneLength="{StaticResource CompatSplitViewOpenPaneLength4}"
                                 PaneBackground="{ThemeResource CardBackgroundFillColorSecondaryBrush}">
                                 <SplitView.Pane>
-                                    <ListView
-                                        Grid.Row="1"
-                                        Padding="{ThemeResource ListViewInSplitPanePadding}"
-                                        ItemTemplate="{StaticResource MonsterListTemplate}"
-                                        ItemsSource="{Binding Monsters}"
-                                        SelectedItem="{Binding Monsters.CurrentItem, Mode=TwoWay}"
-                                        SelectionMode="Single">
-                                        <mxi:Interaction.Behaviors>
-                                            <shuxb:SelectedItemInViewBehavior/>
-                                        </mxi:Interaction.Behaviors>
-                                    </ListView>
+                                    <!--  两级侧边栏：左「分类」/ 右「该分类下的敌人」  -->
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="132"/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <ListView
+                                            Grid.Column="0"
+                                            Padding="4,12,4,12"
+                                            ItemTemplate="{StaticResource MonsterCategoryTemplate}"
+                                            ItemsSource="{Binding Categories}"
+                                            SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                                            SelectionMode="Single"/>
+                                        <ListView
+                                            Grid.Column="1"
+                                            Padding="{ThemeResource ListViewInSplitPanePadding}"
+                                            ItemTemplate="{StaticResource MonsterListTemplate}"
+                                            ItemsSource="{Binding Monsters}"
+                                            SelectedItem="{Binding Monsters.CurrentItem, Mode=TwoWay}"
+                                            SelectionMode="Single">
+                                            <mxi:Interaction.Behaviors>
+                                                <shuxb:SelectedItemInViewBehavior/>
+                                            </mxi:Interaction.Behaviors>
+                                        </ListView>
+                                    </Grid>
                                 </SplitView.Pane>
                                 <SplitView.Content>
                                     <ScrollViewer shuxc:ScrollViewerHelper.ScrollToTopAssociatedObject="{Binding Monsters.CurrentItem}">
@@ -321,20 +424,27 @@
                                                     <EntranceThemeTransition FromVerticalOffset="50"/>
                                                     <RepositionThemeTransition IsStaggeringEnabled="False"/>
                                                 </StackPanel.ChildrenTransitions>
-                                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                                <!--  长标题（如「历经百战的暝视龙·霜雪苛念」）要能换行：放 * 列并开 Wrap，行高才不会被压重叠  -->
+                                                <Grid ColumnSpacing="12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
                                                     <TextBlock
                                                         Margin="1,0,0,0"
                                                         VerticalAlignment="Center"
                                                         Style="{StaticResource SubtitleTextBlockStyle}"
+                                                        TextWrapping="Wrap"
                                                         Text="{Binding Monsters.CurrentItem.Title}"/>
                                                     <!--  补全过档案的敌人：标注数据来源（图鉴卡制图 @Csxylic）  -->
                                                     <HyperlinkButton
+                                                        Grid.Column="1"
                                                         Padding="2,0"
                                                         VerticalAlignment="Center"
                                                         Content="{shuxm:ResourceString Name=ViewPageWikiMonsterArchiveSource}"
                                                         NavigateUri="https://www.miyoushe.com/ys/accountCenter/collectionList?id=258229537"
                                                         Visibility="{Binding Monsters.CurrentItem.Archive, Converter={StaticResource EmptyObjectToVisibilityConverter}}"/>
-                                                </StackPanel>
+                                                </Grid>
                                                 <shuxct:DescriptionTextBlock
                                                     Margin="1,0,0,0"
                                                     HorizontalAlignment="Stretch"
@@ -352,7 +462,7 @@
                                                     ItemTemplate="{StaticResource MonsterBaseValueTemplate}"
                                                     ItemsPanel="{StaticResource UniformGridColumns2Spacing4Template}"
                                                     ItemsSource="{Binding Monsters.CurrentItem.BaseValue.SubHurts}"
-                                                    Visibility="{Binding Monsters.CurrentItem.HasArchiveResistances, Converter={StaticResource BoolToVisibilityRevertConverter}}">
+                                                    Visibility="{Binding Monsters.CurrentItem.ShowFallbackResistances, Converter={StaticResource BoolToVisibilityConverter}}">
                                                     <ItemsControl.Resources>
                                                         <!--  ReSharper disable Xaml.RedundantResource  -->
                                                         <x:Double x:Key="SettingsCardMinHeight">0</x:Double>
@@ -365,7 +475,7 @@
                                                 <Border
                                                     Padding="16"
                                                     Style="{ThemeResource BorderShimmerStyle}"
-                                                    Visibility="{Binding Monsters.CurrentItem.Archive.HasResistances, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    Visibility="{Binding Monsters.CurrentItem.HasArchiveResistances, Converter={StaticResource BoolToVisibilityConverter}}">
                                                     <StackPanel Spacing="12">
                                                         <StackPanel Orientation="Horizontal" Spacing="12">
                                                             <TextBlock
@@ -419,7 +529,7 @@
                                                 <Border
                                                     Padding="16"
                                                     Style="{ThemeResource BorderShimmerStyle}"
-                                                    Visibility="{Binding Monsters.CurrentItem.Archive.HasMechanics, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    Visibility="{Binding Monsters.CurrentItem.HasArchiveMechanics, Converter={StaticResource BoolToVisibilityConverter}}">
                                                     <StackPanel Spacing="12">
                                                         <TextBlock
                                                             Style="{StaticResource BaseTextBlockStyle}"
@@ -430,10 +540,25 @@
                                                     </StackPanel>
                                                 </Border>
 
+                                                                                                <!--  档案：护盾（XML 图鉴源独有字段）  -->
                                                 <Border
                                                     Padding="16"
                                                     Style="{ThemeResource BorderShimmerStyle}"
-                                                    Visibility="{Binding Monsters.CurrentItem.Archive.HasEnergy, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    Visibility="{Binding Monsters.CurrentItem.HasArchiveShield, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    <StackPanel Spacing="12">
+                                                        <TextBlock
+                                                            Style="{StaticResource BaseTextBlockStyle}"
+                                                            Text="{shuxm:ResourceString Name=ViewPageWikiMonsterArchiveShield}"/>
+                                                        <ItemsControl
+                                                            ItemTemplate="{StaticResource MonsterArchiveShieldTemplate}"
+                                                            ItemsSource="{Binding Monsters.CurrentItem.Archive.Shield}"/>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <Border
+                                                    Padding="16"
+                                                    Style="{ThemeResource BorderShimmerStyle}"
+                                                    Visibility="{Binding Monsters.CurrentItem.HasArchiveEnergy, Converter={StaticResource BoolToVisibilityConverter}}">
                                                     <StackPanel Spacing="12">
                                                         <TextBlock
                                                             Style="{StaticResource BaseTextBlockStyle}"
@@ -469,7 +594,7 @@
                                                 <Border
                                                     Padding="16"
                                                     Style="{ThemeResource BorderShimmerStyle}"
-                                                    Visibility="{Binding Monsters.CurrentItem.Archive.HasSkills, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    Visibility="{Binding Monsters.CurrentItem.HasArchiveSkills, Converter={StaticResource BoolToVisibilityConverter}}">
                                                     <StackPanel Spacing="12">
                                                         <TextBlock
                                                             Style="{StaticResource BaseTextBlockStyle}"
@@ -479,28 +604,7 @@
                                                             ItemsSource="{Binding Monsters.CurrentItem.Archive.Skills}"/>
                                                     </StackPanel>
                                                 </Border>
-
-                                                <Border Padding="16" Style="{ThemeResource BorderShimmerStyle}">
-                                                    <StackPanel Spacing="16">
-                                                        <TextBlock
-                                                            Style="{StaticResource BaseTextBlockStyle}"
-                                                            Text="{shuxm:ResourceString Name=ViewPageWikiMonsterDropItems}"
-                                                            Visibility="{Binding Monsters.CurrentItem.DropsView, Converter={StaticResource EmptyObjectToVisibilityConverter}}"/>
-                                                        <ItemsControl
-                                                            ItemTemplate="{StaticResource MonsterDropTemplate}"
-                                                            ItemsSource="{Binding Monsters.CurrentItem.DropsView}"
-                                                            Visibility="{Binding Monsters.CurrentItem.DropsView, Converter={StaticResource EmptyObjectToVisibilityConverter}}">
-                                                            <ItemsControl.ItemsPanel>
-                                                                <ItemsPanelTemplate>
-                                                                    <cwc:UniformGrid
-                                                                        ColumnSpacing="8"
-                                                                        Columns="3"
-                                                                        RowSpacing="8"/>
-                                                                </ItemsPanelTemplate>
-                                                            </ItemsControl.ItemsPanel>
-                                                        </ItemsControl>
-                                                    </StackPanel>
-                                                </Border>
+                                                <!--  上游 GIEnemyChartXML 没有掉落物数据，掉落区整块不渲染（DropsView 恒为空）  -->
                                             </StackPanel>
                                         </Grid>
                                     </ScrollViewer>
@@ -531,4 +635,524 @@
             </cwc:SwitchPresenter>
         </Grid>
     </shuxc:StandardView>
+
+        <!--  ============ P2 Web 视图：ellen.wiki 753 条（默认折叠）============  -->
+        <!--  ============ Web 图鉴（ellen.wiki 752 条） ============
+             骨架与 WikiAvatarPage / WikiWeaponPage 完全一致：
+             外层阴影 Acrylic 卡片 → SplitView（左列表 / 右详情）→ ScrollViewer 切条目自动回顶。
+             详情是**通栏卡片流**（身份 → 数值 → 抗性 → 技能 → 机制 → 能量 → 一图流），
+             不再有右侧技能栏；本体 / 幽境用 Segmented 分段，抗性切换也用 Segmented（与旧图鉴一致）。  -->
+        <Grid
+            Visibility="{Binding IsWebMode, Converter={StaticResource BoolToVisibilityConverter}}"
+            RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Grid.Resources>
+                <!--  抗性单元格：元素名自动上色（与旧图鉴同一套 GuideRichText）  -->
+                <DataTemplate x:Key="WebResistanceCellTemplate">
+                    <Border
+                        Padding="10,7"
+                        Background="{ThemeResource ControlAltFillColorSecondaryBrush}"
+                        BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{ThemeResource ControlCornerRadius}">
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                shuxc:GuideRichText.AutoElementColor="True"
+                                shuxc:GuideRichText.Source="{Binding Label}"
+                                TextWrapping="NoWrap"/>
+                            <TextBlock
+                                Grid.Column="1"
+                                FontWeight="SemiBold"
+                                Text="{Binding ValueText}"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+
+                <!--  技能卡：与 ellen.wiki 敌人页一致（图标 + 名称 + 类型标签 + 描述）。
+                      描述走 GuideRichText，<c=#hex> 行内颜色与线上同色。  -->
+                <DataTemplate x:Key="WebSkillTemplate">
+                    <Border
+                        Margin="0,0,0,8"
+                        Padding="12,10"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{ThemeResource ControlCornerRadius}">
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Border
+                                Grid.Column="0"
+                                Width="44"
+                                Height="44"
+                                VerticalAlignment="Top"
+                                Background="#59000000"
+                                CornerRadius="8"
+                                Visibility="{Binding HasIcon, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <shuxci:CachedImage
+                                    Width="36"
+                                    Height="36"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FadeIn="False"
+                                    Source="{Binding IconUri}"
+                                    Stretch="Uniform"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" Spacing="4">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock FontWeight="SemiBold" Text="{Binding Name}" TextWrapping="Wrap"/>
+                                    <Border
+                                        Padding="6,1"
+                                        VerticalAlignment="Center"
+                                        Background="{ThemeResource ControlAltFillColorSecondaryBrush}"
+                                        CornerRadius="4"
+                                        Visibility="{Binding HasTag, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <TextBlock FontSize="11" Opacity="0.8" Text="{Binding Tag}"/>
+                                    </Border>
+                                </StackPanel>
+                                <TextBlock
+                                    Opacity="0.9"
+                                    shuxc:GuideRichText.Source="{Binding DescriptionText}"
+                                    TextWrapping="Wrap"
+                                    Visibility="{Binding HasDescription, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+
+                <!--  机制 / 注解  -->
+                <DataTemplate x:Key="WebNoteTemplate">
+                    <StackPanel Margin="0,0,0,10" Spacing="2">
+                        <TextBlock
+                            FontWeight="SemiBold"
+                            Text="{Binding Title}"
+                            Visibility="{Binding HasTitle, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        <TextBlock
+                            Opacity="0.9"
+                            shuxc:GuideRichText.Source="{Binding Text}"
+                            TextWrapping="Wrap"/>
+                    </StackPanel>
+                </DataTemplate>
+
+                <!--  一图流：独立卡片，放详情最底部。FadeIn=False 避免切敌人时闪一下。  -->
+                <DataTemplate x:Key="WebArtTemplate">
+                    <Border
+                        HorizontalAlignment="Stretch"
+                        CornerRadius="{ThemeResource OverlayCornerRadius}">
+                        <shuxci:CachedImage
+                            HorizontalAlignment="Stretch"
+                            FadeIn="False"
+                            Source="{Binding}"
+                            Stretch="Uniform"/>
+                    </Border>
+                </DataTemplate>
+            </Grid.Resources>
+
+            <!--  分类 / 搜索：与角色页同一条 CommandBar 卡片  -->
+            <Border Grid.Row="0" Margin="16,16,16,0" cw:Effects.Shadow="{ThemeResource CompatCardShadow}">
+                <Border Style="{ThemeResource AcrylicBorderCardStyle}">
+                    <CommandBar
+                        BorderBrush="{x:Null}"
+                        BorderThickness="0"
+                        DefaultLabelPosition="Right">
+                        <CommandBar.Content>
+                            <ComboBox
+                                Width="220"
+                                Margin="8"
+                                DisplayMemberPath="Name"
+                                ItemsSource="{Binding WebCategories}"
+                                SelectedItem="{Binding WebSelectedCategory, Mode=TwoWay}"/>
+                        </CommandBar.Content>
+                        <AppBarElementContainer>
+                            <shuxca:AutoSuggestTokenBox
+                                Width="600"
+                                Height="44"
+                                Margin="6,-2,6,6"
+                                HorizontalAlignment="Right"
+                                VerticalContentAlignment="Center"
+                                AvailableTokens="{Binding WebSearchData.AvailableTokens}"
+                                FilterCommand="{Binding WebFilterCommand}"
+                                ItemsSource="{Binding WebSearchData.FilterTokens, Mode=TwoWay}"
+                                MaximumTokens="5"
+                                PlaceholderText="{shuxm:ResourceString Name=ViewPageWiKiMonsterAutoSuggestBoxPlaceHolder}"
+                                QueryIcon="{cw:FontIconSource Glyph=&#xE721;}"
+                                ShowTokenCounter="False"
+                                Style="{StaticResource DefaultAutoSuggestTokenBoxStyle}"
+                                SuggestedItemTemplate="{StaticResource TokenTemplate}"
+                                SuggestedItemsSource="{Binding WebSearchData.AvailableTokens.Values}"
+                                Text="{Binding WebSearchData.FilterToken, Mode=TwoWay}"
+                                TokenItemTemplate="{StaticResource TokenTemplate}"/>
+                        </AppBarElementContainer>
+                    </CommandBar>
+                </Border>
+            </Border>
+
+            <!--  列表 + 详情  -->
+            <Border Grid.Row="1" Margin="16" cw:Effects.Shadow="{ThemeResource CompatCardShadow}">
+                <Border Style="{ThemeResource AcrylicBorderCardStyle}">
+                    <SplitView
+                        DisplayMode="Inline"
+                        IsPaneOpen="True"
+                        OpenPaneLength="{StaticResource CompatSplitViewOpenPaneLength}"
+                        PaneBackground="{ThemeResource CardBackgroundFillColorSecondaryBrush}">
+                        <SplitView.Pane>
+                            <Grid>
+                                <ListView
+                                    x:Name="WebMonsterList"
+                                    ItemsSource="{Binding WebMonsters}"
+                                    SelectedItem="{Binding WebCurrentItem, Mode=TwoWay}"
+                                    SelectionMode="Single">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Padding="4" ColumnSpacing="10">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <shuxci:CachedImage
+                                                    Width="40"
+                                                    Height="40"
+                                                    VerticalAlignment="Center"
+                                                    Source="{Binding IconUri}"
+                                                    Visibility="{Binding HasIcon, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                <StackPanel
+                                                    Grid.Column="1"
+                                                    VerticalAlignment="Center"
+                                                    Spacing="1">
+                                                    <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock
+                                                        FontSize="12"
+                                                        Opacity="0.65"
+                                                        Text="{Binding CategoryLabel}"
+                                                        TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                                <TextBlock
+                                    Margin="16"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Opacity="0.8"
+                                    Text="{Binding WebEmptyStateText}"
+                                    TextWrapping="Wrap"
+                                    Visibility="{Binding WebEmptyStateText, Converter={StaticResource EmptyObjectToBoolConverter}}"/>
+                            </Grid>
+                        </SplitView.Pane>
+
+                        <SplitView.Content>
+                            <ScrollViewer x:Name="WebDetailScroll" shuxc:ScrollViewerHelper.ScrollToTopAssociatedObject="{Binding WebCurrentItem}">
+                                <StackPanel Padding="16" Spacing="12">
+
+                                    <!--  本体 / 幽境：与角色页技能同一个 Segmented 分段控件  -->
+                                    <cwc:Segmented
+                                        HorizontalAlignment="Left"
+                                        ItemsSource="{Binding WebDetailTabs}"
+                                        SelectedIndex="{Binding WebDetailTabIndex, Mode=TwoWay}"
+                                        Visibility="{Binding WebCurrentItem.HasLeyline, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                                    <!--  ============ 本体 ============  -->
+                                    <StackPanel Spacing="12" Visibility="{Binding WebIsBodyTab, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <!--  多阶段：女士一/二阶段、公子三形态、若陀九元素… 只有 1 个阶段时不显示。  -->
+                                        <cwc:Segmented
+                                            HorizontalAlignment="Left"
+                                            ItemsSource="{Binding WebStageTabs}"
+                                            SelectedIndex="{Binding WebSelectedStageIndex, Mode=TwoWay}"
+                                            Visibility="{Binding WebHasStages, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                                        <Border Padding="16" Style="{ThemeResource BorderShimmerStyle}">
+                                            <Grid ColumnSpacing="16">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <Border
+                                                    Width="112"
+                                                    Height="112"
+                                                    VerticalAlignment="Top"
+                                                    CornerRadius="{ThemeResource OverlayCornerRadius}"
+                                                    Visibility="{Binding WebBodyHasIcon, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    <shuxci:CachedImage
+                                                        FadeIn="False"
+                                                        Source="{Binding WebBodyIconUri}"
+                                                        Stretch="UniformToFill"/>
+                                                </Border>
+                                                <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                                                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{Binding WebBodyName}" TextWrapping="Wrap"/>
+                                                    <TextBlock Opacity="0.7" Text="{Binding WebBodyNameEn}" TextWrapping="Wrap"/>
+                                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                                        <TextBlock Opacity="0.7" Text="{Binding WebCurrentItem.CategoryLabel}"/>
+                                                        <TextBlock Opacity="0.7" Text="{Binding WebBodySubtitle}"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+
+                                        <Border
+                                            Padding="16"
+                                            Style="{ThemeResource BorderShimmerStyle}"
+                                            Visibility="{Binding WebShowBaseValueCard, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <StackPanel Spacing="8">
+                                                <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="基础数值"/>
+                                                <shuxvs:BaseValueSlider
+                                                    HorizontalAlignment="Stretch"
+                                                    HorizontalContentAlignment="Stretch"
+                                                    BaseValueInfo="{Binding WebBaseValueInfo, Mode=OneWay}"
+                                                    IsPromoteVisible="False"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border
+                                            Padding="16"
+                                            Style="{ThemeResource BorderShimmerStyle}"
+                                            Visibility="{Binding WebBodyHasLevelInfo, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <StackPanel Spacing="8">
+                                                <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="阶段数值"/>
+                                                <TextBlock Opacity="0.7" Text="{Binding WebBodyLevelText}"/>
+                                                <Grid ColumnSpacing="8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0" Spacing="2">
+                                                        <TextBlock Opacity="0.7" Text="生命值"/>
+                                                        <TextBlock FontWeight="SemiBold" Text="{Binding WebBodyHpText}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="1" Spacing="2">
+                                                        <TextBlock Opacity="0.7" Text="攻击力"/>
+                                                        <TextBlock FontWeight="SemiBold" Text="{Binding WebBodyAtkText}"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border Padding="16" Style="{ThemeResource BorderShimmerStyle}">
+                                            <StackPanel Spacing="12">
+                                                <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="抗性数据"/>
+                                                <cwc:Segmented
+                                                    HorizontalAlignment="Left"
+                                                    ItemsSource="{Binding DataContext.WebResistanceStates, ElementName=PageRoot}"
+                                                    SelectedIndex="{Binding DataContext.WebSelectedResistanceStateIndex, ElementName=PageRoot, Mode=TwoWay}"
+                                                    Visibility="{Binding DataContext.WebHasResistanceStates, ElementName=PageRoot, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    <cwc:Segmented.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding Name}"/>
+                                                        </DataTemplate>
+                                                    </cwc:Segmented.ItemTemplate>
+                                                </cwc:Segmented>
+                                                <ItemsControl
+                                                    ItemTemplate="{StaticResource WebResistanceCellTemplate}"
+                                                    ItemsPanel="{StaticResource UniformGridColumns2Spacing4Template}"
+                                                    ItemsSource="{Binding DataContext.WebResistanceCells, ElementName=PageRoot}"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border
+                                            Padding="16"
+                                            Style="{ThemeResource BorderShimmerStyle}"
+                                            Visibility="{Binding WebBodyHasSkills, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <StackPanel Spacing="10">
+                                                <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="技能"/>
+                                                <ItemsControl
+                                                    ItemTemplate="{StaticResource WebSkillTemplate}"
+                                                    ItemsSource="{Binding WebBodySkills}"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border
+                                            Padding="16"
+                                            Style="{ThemeResource BorderShimmerStyle}"
+                                            Visibility="{Binding WebBodyHasNotes, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <StackPanel Spacing="10">
+                                                <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="特殊机制"/>
+                                                <ItemsControl
+                                                    ItemTemplate="{StaticResource WebNoteTemplate}"
+                                                    ItemsSource="{Binding WebBodyNotes}"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border
+                                            Padding="16"
+                                            Style="{ThemeResource BorderShimmerStyle}"
+                                            Visibility="{Binding WebCurrentItem.HasEnergy, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <StackPanel Spacing="8">
+                                                <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="元素能量"/>
+                                                <Grid ColumnSpacing="8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Opacity="0.7" Text="坚盾值"/>
+                                                    <TextBlock Grid.Column="1" HorizontalAlignment="Center" Opacity="0.7" Text="元素微粒"/>
+                                                    <TextBlock Grid.Column="2" HorizontalAlignment="Right" Opacity="0.7" Text="元素晶球"/>
+                                                </Grid>
+                                                <ItemsControl ItemsSource="{Binding WebCurrentItem.EnergyRows}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Grid Padding="0,4" ColumnSpacing="8">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                </Grid.ColumnDefinitions>
+                                                                <TextBlock Grid.Column="0" Text="{Binding HpText}"/>
+                                                                <TextBlock Grid.Column="1" HorizontalAlignment="Center" Text="{Binding ParticleText}"/>
+                                                                <TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="{Binding OrbText}"/>
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border
+                                            Padding="16"
+                                            Style="{ThemeResource BorderShimmerStyle}"
+                                            Visibility="{Binding WebBodyHasArt, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <StackPanel Spacing="8">
+                                                <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="一图流"/>
+                                                <ContentControl
+                                                    Content="{Binding WebBodyArtUri}"
+                                                    ContentTemplate="{StaticResource WebArtTemplate}"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+
+                                    <!--  ============ 幽境 ============  -->
+                                    <StackPanel Spacing="12" Visibility="{Binding WebIsLeylineTab, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <Border Padding="16" Style="{ThemeResource BorderShimmerStyle}">
+                                            <Grid ColumnSpacing="16">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <Border
+                                                    Width="112"
+                                                    Height="112"
+                                                    VerticalAlignment="Top"
+                                                    CornerRadius="{ThemeResource OverlayCornerRadius}"
+                                                    Visibility="{Binding WebCurrentItem.HasLeylinePortrait, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    <shuxci:CachedImage
+                                                        FadeIn="False"
+                                                        Source="{Binding WebCurrentItem.LeylinePortraitUri}"
+                                                        Stretch="UniformToFill"/>
+                                                </Border>
+                                                <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                                                    <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="幽境挑战"/>
+                                                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{Binding WebCurrentItem.LeylineName}" TextWrapping="Wrap"/>
+                                                    <TextBlock
+                                                        Opacity="0.7"
+                                                        Text="{Binding WebCurrentItem.LeylineNameEn}"
+                                                        TextWrapping="Wrap"
+                                                        Visibility="{Binding WebCurrentItem.HasLeylineNameEn, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+
+                                        <Border Padding="16" Style="{ThemeResource BorderShimmerStyle}">
+                                            <StackPanel Spacing="10">
+                                                <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="难度数值"/>
+                                                <Grid ColumnSpacing="8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0" Spacing="2">
+                                                        <TextBlock Opacity="0.7" Text="等级"/>
+                                                        <TextBlock FontWeight="SemiBold" Text="{Binding WebLeylineCurrentStage.LevelText}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="1" Spacing="2">
+                                                        <TextBlock Opacity="0.7" Text="生命值"/>
+                                                        <TextBlock FontWeight="SemiBold" Text="{Binding WebLeylineCurrentStage.HpText}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="2" Spacing="2">
+                                                        <TextBlock Opacity="0.7" Text="攻击力"/>
+                                                        <TextBlock FontWeight="SemiBold" Text="{Binding WebLeylineCurrentStage.AtkText}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="3" Spacing="2">
+                                                        <TextBlock Opacity="0.7" Text="生命倍率"/>
+                                                        <TextBlock FontWeight="SemiBold" Text="{Binding WebLeylineCurrentStage.MultiplierText}"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border Padding="16" Style="{ThemeResource BorderShimmerStyle}">
+                                            <StackPanel Spacing="12">
+                                                <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="抗性数据"/>
+                                                <cwc:Segmented
+                                                    HorizontalAlignment="Left"
+                                                    ItemsSource="{Binding WebLeylineStages}"
+                                                    SelectedIndex="{Binding WebSelectedLeylineStageIndex, Mode=TwoWay}">
+                                                    <cwc:Segmented.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding Label}"/>
+                                                        </DataTemplate>
+                                                    </cwc:Segmented.ItemTemplate>
+                                                </cwc:Segmented>
+                                                <ItemsControl
+                                                    ItemTemplate="{StaticResource WebResistanceCellTemplate}"
+                                                    ItemsPanel="{StaticResource UniformGridColumns2Spacing4Template}"
+                                                    ItemsSource="{Binding WebLeylineCurrentStage.Cells}"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border
+                                            Padding="16"
+                                            Style="{ThemeResource BorderShimmerStyle}"
+                                            Visibility="{Binding WebCurrentItem.HasLeylineSkills, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <StackPanel Spacing="10">
+                                                <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="技能变化"/>
+                                                <ItemsControl
+                                                    ItemTemplate="{StaticResource WebSkillTemplate}"
+                                                    ItemsSource="{Binding WebCurrentItem.LeylineSkills}"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border
+                                            Padding="16"
+                                            Style="{ThemeResource BorderShimmerStyle}"
+                                            Visibility="{Binding WebCurrentItem.HasLeylineNotes, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <StackPanel Spacing="10">
+                                                <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="机制说明"/>
+                                                <ItemsControl
+                                                    ItemTemplate="{StaticResource WebNoteTemplate}"
+                                                    ItemsSource="{Binding WebCurrentItem.LeylineNotes}"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border
+                                            Padding="16"
+                                            Style="{ThemeResource BorderShimmerStyle}"
+                                            Visibility="{Binding WebCurrentItem.HasLeylineArt, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <StackPanel Spacing="8">
+                                                <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="幽境一图流"/>
+                                                <ContentControl
+                                                    Content="{Binding WebCurrentItem.LeylineArtUri}"
+                                                    ContentTemplate="{StaticResource WebArtTemplate}"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </SplitView.Content>
+                    </SplitView>
+                </Border>
+            </Border>
+        </Grid>
+    </Grid>
 </shuxc:ScopedPage>

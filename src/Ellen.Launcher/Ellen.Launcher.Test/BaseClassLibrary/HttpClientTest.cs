@@ -5,7 +5,9 @@ namespace Ellen.Launcher.Test.BaseClassLibrary;
 [TestClass]
 public sealed class HttpClientTest
 {
+    /// <summary>真实请求 api.snaphutaorp.org，网络不通即超时；已登记为 known-env-failure。</summary>
     [TestMethod]
+    [TestCategory("KnownEnvFailure")]
     public void RedirectionHeaderTest()
     {
         HttpClientHandler handler = new()

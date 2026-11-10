@@ -169,10 +169,17 @@ public sealed partial class WikiWeaponViewModel : Abstraction.ViewModel
             return;
         }
 
+        /* 同上：新武器可能还没有突破表数据 */
+        if (!metadataContext.IdDictionaryWeaponLevelPromoteMap.TryGetValue(weapon.PromoteId, out var promoteMap))
+        {
+            BaseValueInfo = null;
+            return;
+        }
+
         BaseValueInfoMetadataContext context = new()
         {
             GrowCurveMap = metadataContext.LevelDictionaryWeaponGrowCurveMap,
-            PromoteMap = metadataContext.IdDictionaryWeaponLevelPromoteMap[weapon.PromoteId],
+            PromoteMap = promoteMap,
         };
 
         BaseValueInfo = new(weapon.MaxLevel, weapon.GrowCurves.ToPropertyCurveValues(), context);

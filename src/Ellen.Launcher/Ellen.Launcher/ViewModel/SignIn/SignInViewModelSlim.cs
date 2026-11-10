@@ -5,17 +5,18 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Ellen.Launcher.Core.Database;
 using Ellen.Launcher.Core.DependencyInjection.Abstraction;
 using Ellen.Launcher.Service.Notification;
+using Ellen.Launcher.Service.SignIn;
 using Ellen.Launcher.Service.User;
-using Ellen.Launcher.ViewModel.User;
-using Ellen.Launcher.Web.Hoyolab.Takumi.Binding;
 using Ellen.Launcher.Web.Hoyolab.Takumi.Event.BbsSignReward;
+using System.Collections.Immutable;
 using BindingUser = Ellen.Launcher.ViewModel.User.User;
 using EntityUser = Ellen.Launcher.Model.Entity.User;
 
 namespace Ellen.Launcher.ViewModel.SignIn;
 
 /// <summary>
-/// 首页「每日签到」卡片：列出所有已登录账号（角色）的今日签到状态。
+/// 首页「每日签到」卡片：列出所有已登录账号下所有可签到游戏的今日签到状态，
+/// 并用一个「一键全签」按钮签完所有未签的角色。
 /// </summary>
 [BindableCustomPropertyProvider]
 [Service(ServiceLifetime.Transient)]
@@ -23,6 +24,7 @@ public sealed partial class SignInViewModelSlim : Abstraction.ViewModelSlim
 {
     private readonly IServiceProvider serviceProvider;
     private readonly IUserService userService;
+    private readonly IGameRoleCollectionService roleCollectionService;
     private readonly IMessenger messenger;
     private readonly ITaskContext taskContext;
 
@@ -32,11 +34,34 @@ public sealed partial class SignInViewModelSlim : Abstraction.ViewModelSlim
     [ObservableProperty]
     public partial List<SignInEntry>? Entries { get; set; }
 
+    /// <summary>
+    /// 按账号分组的签到展示：一行一个账号，后面跟该账号各游戏本次签到获得的物品图标。
+    /// </summary>
+    [ObservableProperty]
+    public partial List<SignInAccountGroup>? AccountGroups { get; set; }
+
     [ObservableProperty]
     public partial string? Summary { get; set; }
 
     [ObservableProperty]
     public partial bool HasEntries { get; set; }
+
+    /// <summary>
+    /// 所有角色今天都已签到。
+    /// </summary>
+    [ObservableProperty]
+    public partial bool AllSigned { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsSigningAll { get; set; }
+
+    /// <summary>
+    /// 「一键全签」是否可点：有条目、还有没签的、且当前没在签。
+    /// </summary>
+    public bool CanSignAll
+    {
+        get => HasEntries && !AllSigned && !IsSigningAll;
+    }
 
     /// <inheritdoc/>
     protected override async Task LoadAsync()
@@ -52,28 +77,38 @@ public sealed partial class SignInViewModelSlim : Abstraction.ViewModelSlim
             AdvancedDbCollectionView<BindingUser, EntityUser> users = await userService.GetUsersAsync().ConfigureAwait(false);
 
             List<SignInEntry> entries = [];
+            List<SignInAccountGroup> groups = [];
             foreach (BindingUser user in users.Source)
             {
-                if (user.UserGameRoles.Count is 0)
+                // 该账号下的所有已注册游戏：原神 / 崩坏：星穹铁道 / 绝区零
+                ImmutableArray<SignInGameRole> roles = await roleCollectionService.GetRolesAsync(user).ConfigureAwait(false);
+                if (roles.IsEmpty)
                 {
                     continue;
                 }
 
                 ISignInClient signInClient = signInClientFactory.Create(user.IsOversea);
-                foreach (UserGameRole role in user.UserGameRoles)
+                List<SignInEntry> userEntries = new(roles.Length);
+                foreach (SignInGameRole role in roles)
                 {
-                    SignInEntry entry = new(signInClient, taskContext, messenger, UserAndUid.From(user.Entity, role), role);
-                    entry.PropertyChanged += OnEntryPropertyChanged;
+                    SignInEntry entry = new(signInClient, taskContext, messenger, user.Entity, role);
                     entries.Add(entry);
+                    userEntries.Add(entry);
                 }
+
+                groups.Add(new(GetAccountName(user, roles), userEntries));
             }
 
             await taskContext.SwitchToMainThreadAsync();
             Entries = entries;
+            AccountGroups = groups;
             HasEntries = entries.Count > 0;
             UpdateSummary();
 
             await Task.WhenAll(entries.Select(static entry => entry.UpdateAsync())).ConfigureAwait(false);
+
+            await taskContext.SwitchToMainThreadAsync();
+            UpdateSummary();
         }
         finally
         {
@@ -82,24 +117,63 @@ public sealed partial class SignInViewModelSlim : Abstraction.ViewModelSlim
         }
     }
 
-    [Command("RefreshCommand")]
-    private async Task RefreshAsync()
+    /// <summary>
+    /// 一键全签：把所有未签到的角色依次签一遍（顺序执行，避免触发风控）。
+    /// </summary>
+    [Command("SignAllCommand")]
+    private async Task SignAllAsync()
     {
-        if (Entries is not { Count: > 0 } entries)
+        if (IsSigningAll || Entries is not { Count: > 0 } entries)
         {
-            await LoadAsync().ConfigureAwait(false);
             return;
         }
 
-        await Task.WhenAll(entries.Select(static entry => entry.UpdateAsync())).ConfigureAwait(false);
-    }
+        IsSigningAll = true;
 
-    private void OnEntryPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(SignInEntry.IsSign))
+        try
         {
+            foreach (SignInEntry entry in entries.Where(static entry => !entry.IsSign).ToArray())
+            {
+                await entry.SignAsync().ConfigureAwait(false);
+
+                await taskContext.SwitchToMainThreadAsync();
+                UpdateSummary();
+            }
+        }
+        finally
+        {
+            await taskContext.SwitchToMainThreadAsync();
+            IsSigningAll = false;
             UpdateSummary();
         }
+    }
+
+    /// <summary>
+    /// 账号名优先取米游社通行证昵称，其次取原神角色昵称，最后用首个角色的展示名兜底。
+    /// </summary>
+    private static string GetAccountName(BindingUser user, ImmutableArray<SignInGameRole> roles)
+    {
+        if (!string.IsNullOrEmpty(user.UserInfo?.Nickname))
+        {
+            return user.UserInfo.Nickname;
+        }
+
+        return roles
+            .Where(static role => role.Game is SignInGame.Genshin)
+            .Concat(roles)
+            .Select(static role => role.Nickname)
+            .FirstOrDefault(static nickname => !string.IsNullOrEmpty(nickname))
+            ?? roles[0].DisplayName;
+    }
+
+    partial void OnIsSigningAllChanged(bool value)
+    {
+        OnPropertyChanged(nameof(CanSignAll));
+    }
+
+    partial void OnHasEntriesChanged(bool value)
+    {
+        OnPropertyChanged(nameof(CanSignAll));
     }
 
     private void UpdateSummary()
@@ -107,9 +181,14 @@ public sealed partial class SignInViewModelSlim : Abstraction.ViewModelSlim
         if (Entries is not { Count: > 0 } entries)
         {
             Summary = null;
+            AllSigned = false;
+            OnPropertyChanged(nameof(CanSignAll));
             return;
         }
 
-        Summary = SH.FormatViewCardSignInSummary(entries.Count(static entry => entry.IsSign), entries.Count);
+        int signed = entries.Count(static entry => entry.IsSign);
+        Summary = SH.FormatViewCardSignInSummary(signed, entries.Count);
+        AllSigned = signed == entries.Count;
+        OnPropertyChanged(nameof(CanSignAll));
     }
 }

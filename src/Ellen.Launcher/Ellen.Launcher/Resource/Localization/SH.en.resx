@@ -2209,6 +2209,9 @@ Space Available: {2}</value>
   <data name="ViewPageCultivationWikiWeaponDescription" xml:space="preserve">
     <value>Add any weapon to Development Plan</value>
   </data>
+  <data name="ViewPageDailyNoteAccountGroupNoId" xml:space="preserve">
+    <value>HoYoLAB Account</value>
+  </data>
   <data name="ViewPageDailyNoteAddEntry" xml:space="preserve">
     <value>Add Real-Time Note</value>
   </data>

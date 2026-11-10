@@ -1,0 +1,170 @@
+{
+  "schema": "wiki-offline-probe-vectors-v1",
+  "note": "G7a 四项结论的共享判定向量。C# WikiOfflineProbe.Evaluate 与 gate 的 evaluateOfflineSessions 必须对每个 case 得到 expected，否则两边判定漂移。改判据时三处一起改：Domain/WikiSource/WikiOfflineProbe.cs、scripts/build-p5-gate.mjs、本文件。",
+  "cases": [
+    {
+      "id": "empty",
+      "why": "没有 sessions = 缺数据，四项必须全 false（不能默认 true）",
+      "sessions": [],
+      "expected": {
+        "offlineBundled753Success": false,
+        "legacyCoexistOk": false,
+        "rollbackOk": false,
+        "switchRestartKept": false
+      }
+    },
+    {
+      "id": "bundled-hit-only",
+      "why": "随包 753 命中，但没有 legacy 会话、也没重启过",
+      "sessions": [
+        {
+          "at": "2026-11-08T10:00:00+00:00",
+          "uiSource": "enemy-web-753",
+          "persistedUiSource": "enemy-web-753",
+          "startupUiSource": "legacy-722-bundled",
+          "isGrayscale": false,
+          "offlineBundled": true,
+          "itemCount": 753
+        }
+      ],
+      "expected": {
+        "offlineBundled753Success": true,
+        "legacyCoexistOk": false,
+        "rollbackOk": false,
+        "switchRestartKept": false
+      }
+    },
+    {
+      "id": "full-flow-restart-kept",
+      "why": "手动切到 753 并重启（startup=web），随后回滚到 legacy 722",
+      "sessions": [
+        {
+          "at": "2026-11-08T10:00:00+00:00",
+          "uiSource": "enemy-web-753",
+          "persistedUiSource": "enemy-web-753",
+          "startupUiSource": "enemy-web-753",
+          "isGrayscale": false,
+          "offlineBundled": true,
+          "itemCount": 753
+        },
+        {
+          "at": "2026-11-08T10:05:00+00:00",
+          "uiSource": "legacy-722-bundled",
+          "persistedUiSource": "enemy-web-753",
+          "startupUiSource": "enemy-web-753",
+          "isGrayscale": false,
+          "offlineBundled": false,
+          "itemCount": 722
+        }
+      ],
+      "expected": {
+        "offlineBundled753Success": true,
+        "legacyCoexistOk": true,
+        "rollbackOk": true,
+        "switchRestartKept": true
+      }
+    },
+    {
+      "id": "same-process-switch",
+      "why": "关键反例：设置里切到 753 但没重启（startup 仍是 legacy）→ 不能算重启保持。只判 persisted 会在这里误判 true",
+      "sessions": [
+        {
+          "at": "2026-11-08T10:00:00+00:00",
+          "uiSource": "legacy-722-bundled",
+          "persistedUiSource": "",
+          "startupUiSource": "legacy-722-bundled",
+          "isGrayscale": false,
+          "offlineBundled": false,
+          "itemCount": 722
+        },
+        {
+          "at": "2026-11-08T10:02:00+00:00",
+          "uiSource": "enemy-web-753",
+          "persistedUiSource": "enemy-web-753",
+          "startupUiSource": "legacy-722-bundled",
+          "isGrayscale": false,
+          "offlineBundled": true,
+          "itemCount": 753
+        }
+      ],
+      "expected": {
+        "offlineBundled753Success": true,
+        "legacyCoexistOk": true,
+        "rollbackOk": false,
+        "switchRestartKept": false
+      }
+    },
+    {
+      "id": "grayscale-not-user-choice",
+      "why": "灰度放量给的 753：startup 与 persisted 都是 web 但 isGrayscale=true 不算用户选择；且 startup 由灰度给时也不能算重启保持",
+      "sessions": [
+        {
+          "at": "2026-11-08T10:00:00+00:00",
+          "uiSource": "enemy-web-753",
+          "persistedUiSource": "",
+          "startupUiSource": "legacy-722-bundled",
+          "isGrayscale": true,
+          "offlineBundled": true,
+          "itemCount": 753
+        }
+      ],
+      "expected": {
+        "offlineBundled753Success": true,
+        "legacyCoexistOk": false,
+        "rollbackOk": false,
+        "switchRestartKept": false
+      }
+    },
+    {
+      "id": "rollback-without-722",
+      "why": "web 之后回了 legacy，但视图没真起来（0 条）→ 回滚不成立",
+      "sessions": [
+        {
+          "at": "2026-11-08T10:00:00+00:00",
+          "uiSource": "enemy-web-753",
+          "persistedUiSource": "enemy-web-753",
+          "startupUiSource": "enemy-web-753",
+          "isGrayscale": false,
+          "offlineBundled": true,
+          "itemCount": 753
+        },
+        {
+          "at": "2026-11-08T10:05:00+00:00",
+          "uiSource": "legacy-722-bundled",
+          "persistedUiSource": "enemy-web-753",
+          "startupUiSource": "enemy-web-753",
+          "isGrayscale": false,
+          "offlineBundled": false,
+          "itemCount": 0
+        }
+      ],
+      "expected": {
+        "offlineBundled753Success": true,
+        "legacyCoexistOk": true,
+        "rollbackOk": false,
+        "switchRestartKept": true
+      }
+    },
+    {
+      "id": "legacy-only",
+      "why": "本来就在 722：并存 / 回滚 / 随包命中都不成立",
+      "sessions": [
+        {
+          "at": "2026-11-08T10:00:00+00:00",
+          "uiSource": "legacy-722-bundled",
+          "persistedUiSource": "",
+          "startupUiSource": "legacy-722-bundled",
+          "isGrayscale": false,
+          "offlineBundled": false,
+          "itemCount": 722
+        }
+      ],
+      "expected": {
+        "offlineBundled753Success": false,
+        "legacyCoexistOk": false,
+        "rollbackOk": false,
+        "switchRestartKept": false
+      }
+    }
+  ]
+}

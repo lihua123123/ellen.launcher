@@ -5,5 +5,5 @@ namespace Ellen.Launcher.Service.User;
 
 public interface IUserFingerprintService
 {
-    ValueTask TryInitializeAsync(ViewModel.User.User user, CancellationToken token = default);
+    ValueTask TryInitializeAsync(ViewModel.User.User user, CancellationToken token = default, bool forceRefresh = false);
 }

@@ -27,6 +27,25 @@ public static class SettingKeys
     public const string PrimaryLanguage              = "Ellen::Globalization::PrimaryLanguage";
     public const string AnnouncementRegion           = "Ellen::Globalization::Region::Announcement";
 
+    // Metadata
+    /// <summary>
+    /// 自建数据站地址（默认 https://ellen.wiki），用于同步角色/武器元数据快照。
+    /// 留空或填错时自动回退到默认值。
+    /// </summary>
+    public const string WikiMetadataEndpoint         = "Ellen::Metadata::Wiki::Endpoint";
+
+    /// <summary>P3：敌人图鉴 feature flag 持久化（重启保持）。值只能是 legacy-722-bundled / enemy-web-753。</summary>
+    public const string WikiEnemyUiSource             = "Ellen::Wiki::Enemy::UiSource";
+
+    /// <summary>
+    /// 随包敌人图鉴一图流的资源档位：compact（随包 webp，默认）/ original（一图流 PNG 原图，安装后单独下载）。
+    /// 安装器会把首次选择写进便携配置，设置页可随时修改。
+    /// </summary>
+    public const string EnemyArchiveImageQuality     = "Ellen::Resource::EnemyArchive::ImageQuality";
+
+    /// <summary>首次启动是否已完成便携布局的旧数据迁移，避免重复复制。</summary>
+    public const string PortableMigrationDone        = "Ellen::Application::Portable::MigrationDone";
+
     // UI
     public const string BackgroundImageType          = "Ellen::UI::BackgroundImage::Type";
     public const string BackgroundImagePath          = "Ellen::UI::BackgroundImage::Path";
@@ -49,8 +68,22 @@ public static class SettingKeys
     public const string IsHomeCardDailyNotePresented       = "Ellen::UI::Home::Card::DailyNote::Presented";
     public const string HomeCardGachaStatisticsOrder       = "Ellen::UI::Home::Card::GachaStatistics::Order";
     public const string IsHomeCardGachaStatisticsPresented = "Ellen::UI::Home::Card::GachaStatistics::Presented";
+    public const string HomeCardLaunchGameOrder            = "Ellen::UI::Home::Card::LaunchGame::Order";
+    public const string IsHomeCardLaunchGamePresented      = "Ellen::UI::Home::Card::LaunchGame::Presented";
     public const string HomeCardSignInOrder                = "Ellen::UI::Home::Card::SignIn::Order";
     public const string IsHomeCardSignInPresented          = "Ellen::UI::Home::Card::SignIn::Presented";
+
+    // SignIn
+    /// <summary>
+    /// 上次「自动签到」全部成功的 Unix 毫秒时间戳，仅用于诊断。
+    /// </summary>
+    public const string SignInAutoSignInLastSuccessTime    = "Ellen::SignIn::AutoSignIn::LastSuccessTime";
+
+    /// <summary>
+    /// 当天「哪些账号、哪些角色已经确认签过」的账本，跨天后自动作废，
+    /// 等价于签到成功后冷却到当天 23:59:59。格式见 <c>AutoSignInLedger</c>。
+    /// </summary>
+    public const string SignInAutoSignInLedger           = "Ellen::SignIn::AutoSignIn::Ledger";
     public const string HomeCardTravelersDiaryOrder        = "Ellen::UI::Home::Card::TravelersDiary::Order";
     public const string IsHomeCardTravelersDiaryPresented  = "Ellen::UI::Home::Card::TravelersDiary::Presented";
     public const string HomeAnnouncementActPreviewEnabled  = "Ellen::UI::Home::Announcement::ActPreviewEnabled";

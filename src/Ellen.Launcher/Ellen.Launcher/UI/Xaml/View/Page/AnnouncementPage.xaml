@@ -913,7 +913,7 @@
                                 Label="{shuxm:ResourceString Name=ViewPageAnnouncementSetGamePathLabel}"/>
                             <AppBarButton
                                 Command="{Binding SetZZZGamePathCommand}"
-                                Icon="{shuxm:FontIcon Glyph=&#xE8B5;}"
+                                Icon="{shuxm:FontIcon Glyph=&#xE8B7;}"
                                 Label="{shuxm:ResourceString Name=ViewPageAnnouncementSetZZZGamePathLabel}"/>
                             <AppBarElementContainer>
                                 <!--

@@ -92,13 +92,6 @@
                         Spacing="6">
 
                         <Button
-                            Padding="6"
-                            Command="{Binding InvertAppThemeCommand}"
-                            Content="[Dev] Invert Theme"
-                            Style="{ThemeResource SettingButtonStyle}"
-                            Visibility="{Binding IsDebug}"/>
-
-                        <Button
                             Padding="0"
                             HorizontalContentAlignment="Stretch"
                             VerticalContentAlignment="Stretch"
@@ -264,7 +257,7 @@
                 IsEnabled="{Binding ElementName=ContentFrame, Path=Content.DataContext.IsInitialized, Mode=OneWay}"
                 IsPaneOpen="True"
                 IsPaneToggleButtonVisible="False"
-                IsSettingsVisible="False"
+                IsSettingsVisible="True"
                 OpenPaneLength="205"
                 PaneDisplayMode="Auto"
                 UseLayoutRounding="False">
@@ -315,19 +308,13 @@
 
                     <NavigationViewItem
                         shuxc:NavigationViewItemHelper.NavigateTo="shuxvp:TeyvatMapPage"
-                        Content="{shuxm:ResourceString Name=ViewTeyvatMapHeader}">
-                        <NavigationViewItem.Icon>
-                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE707;"/>
-                        </NavigationViewItem.Icon>
-                    </NavigationViewItem>
+                        Content="{shuxm:ResourceString Name=ViewTeyvatMapHeader}"
+                        Icon="{shuxm:BitmapIcon Source=ms-appx:///Resource/Navigation/TeyvatMap.png}"/>
 
                     <NavigationViewItem
                         shuxc:NavigationViewItemHelper.NavigateTo="shuxvp:HoyoFanTranslatePage"
-                        Content="{shuxm:ResourceString Name=ViewHoyoFanTranslateHeader}">
-                        <NavigationViewItem.Icon>
-                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE774;"/>
-                        </NavigationViewItem.Icon>
-                    </NavigationViewItem>
+                        Content="{shuxm:ResourceString Name=ViewHoyoFanTranslateHeader}"
+                        Icon="{shuxm:BitmapIcon Source=ms-appx:///Resource/Navigation/HoyoFanTranslate.png}"/>
 
                     <NavigationViewItemHeader Content="{shuxm:ResourceString Name=ViewPeriodHeader}"/>
 

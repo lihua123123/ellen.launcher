@@ -17,57 +17,82 @@
 
     <UserControl.Resources>
         <!--
-            时间轴上的一条公告：缩略图 + 标题 + 剩余时间，
-            点击后仍然打开原来的公告详情窗口。
+            时间轴上的一条公告：封面 + 标题 + 剩余时间。
+            条底色由封面取色决定（code-behind 在取色完成后写入），
+            封面右侧叠一层「透明 → 条色」的渐变，让图和底色接得上。
+            封面和标题放在同一个 StickyGroup 里、整体靠左：
+            横向滚动时 code-behind 只平移这个组，于是「图 + 文字」始终贴住视口最左侧，
+            而剩余时间固定在条的右端不动。
         -->
         <DataTemplate x:Key="AnnouncementTimelineBarTemplate" x:DataType="shwhhca:Announcement">
             <ItemContainer
                 cw:Effects.Shadow="{ThemeResource CompatCardShadow}"
                 SizeChanged="OnBarSizeChanged"
                 ToolTipService.ToolTip="{Binding TimeFormatted}">
-                <Border Background="{ThemeResource SystemControlAcrylicElementMediumHighBrush}" CornerRadius="{ThemeResource ControlCornerRadius}">
-                    <Grid
-                        Padding="4,0,8,0"
-                        ColumnSpacing="8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <shuxci:CachedImage
-                            Grid.Column="0"
-                            Width="78"
-                            Height="42"
-                            VerticalAlignment="Center"
-                            PlaceholderSource="{StaticResource UI_EmotionIcon271}"
-                            Source="{Binding Banner}"
-                            Stretch="UniformToFill"/>
-
+                <Border
+                    x:Name="Bar"
+                    cw:UIElementExtensions.ClipToBounds="True"
+                    Background="#3A3D44"
+                    CornerRadius="{ThemeResource ControlCornerRadius}">
+                    <Grid>
                         <!--
-                            标题特意用「按文字宽度」的左对齐：
-                            这样它的 ActualWidth 就是文字本身宽度，code-behind 才能在列内
-                            把它左右滑动去贴近视口中轴（滑到头就停在列边，不越出卡片边框）。
+                            贴左组铺满整条（自己裁剪），剩余时间叠加在右端：
+                            两者不再是同一个 Grid 里互相抢宽度的两列，窄条上时间也不会被挤到换行。
                         -->
-                        <TextBlock
-                            x:Name="TitleText"
-                            Grid.Column="1"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            Text="{Binding Subtitle}"
-                            TextTrimming="CharacterEllipsis"
-                            TextWrapping="NoWrap">
-                            <TextBlock.RenderTransform>
-                                <TranslateTransform/>
-                            </TextBlock.RenderTransform>
-                        </TextBlock>
+                        <Grid x:Name="StickyHost" cw:UIElementExtensions.ClipToBounds="True">
+                            <Grid x:Name="StickyGroup" HorizontalAlignment="Left">
+                                <Grid.RenderTransform>
+                                    <TranslateTransform/>
+                                </Grid.RenderTransform>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid
+                                    x:Name="CoverHost"
+                                    Grid.Column="0"
+                                    Width="128">
+                                    <shuxci:CachedImage
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        Source="{Binding Banner}"
+                                        Stretch="UniformToFill"/>
+                                    <Border x:Name="CoverFade" IsHitTestVisible="False">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                                <GradientStop Offset="0" Color="#00FFFFFF"/>
+                                                <GradientStop Offset="0.4" Color="#00FFFFFF"/>
+                                                <GradientStop Offset="1" Color="#00FFFFFF"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                </Grid>
+
+                                <!--
+                                    标题压到封面上一点点（负左边距），正好落在渐变带上；
+                                    它的 MaxWidth 由 code-behind 按「条宽 - 封面 - 右侧时间」算出来，保证长标题能正常省略号截断。
+                                -->
+                                <TextBlock
+                                    x:Name="TitleText"
+                                    Grid.Column="1"
+                                    Margin="-24,0,10,0"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Subtitle}"
+                                    TextTrimming="CharacterEllipsis"
+                                    TextWrapping="NoWrap"/>
+                            </Grid>
+                        </Grid>
 
                         <TextBlock
-                            Grid.Column="2"
+                            x:Name="TimeText"
+                            HorizontalAlignment="Right"
                             VerticalAlignment="Center"
-                            Opacity="0.7"
+                            Margin="0,0,10,0"
+                            Opacity="0.85"
                             Style="{ThemeResource CaptionTextBlockStyle}"
                             Text="{Binding TimeDescription}"
+                            TextWrapping="NoWrap"
                             Visibility="{Binding ShouldShowTimeDescription, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     </Grid>
                 </Border>

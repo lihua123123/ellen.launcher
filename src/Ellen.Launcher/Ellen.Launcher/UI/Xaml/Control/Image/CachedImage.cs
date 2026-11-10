@@ -33,11 +33,21 @@ namespace Ellen.Launcher.UI.Xaml.Control.Image;
 [DependencyProperty<object>("Source", PropertyChangedCallbackName = nameof(OnSourceChanged))]
 [DependencyProperty<bool>("ShowAsMonoChrome", DefaultValue = false, NotNull = true)]
 [DependencyProperty<double>("DecodeWidth", DefaultValue = 0D, NotNull = true)]
+
+/// <summary>
+/// 图片出现时是否做 200ms 淡入。默认 true（列表滚动时观感更柔和）。
+/// 详情页那些「每次切换条目都会重建」的图片（技能图标、一图流）要设 false：
+/// 重建后整组图从透明淡入，看起来就是点开敌人闪一下。
+/// </summary>
+[DependencyProperty<bool>("FadeIn", DefaultValue = true, NotNull = true)]
 public sealed partial class CachedImage : Microsoft.UI.Xaml.Controls.Control
 {
     private const string PartImage = "Image";
 
     private static readonly ConditionalWeakTable<Microsoft.UI.Xaml.Controls.Image, object> IsPlaceholder = [];
+
+    /// <summary>FadeIn=False 的 Image：换源前保留旧图、新图解码完直接不透明，避免「清空→淡入」的闪。</summary>
+    private static readonly ConditionalWeakTable<Microsoft.UI.Xaml.Controls.Image, object> NoFadeImages = [];
 
     private readonly AsyncLock sourceLock = new();
 
@@ -145,6 +155,13 @@ public sealed partial class CachedImage : Microsoft.UI.Xaml.Controls.Control
             return;
         }
 
+        // FadeIn=False 的直接全不透明：图片解码完就出现，不做 0→1 淡入。
+        if (sender is Microsoft.UI.Xaml.Controls.Image image && NoFadeImages.TryGetValue(image, out _))
+        {
+            image.Opacity = 1;
+            return;
+        }
+
         AnimationBuilder
             .Create()
             .Opacity(
@@ -165,6 +182,14 @@ public sealed partial class CachedImage : Microsoft.UI.Xaml.Controls.Control
         if (IsPlaceholder.TryGetValue(image, out _))
         {
             return;
+        }
+
+        // P5a 灰度指标：只统计敌人图鉴图源（ellen.wiki 远程图 / Wiki 缓存本地文件）的解码失败，
+        // 全应用其它图片的失败不计入，避免污染「图片解析失败率」。
+        if (image.Source is BitmapImage bitmap
+            && Ellen.Launcher.Service.EnemyArchive.WikiImageDecodeCounter.IsWikiImage(bitmap.UriSource))
+        {
+            Ellen.Launcher.Service.EnemyArchive.WikiImageDecodeCounter.Report();
         }
 
         AnimationBuilder
@@ -219,6 +244,12 @@ public sealed partial class CachedImage : Microsoft.UI.Xaml.Controls.Control
             // Connecting the BitmapImage to the tree before setting its UriSource
             target.Visibility = Visibility.Visible;
 
+            // FadeIn=False：不透明度直接拉满，避免「先透明、再等解码、再淡入」的三段闪烁。
+            if (NoFadeImages.TryGetValue(target, out _))
+            {
+                target.Opacity = 1;
+            }
+
             BitmapImage source = new();
 
             // Right-sized decoding. Item lists realize hundreds of icons; decoding each one at its
@@ -235,7 +266,24 @@ public sealed partial class CachedImage : Microsoft.UI.Xaml.Controls.Control
             // https://learn.microsoft.com/en-us/windows/uwp/debug-test-perf/optimize-animations-and-media#right-sized-decoding
             // UriSource should be set after the Image is connected to live XAML tree
             target.Source = source;
-            source.UriSource = uri;
+
+            if (uri.IsFile)
+            {
+                /* 本地文件直接喂流，**不要走 UriSource**。
+                   敌人图鉴有 224 个条目的 id 是中文（以索忒/科西霍/蟹沙皇/拉斯科尔尼科夫…），
+                   file:// 形式的 URI 会把路径转义成 %E4%BB%A5%E7%B4%A2%E5%BF%92 这种形式，
+                   BitmapImage 按转义后的路径取文件 → 取不到、ImageOpened 不触发、控件一直透明，
+                   表现就是「ASCII id 的全有头像，中文 id 的头像和一图流整片空白」。 */
+                Windows.Storage.StorageFile file = await Windows.Storage.StorageFile.GetFileFromPathAsync(uri.LocalPath);
+                using (IRandomAccessStreamWithContentType stream = await file.OpenReadAsync())
+                {
+                    await source.SetSourceAsync(stream);
+                }
+            }
+            else
+            {
+                source.UriSource = uri;
+            }
         }
     }
 
@@ -336,11 +384,33 @@ public sealed partial class CachedImage : Microsoft.UI.Xaml.Controls.Control
             {
                 using (await sourceLock.LockAsync().ConfigureAwait(true))
                 {
-                    // Remove old ImageSource from tree
-                    await ImageAttachUriSourceWithAnimationAsync(Image, default, placeholder, 0).ConfigureAwait(true);
+                    /* FadeIn=True：先把旧图淡出清空（列表滚动时的常规观感）。
+                       FadeIn=False：**不清空**，旧图留在原位，等新图解码完直接替换 —— 
+                       否则每次换源都会「先白一下再淡入」，详情页切条目就会闪。 */
+                    if (FadeIn)
+                    {
+                        if (Image is { } fadingImage)
+                        {
+                            NoFadeImages.Remove(fadingImage);
+                        }
+
+                        // Remove old ImageSource from tree
+                        await ImageAttachUriSourceWithAnimationAsync(Image, default, placeholder, 0).ConfigureAwait(true);
+                    }
+                    else if (Image is { } instantImage)
+                    {
+                        NoFadeImages.AddOrUpdate(instantImage, string.Empty);
+                    }
 
                     if (source is null)
                     {
+                        // FadeIn=False 时上面没清空旧图，这里必须显式清掉，否则换了没有图的条目会留着上一张。
+                        if (!FadeIn && Image is { } blankImage)
+                        {
+                            blankImage.Source = null;
+                            blankImage.Visibility = Visibility.Collapsed;
+                        }
+
                         return;
                     }
 
@@ -359,7 +429,15 @@ public sealed partial class CachedImage : Microsoft.UI.Xaml.Controls.Control
                     }
 
                     int decodeLength = ResolveDecodeLength();
-                    Uri? targetUri = uri.Scheme is "ms-appx" ? ResolveAppxUriForUnpackaged(uri) : await ProvideCachedResourceAsync(uri, token).ConfigureAwait(true);
+                    /* 本地文件（随包图片 / 内容寻址缓存）已经是磁盘上的成品，不能再走「下载→缓存」：
+                       file:// 的 Host 为空，ProvideCachedResourceAsync 会判成非法 URI 直接降级占位图，
+                       表现为「缓存命中率 100% 但界面全是空白图」。 */
+                    Uri? targetUri = uri.Scheme switch
+                    {
+                        "ms-appx" => ResolveAppxUriForUnpackaged(uri),
+                        "file" => uri,
+                        _ => await ProvideCachedResourceAsync(uri, token).ConfigureAwait(true),
+                    };
                     if (!token.IsCancellationRequested)
                     {
                         // Only attach our image if we still have a valid request.

@@ -4,15 +4,17 @@
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Ellen.Launcher.Core.Caching;
+using Ellen.Launcher.Core.Graphics.Imaging;
+using Ellen.Launcher.UI.Content;
 using Ellen.Launcher.Web.Hoyolab.Hk4e.Common.Announcement;
 using System.Collections;
 using System.Collections.Immutable;
 using Windows.System;
+using Windows.UI;
 using WinUITextBlock = Microsoft.UI.Xaml.Controls.TextBlock;
-using Windows.Foundation;
 
 namespace Ellen.Launcher.UI.Xaml.Control;
 
@@ -31,7 +33,20 @@ public sealed partial class AnnouncementTimeline : UserControl
     private const double RowHeight = 58;
     private const double RowGap = 8;
     private const double BarHeight = 48;
-    private const double MinBarWidth = 140;
+
+    /// <summary>
+    /// 时间条的最小宽度。封面固定占 <see cref="CoverWidth"/>，还要留出标题和右侧剩余时间的空间，
+    /// 否则短公告（一两天）的条会窄到只剩半张图。
+    /// </summary>
+    private const double MinBarWidth = 196;
+
+    /// <summary>封面在条内占的宽度（与参考站一致）。</summary>
+    private const double CoverWidth = 128;
+
+    /// <summary>标题向左压进封面渐变的距离。</summary>
+    private const double TitleOverlap = 24;
+
+    private const double TitleRightMargin = 10;
     private const double MinDayWidth = 8;
     private const double MaxDayWidth = 160;
     private const double DefaultDayWidth = 46;
@@ -61,6 +76,15 @@ public sealed partial class AnnouncementTimeline : UserControl
 
         // 用 handledEventsToo 挂到最外层，确保即使内部元素先处理过也能收到
         AddHandler(PointerWheelChangedEvent, new PointerEventHandler(OnTimelinePointerWheelChanged), true);
+
+        // 取色要拿 IImageCache，得等控件进了可视树（XamlRoot 就绪）才能取到服务
+        Loaded += OnLoaded;
+    }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        StartPaletteLoads();
+        UpdateStickyPositions();
     }
 
     private static void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -82,7 +106,7 @@ public sealed partial class AnnouncementTimeline : UserControl
     {
         Layout();
         CenterOnToday();
-        UpdateTitlePositions();
+        UpdateStickyPositions();
     }
 
     /// <summary>
@@ -165,6 +189,8 @@ public sealed partial class AnnouncementTimeline : UserControl
         BuildBars(visible);
         Layout();
         CenterOnToday();
+        StartPaletteLoads();
+        UpdateStickyPositions();
     }
 
     private void BuildDayCells()
@@ -295,7 +321,7 @@ public sealed partial class AnnouncementTimeline : UserControl
 
         horizontalOffset = Math.Clamp(value, 0d, max);
         HorizontalOffsetTransform.X = -horizontalOffset;
-        UpdateTitlePositions();
+        UpdateStickyPositions();
     }
 
     private void CenterOnToday()
@@ -316,22 +342,22 @@ public sealed partial class AnnouncementTimeline : UserControl
     }
 
     /// <summary>
-    /// 卡片尺寸变化后重新摆放标题：第一次布局完成时标题宽度才可用。
+    /// 卡片尺寸变化后重新摆放贴左组：第一次布局完成时标题宽度才可用。
     /// </summary>
     private void OnBarSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        UpdateTitlePositions();
+        UpdateStickyPositions();
     }
 
     /// <summary>
-    /// 让每条公告卡片里的标题主动贴近视口中轴，但不越过卡片边框。
+    /// 让每条公告的「封面 + 标题」在横向滚动时钉住视口最左侧（与参考站 <c>sticky left-0</c> 一致）。
     /// <para>
-    /// 标题所在的那一列就是它可用的全部空间：目标位置是把文字中心对到视口中轴，
-    /// 然后拿「列范围」夹取一次，所以最多滑到列边上，永远不会越出卡片。
-    /// 列宽装不下文字时（窄卡片）可滑距离为 0，保持原样。
+    /// 组的自然位置就是条的左端；条左端滚出视口后，把它整体右移 <c>horizontalOffset - barLeft</c>，
+    /// 让它停在视口左边缘。右移量再按「可用列宽 - 组宽」夹一次，
+    /// 所以它永远不会越过自己这条时间条、也不会压到右侧固定的剩余时间。
     /// </para>
     /// </summary>
-    private void UpdateTitlePositions()
+    private void UpdateStickyPositions()
     {
         double viewport = Viewport.ActualWidth;
         if (viewport <= 0d)
@@ -339,59 +365,183 @@ public sealed partial class AnnouncementTimeline : UserControl
             return;
         }
 
-        double centerX = viewport / 2d;
         foreach (BarEntry entry in bars)
         {
+            if (!TryResolveParts(entry))
+            {
+                continue;
+            }
+
+            BarParts parts = entry.Parts!;
+
             double cardLeft = Canvas.GetLeft(entry.Presenter);
-            if (double.IsNaN(cardLeft))
+            double hostWidth = parts.Host.ActualWidth;
+            if (double.IsNaN(cardLeft) || hostWidth <= 0d)
             {
                 continue;
             }
 
-            WinUITextBlock? title = entry.Title;
-            if (title is null || title.XamlRoot is null)
+            // 剩余时间叠在条右端，给它留出宽度，贴左组和标题都不许越过它
+            double timeReserve = parts.Time.Visibility == Visibility.Visible
+                ? parts.Time.ActualWidth + TitleRightMargin
+                : 0d;
+
+            // 标题必须先被条宽约束住，长标题才会省略号截断，
+            // 也才能保证「组宽 ≤ 条宽 - 时间宽度」，滑动范围有意义。
+            double titleMax = Math.Max(0d, hostWidth - (parts.HasCover ? CoverWidth - TitleOverlap : 0d) - TitleRightMargin - timeReserve);
+            if (Math.Abs(parts.Title.MaxWidth - titleMax) > 0.5d)
             {
-                title = FindTitleText(entry.Presenter);
-                entry.Title = title;
+                parts.Title.MaxWidth = titleMax;
             }
 
-            if (title?.RenderTransform is not TranslateTransform transform)
+            if (parts.Group.RenderTransform is not TranslateTransform transform)
             {
                 continue;
             }
 
-            double titleWidth = title.ActualWidth;
-            if (titleWidth <= 0d)
-            {
-                continue;
-            }
-
-            Rect slot = LayoutInformation.GetLayoutSlot(title);
-            double slideRange = slot.Width - titleWidth;
-            if (slideRange <= 1d)
-            {
-                transform.X = 0d;
-                continue;
-            }
-
-            double cardLeftInViewport = cardLeft - horizontalOffset;
-            double desired = centerX - cardLeftInViewport - slot.X - (titleWidth / 2d);
-            transform.X = Math.Clamp(desired, 0d, slideRange);
+            double maxSlide = Math.Max(0d, hostWidth - timeReserve - parts.Group.ActualWidth);
+            transform.X = Math.Clamp(horizontalOffset - cardLeft, 0d, maxSlide);
         }
     }
 
-    private static WinUITextBlock? FindTitleText(DependencyObject root)
+    /// <summary>
+    /// 首次把条模板里的元素抓出来并缓存（模板里的 x:Name 不在控件命名空间内，只能走视觉树）。
+    /// </summary>
+    private static bool TryResolveParts(BarEntry entry)
+    {
+        if (entry.Parts is not null)
+        {
+            return true;
+        }
+
+        ContentPresenter presenter = entry.Presenter;
+        if (FindDescendant<Border>(presenter, "Bar") is not { } bar
+            || FindDescendant<Grid>(presenter, "StickyHost") is not { } host
+            || FindDescendant<Grid>(presenter, "StickyGroup") is not { } group
+            || FindDescendant<WinUITextBlock>(presenter, "TitleText") is not { } title
+            || FindDescendant<WinUITextBlock>(presenter, "TimeText") is not { } time)
+        {
+            return false;
+        }
+
+        Grid? coverHost = FindDescendant<Grid>(presenter, "CoverHost");
+        Border? coverFade = FindDescendant<Border>(presenter, "CoverFade");
+        GradientStop? fadeStop = (coverFade?.Background as LinearGradientBrush)?.GradientStops.LastOrDefault();
+
+        bool hasCover = coverHost is not null && !string.IsNullOrWhiteSpace(entry.Item.Banner);
+        if (!hasCover && coverHost is not null)
+        {
+            // 没有封面的公告直接让标题从条左端开始，不留一块空图位
+            coverHost.Visibility = Visibility.Collapsed;
+            title.Margin = new Thickness(TitleRightMargin, 0d, TitleRightMargin, 0d);
+        }
+
+        entry.Parts = new(bar, title, time, host, group, fadeStop, hasCover);
+
+        // 先用兜底色上屏（取色还没回来时也有颜色），取色结果回来后再覆盖
+        ApplyBarColor(entry, GetFallbackPalette(entry.Item));
+        if (entry.Palette is { } palette)
+        {
+            ApplyBarColor(entry, palette);
+        }
+
+        return true;
+    }
+
+    private static void ApplyBarColor(BarEntry entry, CoverPalette palette)
+    {
+        if (entry.Parts is not { } parts)
+        {
+            return;
+        }
+
+        parts.Bar.Background = new SolidColorBrush(palette.BarColor);
+
+        // 封面右侧那层「透明 → 条色」的渐变要跟着条色一起变，否则接缝会露出色差
+        if (parts.FadeStop is { } fadeStop)
+        {
+            fadeStop.Color = palette.BarColor;
+        }
+
+        SolidColorBrush text = new(palette.TextColor);
+        parts.Title.Foreground = text;
+        parts.Time.Foreground = text;
+    }
+
+    /// <summary>
+    /// 取色未完成（或取色失败）时的兜底色，参考站同样按类别给固定色。
+    /// </summary>
+    private static CoverPalette GetFallbackPalette(Announcement item)
+    {
+        Color color = item.Type switch
+        {
+            1 => Color.FromArgb(0xFF, 0x5B, 0x7C, 0xFA),
+            2 => Color.FromArgb(0xFF, 0x22, 0xA6, 0xB3),
+            3 => Color.FromArgb(0xFF, 0x8B, 0x5C, 0xF6),
+            _ => Color.FromArgb(0xFF, 0x64, 0x74, 0x8B),
+        };
+
+        return new(color, Color.FromArgb(0xFF, 0xFF, 0xFF, 0xFF));
+    }
+
+    /// <summary>
+    /// 给每条公告发起一次封面取色（同一 URL 在 <see cref="CoverPaletteService"/> 里常驻缓存）。
+    /// </summary>
+    private void StartPaletteLoads()
+    {
+        if (bars.Count is 0)
+        {
+            return;
+        }
+
+        if (XamlRoot?.XamlContext()?.ServiceProvider.GetRequiredService<IImageCache>() is not { } imageCache)
+        {
+            return;
+        }
+
+        foreach (BarEntry entry in bars)
+        {
+            if (entry.IsPaletteRequested)
+            {
+                continue;
+            }
+
+            entry.IsPaletteRequested = true;
+
+            if (!Uri.TryCreate(entry.Item.Banner, UriKind.Absolute, out Uri? bannerUri))
+            {
+                continue;
+            }
+
+            LoadPaletteAsync(entry, bannerUri, imageCache).SafeForget();
+        }
+    }
+
+    private async Task LoadPaletteAsync(BarEntry entry, Uri bannerUri, IImageCache imageCache)
+    {
+        CoverPalette? palette = await CoverPaletteService.GetAsync(bannerUri, imageCache);
+        if (palette is not { } value || !bars.Contains(entry))
+        {
+            return;
+        }
+
+        entry.Palette = value;
+        ApplyBarColor(entry, value);
+    }
+
+    private static T? FindDescendant<T>(DependencyObject root, string name)
+        where T : FrameworkElement
     {
         int count = VisualTreeHelper.GetChildrenCount(root);
         for (int i = 0; i < count; i++)
         {
             DependencyObject child = VisualTreeHelper.GetChild(root, i);
-            if (child is WinUITextBlock { Name: "TitleText" } title)
+            if (child is T element && element.Name == name)
             {
-                return title;
+                return element;
             }
 
-            if (FindTitleText(child) is { } found)
+            if (FindDescendant<T>(child, name) is { } found)
             {
                 return found;
             }
@@ -407,10 +557,27 @@ public sealed partial class AnnouncementTimeline : UserControl
         public ContentPresenter Presenter { get; } = presenter;
 
         /// <summary>
-        /// 模板实例里的标题。要等首次布局完成才能从视觉树里找到，所以缓存起来。
+        /// 模板实例里的元素。要等首次布局完成才能从视觉树里找到，所以缓存起来。
         /// </summary>
-        public WinUITextBlock? Title { get; set; }
+        public BarParts? Parts { get; set; }
+
+        /// <summary>封面取色结果，可能比模板实例先到。</summary>
+        public CoverPalette? Palette { get; set; }
+
+        public bool IsPaletteRequested { get; set; }
     }
+
+    /// <summary>
+    /// 一条时间条里需要用代码改动的元素。
+    /// </summary>
+    private sealed record BarParts(
+        Border Bar,
+        WinUITextBlock Title,
+        WinUITextBlock Time,
+        Grid Host,
+        Grid Group,
+        GradientStop? FadeStop,
+        bool HasCover);
 
     private sealed record DayCell(Border Cell, WinUITextBlock Label, DateTimeOffset Day);
 }

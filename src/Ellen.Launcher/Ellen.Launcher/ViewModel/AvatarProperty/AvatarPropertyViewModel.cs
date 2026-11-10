@@ -452,7 +452,10 @@ public sealed partial class AvatarPropertyViewModel : Abstraction.ViewModel, IRe
                 }
                 else
                 {
-                    await ApplyZZZEmptyStateAsync(generation, InfoBarMessage.Error(SH.ViewPageAvatarPropertyZZZLoadFailed), preserveSummary: true).ConfigureAwait(false);
+                    await ApplyZZZEmptyStateAsync(
+                        generation,
+                        InfoBarMessage.Error(WithZZZFailureReason(SH.ViewPageAvatarPropertyZZZLoadFailed, FormatZZZFailureReason(response.ReturnCode, response.Message))),
+                        preserveSummary: true).ConfigureAwait(false);
                 }
 
                 return;
@@ -579,26 +582,26 @@ public sealed partial class AvatarPropertyViewModel : Abstraction.ViewModel, IRe
                 return;
             }
 
-            Response<ZZZAvatarListWrapper<ZZZAvatarBasic>> response = await scopeContext.ZZZGameRecordClient
-                .GetZZZAgentsAsync(userAndUid.User, role.GameUid, role.Region, CancellationToken)
-                .ConfigureAwait(false);
-
-            if (!IsCurrentZZZLoad(loadGeneration))
+            Response<ZZZAvatarListWrapper<ZZZAvatarBasic>>? fetchedResponse = await FetchZZZAgentsWithDeviceFpRetryAsync(userAndUid, role, loadGeneration).ConfigureAwait(false);
+            if (fetchedResponse is null || !IsCurrentZZZLoad(loadGeneration))
             {
                 return;
             }
 
+            Response<ZZZAvatarListWrapper<ZZZAvatarBasic>> response = fetchedResponse;
+
             if (!ResponseValidator.TryValidateWithoutUINotification(response, scopeContext.ServiceProvider, out ZZZAvatarListWrapper<ZZZAvatarBasic>? basicWrapper))
             {
+                string failureReason = FormatZZZFailureReason(response.ReturnCode, response.Message);
                 logger.LogWarning("Failed to refresh ZZZ agents: {Code} {Message}", response.ReturnCode, response.Message);
 
                 if (!cacheApplied)
                 {
-                    await ApplyZZZEmptyStateAsync(loadGeneration, InfoBarMessage.Error(SH.ViewPageAvatarPropertyZZZLoadFailed), preserveSummary: true).ConfigureAwait(false);
+                    await ApplyZZZEmptyStateAsync(loadGeneration, InfoBarMessage.Error(WithZZZFailureReason(SH.ViewPageAvatarPropertyZZZLoadFailed, failureReason)), preserveSummary: true).ConfigureAwait(false);
                 }
                 else if (forceRefresh)
                 {
-                    await ShowZZZRefreshFailedUsingCacheAsync(loadGeneration).ConfigureAwait(false);
+                    await ShowZZZRefreshFailedUsingCacheAsync(loadGeneration, failureReason).ConfigureAwait(false);
                 }
 
                 return;
@@ -824,7 +827,56 @@ public sealed partial class AvatarPropertyViewModel : Abstraction.ViewModel, IRe
         }
     }
 
-    private async Task ShowZZZRefreshFailedUsingCacheAsync(int generation)
+    /// <summary>
+    /// 米游社要求 x-rpc-device_fp 必须是「已注册」的设备指纹：实测缺失或未注册的随机值
+    /// 一律返回 10041（原神 index 则是 5003）。指纹为空时先补打一次；仍被 10041 拒绝时
+    /// 强制重打并重试一次（只重试基础列表这一条，重试成功后批量详情自然带上新指纹）。
+    /// </summary>
+    private async Task<Response<ZZZAvatarListWrapper<ZZZAvatarBasic>>?> FetchZZZAgentsWithDeviceFpRetryAsync(UserAndUid userAndUid, ZZZUserGameRole role, int loadGeneration)
+    {
+        Ellen.Launcher.ViewModel.User.User? bindingUser = await scopeContext.UserService.GetCurrentUserAsync().ConfigureAwait(false);
+
+        if (!userAndUid.User.IsOversea
+            && bindingUser is not null
+            && string.IsNullOrEmpty(userAndUid.User.Fingerprint))
+        {
+            await scopeContext.UserFingerprintService.TryInitializeAsync(bindingUser, CancellationToken).ConfigureAwait(false);
+            if (!IsCurrentZZZLoad(loadGeneration))
+            {
+                return null;
+            }
+        }
+
+        Response<ZZZAvatarListWrapper<ZZZAvatarBasic>> response = await scopeContext.ZZZGameRecordClient
+            .GetZZZAgentsAsync(userAndUid.User, role.GameUid, role.Region, CancellationToken)
+            .ConfigureAwait(false);
+
+        if (!IsCurrentZZZLoad(loadGeneration)
+            || userAndUid.User.IsOversea
+            || bindingUser is null
+            || response.ReturnCode is not 10041)
+        {
+            return response;
+        }
+
+        string previousFingerprint = userAndUid.User.Fingerprint ?? string.Empty;
+        await scopeContext.UserFingerprintService
+            .TryInitializeAsync(bindingUser, CancellationToken, forceRefresh: true)
+            .ConfigureAwait(false);
+
+        if (!IsCurrentZZZLoad(loadGeneration)
+            || string.IsNullOrEmpty(userAndUid.User.Fingerprint)
+            || string.Equals(userAndUid.User.Fingerprint, previousFingerprint, StringComparison.Ordinal))
+        {
+            return response;
+        }
+
+        return await scopeContext.ZZZGameRecordClient
+            .GetZZZAgentsAsync(userAndUid.User, role.GameUid, role.Region, CancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    private async Task ShowZZZRefreshFailedUsingCacheAsync(int generation, string? reason = null)
     {
         await scopeContext.TaskContext.SwitchToMainThreadAsync();
         if (!IsCurrentZZZLoad(generation))
@@ -832,7 +884,22 @@ public sealed partial class AvatarPropertyViewModel : Abstraction.ViewModel, IRe
             return;
         }
 
-        scopeContext.Messenger.Send(InfoBarMessage.Warning(SH.ViewPageAvatarPropertyZZZRefreshFailedUsingCache));
+        scopeContext.Messenger.Send(InfoBarMessage.Warning(WithZZZFailureReason(SH.ViewPageAvatarPropertyZZZRefreshFailedUsingCache, reason)));
+    }
+
+    private static string FormatZZZFailureReason(int returnCode, string? message)
+    {
+        if (returnCode is 0)
+        {
+            return string.Empty;
+        }
+
+        return $"{returnCode} {message}".Trim();
+    }
+
+    private static string WithZZZFailureReason(string baseMessage, string? reason)
+    {
+        return string.IsNullOrEmpty(reason) ? baseMessage : $"{baseMessage}（{reason}）";
     }
 
     private async Task SetZZZLoadingAsync(bool value)

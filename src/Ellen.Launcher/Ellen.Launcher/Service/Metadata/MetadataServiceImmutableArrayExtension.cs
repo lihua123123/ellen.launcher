@@ -9,6 +9,7 @@ using Ellen.Launcher.Model.Metadata.Monster;
 using Ellen.Launcher.Model.Metadata.Reliquary;
 using Ellen.Launcher.Model.Metadata.Tower;
 using Ellen.Launcher.Model.Metadata.Weapon;
+using Ellen.Launcher.Service.GachaLog;
 using System.Collections.Immutable;
 
 namespace Ellen.Launcher.Service.Metadata;
@@ -59,7 +60,8 @@ public static class MetadataServiceImmutableArrayExtension
 
         public ValueTask<ImmutableArray<GachaEvent>> GetGachaEventArrayAsync(CancellationToken token = default)
         {
-            return metadataService.FromCacheOrFileAsync<GachaEvent>(MetadataFileStrategies.GachaEvent, token);
+            // 随包快照只到发版时的卡池，合并后台抓到的近期卡池补充（见 GachaEventAutoUpdater）。
+            return GachaEventSupplement.GetMergedAsync(metadataService, token);
         }
 
         public ValueTask<ImmutableArray<HyperLinkName>> GetHyperLinkNameArrayAsync(CancellationToken token = default)

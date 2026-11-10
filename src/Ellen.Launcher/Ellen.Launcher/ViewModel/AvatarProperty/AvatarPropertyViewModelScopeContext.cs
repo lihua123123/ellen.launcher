@@ -39,6 +39,8 @@ public sealed partial class AvatarPropertyViewModelScopeContext
 
     public partial IZZZAvatarCacheService ZZZAvatarCacheService { get; }
 
+    public partial IUserFingerprintService UserFingerprintService { get; }
+
     public partial BindingClient BindingClient { get; }
 
     public partial IZZZGameRecordClient ZZZGameRecordClient { get; }

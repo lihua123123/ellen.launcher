@@ -30,8 +30,10 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window,
 
     public MainWindow(IServiceProvider serviceProvider)
     {
+        Service.EnemyArchive.StartupProbe.Mark("mainwindow-ctor-begin");
         Instance = this;
         InitializeComponent();
+        Service.EnemyArchive.StartupProbe.Mark("mainwindow-xaml");
 
         if (AppWindow.Presenter is OverlappedPresenter presenter)
         {
@@ -39,14 +41,28 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window,
             presenter.PreferredMinimumWidth = minSize.Width;
             presenter.PreferredMinimumHeight = minSize.Height;
         }
+        Service.EnemyArchive.StartupProbe.Mark("mainwindow-presenter");
 
         IServiceScope scope = serviceProvider.CreateScope();
         this.InitializeController(scope.ServiceProvider);
+        Service.EnemyArchive.StartupProbe.Mark("mainwindow-controller");
 
         MainView.InitializeDataContext<MainViewModel>(scope.ServiceProvider);
+        Service.EnemyArchive.StartupProbe.Mark("mainwindow-datacontext");
 
         app = scope.ServiceProvider.GetRequiredService<App>();
         backgroundMediaPlayerService = serviceProvider.GetRequiredService<IBackgroundMediaPlayerService>();
+
+        // P5 启动探针：只在 ELLEN_STARTUP_PROBE 设置时记录，正常启动无副作用。
+        Service.EnemyArchive.StartupProbe.Mark("mainwindow-ctor");
+        MainView.Loaded += OnMainViewLoaded;
+    }
+
+    private void OnMainViewLoaded(object sender, RoutedEventArgs e)
+    {
+        Service.EnemyArchive.StartupProbe.Mark("mainview-loaded");
+        Service.EnemyArchive.StartupProbe.AttachFirstFrame(this);
+        _ = Service.EnemyArchive.WikiUiBench.TryStart(this);
     }
 
     public SizeInt32 InitSize { get => ScaledSizeInt32.CreateForWindow(1200, 741, this); }

@@ -92,6 +92,11 @@ public sealed partial class DailyNoteService : IDailyNoteService, IRecipient<Use
 
                 await PrivateRefreshDailyNotesAsync(forceRefresh, token).ConfigureAwait(false);
             }
+            else if (forceRefresh)
+            {
+                // 集合已经建好时，forceRefresh 仍然要生效：便笺页面每次进入都要求一次联网刷新。
+                await PrivateRefreshDailyNotesAsync(true, token).ConfigureAwait(false);
+            }
 
             return entries;
         }

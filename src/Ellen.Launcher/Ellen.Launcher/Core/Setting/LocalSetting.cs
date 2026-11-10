@@ -141,6 +141,14 @@ public static class LocalSetting
         {
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             string directory = Path.Combine(appData, "EllenLauncher");
+
+            // 便携布局：exe 旁的 portable.json 指定数据目录后，settings.json 本身也跟着走。
+            // 必须在静态构造里决定，因为 InitializeDataDirectory() 随后就要读它。
+            if (PortableLayout.DataDirectory is { } portableDirectory)
+            {
+                directory = portableDirectory;
+            }
+
             Directory.CreateDirectory(directory);
             SettingsFilePath = Path.Combine(directory, "settings.json");
         }

@@ -29,6 +29,23 @@
             <Setter Property="Margin" Value="1,0,0,5"/>
         </Style.Setters>
     </Style>
+
+    <!--  设置页分组容器：一整块面板 + 行内分隔线，视觉参照 ky3 Launcher  -->
+    <Style x:Key="SettingsGroupBorderStyle" TargetType="Border">
+        <Style.Setters>
+            <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}"/>
+            <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="{ThemeResource OverlayCornerRadius}"/>
+        </Style.Setters>
+    </Style>
+    <Style x:Key="SettingsGroupDividerStyle" TargetType="Border">
+        <Style.Setters>
+            <Setter Property="Height" Value="1"/>
+            <Setter Property="Margin" Value="16,0,16,0"/>
+            <Setter Property="Background" Value="{ThemeResource DividerStrokeColorDefaultBrush}"/>
+        </Style.Setters>
+    </Style>
     <Style
         x:Key="SettingsContentComboBoxStyle"
         BasedOn="{StaticResource DefaultComboBoxStyle}"

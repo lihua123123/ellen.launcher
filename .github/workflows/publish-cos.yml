@@ -1,0 +1,84 @@
+name: Publish to COS
+
+# 触发方式：
+#   1) 在 GitHub 发布 Release 时自动跑（把已上传的安装包搬到 COS，并刷新 latest.json）
+#   2) 手动 workflow_dispatch，补传某个历史版本
+#
+# 需要的仓库 Secrets：
+#   COS_SECRET_ID / COS_SECRET_KEY   —— 子账号 API 密钥，只授权 ellen-launcher-1327452638 这个桶
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag（如 v7.2.0.2）'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-cos-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install COS SDK
+        run: python -m pip install --disable-pip-version-check cos-python-sdk-v5
+
+      - name: Check secrets
+        env:
+          COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
+          COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}
+        run: |
+          if [ -z "$COS_SECRET_ID" ] || [ -z "$COS_SECRET_KEY" ]; then
+            echo "::error::缺少 COS_SECRET_ID / COS_SECRET_KEY，请在 Settings → Secrets and variables → Actions 里添加"
+            exit 1
+          fi
+
+      - name: Download release asset
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: |
+          set -euo pipefail
+          mkdir -p cos-staging
+          gh release download "$TAG" --pattern '*-Setup.exe' --dir cos-staging --clobber
+          ls -l cos-staging
+
+      - name: Publish to COS
+        env:
+          COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
+          COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+          exe="$(ls cos-staging/*-Setup.exe | head -n1)"
+          python tools/CosDeploy/publish_cos.py \
+            --version "$version" \
+            --exe "$exe" \
+            --notes "https://github.com/${GITHUB_REPOSITORY}/releases/tag/${TAG}"
+
+      - name: Smoke test public URL
+        run: |
+          set -euo pipefail
+          base="https://ellen-launcher-1327452638.cos.ap-guangzhou.myqcloud.com"
+          curl -fsS --max-time 30 "$base/latest.json?t=$(date +%s)" \
+            | python -c "import json,sys; d=json.load(sys.stdin); print('latest =', d['version'], '| size =', d['installer']['size'], '| sha256 =', d['sha256'][:12] + '…')"

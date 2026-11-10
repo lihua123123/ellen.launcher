@@ -475,3 +475,6 @@ publish/
 # 保留同目录的 sample.json / cal_gold.json（后者是人工精读的金标准）
 _design/enemy-archive/cal/*.png
 _design/enemy-archive/*.png
+
+# COS 发布：CI 里下载 Release 资产的暂存目录
+cos-staging/

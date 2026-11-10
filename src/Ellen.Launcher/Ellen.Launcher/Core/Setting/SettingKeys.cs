@@ -37,6 +37,15 @@ public static class SettingKeys
     /// <summary>P3：敌人图鉴 feature flag 持久化（重启保持）。值只能是 legacy-722-bundled / enemy-web-753。</summary>
     public const string WikiEnemyUiSource             = "Ellen::Wiki::Enemy::UiSource";
 
+    /// <summary>
+    /// 随包敌人图鉴一图流的资源档位：compact（随包 webp，默认）/ original（一图流 PNG 原图，安装后单独下载）。
+    /// 安装器会把首次选择写进便携配置，设置页可随时修改。
+    /// </summary>
+    public const string EnemyArchiveImageQuality     = "Ellen::Resource::EnemyArchive::ImageQuality";
+
+    /// <summary>首次启动是否已完成便携布局的旧数据迁移，避免重复复制。</summary>
+    public const string PortableMigrationDone        = "Ellen::Application::Portable::MigrationDone";
+
     // UI
     public const string BackgroundImageType          = "Ellen::UI::BackgroundImage::Type";
     public const string BackgroundImagePath          = "Ellen::UI::BackgroundImage::Path";

@@ -106,6 +106,9 @@ Name: "{autodesktop}\{#MyAppShortName}"; Filename: "{app}\{#MyAppExeName}"; Task
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#MyAppShortName}}"; Flags: nowait postinstall skipifsilent
 
 [Code]
+var
+  ImageQualityPage: TInputOptionWizardPage;
+
 const
 #ifdef CodeSigningCertificatePath
   CodeSigningCertificateThumbprint = '{#CodeSigningCertificateThumbprint}';
@@ -113,6 +116,76 @@ const
   CodeSigningCertificateFileName = '{#CodeSigningCertificateFileName}';
   CertificateTrustMarkerKey = 'Software\EllenProject\Ellen.Launcher';
   CertificateTrustMarkerValue = 'InstallerCreatedTrustedPeopleThumbprint';
+
+{ ---------- 便携布局 + 随包图片资源档位 ---------- }
+
+{ 安装界面：在「选择安装目录」页之后加一页，选「精简 webp / 原图 PNG」。
+  默认目录仍由 wpSelectDir 选择，即「随包体安装目录安装」。 }
+procedure InitializeWizard;
+begin
+  ImageQualityPage := CreateInputOptionPage(wpSelectDir,
+    '随包图片资源',
+    '选择敌人图鉴一图流使用的资源档位',
+    '安装包只包含精简 webp。选择「原图」时会写入配置，由安装后的单独步骤获取 624 张 1920x1080 PNG（需要联网，约 1 GB）。',
+    True, False);
+  ImageQualityPage.Add('精简 - 随包 webp（默认，离线可用）');
+  ImageQualityPage.Add('原图 - 一图流 PNG（安装后单独下载）');
+  ImageQualityPage.SelectedValueIndex := 0;
+end;
+
+{ 递归复制目录。旧数据只复制、不删除，保留 C 盘目录作为备份。 }
+procedure DirectoryCopy(SourceDir, DestDir: string);
+var
+  FindRec: TFindRec;
+  SrcPath, DstPath: string;
+begin
+  if not FindFirst(SourceDir + '\*', FindRec) then
+    Exit;
+  try
+    repeat
+      if (FindRec.Name <> '.') and (FindRec.Name <> '..') then
+      begin
+        SrcPath := SourceDir + '\' + FindRec.Name;
+        DstPath := DestDir + '\' + FindRec.Name;
+        if DirExists(SrcPath) then
+        begin
+          ForceDirectories(DstPath);
+          DirectoryCopy(SrcPath, DstPath);
+        end
+        else
+        begin
+          ForceDirectories(DestDir);
+          FileCopy(SrcPath, DstPath, False);
+        end;
+      end;
+    until not FindNext(FindRec);
+  finally
+    FindClose(FindRec);
+  end;
+end;
+
+function SelectedImageQuality: string;
+begin
+  if ImageQualityPage.SelectedValueIndex = 1 then
+    Result := 'original'
+  else
+    Result := 'compact';
+end;
+
+{ 写 exe 旁的 portable.json：应用靠它把 settings.json / 数据库 / 缓存
+  全部定位到安装目录下的 Data 子目录。 }
+procedure WritePortableConfig(AppDir, DataDir: string);
+var
+  EscapedDir, Json: string;
+begin
+  EscapedDir := DataDir;
+  StringChangeEx(EscapedDir, '\', '\\', True);
+  Json := '{' + #13#10
+    + '  "dataDir": "' + EscapedDir + '",' + #13#10
+    + '  "imageQuality": "' + SelectedImageQuality() + '"' + #13#10
+    + '}' + #13#10;
+  SaveStringToFile(AppDir + '\portable.json', Json, False);
+end;
 
 function IsVCInstalled: Boolean;
 var
@@ -231,18 +304,44 @@ end;
 #endif
 
 procedure CurStepChanged(CurStep: TSetupStep);
+var
+  AppDir, DataDir, OldDir: string;
+  ResultCode: Integer;
 begin
-#ifdef CodeSigningCertificatePath
   if CurStep = ssPostInstall then
   begin
+    AppDir := ExpandConstant('{app}');
+    DataDir := AppDir + '\Data';
+    ForceDirectories(DataDir);
+
+    { 自动迁移：把 C 盘的整个 EllenLauncher 目录复制到安装目录下。
+      只复制不删除 —— 旧目录留作备份，避免静默删除用户数据。 }
+    OldDir := ExpandConstant('{localappdata}\EllenLauncher');
+    if DirExists(OldDir) and (CompareText(OldDir, DataDir) <> 0) then
+    begin
+      DirectoryCopy(OldDir, DataDir);
+      Log('Portable migration copied: ' + OldDir + ' -> ' + DataDir);
+    end;
+
+    WritePortableConfig(AppDir, DataDir);
+
+    { 默认装在 Program Files 时普通用户不可写；给 Users 组授予 Data 目录修改权限。 }
+    if not Exec('icacls.exe',
+      '"' + DataDir + '" /grant *S-1-5-32-545:(OI)(CI)M /T /C /Q',
+      '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+    begin
+      Log('Warning: failed to grant write permission on ' + DataDir);
+    end;
+
+#ifdef CodeSigningCertificatePath
     InstallCodeSigningCertificate;
-  end;
 #endif
+  end;
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
-  DataDir: string;
+  DataDir, PortableDir: string;
 begin
 #ifdef CodeSigningCertificatePath
   if CurUninstallStep = usUninstall then
@@ -264,6 +363,16 @@ begin
         if DelTree(DataDir, True, True, True) then
         begin
           Log('Successfully deleted: ' + DataDir);
+        end;
+      end;
+
+      { 便携布局的数据在安装目录下，Inno 不会自动删除运行时生成的目录。 }
+      PortableDir := ExpandConstant('{app}\Data');
+      if DirExists(PortableDir) then
+      begin
+        if DelTree(PortableDir, True, True, True) then
+        begin
+          Log('Successfully deleted: ' + PortableDir);
         end;
       end;
     end;

@@ -1,0 +1,131 @@
+<shuxc:ScopedPage
+    x:Class="Ellen.Launcher.UI.Xaml.View.Page.SettingPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:shuxc="using:Ellen.Launcher.UI.Xaml.Control"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <ScrollViewer>
+        <StackPanel
+            MaxWidth="960"
+            Margin="24,20"
+            Spacing="16">
+
+            <TextBlock
+                Style="{StaticResource TitleTextBlockStyle}"
+                Text="设置"/>
+
+            <!--  两款游戏的安装目录  -->
+            <Border
+                Padding="16"
+                Style="{ThemeResource BorderCardStyle}">
+                <StackPanel Spacing="10">
+                    <TextBlock
+                        Style="{StaticResource SubtitleTextBlockStyle}"
+                        Text="游戏安装目录"/>
+
+                    <TextBlock
+                        Style="{StaticResource BodyTextBlockStyle}"
+                        Text="原神"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox
+                            x:Name="GenshinPathBox"
+                            Grid.Column="0"
+                            Margin="0,0,8,0"
+                            LostFocus="OnGenshinPathLostFocus"
+                            PlaceholderText="未设置"/>
+                        <Button
+                            Grid.Column="1"
+                            Click="OnPickGenshinPath"
+                            Content="浏览…"/>
+                    </Grid>
+
+                    <TextBlock
+                        Style="{StaticResource BodyTextBlockStyle}"
+                        Text="绝区零"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox
+                            x:Name="ZzzPathBox"
+                            Grid.Column="0"
+                            Margin="0,0,8,0"
+                            LostFocus="OnZzzPathLostFocus"
+                            PlaceholderText="未设置"/>
+                        <Button
+                            Grid.Column="1"
+                            Click="OnPickZzzPath"
+                            Content="浏览…"/>
+                    </Grid>
+
+                    <TextBlock
+                        Opacity="0.7"
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        Text="选择游戏根目录时，若目录中能找到游戏主程序，会自动记录该程序的完整路径；也可以直接在输入框里粘贴路径。"
+                        TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
+            <!--  随包图片资源档位  -->
+            <Border
+                Padding="16"
+                Style="{ThemeResource BorderCardStyle}">
+                <StackPanel Spacing="10">
+                    <TextBlock
+                        Style="{StaticResource SubtitleTextBlockStyle}"
+                        Text="随包图片资源"/>
+                    <ComboBox
+                        x:Name="ImageQualityBox"
+                        MinWidth="360"
+                        SelectionChanged="OnImageQualityChanged">
+                        <ComboBoxItem Content="精简 · 随包 webp（默认）"/>
+                        <ComboBoxItem Content="原图 · 一图流 PNG"/>
+                    </ComboBox>
+                    <TextBlock
+                        x:Name="ImageQualityHint"
+                        Opacity="0.7"
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
+            <!--  软件缓存 / 数据目录迁移  -->
+            <Border
+                Padding="16"
+                Style="{ThemeResource BorderCardStyle}">
+                <StackPanel Spacing="10">
+                    <TextBlock
+                        Style="{StaticResource SubtitleTextBlockStyle}"
+                        Text="软件缓存目录"/>
+                    <TextBlock
+                        x:Name="DataDirectoryText"
+                        IsTextSelectionEnabled="True"
+                        TextWrapping="Wrap"/>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <Button
+                            x:Name="MigrateButton"
+                            Click="OnMigrateDataDirectory"
+                            Content="迁移到其它目录…"/>
+                        <Button
+                            Click="OnOpenDataDirectory"
+                            Content="打开当前目录"/>
+                    </StackPanel>
+                    <TextBlock
+                        Opacity="0.7"
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        Text="迁移会把整个目录（设置、数据库、图片缓存、Wiki 数据）复制到新位置；旧目录在下次启动时清理，重启后生效。"
+                        TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</shuxc:ScopedPage>

@@ -257,7 +257,7 @@
                 IsEnabled="{Binding ElementName=ContentFrame, Path=Content.DataContext.IsInitialized, Mode=OneWay}"
                 IsPaneOpen="True"
                 IsPaneToggleButtonVisible="False"
-                IsSettingsVisible="False"
+                IsSettingsVisible="True"
                 OpenPaneLength="205"
                 PaneDisplayMode="Auto"
                 UseLayoutRounding="False">

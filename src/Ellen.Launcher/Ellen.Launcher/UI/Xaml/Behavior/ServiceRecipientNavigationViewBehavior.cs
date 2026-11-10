@@ -137,6 +137,9 @@ public sealed class ServiceRecipientNavigationViewBehavior : BehaviorBase<Naviga
 
         if (args.IsSettingsInvoked)
         {
+            // 设置项在 NavigationView 里是自动生成的 SettingsItem，不在 MenuItems 中，
+            // 没法挂 NavigationViewItemHelper.NavigateTo，所以直接在这里导航。
+            _ = Navigate(sender, typeof(SettingPage), NavigationExtraData.Default, syncNavigationViewItem: false);
             return;
         }
 
@@ -209,6 +212,12 @@ public sealed class ServiceRecipientNavigationViewBehavior : BehaviorBase<Naviga
         if (pageType is null)
         {
             return false;
+        }
+
+        if (pageType == typeof(SettingPage))
+        {
+            navigationView.SelectedItem = navigationView.SettingsItem;
+            return true;
         }
 
         NavigationViewItem? target = EnumerateMenuItems(navigationView.MenuItems)

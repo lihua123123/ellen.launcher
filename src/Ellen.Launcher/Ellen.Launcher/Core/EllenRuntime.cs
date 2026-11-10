@@ -25,9 +25,11 @@ public static class EllenRuntime
 
     public static string DataDirectory { get; } = InitializeDataDirectory();
 
+    // 缓存始终是数据目录下的 Cache 子目录：默认布局下与原来的
+    // %LOCALAPPDATA%\EllenLauncher\Cache 完全一致，便携布局下自动跟到安装目录。
     public static string LocalCacheDirectory { get; } = RuntimeEnvironment.IsPackaged
         ? ApplicationData.Current.LocalCacheFolder.Path
-        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"EllenLauncher\Cache");
+        : Path.Combine(DataDirectory, "Cache");
 
     public static string FamilyName { get; } = RuntimeEnvironment.IsPackaged
         ? Package.Current.Id.FamilyName
@@ -135,6 +137,16 @@ public static class EllenRuntime
 
     private static string InitializeDataDirectory()
     {
+        // 便携布局优先：安装器已经把旧数据复制到 {app}\Data，这里直接认它。
+        // 不执行下面的「删旧目录」逻辑 —— 旧目录是复制来源，保留作为备份，
+        // 而且误删用户 %LOCALAPPDATA% 内容的风险远大于省下的那点磁盘。
+        if (!RuntimeEnvironment.IsPackaged && PortableLayout.DataDirectory is { } portableDirectory)
+        {
+            Directory.CreateDirectory(portableDirectory);
+            LocalSetting.Set(SettingKeys.DataDirectory, portableDirectory);
+            return portableDirectory;
+        }
+
         // Delete the previous data folder if it exists
         try
         {

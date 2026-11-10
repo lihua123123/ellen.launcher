@@ -24,7 +24,7 @@
 #define MyAppName "Ellen.Launcher"
 #define MyAppShortName "Ellen.Launcher"
 #ifndef MyAppVersion
-  #define MyAppVersion "7.2.0.2"
+  #define MyAppVersion "7.2.0.3"
 #endif
 #ifndef MyAppVersionSuffix
   #define MyAppVersionSuffix ""
@@ -126,41 +126,29 @@ begin
   ImageQualityPage := CreateInputOptionPage(wpSelectDir,
     '随包图片资源',
     '选择敌人图鉴一图流使用的资源档位',
-    '安装包只包含精简 webp。选择「原图」时会写入配置，由安装后的单独步骤获取 624 张 1920x1080 PNG（需要联网，约 1 GB）。',
+    '安装包只包含精简 webp。原图档位（1920×1080 PNG）尚未接通：当前无论选哪项都按随包 webp 显示，选择会被记录下来，供后续版本使用。',
     True, False);
   ImageQualityPage.Add('精简 - 随包 webp（默认，离线可用）');
   ImageQualityPage.Add('原图 - 一图流 PNG（安装后单独下载）');
   ImageQualityPage.SelectedValueIndex := 0;
 end;
 
-{ 递归复制目录。旧数据只复制、不删除，保留 C 盘目录作为备份。 }
-procedure DirectoryCopy(SourceDir, DestDir: string);
-var
-  FindRec: TFindRec;
-  SrcPath, DstPath: string;
+{ 判断目录里有没有「真正的用户数据」，用来区分全新安装和升级。
+  只看标志性文件/目录，避免把安装器刚建出来的空 Data 当成已有数据。 }
+function HasUserData(Dir: string): Boolean;
 begin
-  if not FindFirst(SourceDir + '\*', FindRec) then
-    Exit;
-  try
-    repeat
-      if (FindRec.Name <> '.') and (FindRec.Name <> '..') then
-      begin
-        SrcPath := SourceDir + '\' + FindRec.Name;
-        DstPath := DestDir + '\' + FindRec.Name;
-        if DirExists(SrcPath) then
-        begin
-          ForceDirectories(DstPath);
-          DirectoryCopy(SrcPath, DstPath);
-        end
-        else
-        begin
-          ForceDirectories(DestDir);
-          FileCopy(SrcPath, DstPath, False);
-        end;
-      end;
-    until not FindNext(FindRec);
-  finally
-    FindClose(FindRec);
+  Result := FileExists(Dir + '\settings.json')
+    or FileExists(Dir + '\Userdata.db')
+    or DirExists(Dir + '\Cache');
+end;
+
+{ 便携布局关闭时，把 exe 旁可能存在的 portable.json 删掉，避免沿用上一版的设置。 }
+procedure RemovePortableConfig(AppDir: string);
+begin
+  if FileExists(AppDir + '\portable.json') then
+  begin
+    DeleteFile(AppDir + '\portable.json');
+    Log('Removed stale portable.json');
   end;
 end;
 
@@ -307,30 +295,43 @@ procedure CurStepChanged(CurStep: TSetupStep);
 var
   AppDir, DataDir, OldDir: string;
   ResultCode: Integer;
+  UsePortable: Boolean;
 begin
   if CurStep = ssPostInstall then
   begin
     AppDir := ExpandConstant('{app}');
     DataDir := AppDir + '\Data';
-    ForceDirectories(DataDir);
-
-    { 自动迁移：把 C 盘的整个 EllenLauncher 目录复制到安装目录下。
-      只复制不删除 —— 旧目录留作备份，避免静默删除用户数据。 }
     OldDir := ExpandConstant('{localappdata}\EllenLauncher');
-    if DirExists(OldDir) and (CompareText(OldDir, DataDir) <> 0) then
-    begin
-      DirectoryCopy(OldDir, DataDir);
-      Log('Portable migration copied: ' + OldDir + ' -> ' + DataDir);
-    end;
 
-    WritePortableConfig(AppDir, DataDir);
+    { 便携布局只在「全新安装」启用：
+      · 安装目录下的 Data 里已经有数据 → 本来就装的是便携版，继续便携；
+      · LOCALAPPDATA 里有老数据        → 老用户升级，保持原布局原地不动
+                                         （不复制、不搬，否则每次升级都白复制 400+ MB）；
+      · 两边都没有                     → 全新安装，启用便携。 }
+    if HasUserData(DataDir) then
+      UsePortable := True
+    else if HasUserData(OldDir) then
+      UsePortable := False
+    else
+      UsePortable := True;
 
-    { 默认装在 Program Files 时普通用户不可写；给 Users 组授予 Data 目录修改权限。 }
-    if not Exec('icacls.exe',
-      '"' + DataDir + '" /grant *S-1-5-32-545:(OI)(CI)M /T /C /Q',
-      '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+    if UsePortable then
     begin
-      Log('Warning: failed to grant write permission on ' + DataDir);
+      ForceDirectories(DataDir);
+      WritePortableConfig(AppDir, DataDir);
+
+      { 默认装在 Program Files 时普通用户不可写；给 Users 组授予 Data 目录修改权限。 }
+      if not Exec('icacls.exe',
+        '"' + DataDir + '" /grant *S-1-5-32-545:(OI)(CI)M /T /C /Q',
+        '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+      begin
+        Log('Warning: failed to grant write permission on ' + DataDir);
+      end;
+    end
+    else
+    begin
+      RemovePortableConfig(AppDir);
+      Log('Existing data at ' + OldDir + '; keep legacy layout, portable disabled.');
     end;
 
 #ifdef CodeSigningCertificatePath

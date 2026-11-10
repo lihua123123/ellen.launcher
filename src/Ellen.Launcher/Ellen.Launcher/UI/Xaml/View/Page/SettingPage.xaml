@@ -200,6 +200,7 @@
                         <Border Style="{StaticResource SettingsGroupDividerStyle}" />
 
                         <cwc:SettingsCard
+                            x:Name="MigrateCard"
                             Margin="0"
                             Padding="16,16"
                             BorderThickness="0"
@@ -211,6 +212,7 @@
                             </cwc:SettingsCard.HeaderIcon>
                             <cwc:SettingsCard.Description>
                                 <TextBlock
+                                    x:Name="MigrateHint"
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                     Style="{StaticResource CaptionTextBlockStyle}"
                                     Text="复制整个目录后重启生效，旧目录在下次启动时清理"

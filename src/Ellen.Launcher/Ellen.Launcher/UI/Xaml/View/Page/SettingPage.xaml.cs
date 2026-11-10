@@ -65,6 +65,16 @@ public sealed partial class SettingPage : ScopedPage
         UpdateImageQualityHint();
 
         DataPathText.Text = EllenRuntime.DataDirectory;
+
+        // 便携布局下 InitializeDataDirectory 直接认 exe 旁的 portable.json，忽略
+        // SettingKeys.DataDirectory —— 在这里再跑迁移只会白复制一份然后下次启动被无视，
+        // 所以直接把这行关掉并说明原因。
+        if (PortableLayout.IsEnabled)
+        {
+            MigrateCard.IsClickEnabled = false;
+            MigrateCard.IsEnabled = false;
+            MigrateHint.Text = "便携模式：数据存放在安装目录下的 Data 子目录，跟随安装位置。要换位置请重新安装到目标目录。";
+        }
     }
 
     private static void UpdateGamePathText(TextBlock target, string settingKey)

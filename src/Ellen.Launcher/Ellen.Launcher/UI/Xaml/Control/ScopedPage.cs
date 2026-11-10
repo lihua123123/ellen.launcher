@@ -130,10 +130,20 @@ public partial class ScopedPage : Page
 
         if (DataContext is IViewModel viewModel)
         {
-            // Wait to ensure critical viewmodel operation is completed
-            using (viewModel.CriticalSection.Enter())
+            try
             {
-                viewModel.Uninitialize();
+                // Wait to ensure critical viewmodel operation is completed
+                using (viewModel.CriticalSection.Enter())
+                {
+                    viewModel.Uninitialize();
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // 信号量已随作用域一起释放（页面缓存归来后重复卸载、或 DI 作用域先于页面销毁）。
+                // SemaphoreSlimExtension.Enter 会把 ObjectDisposedException 转成 OperationCanceledException；
+                // 这种情况下 ViewModel 早已拆完，没有需要再 Uninitialize 的东西，继续往下清理即可。
+                // 不吞的话异常会从 Unloaded 事件逸出 → 0xC000027B (STOWED_EXCEPTION) 关闭应用时崩溃。
             }
 
             try

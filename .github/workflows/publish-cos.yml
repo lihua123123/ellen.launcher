@@ -6,6 +6,10 @@ name: Publish to COS
 #
 # 需要的仓库 Secrets：
 #   COS_SECRET_ID / COS_SECRET_KEY   —— 子账号 API 密钥，只授权 ellen-launcher-1327452638 这个桶
+#
+# 未配置密钥时不会报错，只留一条 notice 后跳过整条流水线。
+# 注意：secrets 上下文不能用在 job 级 if 里（会导致工作流校验失败、0 个 job），
+# 所以这里用「先探测再当输出」的写法。
 
 on:
   release:
@@ -13,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Release tag（如 v7.2.0.2）'
+        description: 'Release tag（如 v7.2.0.3）'
         required: true
         type: string
 
@@ -28,34 +32,38 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     timeout-minutes: 40
-    # 还没配 COS 密钥时直接跳过，避免每次发版都留一个失败记录。
-    # 配好 COS_SECRET_ID / COS_SECRET_KEY 之后自动生效。
-    if: ${{ secrets.COS_SECRET_ID != '' && secrets.COS_SECRET_KEY != '' }}
     steps:
-      - name: Checkout default branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.repository.default_branch }}
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install COS SDK
-        run: python -m pip install --disable-pip-version-check cos-python-sdk-v5
-
-      - name: Check secrets
+      - name: Check COS credentials
+        id: cfg
         env:
           COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
           COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}
         run: |
           if [ -z "$COS_SECRET_ID" ] || [ -z "$COS_SECRET_KEY" ]; then
-            echo "::error::缺少 COS_SECRET_ID / COS_SECRET_KEY，请在 Settings → Secrets and variables → Actions 里添加"
-            exit 1
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=COS 未配置::仓库还没加 COS_SECRET_ID / COS_SECRET_KEY，本次跳过上传"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Checkout default branch
+        if: steps.cfg.outputs.configured == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Setup Python
+        if: steps.cfg.outputs.configured == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install COS SDK
+        if: steps.cfg.outputs.configured == 'true'
+        run: python -m pip install --disable-pip-version-check cos-python-sdk-v5
+
       - name: Download release asset
+        if: steps.cfg.outputs.configured == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ github.event.release.tag_name || inputs.tag }}
@@ -66,6 +74,7 @@ jobs:
           ls -l cos-staging
 
       - name: Publish to COS
+        if: steps.cfg.outputs.configured == 'true'
         env:
           COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
           COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}
@@ -80,6 +89,7 @@ jobs:
             --notes "https://github.com/${GITHUB_REPOSITORY}/releases/tag/${TAG}"
 
       - name: Smoke test public URL
+        if: steps.cfg.outputs.configured == 'true'
         run: |
           set -euo pipefail
           base="https://ellen-launcher-1327452638.cos.ap-guangzhou.myqcloud.com"

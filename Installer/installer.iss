@@ -343,6 +343,8 @@ end;
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
   DataDir, PortableDir: string;
+  ResultCode: Integer;
+  AnyFailed: Boolean;
 begin
 #ifdef CodeSigningCertificatePath
   if CurUninstallStep = usUninstall then
@@ -353,28 +355,57 @@ begin
 
   if (CurUninstallStep = usPostUninstall) and not UninstallSilent then
   begin
+    DataDir := ExpandConstant('{localappdata}\EllenLauncher');
+    PortableDir := ExpandConstant('{app}\Data');
+
+    { 默认按钮必须是「否」。删数据不可逆：账号登录态、界面布局、图片缓存
+      一次点掉就没了，重装也救不回来。历史上就是这里默认「是」，
+      用户顺手回车 → 设置和缓存被删 → 以为是新版本弄丢了功能。 }
     if MsgBox(
-      '是否同时删除用户数据和缓存？' + #13#10 +
-      'Do you also want to remove user data and cache?',
-      mbConfirmation, MB_YESNO) = IDYES then
+      '是否同时删除用户数据和缓存？' + #13#10#13#10 +
+      '数据位置：' + DataDir + #13#10 +
+      '删除后账号登录状态、界面布局、图片缓存全部消失，重新安装也无法恢复。' + #13#10 +
+      '只是升级或重装请选「否」，数据会原样保留。' + #13#10#13#10 +
+      'Do you also want to remove user data and cache?' + #13#10 +
+      'Choose "No" unless you really want a clean slate.',
+      mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES then
     begin
-      DataDir := ExpandConstant('{localappdata}\EllenLauncher');
+      { 先结束进程：文件被占用时 DelTree 会删一半就失败，
+        留下「设置没了、数据库还在」的半残状态，比全删更难排查。 }
+      Exec('taskkill.exe', '/F /IM Ellen.Launcher.exe /T', '',
+        SW_HIDE, ewWaitUntilTerminated, ResultCode);
+      Sleep(1200);
+
+      AnyFailed := False;
+
       if DirExists(DataDir) then
       begin
         if DelTree(DataDir, True, True, True) then
+          Log('Successfully deleted: ' + DataDir)
+        else
         begin
-          Log('Successfully deleted: ' + DataDir);
+          AnyFailed := True;
+          Log('Failed to delete: ' + DataDir);
         end;
       end;
 
       { 便携布局的数据在安装目录下，Inno 不会自动删除运行时生成的目录。 }
-      PortableDir := ExpandConstant('{app}\Data');
       if DirExists(PortableDir) then
       begin
         if DelTree(PortableDir, True, True, True) then
+          Log('Successfully deleted: ' + PortableDir)
+        else
         begin
-          Log('Successfully deleted: ' + PortableDir);
+          AnyFailed := True;
+          Log('Failed to delete: ' + PortableDir);
         end;
+      end;
+
+      if AnyFailed then
+      begin
+        MsgBox('部分文件未能删除（可能仍被其它程序占用）。' + #13#10 +
+          '请关闭 Ellen.Launcher 后手动删除上面的数据目录。',
+          mbInformation, MB_OK);
       end;
     end;
   end;

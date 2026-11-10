@@ -1,7 +1,6 @@
 // Copyright (c) DGP Studio. All rights reserved.
 // Licensed under the MIT license.
 
-using CommunityToolkit.Common;
 using Ellen.Launcher.Core;
 using Ellen.Launcher.Core.Setting;
 using Ellen.Launcher.Factory.ContentDialog;
@@ -13,7 +12,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Diagnostics;
 using System.IO;
-using System.Text.Json;
 
 namespace Ellen.Launcher.UI.Xaml.View.Page;
 
@@ -22,10 +20,9 @@ namespace Ellen.Launcher.UI.Xaml.View.Page;
 /// <c>IsSettingsVisible="False"</c>），但底层 SettingKeys、文件夹选择器、
 /// 数据目录迁移操作和样式资源都还在，这里把它们重新接成可用 UI。
 ///
-/// 布局参照 ky3 Launcher：品牌头卡 + 分组标题 + 整块圆角面板（行内分隔线），
-/// 每行是「图标 + 标题 / 说明 + 右侧控件」。四组：游戏安装目录 / 图鉴图片资源 /
-/// 存储空间（数据、缓存、安装目录 + 数据目录迁移）。
-/// 不新建 ViewModel（只用 LocalSetting，避免改动启动期 DI）。
+/// 只放三件事：两款游戏的安装目录、图鉴图片资源档位、数据与缓存目录迁移。
+/// 布局沿用设置卡片的观感（分组标题 + 整块面板 + 行内分隔线 + 行右侧控件），
+/// 宽度随窗口自适应，不新建 ViewModel（只用 LocalSetting，避免改动启动期 DI）。
 /// </summary>
 public sealed partial class SettingPage : ScopedPage
 {
@@ -40,8 +37,6 @@ public sealed partial class SettingPage : ScopedPage
         InitializeComponent();
         Loaded += OnLoaded;
     }
-
-    private static string BundledDirectory => Path.Combine(AppContext.BaseDirectory, @"Resource\EnemyArchives\Web753");
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
@@ -70,121 +65,12 @@ public sealed partial class SettingPage : ScopedPage
         UpdateImageQualityHint();
 
         DataPathText.Text = EllenRuntime.DataDirectory;
-        CachePathText.Text = EllenRuntime.LocalCacheDirectory;
-        InstallPathText.Text = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
-
-        _ = RefreshStorageInformationAsync();
     }
 
     private static void UpdateGamePathText(TextBlock target, string settingKey)
     {
         string value = LocalSetting.Get(settingKey, string.Empty);
-        target.Text = string.IsNullOrWhiteSpace(value) ? "未设置（点击右侧「选择文件夹」指定游戏根目录）" : value;
-    }
-
-    private async Task RefreshStorageInformationAsync()
-    {
-        (long dataSize, long cacheSize, long installSize) = await Task.Run(() =>
-        {
-            long data = GetDirectorySize(EllenRuntime.DataDirectory);
-            long cache = GetDirectorySize(EllenRuntime.LocalCacheDirectory);
-            long install = GetDirectorySize(AppContext.BaseDirectory);
-            return (data, cache, install);
-        }).ConfigureAwait(true);
-
-        DataSizeText.Text = $"已使用磁盘空间：{Converters.ToFileSizeString(dataSize)}";
-        CacheSizeText.Text = $"已使用磁盘空间：{Converters.ToFileSizeString(cacheSize)}";
-        InstallSizeText.Text = $"已使用磁盘空间：{Converters.ToFileSizeString(installSize)}";
-
-        (int count, int images, long bytes) = await Task.Run(ReadBundledSummary).ConfigureAwait(true);
-        BundledText.Text = count > 0
-            ? $"随包 Web753 数据：{count} 条图鉴 · {images:N0} 张图片 · {Converters.ToFileSizeString(bytes)}"
-            : "未找到随包图鉴数据（Resource\\EnemyArchives\\Web753）";
-    }
-
-    private static (int Count, int Images, long Bytes) ReadBundledSummary()
-    {
-        string directory = BundledDirectory;
-        if (!Directory.Exists(directory))
-        {
-            return (0, 0, 0);
-        }
-
-        int images = 0;
-        long bytes = 0;
-        try
-        {
-            foreach (string file in Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories))
-            {
-                try
-                {
-                    bytes += new FileInfo(file).Length;
-                    if (file.EndsWith(".webp", StringComparison.OrdinalIgnoreCase))
-                    {
-                        images++;
-                    }
-                }
-                catch (IOException)
-                {
-                    // 统计失败的文件跳过，不影响页面
-                }
-            }
-        }
-        catch (Exception)
-        {
-            // 目录不可读时如实降级为空统计
-        }
-
-        int count = 0;
-        string bundled = Path.Combine(directory, "bundled-all.json");
-        if (File.Exists(bundled))
-        {
-            try
-            {
-                using FileStream stream = File.OpenRead(bundled);
-                using JsonDocument document = JsonDocument.Parse(stream);
-                if (document.RootElement.TryGetProperty("count", out JsonElement element) && element.TryGetInt32(out int value))
-                {
-                    count = value;
-                }
-            }
-            catch (JsonException)
-            {
-                // 数据结构异常时只显示文件统计
-            }
-        }
-
-        return (count, images, bytes);
-    }
-
-    private static long GetDirectorySize(string path)
-    {
-        if (string.IsNullOrEmpty(path) || !Directory.Exists(path))
-        {
-            return 0;
-        }
-
-        long total = 0;
-        try
-        {
-            foreach (string file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
-            {
-                try
-                {
-                    total += new FileInfo(file).Length;
-                }
-                catch (IOException)
-                {
-                    // 单个文件读不到就跳过
-                }
-            }
-        }
-        catch (Exception)
-        {
-            // 目录枚举失败按 0 处理
-        }
-
-        return total;
+        target.Text = string.IsNullOrWhiteSpace(value) ? "未设置 · 点右侧「选择文件夹」指定游戏根目录" : value;
     }
 
     private void OnPickGenshinPath(object sender, RoutedEventArgs e)
@@ -254,16 +140,6 @@ public sealed partial class SettingPage : ScopedPage
     private void OnOpenDataDirectory(object sender, RoutedEventArgs e)
     {
         OpenInExplorer(EllenRuntime.DataDirectory);
-    }
-
-    private void OnOpenCacheDirectory(object sender, RoutedEventArgs e)
-    {
-        OpenInExplorer(EllenRuntime.LocalCacheDirectory);
-    }
-
-    private void OnOpenInstallDirectory(object sender, RoutedEventArgs e)
-    {
-        OpenInExplorer(AppContext.BaseDirectory);
     }
 
     private static void OpenInExplorer(string path)

@@ -1,13 +1,13 @@
 {
   "Id": 10000057,
   "PromoteId": 57,
-  "Sort": 43,
+  "Sort": 203057,
   "Body": 4,
   "Icon": "UI_AvatarIcon_Itto",
   "SideIcon": "UI_AvatarIcon_Side_Itto",
   "Name": "荒泷一斗",
   "Description": "活跃在稻妻城花见坂的「荒泷派」初代目头领。什么，从没听说过荒泷派？你是想找茬吗？",
-  "BeginTime": "2021-12-14T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 11,
   "BaseValue": {
@@ -319,8 +319,7 @@
                 60
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10571,
         "Name": "喧哗屋传说",
@@ -503,8 +502,7 @@
                 10
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10572,
         "Name": "魔杀绝技·赤牛发破！",
@@ -705,8 +703,7 @@
               70
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10575,
       "Name": "最恶鬼王·一斗轰临！！",
@@ -726,8 +723,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 572101,
         "Name": "荒泷第一",
@@ -747,8 +743,7 @@
                 0.35
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 572201,
         "Name": "赤鬼之血",
@@ -766,8 +761,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 572301,
         "Name": "干裂枝碎",
@@ -831,7 +825,8 @@
     "BirthMonth": 6,
     "BirthDay": 1,
     "VisionBefore": "岩",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "天牛座",
     "CvChinese": "刘照坤",
     "CvJapanese": "西川贵教",

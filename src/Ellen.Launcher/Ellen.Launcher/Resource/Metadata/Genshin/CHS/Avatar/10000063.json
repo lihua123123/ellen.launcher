@@ -1,13 +1,13 @@
 {
   "Id": 10000063,
   "PromoteId": 63,
-  "Sort": 45,
+  "Sort": 204063,
   "Body": 3,
   "Icon": "UI_AvatarIcon_Shenhe",
   "SideIcon": "UI_AvatarIcon_Side_Shenhe",
   "Name": "申鹤",
   "Description": "气质出尘的仙家子弟。隐修在璃月群山之间，个性也如仙人般淡漠疏离。",
-  "BeginTime": "2022-01-05T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 13,
   "BaseValue": {
@@ -302,8 +302,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10631,
         "Name": "踏辰摄斗",
@@ -549,8 +548,7 @@
                 15
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10632,
         "Name": "仰灵威召将役咒",
@@ -752,8 +750,7 @@
               80
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10635,
       "Name": "神女遣灵真诀",
@@ -775,8 +772,7 @@
                 0.15
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 632101,
         "Name": "大洞弥罗尊法",
@@ -799,8 +795,7 @@
                 15
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 632201,
         "Name": "缚灵通真法印",
@@ -818,8 +813,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 632301,
         "Name": "来复知时",
@@ -883,7 +877,8 @@
     "BirthMonth": 3,
     "BirthDay": 10,
     "VisionBefore": "冰",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "愁疏座",
     "CvChinese": "秦紫翼",
     "CvJapanese": "川澄绫子",

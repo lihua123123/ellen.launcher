@@ -1,13 +1,13 @@
 {
   "Id": 10000051,
   "PromoteId": 51,
-  "Sort": 32,
+  "Sort": 105051,
   "Body": 3,
   "Icon": "UI_AvatarIcon_Eula",
   "SideIcon": "UI_AvatarIcon_Side_Eula",
   "Name": "优菈",
   "Description": "古老家族出身的「浪花骑士」，西风骑士团游击小队队长。身为旧贵族后裔却加入了堪称死对头的西风骑士团，该事件至今仍是蒙德一大谜团。",
-  "BeginTime": "2021-05-18T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 11,
   "BaseValue": {
@@ -319,8 +319,7 @@
                 5.413209
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10511,
         "Name": "西风剑术·宗室",
@@ -629,8 +628,7 @@
                 18
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10512,
         "Name": "冰潮的涡旋",
@@ -832,8 +830,7 @@
               80
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10515,
       "Name": "凝浪之光剑",
@@ -855,8 +852,7 @@
                 0.5
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 512101,
         "Name": "潮卷冰削",
@@ -874,8 +870,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 512201,
         "Name": "战欲涌现",
@@ -893,8 +888,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 512301,
         "Name": "贵族的自省",
@@ -958,7 +952,8 @@
     "BirthMonth": 10,
     "BirthDay": 25,
     "VisionBefore": "冰",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "浪沫座",
     "CvChinese": "子音",
     "CvJapanese": "佐藤利奈",

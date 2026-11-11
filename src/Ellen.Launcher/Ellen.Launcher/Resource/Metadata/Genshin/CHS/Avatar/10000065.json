@@ -1,13 +1,13 @@
 {
   "Id": 10000065,
   "PromoteId": 65,
-  "Sort": 49,
+  "Sort": 207065,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Shinobu",
   "SideIcon": "UI_AvatarIcon_Side_Shinobu",
   "Name": "久岐忍",
   "Description": "干练可靠的「荒泷派」的副手——特别注明：干练可靠形容的不是「荒泷派」而是副手。",
-  "BeginTime": "2022-06-21T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 1,
   "BaseValue": {
@@ -286,8 +286,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10651,
         "Name": "忍流飞刃斩",
@@ -502,8 +501,7 @@
                 15
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10652,
         "Name": "越祓雷草之轮",
@@ -719,8 +717,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10655,
       "Name": "御咏鸣神刈山祭",
@@ -743,8 +740,7 @@
                 0.15
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 652101,
         "Name": "破笼之志",
@@ -765,8 +761,7 @@
                 0.25
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 652201,
         "Name": "安心之所",
@@ -784,8 +779,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 652301,
         "Name": "久时的祝祷",
@@ -849,7 +843,8 @@
     "BirthMonth": 7,
     "BirthDay": 27,
     "VisionBefore": "雷",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "烦恼刈座",
     "CvChinese": "杨凝",
     "CvJapanese": "水桥香织",

@@ -1,13 +1,13 @@
 {
   "Id": 10000087,
   "PromoteId": 87,
-  "Sort": 71,
+  "Sort": 401087,
   "Body": 4,
   "Icon": "UI_AvatarIcon_Neuvillette",
   "SideIcon": "UI_AvatarIcon_Side_Neuvillette",
   "Name": "那维莱特",
   "Description": "枫丹的最高审判官，因其无懈可击的「秉公无私」而闻名。",
-  "BeginTime": "2023-09-26T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 10,
   "BaseValue": {
@@ -333,8 +333,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10871,
         "Name": "如水从平",
@@ -518,8 +517,7 @@
                 10
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10872,
         "Name": "泪水啊，我必偿还",
@@ -689,8 +687,7 @@
               70
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10875,
       "Name": "潮水啊，我已归来",
@@ -715,8 +712,7 @@
                 30
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 872101,
         "Name": "古海孑遗的权柄",
@@ -738,8 +734,7 @@
                 0.6
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 872201,
         "Name": "至高仲裁的纪律",
@@ -757,8 +752,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 872301,
         "Name": "汇聚如浪潮一般",
@@ -822,11 +816,9 @@
     "BirthMonth": 12,
     "BirthDay": 18,
     "VisionBefore": "水",
-    "VisionAfter": "水",
-    "VisionOverrideLocked": "？？？",
-    "VisionOverrideUnlocked": "古龙大权",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "？？？",
-    "ConstellationAfter": "原海巨灵座",
     "CvChinese": "桑毓泽",
     "CvJapanese": "神谷浩史",
     "CvEnglish": "雷·查斯",
@@ -1176,7 +1168,9 @@
         "Title": "神之眼",
         "Context": "那维莱特本身并不需要使用神之眼来驱动元素力量。只不过有些事情他也是在最后成为完全之体时才知晓的：\n在复仇的大战中受到重创，僭位者机能损毁，无力再凭借自己的绝对威权压制这个世界本来的秩序。为了镇压、调服世界的不甘与愤恨，僭位者与另一位后来者一同制造了「神之心」。世上应当建立起这样的秩序，人因此也只能拥有这七类念想。所有来自原初的碎片被驱使着互相吞并。\n在那以后，当人的渴望传达天上，七位物质世界的执政就应当为了他而献礼。尽管并不知晓究竟是何人或者何种愿望通达了神圣的境地，七神仍需分封出自身支配权的碎屑予其人。而当获取了赠礼的人完成使命之后…众神收到的回赠也会更加丰厚。\n那维莱特虽然并不听从天上的传谕，但是他认可人类的意义。他也献出了自己的一部分，就像是最传统的龙之宝藏一样，等待着勇敢的人前来领取。"
       }
-    ]
+    ],
+    "VisionAfter": "水",
+    "ConstellationAfter": "原海巨灵座"
   },
   "Costumes": [
     {

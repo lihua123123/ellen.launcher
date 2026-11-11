@@ -1,13 +1,13 @@
 {
   "Id": 10000132,
   "PromoteId": 132,
-  "Sort": 115,
+  "Sort": 606132,
   "Body": 5,
   "Icon": "UI_AvatarIcon_Prune",
   "SideIcon": "UI_AvatarIcon_Side_Prune",
   "Name": "布伦妮",
   "Description": "小小的「魔女猎人」。从挪德卡莱跋涉而来，只为了讨伐那位在她口中以大欺小、无恶不作的魔女。",
-  "BeginTime": "2026-05-19T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 10,
   "BaseValue": {
@@ -255,8 +255,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11321,
         "Name": "隆咚咚·破魔之锤",
@@ -408,8 +407,7 @@
                 15
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11322,
         "Name": "叮铃铃·猎魔之音",
@@ -417,32 +415,6 @@
         "SpecialEnergyType": 0,
         "Icon": "Skill_S_Prune_01",
         "CdTime": 15
-      }
-    ],
-    "SpecialSkills": [
-      {
-        "GroupId": 13251,
-        "Proud": {
-          "Descriptions": [],
-          "Parameters": [
-            {
-              "Id": 1325101,
-              "Level": 1,
-              "Parameters": [
-                0.6,
-                5,
-                0.3,
-                5
-              ]
-            }
-          ],
-          "Display": 3
-        },
-        "Id": 1325101,
-        "Name": "魔女的前夜礼·寻魔之誓",
-        "Description": "完成<color=#FFD780FF>魔女的课业·辩驳之题</color>后，布伦妮将成为<color=#FFD780FF>魔导</color>角色。队伍中编入至少2名魔导角色时，将获得<color=#FFD780FF>魔导·秘仪</color>效果，使魔导角色获得强化。\n\n<color=#FFD780FF>魔导·秘仪</color>\n队伍中处于「振铃鼓舞」效果影响下的魔导角色对敌人触发任意元素反应后，布伦妮自身的攻击力提高60%，持续5秒；若该角色触发的元素反应为扩散或星扩散反应，则其自身的攻击力还将额外提高30%，持续5秒。",
-        "SpecialEnergyType": 0,
-        "Icon": "UI_Talent_S_Prune_07"
       }
     ],
     "EnergySkill": {
@@ -621,8 +593,7 @@
               70
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11325,
       "Name": "铃鸣·狩魔之刻",
@@ -631,6 +602,26 @@
       "Icon": "Skill_E_Prune_01",
       "CdTime": 18
     },
+    "SpecialSkills": [
+      {
+        "GroupId": 13251,
+        "Proud": {
+          "Descriptions": [],
+          "Parameters": [
+            {
+              "Id": 1325101,
+              "Level": 1,
+              "Parameters": []
+            }
+          ]
+        },
+        "Id": 1325101,
+        "Name": "魔女的前夜礼·寻魔之誓",
+        "Description": "完成<color=#FFD780FF>魔女的课业·辩驳之题</color>后，布伦妮将成为<color=#FFD780FF>魔导</color>角色。队伍中编入至少2名魔导角色时，将获得<color=#FFD780FF>魔导·秘仪</color>效果，使魔导角色获得强化。\n\n<color=#FFD780FF>魔导·秘仪</color>\n队伍中处于「振铃鼓舞」效果影响下的魔导角色对敌人触发任意元素反应后，布伦妮自身的攻击力提高60%，持续5秒；若该角色触发的元素反应为扩散或星扩散反应，则其自身的攻击力还将额外提高30%，持续5秒。",
+        "SpecialEnergyType": 0,
+        "Icon": "UI_Talent_S_Prune_07"
+      }
+    ],
     "Inherents": [
       {
         "GroupId": 13221,
@@ -644,8 +635,7 @@
                 1.5
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1322101,
         "Name": "裁断追惩",
@@ -668,8 +658,7 @@
                 2000
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1322201,
         "Name": "振铃同心",
@@ -687,8 +676,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1322301,
         "Name": "改装！敲敲打打！",
@@ -752,7 +740,8 @@
     "BirthMonth": 11,
     "BirthDay": 20,
     "VisionBefore": "风",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "魔塔座",
     "CvChinese": "宴宁",
     "CvJapanese": "长月葵",
@@ -1141,6 +1130,6 @@
     "Name": "布伦妮·制裁",
     "Description": "名片纹饰。\n「我迄今为止、波澜壮阔的半生，如果写成回忆录，名字就叫《给邪恶的魔女制裁的铁锤》！」尽管，这个波澜壮阔的半生其实也没几年就是了。",
     "Icon": "UI_NameCardIcon_Prune",
-    "PicturePrefix": "UI_NameCardPicrune"
+    "PicturePrefix": "UI_NameCardPic_Prune"
   }
 }

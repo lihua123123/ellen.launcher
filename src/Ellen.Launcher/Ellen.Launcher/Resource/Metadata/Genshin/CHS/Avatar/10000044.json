@@ -1,13 +1,13 @@
 {
   "Id": 10000044,
   "PromoteId": 44,
-  "Sort": 25,
+  "Sort": 101044,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Xinyan",
   "SideIcon": "UI_AvatarIcon_Side_Xinyan",
   "Name": "辛焱",
   "Description": "璃月港唯一的摇滚乐手，以音乐和热情歌颂着对「成见」的反抗。",
-  "BeginTime": "2020-12-02T04:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 11,
   "BaseValue": {
@@ -303,8 +303,7 @@
                 4.982145
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10441,
         "Name": "炎舞",
@@ -565,8 +564,7 @@
                 18
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10442,
         "Name": "热情拂扫",
@@ -752,8 +750,7 @@
               2
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10443,
       "Name": "叛逆刮弦",
@@ -773,8 +770,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 442101,
         "Name": "「没听众也要演奏…」",
@@ -794,8 +790,7 @@
                 0.15
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 442201,
         "Name": "「…这才是摇滚！」",
@@ -813,8 +808,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 442301,
         "Name": "摇滚的食谱",
@@ -878,7 +872,8 @@
     "BirthMonth": 10,
     "BirthDay": 16,
     "VisionBefore": "火",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "红檀四弦座",
     "CvChinese": "王雅欣",
     "CvJapanese": "高桥智秋",

@@ -1,13 +1,13 @@
 {
   "Id": 10000080,
   "PromoteId": 80,
-  "Sort": 64,
+  "Sort": 305080,
   "Body": 1,
   "Icon": "UI_AvatarIcon_Mika",
   "SideIcon": "UI_AvatarIcon_Side_Mika",
   "Name": "米卡",
   "Description": "平凡家庭出身的年轻骑士，在小队中担任「前进测绘员」一职。为人低调，谨小慎微。",
-  "BeginTime": "2023-03-21T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 13,
   "BaseValue": {
@@ -302,8 +302,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10801,
         "Name": "西风枪术·镝传",
@@ -503,8 +502,7 @@
                 15
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10802,
         "Name": "星霜的流旋",
@@ -736,8 +734,7 @@
               70
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10805,
       "Name": "苍翎的颂愿",
@@ -760,8 +757,7 @@
                 3
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 802101,
         "Name": "速射牵制",
@@ -781,8 +777,7 @@
                 1
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 802201,
         "Name": "地貌测绘",
@@ -800,8 +795,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 802301,
         "Name": "勘界定标",
@@ -865,7 +859,8 @@
     "BirthMonth": 8,
     "BirthDay": 11,
     "VisionBefore": "冰",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "林鸽座",
     "CvChinese": "邓宥希",
     "CvJapanese": "三瓶由布子",

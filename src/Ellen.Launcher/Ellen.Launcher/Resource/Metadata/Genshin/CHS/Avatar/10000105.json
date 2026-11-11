@@ -1,13 +1,13 @@
 {
   "Id": 10000105,
   "PromoteId": 105,
-  "Sort": 89,
+  "Sort": 502105,
   "Body": 4,
   "Icon": "UI_AvatarIcon_Olorun",
   "SideIcon": "UI_AvatarIcon_Side_Olorun",
   "Name": "欧洛伦",
   "Description": "来自烟谜主的年轻人，却与万千生灵一起，生活在原野之中。",
-  "BeginTime": "2024-11-19T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 12,
   "BaseValue": {
@@ -255,8 +255,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 30501,
         "Name": "宿灵闪箭",
@@ -392,8 +391,7 @@
                 15
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 30502,
         "Name": "暝色缒索",
@@ -579,8 +577,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 30505,
       "Name": "黯声回响",
@@ -605,8 +602,7 @@
                 6
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1052101,
         "Name": "夜翳的通感",
@@ -630,8 +626,7 @@
                 3
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1052201,
         "Name": "灵相的触媒",
@@ -649,8 +644,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1052301,
         "Name": "夜域赐礼·流雾跃影",
@@ -668,8 +662,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1052501,
         "Name": "皮行的巧技",
@@ -733,7 +726,8 @@
     "BirthMonth": 10,
     "BirthDay": 14,
     "VisionBefore": "雷",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "夜蝠座",
     "CvChinese": "梁达伟",
     "CvJapanese": "近藤隆",

@@ -1,13 +1,13 @@
 {
   "Id": 10000055,
   "PromoteId": 55,
-  "Sort": 42,
+  "Sort": 203055,
   "Body": 1,
   "Icon": "UI_AvatarIcon_Gorou",
   "SideIcon": "UI_AvatarIcon_Side_Gorou",
   "Name": "五郎",
   "Description": "海祇岛军的大将，深受部下信赖。",
-  "BeginTime": "2021-12-14T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 12,
   "BaseValue": {
@@ -271,8 +271,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10551,
         "Name": "呲牙裂扇箭",
@@ -456,8 +455,7 @@
                 10
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10552,
         "Name": "犬坂吠吠方圆阵",
@@ -643,8 +641,7 @@
               80
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10555,
       "Name": "兽牙逐突形胜战法",
@@ -667,8 +664,7 @@
                 12
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 552101,
         "Name": "不畏风雨",
@@ -689,8 +685,7 @@
                 0.156
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 552201,
         "Name": "报恩之守",
@@ -708,8 +703,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 552301,
         "Name": "亮晶晶发现术",
@@ -773,7 +767,8 @@
     "BirthMonth": 5,
     "BirthDay": 18,
     "VisionBefore": "岩",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "柴犬座",
     "CvChinese": "杨昕燃",
     "CvJapanese": "畠中祐",

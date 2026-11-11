@@ -1,13 +1,13 @@
 {
   "Id": 10000061,
   "PromoteId": 61,
-  "Sort": 67,
+  "Sort": 307061,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Momoka",
   "SideIcon": "UI_AvatarIcon_Side_Momoka",
   "Name": "绮良良",
   "Description": "稻妻快递公司「狛荷屋」的送货员，一只热爱自己工作、向往人类社会的「猫又」。",
-  "BeginTime": "2023-05-23T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 1,
   "BaseValue": {
@@ -316,8 +316,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10611,
         "Name": "箱纸切削术",
@@ -594,8 +593,7 @@
                 12
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10612,
         "Name": "呜喵町飞足",
@@ -781,8 +779,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10615,
       "Name": "秘法·惊喜特派",
@@ -806,8 +803,7 @@
                 0.5
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 612101,
         "Name": "妖说歧尾之变",
@@ -828,8 +824,7 @@
                 0.003
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 612201,
         "Name": "应时惑目之灵",
@@ -847,8 +842,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 612301,
         "Name": "祟祟猫步",
@@ -912,7 +906,8 @@
     "BirthMonth": 1,
     "BirthDay": 22,
     "VisionBefore": "草",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "箱筥座",
     "CvChinese": "孙艳琦",
     "CvJapanese": "铃代纱弓",

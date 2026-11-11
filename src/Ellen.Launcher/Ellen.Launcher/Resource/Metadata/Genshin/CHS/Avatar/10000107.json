@@ -1,13 +1,13 @@
 {
   "Id": 10000107,
   "PromoteId": 107,
-  "Sort": 91,
+  "Sort": 503107,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Citlali",
   "SideIcon": "UI_AvatarIcon_Side_Citlali",
   "Name": "茜特菈莉",
   "Description": "烟谜主的大萨满，令所有族人敬畏的黑曜石奶奶。",
-  "BeginTime": "2024-12-31T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 10,
   "BaseValue": {
@@ -255,8 +255,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11071,
         "Name": "宿灵捕影",
@@ -503,8 +502,7 @@
                 100
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11072,
         "Name": "霜昼黑星",
@@ -706,8 +704,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11075,
       "Name": "诸曜饬令",
@@ -732,8 +729,7 @@
                 12
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1072101,
         "Name": "五重天的寒雨",
@@ -755,8 +751,7 @@
                 4
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1072201,
         "Name": "白燧蝶的星衣",
@@ -778,8 +773,7 @@
                 20
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1072301,
         "Name": "夜域赐礼·镜烟翾风",
@@ -797,8 +791,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1072501,
         "Name": "奥秘传唱",
@@ -862,7 +855,8 @@
     "BirthMonth": 1,
     "BirthDay": 20,
     "VisionBefore": "冰",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "石心镜座",
     "CvChinese": "柳知萧",
     "CvJapanese": "田野麻美",

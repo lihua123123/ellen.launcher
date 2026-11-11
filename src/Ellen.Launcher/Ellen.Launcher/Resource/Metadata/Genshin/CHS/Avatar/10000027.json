@@ -1,13 +1,13 @@
 {
   "Id": 10000027,
   "PromoteId": 27,
-  "Sort": 15,
+  "Sort": 100027,
   "Body": 3,
   "Icon": "UI_AvatarIcon_Ningguang",
   "SideIcon": "UI_AvatarIcon_Side_Ningguang",
   "Name": "凝光",
   "Description": "「璃月七星」中的「天权」，其名下财富之多，全大陆鲜有人能望其项背。",
-  "BeginTime": "2020-09-15T04:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 10,
   "BaseValue": {
@@ -38,7 +38,7 @@
           "Descriptions": [
             "普通攻击伤害|{param1:F1P}",
             "重击伤害|{param2:P}",
-            "星璇伤害|每个{param3:P}",
+            "星璇伤害|每个{param3:F1P}",
             "重击体力消耗|{param4:F1}点",
             "下坠期间伤害|{param5:F1P}",
             "低空/高空坠地冲击伤害|{param6:P}/{param7:P}"
@@ -239,8 +239,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10271,
         "Name": "千金掷",
@@ -407,8 +406,7 @@
                 12
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10272,
         "Name": "璇玑屏",
@@ -422,7 +420,7 @@
       "GroupId": 2739,
       "Proud": {
         "Descriptions": [
-          "宝石伤害|每个{param1:P}",
+          "宝石伤害|每个{param1:F1P}",
           "冷却时间|{param2:F1}秒",
           "元素能量|{param3:I}"
         ],
@@ -562,8 +560,7 @@
               40
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10274,
       "Name": "天权崩玉",
@@ -583,8 +580,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 272101,
         "Name": "星移势转",
@@ -605,8 +601,7 @@
                 10
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 272201,
         "Name": "储之千日，用之一刻",
@@ -624,8 +619,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 272301,
         "Name": "奇石珠宝录",
@@ -689,7 +683,8 @@
     "BirthMonth": 8,
     "BirthDay": 26,
     "VisionBefore": "岩",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "玑衡仪座",
     "CvChinese": "杜冥鸦",
     "CvJapanese": "大原沙耶香",

@@ -1,13 +1,13 @@
 {
   "Id": 10000112,
   "PromoteId": 112,
-  "Sort": 98,
+  "Sort": 506112,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Escoffier",
   "SideIcon": "UI_AvatarIcon_Side_Escoffier",
   "Name": "爱可菲",
   "Description": "闻名枫丹的前德波大饭店主厨，有着「甜点大校」荣誉的「技术料理」先驱，对烹饪的要求无比严格。",
-  "BeginTime": "2025-05-06T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 13,
   "BaseValue": {
@@ -270,8 +270,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11121,
         "Name": "后厨手艺",
@@ -487,8 +486,7 @@
                 6
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11122,
         "Name": "低温烹饪",
@@ -673,8 +671,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11125,
       "Name": "花刀技法",
@@ -697,8 +694,7 @@
                 9
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1122101,
         "Name": "美食胜过良药",
@@ -722,8 +718,7 @@
                 12
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1122201,
         "Name": "灵感浸入调味",
@@ -741,8 +736,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1122301,
         "Name": "时时刻刻的即兴料理",
@@ -806,7 +800,8 @@
     "BirthMonth": 6,
     "BirthDay": 8,
     "VisionBefore": "冰",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "香糕塔座",
     "CvChinese": "蔡海婷",
     "CvJapanese": "佐藤聪美",

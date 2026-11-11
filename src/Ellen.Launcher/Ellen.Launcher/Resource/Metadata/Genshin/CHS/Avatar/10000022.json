@@ -1,13 +1,13 @@
 {
   "Id": 10000022,
   "PromoteId": 22,
-  "Sort": 4,
+  "Sort": 100022,
   "Body": 1,
   "Icon": "UI_AvatarIcon_Venti",
   "SideIcon": "UI_AvatarIcon_Side_Venti",
   "Name": "温迪",
   "Description": "蒙德城诸多吟游诗人中的一位，自由自在地穿行在街头巷尾。",
-  "BeginTime": "2020-09-15T04:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 12,
   "BaseValue": {
@@ -37,12 +37,12 @@
         "Proud": {
           "Descriptions": [
             "一段伤害|{param1:F1P}+{param1:F1P}",
-            "二段伤害|{param2:P}",
-            "三段伤害|{param3:P}",
+            "二段伤害|{param2:F1P}",
+            "三段伤害|{param3:F1P}",
             "四段伤害|{param4:F1P}+{param4:F1P}",
-            "五段伤害|{param5:P}",
-            "六段伤害|{param6:P}",
-            "瞄准射击|{param7:P}",
+            "五段伤害|{param5:F1P}",
+            "六段伤害|{param6:F1P}",
+            "瞄准射击|{param7:F1P}",
             "满蓄力瞄准射击|{param8:P}",
             "下坠期间伤害|{param9:F1P}",
             "低空/高空坠地冲击伤害|{param10:P}/{param11:P}",
@@ -319,38 +319,11 @@
                 3
               ]
             }
-          ],
-          "DescriptionList": [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10
-          ],
-          "SpecialDescriptionList": [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10221,
         "Name": "神代射术",
         "Description": "<color=#FFD780FF>普通攻击</color>\n进行至多六段的连续弓箭射击。\n\n<color=#FFD780FF>重击</color>\n进行伤害更高、更为精准的<color=#FFD780FF>瞄准射击</color>。\n瞄准时，眷顾天地的风会在箭矢上持续积聚。聚满了风之力的箭矢会造成<color=#80FFD7FF>风元素伤害</color>。\n\n<color=#FFD780FF>下落攻击</color>\n从空中射出箭雨，并迅速下坠冲击地面，在落地时造成范围伤害。",
-        "SpecialDescription": "<color=#FFD780FF>普通攻击</color>\n进行至多六段的连续弓箭射击。\n\n<color=#FFD780FF>重击</color>\n进行伤害更高、更为精准的<color=#FFD780FF>瞄准射击</color>。\n瞄准时，眷顾天地的风会在箭矢上持续积聚。聚满了风之力的箭矢会造成<color=#80FFD7FF>风元素伤害</color>。\n\n<color=#FFD780FF>下落攻击</color>\n从空中射出箭雨，并迅速下坠冲击地面，在落地时造成范围伤害。\n\n<color=#FFD780FF>魔导·秘仪</color>\n元素爆发<color=#FFD780FF>风神之诗</color>创造的暴风之眼存在期间，温迪将获得额外的强化效果：\n·温迪的普通攻击将转为发射能穿透敌人的<color=#FFD780FF>飓风箭</color>，对路径上的敌人造成更高的<color=#80FFD7FF>风元素伤害</color>。\n·温迪的普通攻击命中敌人时，将使暴风之眼的持续时间延长1秒，冷却时间延长0.5秒；该效果每0.1秒至多触发一次，每次施放元素爆发<color=#FFD780FF>风神之诗</color>后至多触发2次。",
         "SpecialEnergyType": 0,
         "Icon": "Skill_A_02"
       },
@@ -514,8 +487,7 @@
                 15
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10224,
         "Name": "高天之歌",
@@ -523,31 +495,6 @@
         "SpecialEnergyType": 0,
         "Icon": "Skill_S_Venti_01",
         "CdTime": 6
-      }
-    ],
-    "SpecialSkills": [
-      {
-        "GroupId": 2251,
-        "Proud": {
-          "Descriptions": [],
-          "Parameters": [
-            {
-              "Id": 225101,
-              "Level": 1,
-              "Parameters": [
-                0.5,
-                1.35,
-                4
-              ]
-            }
-          ],
-          "Display": 3
-        },
-        "Id": 225101,
-        "Name": "魔女的前夜礼·颂时风若",
-        "Description": "完成<color=#FFD780FF>魔女的课业·风起之题</color>后，温迪将成为<color=#FFD780FF>魔导</color>角色。队伍中编入至少2名魔导角色时，将获得<color=#FFD780FF>魔导·秘仪</color>效果，使魔导角色获得强化。\n\n<color=#FFD780FF>魔导·秘仪</color>\n元素爆发<color=#FFD780FF>风神之诗</color>创造的暴风之眼存在期间，附近的当前场上角色触发扩散或星扩散反应后的4秒内，该角色造成的伤害提升50%，并使温迪自己的暴风之眼造成原本135%的伤害。",
-        "SpecialEnergyType": 0,
-        "Icon": "UI_Talent_S_Venti_07"
       }
     ],
     "EnergySkill": {
@@ -726,8 +673,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10225,
       "Name": "风神之诗",
@@ -736,6 +682,26 @@
       "Icon": "Skill_E_Venti_01",
       "CdTime": 15
     },
+    "SpecialSkills": [
+      {
+        "GroupId": 2251,
+        "Proud": {
+          "Descriptions": [],
+          "Parameters": [
+            {
+              "Id": 225101,
+              "Level": 1,
+              "Parameters": []
+            }
+          ]
+        },
+        "Id": 225101,
+        "Name": "魔女的前夜礼·颂时风若",
+        "Description": "完成<color=#FFD780FF>魔女的课业·风起之题</color>后，温迪将成为<color=#FFD780FF>魔导</color>角色。队伍中编入至少2名魔导角色时，将获得<color=#FFD780FF>魔导·秘仪</color>效果，使魔导角色获得强化。\n\n<color=#FFD780FF>魔导·秘仪</color>\n元素爆发<color=#FFD780FF>风神之诗</color>创造的暴风之眼存在期间，附近的当前场上角色触发扩散或星扩散反应后的4秒内，该角色造成的伤害提升50%，并使温迪自己的暴风之眼造成原本135%的伤害。",
+        "SpecialEnergyType": 0,
+        "Icon": "UI_Talent_S_Venti_07"
+      }
+    ],
     "Inherents": [
       {
         "GroupId": 2221,
@@ -749,8 +715,7 @@
                 20
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 222101,
         "Name": "绪风之拥",
@@ -771,8 +736,7 @@
                 15
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 222201,
         "Name": "暴风之眼",
@@ -790,8 +754,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 222301,
         "Name": "恒风随行",
@@ -805,15 +768,15 @@
         "Id": 221,
         "Name": "弦发的苍风",
         "Description": "<color=#FFD780FF>瞄准射击</color>会额外发射两枚分裂箭，分别造成原本33%的伤害。",
-        "SpecialDescription": "<color=#FFD780FF>瞄准射击</color>会额外发射两枚分裂箭，分别造成原本33%的伤害。\n此外，<color=#FFD780FF>飓风箭</color>也会额外发射两枚能追踪敌人的箭矢，分别造成原本20%的伤害，该效果每0.25秒至多触发一次。",
-        "Icon": "UI_Talent_S_Venti_01"
+        "Icon": "UI_Talent_S_Venti_01",
+        "SpecialDescription": "<color=#FFD780FF>瞄准射击</color>会额外发射两枚分裂箭，分别造成原本33%的伤害。\n此外，<color=#FFD780FF>飓风箭</color>也会额外发射两枚能追踪敌人的箭矢，分别造成原本20%的伤害，该效果每0.25秒至多触发一次。"
       },
       {
         "Id": 222,
         "Name": "眷恋的泠风",
         "Description": "<color=#FFD780FF>高天之歌</color>会使敌人的<color=#80FFD7FF>风元素抗性</color>与物理抗性降低12%，持续10秒。\n被<color=#FFD780FF>高天之歌</color>击飞的敌人在落地前，<color=#80FFD7FF>风元素抗性</color>与物理抗性额外降低12%。",
-        "SpecialDescription": "<color=#FFD780FF>高天之歌</color>会使敌人的<color=#80FFD7FF>风元素抗性</color>与物理抗性降低24%，持续10秒。\n此外，施放元素爆发<color=#FFD780FF>风神之诗</color>后，温迪将获得<color=#FFD780FF>风起之时</color>效果，并刷新元素战技<color=#FFD780FF>高天之歌</color>的冷却时间；<color=#FFD780FF>飓风箭</color>命中敌人后，也会有25%概率使温迪获得<color=#FFD780FF>风起之时</color>效果。\n\n<color=#FFD780FF>风起之时</color>\n点按施放元素战技<color=#FFD780FF>高天之歌</color>时，将造成原本300%的伤害。该效果持续15秒，并将在温迪点按施放元素战技<color=#FFD780FF>高天之歌</color>后移除。",
-        "Icon": "UI_Talent_S_Venti_02"
+        "Icon": "UI_Talent_S_Venti_02",
+        "SpecialDescription": "<color=#FFD780FF>高天之歌</color>会使敌人的<color=#80FFD7FF>风元素抗性</color>与物理抗性降低24%，持续10秒。\n此外，施放元素爆发<color=#FFD780FF>风神之诗</color>后，温迪将获得<color=#FFD780FF>风起之时</color>效果，并刷新元素战技<color=#FFD780FF>高天之歌</color>的冷却时间；<color=#FFD780FF>飓风箭</color>命中敌人后，也会有25%概率使温迪获得<color=#FFD780FF>风起之时</color>效果。\n\n<color=#FFD780FF>风起之时</color>\n点按施放元素战技<color=#FFD780FF>高天之歌</color>时，将造成原本300%的伤害。该效果持续15秒，并将在温迪点按施放元素战技<color=#FFD780FF>高天之歌</color>后移除。"
       },
       {
         "Id": 223,
@@ -829,8 +792,8 @@
         "Id": 224,
         "Name": "自由的凛风",
         "Description": "温迪获取元素晶球或元素微粒后，获得25%<color=#80FFD7FF>风元素伤害加成</color>，持续10秒。",
-        "SpecialDescription": "温迪施放元素战技<color=#FFD780FF>高天之歌</color>或元素爆发<color=#FFD780FF>风神之诗</color>后，温迪与队伍中自己的当前场上其他角色获得25%<color=#80FFD7FF>风元素伤害加成</color>，持续10秒。",
-        "Icon": "UI_Talent_S_Venti_03"
+        "Icon": "UI_Talent_S_Venti_03",
+        "SpecialDescription": "温迪施放元素战技<color=#FFD780FF>高天之歌</color>或元素爆发<color=#FFD780FF>风神之诗</color>后，温迪与队伍中自己的当前场上其他角色获得25%<color=#80FFD7FF>风元素伤害加成</color>，持续10秒。"
       },
       {
         "Id": 225,
@@ -846,8 +809,8 @@
         "Id": 226,
         "Name": "抗争的暴风",
         "Description": "受<color=#FFD780FF>风神之诗</color>伤害的敌人，<color=#80FFD7FF>风元素抗性</color>降低20%；\n若产生了元素转化，则使转换的元素抗性也降低20%。",
-        "SpecialDescription": "受<color=#FFD780FF>风神之诗</color>伤害的敌人，<color=#80FFD7FF>风元素抗性</color>降低20%；\n若产生了元素转化，则使转换的元素抗性也降低20%。\n此外，温迪对这些敌人造成的伤害，还会获得100%暴击伤害加成。",
-        "Icon": "UI_Talent_S_Venti_04"
+        "Icon": "UI_Talent_S_Venti_04",
+        "SpecialDescription": "受<color=#FFD780FF>风神之诗</color>伤害的敌人，<color=#80FFD7FF>风元素抗性</color>降低20%；\n若产生了元素转化，则使转换的元素抗性也降低20%。\n此外，温迪对这些敌人造成的伤害，还会获得100%暴击伤害加成。"
       }
     ]
   },
@@ -859,10 +822,9 @@
     "BirthMonth": 6,
     "BirthDay": 16,
     "VisionBefore": "风",
-    "VisionAfter": "风",
-    "VisionOverrideUnlocked": "神之心",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "歌仙座",
-    "ConstellationAfter": "歌仙座",
     "CvChinese": "喵酱",
     "CvJapanese": "村濑步",
     "CvEnglish": "艾丽卡·哈拉彻",
@@ -1215,7 +1177,9 @@
         "Title": "神之眼",
         "Context": "「尘世七执政」并不拥有对「神之眼」的期望，他们本就身负伟力。\n但巴巴托斯喜欢人世，自然也希望以「温迪」的身份在蒙德更自在地行走。他仿照着神选者的特征，制作了与「神之眼」非常相像的玻璃珠。\n仿制出的道具并没有什么特殊功能，温迪引导元素力也并不依靠它。\n不过，由于天空之琴不在身边，温迪又懒得把普通的琴挎在腰间，便为它增加了变成木琴「斐林」的能力。"
       }
-    ]
+    ],
+    "VisionAfter": "风",
+    "ConstellationAfter": "歌仙座"
   },
   "Costumes": [
     {

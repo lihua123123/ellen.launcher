@@ -1,13 +1,13 @@
 {
   "Id": 10000114,
   "PromoteId": 114,
-  "Sort": 100,
+  "Sort": 507114,
   "Body": 2,
   "Icon": "UI_AvatarIcon_SkirkNew",
   "SideIcon": "UI_AvatarIcon_Side_SkirkNew",
   "Name": "丝柯克",
   "Description": "曾现身于深渊裂隙和原始胎海的来访者，教导达达利亚武技的老师。孤身一人的女武者。",
-  "BeginTime": "2025-06-17T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 1,
   "BaseValue": {
@@ -302,8 +302,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11141,
         "Name": "极恶技·断",
@@ -644,8 +643,7 @@
                 8
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11142,
         "Name": "极恶技·闪",
@@ -876,13 +874,12 @@
               15
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11145,
       "Name": "极恶技·灭",
       "Description": "丝柯克的元素爆发不依靠元素能量，而是依靠{LINK#N11130005}<color=#FFD780FF>蛇之狡谋</color>{/LINK}。\n当丝柯克拥有至少50点蛇之狡谋时，丝柯克可以消耗所有蛇之狡谋，施放元素爆发，撕裂前方的空间并进行高速的连续斩击，造成<color=#99FFFFFF>冰元素范围伤害</color>。同时，依据施放时丝柯克拥有的蛇之狡谋超过50点的部分，每1点蛇之狡谋都将提升本次元素爆发造成的伤害，至多通过这种方式计入12点蛇之狡谋。\n\n丝柯克处于{LINK#N11130006}<color=#FFD780FF>七相一闪</color>{/LINK}模式下时，元素爆发「极恶技·灭」将会被替换为「极恶技·尽」。\n\n<color=#FFD780FF>极恶技·尽</color>\n无需消耗蛇之狡谋即可施放的特殊元素爆发。\n施放后，丝柯克将获得凋尽效果，效果持续至七相一闪模式结束；解锁突破天赋{LINK#N11130007}<color=#FFD780FF>理外之理</color>{/LINK}后，丝柯克还将汲取附近一定范围内的虚境裂隙。\n凋尽效果持续期间，每0.1秒，丝柯克的普通攻击命中敌人后，将使本次普通攻击造成的伤害提高；若施放<color=#FFD780FF>极恶技·尽</color>时，汲取了虚境裂隙，则会依据汲取的虚境裂隙枚数，使本次普通攻击造成的伤害进一步提高。\n该效果将在触发次数达到10次时解除。",
-      "SpecialEnergyType": 2,
+      "SpecialEnergyType": 0,
       "Icon": "Skill_E_SkirkNew_01",
       "CdTime": 15
     },
@@ -899,8 +896,7 @@
                 8
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1142101,
         "Name": "理外之理",
@@ -926,8 +922,7 @@
                 0.6
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1142201,
         "Name": "万流归寂",
@@ -945,8 +940,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1142301,
         "Name": "诸武相授",
@@ -1010,8 +1004,8 @@
     "BirthMonth": 11,
     "BirthDay": 5,
     "VisionBefore": "冰",
-    "VisionOverrideLocked": "蛇之七变",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "磷星座",
     "CvChinese": "谢莹",
     "CvJapanese": "能登麻美子",

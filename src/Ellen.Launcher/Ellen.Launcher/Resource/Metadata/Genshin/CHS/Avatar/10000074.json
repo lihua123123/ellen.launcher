@@ -1,13 +1,13 @@
 {
   "Id": 10000074,
   "PromoteId": 74,
-  "Sort": 58,
+  "Sort": 302074,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Layla",
   "SideIcon": "UI_AvatarIcon_Side_Layla",
   "Name": "莱依拉",
   "Description": "专攻理论星相学的梨多梵谛学院学生。时常梦游，长期缺觉，饱受睡眠问题困扰。",
-  "BeginTime": "2022-11-18T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 1,
   "BaseValue": {
@@ -270,8 +270,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10741,
         "Name": "熠辉轨度剑",
@@ -470,8 +469,7 @@
                 12
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10742,
         "Name": "垂裳端凝之夜",
@@ -641,8 +639,7 @@
               40
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10745,
       "Name": "星流摇床之梦",
@@ -664,8 +661,7 @@
                 0.06
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 742101,
         "Name": "如光骤现",
@@ -685,8 +681,7 @@
                 0.015
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 742201,
         "Name": "勿扰沉眠",
@@ -704,8 +699,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 742301,
         "Name": "叠影的梦兆",
@@ -769,7 +763,8 @@
     "BirthMonth": 12,
     "BirthDay": 19,
     "VisionBefore": "冰",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "夜莺座",
     "CvChinese": "侯小菲",
     "CvJapanese": "富田美忧",

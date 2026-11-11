@@ -1,13 +1,13 @@
 {
   "Id": 10000128,
   "PromoteId": 128,
-  "Sort": 113,
+  "Sort": 604128,
   "Body": 4,
   "Icon": "UI_AvatarIcon_Varka",
   "SideIcon": "UI_AvatarIcon_Side_Varka",
   "Name": "法尔伽",
   "Description": "西风骑士团大团长，守护蒙德的北风骑士。",
-  "BeginTime": "2026-02-24T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 11,
   "BaseValue": {
@@ -362,8 +362,7 @@
                 4.982145
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11281,
         "Name": "西风剑术·流光之舞",
@@ -780,8 +779,7 @@
                 8
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11282,
         "Name": "烈风终坠",
@@ -789,29 +787,6 @@
         "SpecialEnergyType": 0,
         "Icon": "Skill_S_Varka_01",
         "CdTime": 16
-      }
-    ],
-    "SpecialSkills": [
-      {
-        "GroupId": 12851,
-        "Proud": {
-          "Descriptions": [],
-          "Parameters": [
-            {
-              "Id": 1285101,
-              "Level": 1,
-              "Parameters": [
-                1
-              ]
-            }
-          ],
-          "Display": 3
-        },
-        "Id": 1285101,
-        "Name": "魔女的前夜礼·重光临晨",
-        "Description": "完成<color=#FFD780FF>魔女的课业·无题之题</color>后，法尔伽将成为<color=#FFD780FF>魔导</color>角色。队伍中编入至少2名魔导角色时，将获得<color=#FFD780FF>魔导·秘仪</color>效果，使魔导角色获得强化。\n\n<color=#FFD780FF>魔导·秘仪</color>\n特殊元素战技{LINK#N11280002}<color=#FFD780FF>四风将起</color>{/LINK}获得强化：法尔伽在{LINK#N11280001}<color=#FFD780FF>狂飙突进</color>{/LINK}模式下的普通攻击命中敌人时，<color=#FFD780FF>四风将起</color>的冷却时间将会转为缩短1秒。",
-        "SpecialEnergyType": 0,
-        "Icon": "UI_Talent_S_Varka_08"
       }
     ],
     "EnergySkill": {
@@ -974,8 +949,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11285,
       "Name": "我即朔风",
@@ -984,6 +958,26 @@
       "Icon": "Skill_E_Varka_01",
       "CdTime": 15
     },
+    "SpecialSkills": [
+      {
+        "GroupId": 12851,
+        "Proud": {
+          "Descriptions": [],
+          "Parameters": [
+            {
+              "Id": 1285101,
+              "Level": 1,
+              "Parameters": []
+            }
+          ]
+        },
+        "Id": 1285101,
+        "Name": "魔女的前夜礼·重光临晨",
+        "Description": "完成<color=#FFD780FF>魔女的课业·无题之题</color>后，法尔伽将成为<color=#FFD780FF>魔导</color>角色。队伍中编入至少2名魔导角色时，将获得<color=#FFD780FF>魔导·秘仪</color>效果，使魔导角色获得强化。\n\n<color=#FFD780FF>魔导·秘仪</color>\n特殊元素战技{LINK#N11280002}<color=#FFD780FF>四风将起</color>{/LINK}获得强化：法尔伽在{LINK#N11280001}<color=#FFD780FF>狂飙突进</color>{/LINK}模式下的普通攻击命中敌人时，<color=#FFD780FF>四风将起</color>的冷却时间将会转为缩短1秒。",
+        "SpecialEnergyType": 0,
+        "Icon": "UI_Talent_S_Varka_08"
+      }
+    ],
     "Inherents": [
       {
         "GroupId": 12821,
@@ -1000,8 +994,7 @@
                 2.2
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1282101,
         "Name": "晓风的行军",
@@ -1024,8 +1017,7 @@
                 1
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1282201,
         "Name": "风帜的先引",
@@ -1045,8 +1037,7 @@
                 0.05
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1282301,
         "Name": "归风的凯歌",
@@ -1110,7 +1101,8 @@
     "BirthMonth": 2,
     "BirthDay": 17,
     "VisionBefore": "风",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "天狼座",
     "CvChinese": "郝祥海",
     "CvJapanese": "杉田智和",

@@ -1,13 +1,13 @@
 {
   "Id": 10000045,
   "PromoteId": 45,
-  "Sort": 30,
+  "Sort": 104045,
   "Body": 3,
   "Icon": "UI_AvatarIcon_Rosaria",
   "SideIcon": "UI_AvatarIcon_Side_Rosaria",
   "Name": "罗莎莉亚",
   "Description": "除了打扮哪里都不像神职人员的修女。冷淡的言行中透着锐利。总是单独行动。",
-  "BeginTime": "2021-04-06T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 13,
   "BaseValue": {
@@ -302,8 +302,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10451,
         "Name": "教会枪术",
@@ -454,8 +453,7 @@
                 6
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10452,
         "Name": "噬罪的告解",
@@ -656,8 +654,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10453,
       "Name": "终命的圣礼",
@@ -680,8 +677,7 @@
                 5
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 452101,
         "Name": "聆听忏悔的幽影",
@@ -703,8 +699,7 @@
                 0.15
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 452201,
         "Name": "暗中支援的黯色",
@@ -724,8 +719,7 @@
                 0.1
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 452301,
         "Name": "夜行",
@@ -789,7 +783,8 @@
     "BirthMonth": 1,
     "BirthDay": 24,
     "VisionBefore": "冰",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "荆冠座",
     "CvChinese": "张安琪",
     "CvJapanese": "加隈亚衣",

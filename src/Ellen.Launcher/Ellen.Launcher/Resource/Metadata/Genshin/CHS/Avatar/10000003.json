@@ -1,13 +1,13 @@
 {
   "Id": 10000003,
   "PromoteId": 3,
-  "Sort": 9,
+  "Sort": 100003,
   "Body": 3,
   "Icon": "UI_AvatarIcon_Qin",
   "SideIcon": "UI_AvatarIcon_Side_Qin",
   "Name": "琴",
   "Description": "正直严谨的蒲公英骑士，蒙德西风骑士团的代理团长。",
-  "BeginTime": "2020-09-15T04:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 1,
   "BaseValue": {
@@ -36,11 +36,11 @@
         "GroupId": 331,
         "Proud": {
           "Descriptions": [
-            "一段伤害|{param1:P}",
-            "二段伤害|{param2:P}",
-            "三段伤害|{param3:P}",
-            "四段伤害|{param4:P}",
-            "五段伤害|{param5:P}",
+            "一段伤害|{param1:F1P}",
+            "二段伤害|{param2:F1P}",
+            "三段伤害|{param3:F1P}",
+            "四段伤害|{param4:F1P}",
+            "五段伤害|{param5:F1P}",
             "重击伤害|{param6:P}",
             "重击体力消耗|{param7:F1}点",
             "下坠期间伤害|{param8:F1P}",
@@ -287,8 +287,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10031,
         "Name": "西风剑术",
@@ -456,8 +455,7 @@
                 6
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10033,
         "Name": "风压剑",
@@ -472,7 +470,7 @@
       "Proud": {
         "Descriptions": [
           "爆发伤害|{param1:P}",
-          "出入领域伤害|{param2:P}",
+          "出入领域伤害|{param2:F1P}",
           "领域发动治疗量|{param3:P}攻击力+{param4:I}",
           "持续治疗|每秒{param5:F2P}攻击力+{param6:I}",
           "冷却时间|{param7:F1}秒",
@@ -689,8 +687,7 @@
               80
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10034,
       "Name": "蒲公英之风",
@@ -713,8 +710,7 @@
                 0.15
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 32101,
         "Name": "顺风而行",
@@ -734,8 +730,7 @@
                 16
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 32201,
         "Name": "听凭风引",
@@ -753,8 +748,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 32301,
         "Name": "引领之风",
@@ -818,7 +812,8 @@
     "BirthMonth": 3,
     "BirthDay": 14,
     "VisionBefore": "风",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "幼狮座",
     "CvChinese": "林簌",
     "CvJapanese": "斋藤千和",

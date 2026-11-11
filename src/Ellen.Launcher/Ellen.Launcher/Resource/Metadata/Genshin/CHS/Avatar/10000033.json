@@ -1,13 +1,13 @@
 {
   "Id": 10000033,
   "PromoteId": 33,
-  "Sort": 1,
+  "Sort": 101033,
   "Body": 4,
   "Icon": "UI_AvatarIcon_Tartaglia",
   "SideIcon": "UI_AvatarIcon_Side_Tartaglia",
   "Name": "达达利亚",
   "Description": "愚人众执行官第十一位，「公子」，其战绩威名远扬。",
-  "BeginTime": "2020-11-11T04:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 12,
   "BaseValue": {
@@ -351,8 +351,7 @@
                 10
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10331,
         "Name": "断雨",
@@ -709,8 +708,7 @@
                 45
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10332,
         "Name": "魔王武装·狂澜",
@@ -912,8 +910,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10333,
       "Name": "极恶技·尽灭闪",
@@ -935,8 +932,7 @@
                 8
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 332101,
         "Name": "永无谢幕",
@@ -954,8 +950,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 332201,
         "Name": "水形剑",
@@ -973,8 +968,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 332301,
         "Name": "诸武精通",
@@ -1038,7 +1032,8 @@
     "BirthMonth": 7,
     "BirthDay": 20,
     "VisionBefore": "水",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "鲸天座",
     "CvChinese": "鱼冻",
     "CvJapanese": "木村良平",

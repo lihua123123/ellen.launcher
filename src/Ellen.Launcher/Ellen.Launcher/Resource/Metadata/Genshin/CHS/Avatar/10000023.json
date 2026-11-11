@@ -1,13 +1,13 @@
 {
   "Id": 10000023,
   "PromoteId": 23,
-  "Sort": 18,
+  "Sort": 100023,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Xiangling",
   "SideIcon": "UI_AvatarIcon_Side_Xiangling",
   "Name": "香菱",
   "Description": "来自璃月，名声在外的少女厨师，对料理之道极具热情，拿手麻辣菜肴堪称一绝。",
-  "BeginTime": "2020-09-15T04:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 13,
   "BaseValue": {
@@ -36,11 +36,11 @@
         "GroupId": 2331,
         "Proud": {
           "Descriptions": [
-            "一段伤害|{param1:P}",
-            "二段伤害|{param2:P}",
+            "一段伤害|{param1:F1P}",
+            "二段伤害|{param2:F1P}",
             "三段伤害|{param3:F1P}+{param3:F1P}",
             "四段伤害|{param4:F1P}*4",
-            "五段伤害|{param5:P}",
+            "五段伤害|{param5:F1P}",
             "重击伤害|{param6:P}",
             "重击体力消耗|{param7:F1}点",
             "下坠期间伤害|{param8:F1P}",
@@ -287,8 +287,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10231,
         "Name": "白案功夫",
@@ -424,8 +423,7 @@
                 12
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10232,
         "Name": "锅巴出击",
@@ -439,8 +437,8 @@
       "GroupId": 2339,
       "Proud": {
         "Descriptions": [
-          "一段挥舞伤害|{param1:P}",
-          "二段挥舞伤害|{param2:P}",
+          "一段挥舞伤害|{param1:F1P}",
+          "二段挥舞伤害|{param2:F1P}",
           "三段挥舞伤害|{param3:P}",
           "旋火轮伤害|{param4:P}",
           "持续时间|{param5:F1}秒",
@@ -643,8 +641,7 @@
               80
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10235,
       "Name": "旋火轮",
@@ -666,8 +663,7 @@
                 0.2
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 232101,
         "Name": "交叉火力",
@@ -688,8 +684,7 @@
                 10
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 232201,
         "Name": "绝云朝天椒",
@@ -707,8 +702,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 232301,
         "Name": "万民堂大厨",
@@ -772,7 +766,8 @@
     "BirthMonth": 11,
     "BirthDay": 2,
     "VisionBefore": "火",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "长杓座",
     "CvChinese": "小N",
     "CvJapanese": "小泽亚李",

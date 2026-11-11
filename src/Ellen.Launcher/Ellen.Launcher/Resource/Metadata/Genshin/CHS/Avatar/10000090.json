@@ -1,13 +1,13 @@
 {
   "Id": 10000090,
   "PromoteId": 90,
-  "Sort": 76,
+  "Sort": 403090,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Chevreuse",
   "SideIcon": "UI_AvatarIcon_Side_Chevreuse",
   "Name": "夏沃蕾",
   "Description": "时刻恪守着心中「正义」的特巡队队长，手中的铳枪只会指向负罪之人。",
-  "BeginTime": "2024-01-09T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 13,
   "BaseValue": {
@@ -286,8 +286,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10901,
         "Name": "线列枪刺·改",
@@ -534,8 +533,7 @@
                 15
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10902,
         "Name": "近迫式急促拦射",
@@ -705,8 +703,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10905,
       "Name": "圆阵掷弹爆轰术",
@@ -729,8 +726,7 @@
                 6
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 902101,
         "Name": "尖兵协同战法",
@@ -752,8 +748,7 @@
                 0.4
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 902201,
         "Name": "纵阵武力统筹",
@@ -771,8 +766,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 902301,
         "Name": "迅捷行军策略",
@@ -836,7 +830,8 @@
     "BirthMonth": 1,
     "BirthDay": 10,
     "VisionBefore": "火",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "剑铳座",
     "CvChinese": "潘丹妮",
     "CvJapanese": "下地紫野",

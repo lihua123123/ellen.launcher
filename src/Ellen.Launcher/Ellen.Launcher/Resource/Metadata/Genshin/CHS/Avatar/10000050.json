@@ -1,13 +1,13 @@
 {
   "Id": 10000050,
   "PromoteId": 50,
-  "Sort": 41,
+  "Sort": 202050,
   "Body": 4,
   "Icon": "UI_AvatarIcon_Tohma",
   "SideIcon": "UI_AvatarIcon_Side_Tohma",
   "Name": "托马",
   "Description": "神里家的家政官，活跃在稻妻的「地头蛇」。",
-  "BeginTime": "2021-11-02T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 13,
   "BaseValue": {
@@ -271,8 +271,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10501,
         "Name": "迅破枪势",
@@ -486,8 +485,7 @@
                 15
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10502,
         "Name": "烈烧佑命之侍护",
@@ -735,8 +733,7 @@
               80
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10505,
       "Name": "真红炽火之大铠",
@@ -761,8 +758,7 @@
                 0.3
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 502101,
         "Name": "甲衣交叠",
@@ -782,8 +778,7 @@
                 0.022
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 502201,
         "Name": "烈火攻燔",
@@ -801,8 +796,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 502301,
         "Name": "悬鲷狩",
@@ -866,7 +860,8 @@
     "BirthMonth": 1,
     "BirthDay": 9,
     "VisionBefore": "火",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "赤楯座",
     "CvChinese": "张沛",
     "CvJapanese": "森田成一",

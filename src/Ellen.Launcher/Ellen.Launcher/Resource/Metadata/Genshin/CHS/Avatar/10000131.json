@@ -1,13 +1,13 @@
 {
   "Id": 10000131,
   "PromoteId": 131,
-  "Sort": 116,
+  "Sort": 606131,
   "Body": 3,
   "Icon": "UI_AvatarIcon_Nicole",
   "SideIcon": "UI_AvatarIcon_Side_Nicole",
   "Name": "尼可",
   "Description": "无言的「魔女」，弃声的「天使」。",
-  "BeginTime": "2026-05-19T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 10,
   "BaseValue": {
@@ -255,8 +255,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11311,
         "Name": "托喻",
@@ -487,8 +486,7 @@
                 16
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11312,
         "Name": "圣言默示·未现之光",
@@ -496,29 +494,6 @@
         "SpecialEnergyType": 0,
         "Icon": "Skill_S_Nicole_01",
         "CdTime": 16
-      }
-    ],
-    "SpecialSkills": [
-      {
-        "GroupId": 13151,
-        "Proud": {
-          "Descriptions": [],
-          "Parameters": [
-            {
-              "Id": 1315101,
-              "Level": 1,
-              "Parameters": [
-                3
-              ]
-            }
-          ],
-          "Display": 3
-        },
-        "Id": 1315101,
-        "Name": "魔女的前夜礼·光自暗来",
-        "Description": "完成<color=#FFD780FF>魔女的课业·导引之职…？</color>后，尼可将成为<color=#FFD780FF>魔导</color>角色。队伍中编入至少2名魔导角色时，将获得<color=#FFD780FF>魔导·秘仪</color>效果，使魔导角色获得强化。\n\n<color=#FFD780FF>魔导·秘仪</color>\n魔导角色的<color=#FFD780FF>{LINK#S11315}奥迹造影{/LINK}</color>造成的伤害提升，提升值相当于尼可攻击力的300%。",
-        "SpecialEnergyType": 0,
-        "Icon": "UI_Talent_S_Nicole_07"
       }
     ],
     "EnergySkill": {
@@ -713,8 +688,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11315,
       "Name": "圣言默示·天路历程",
@@ -723,6 +697,26 @@
       "Icon": "Skill_E_Nicole_01",
       "CdTime": 15
     },
+    "SpecialSkills": [
+      {
+        "GroupId": 13151,
+        "Proud": {
+          "Descriptions": [],
+          "Parameters": [
+            {
+              "Id": 1315101,
+              "Level": 1,
+              "Parameters": []
+            }
+          ]
+        },
+        "Id": 1315101,
+        "Name": "魔女的前夜礼·光自暗来",
+        "Description": "完成<color=#FFD780FF>魔女的课业·导引之职…？</color>后，尼可将成为<color=#FFD780FF>魔导</color>角色。队伍中编入至少2名魔导角色时，将获得<color=#FFD780FF>魔导·秘仪</color>效果，使魔导角色获得强化。\n\n<color=#FFD780FF>魔导·秘仪</color>\n魔导角色的<color=#FFD780FF>{LINK#S11315}奥迹造影{/LINK}</color>造成的伤害提升，提升值相当于尼可攻击力的300%。",
+        "SpecialEnergyType": 0,
+        "Icon": "UI_Talent_S_Nicole_07"
+      }
+    ],
     "Inherents": [
       {
         "GroupId": 13121,
@@ -738,8 +732,7 @@
                 300
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1312101,
         "Name": "分有",
@@ -759,8 +752,7 @@
                 8
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1312201,
         "Name": "慕善",
@@ -780,8 +772,7 @@
                 5
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1312301,
         "Name": "静念",
@@ -845,7 +836,8 @@
     "BirthMonth": 9,
     "BirthDay": 29,
     "VisionBefore": "火",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "金匣座",
     "CvChinese": "云鹤追",
     "CvJapanese": "丰口惠美",

@@ -1,13 +1,13 @@
 {
   "Id": 10000042,
   "PromoteId": 42,
-  "Sort": 5,
+  "Sort": 100042,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Keqing",
   "SideIcon": "UI_AvatarIcon_Side_Keqing",
   "Name": "刻晴",
   "Description": "璃月七星之一，玉衡星。对「帝君一言而决的璃月」颇有微词——但实际上，神挺欣赏她这样的人。",
-  "BeginTime": "2020-09-15T04:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 1,
   "BaseValue": {
@@ -36,12 +36,12 @@
         "GroupId": 4231,
         "Proud": {
           "Descriptions": [
-            "一段伤害|{param1:P}",
-            "二段伤害|{param2:P}",
-            "三段伤害|{param3:P}",
+            "一段伤害|{param1:F1P}",
+            "二段伤害|{param2:F1P}",
+            "三段伤害|{param3:F1P}",
             "四段伤害|{param4:F1P}+{param5:F1P}",
-            "五段伤害|{param6:P}",
-            "重击伤害|{param7:P}+{param8:P}",
+            "五段伤害|{param6:F1P}",
+            "重击伤害|{param7:F1P}+{param8:F1P}",
             "重击体力消耗|{param9:F1}点",
             "下坠期间伤害|{param10:F1P}",
             "低空/高空坠地冲击伤害|{param11:P}/{param12:P}"
@@ -317,8 +317,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10421,
         "Name": "云来剑法",
@@ -330,9 +329,9 @@
         "GroupId": 4232,
         "Proud": {
           "Descriptions": [
-            "雷楔伤害|{param1:P}",
+            "雷楔伤害|{param1:F1P}",
             "斩击伤害|{param2:P}",
-            "雷暴连斩伤害|{param3:P}*2",
+            "雷暴连斩伤害|{param3:F1P}*2",
             "冷却时间|{param4:F1}秒"
           ],
           "Parameters": [
@@ -486,8 +485,7 @@
                 7.5
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10422,
         "Name": "星斗归位",
@@ -501,7 +499,7 @@
       "GroupId": 4239,
       "Proud": {
         "Descriptions": [
-          "技能伤害|{param1:P}",
+          "技能伤害|{param1:F1P}",
           "连斩伤害|{param2:F1P}*8",
           "最后一击伤害|{param3:P}",
           "冷却时间|{param4:F1}秒",
@@ -673,8 +671,7 @@
               40
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10425,
       "Name": "天街巡游",
@@ -696,8 +693,7 @@
                 5
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 422101,
         "Name": "抵天雷罚",
@@ -719,8 +715,7 @@
                 8
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 422201,
         "Name": "玉衡之贵",
@@ -738,8 +733,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 422301,
         "Name": "总务土地",
@@ -803,7 +797,8 @@
     "BirthMonth": 11,
     "BirthDay": 20,
     "VisionBefore": "雷",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "金紫定垂座",
     "CvChinese": "谢莹",
     "CvJapanese": "喜多村英梨",

@@ -1,13 +1,13 @@
 {
   "Id": 10000002,
   "PromoteId": 2,
-  "Sort": 34,
+  "Sort": 200002,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Ayaka",
   "SideIcon": "UI_AvatarIcon_Side_Ayaka",
   "Name": "神里绫华",
   "Description": "稻妻「社奉行」神里家的大小姐。端庄而文雅，聪慧又坚韧。",
-  "BeginTime": "2021-07-21T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 1,
   "BaseValue": {
@@ -317,8 +317,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10024,
         "Name": "神里流·倾",
@@ -454,8 +453,7 @@
                 10
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10018,
         "Name": "神里流·冰华",
@@ -482,8 +480,7 @@
                 5
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10013,
         "Name": "神里流·霰步",
@@ -668,8 +665,7 @@
               80
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10019,
       "Name": "神里流·霜灭",
@@ -692,8 +688,7 @@
                 6
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 22101,
         "Name": "天罪国罪镇词",
@@ -715,8 +710,7 @@
                 10
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 22201,
         "Name": "寒天宣命祝词",
@@ -737,8 +731,7 @@
                 2
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 22301,
         "Name": "鉴查心得",
@@ -802,7 +795,8 @@
     "BirthMonth": 9,
     "BirthDay": 28,
     "VisionBefore": "冰",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "雪鹤座",
     "CvChinese": "小N",
     "CvJapanese": "早见沙织",

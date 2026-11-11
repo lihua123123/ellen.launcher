@@ -1,13 +1,13 @@
 {
   "Id": 10000070,
   "PromoteId": 70,
-  "Sort": 56,
+  "Sort": 301070,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Nilou",
   "SideIcon": "UI_AvatarIcon_Side_Nilou",
   "Name": "妮露",
   "Description": "祖拜尔剧场的知名舞者，舞姿灵动优美，为人纯真亲善。",
-  "BeginTime": "2022-10-14T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 1,
   "BaseValue": {
@@ -270,8 +270,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10701,
         "Name": "弦月舞步",
@@ -548,8 +547,7 @@
                 10
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10702,
         "Name": "七域舞步",
@@ -719,8 +717,7 @@
               70
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10705,
       "Name": "浮莲舞步·远梦聆泉",
@@ -744,8 +741,7 @@
                 10
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 702101,
         "Name": "折旋落英之庭",
@@ -767,8 +763,7 @@
                 4
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 702201,
         "Name": "翩舞永世之梦",
@@ -786,8 +781,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 702301,
         "Name": "白玉莲盏",
@@ -851,7 +845,8 @@
     "BirthMonth": 12,
     "BirthDay": 3,
     "VisionBefore": "水",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "睡莲座",
     "CvChinese": "紫苏九月",
     "CvJapanese": "金元寿子",

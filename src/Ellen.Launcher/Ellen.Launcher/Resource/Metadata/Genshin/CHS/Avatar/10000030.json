@@ -1,13 +1,13 @@
 {
   "Id": 10000030,
   "PromoteId": 30,
-  "Sort": 24,
+  "Sort": 101030,
   "Body": 4,
   "Icon": "UI_AvatarIcon_Zhongli",
   "SideIcon": "UI_AvatarIcon_Side_Zhongli",
   "Name": "钟离",
   "Description": "被「往生堂」请来的神秘客人，知识渊博，对各种事物都颇有见地。",
-  "BeginTime": "2020-12-02T04:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 13,
   "BaseValue": {
@@ -303,8 +303,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10301,
         "Name": "岩雨",
@@ -535,8 +534,7 @@
                 12
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10302,
         "Name": "地心",
@@ -706,8 +704,7 @@
               40
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10303,
       "Name": "天星",
@@ -729,8 +726,7 @@
                 0.05
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 302101,
         "Name": "悬岩宸断",
@@ -752,8 +748,7 @@
                 0.33
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 302201,
         "Name": "炊金馔玉",
@@ -771,8 +766,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 302301,
         "Name": "晶石命理",
@@ -836,10 +830,9 @@
     "BirthMonth": 12,
     "BirthDay": 31,
     "VisionBefore": "岩",
-    "VisionAfter": "岩",
-    "VisionOverrideUnlocked": "神之心",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "？？？",
-    "ConstellationAfter": "岩王帝君座",
     "CvChinese": "彭博",
     "CvJapanese": "前野智昭",
     "CvEnglish": "基思·西尔弗斯坦",
@@ -1196,7 +1189,9 @@
         "Title": "神之眼",
         "Context": "璃月港这场由钟离自导自演的「送仙」典仪筹备完毕后，「愚人众」执行官「女士」出现在他面前。\n按照事先签订的「契约」，她前来取走岩神摩拉克斯的「神之心」。\n当着旅行者与两位「愚人众」执行官的面，钟离坦率说出了自己与「冰之神」达成交易一事。\n依他本人所说，这是在最后的时刻，所订立的「终结一切契约的契约」。\n可无论怎么看，岩之神在这场交易中付出的代价实在太多，连守护璃月港的神力都将失去…\n就算是人与人之间，交易的铁则也是「等价交换」。\n对千百年来签下千百「契约」的岩神而言，如此重要的契约，必定是有利可图才会考虑吧。\n现在，岩之神已将自己的「神之心」作为代价送出。\n冰之神究竟是押上何种筹码，才使交易的天平达到了平衡呢？"
       }
-    ]
+    ],
+    "VisionAfter": "岩",
+    "ConstellationAfter": "岩王帝君座"
   },
   "Costumes": [
     {

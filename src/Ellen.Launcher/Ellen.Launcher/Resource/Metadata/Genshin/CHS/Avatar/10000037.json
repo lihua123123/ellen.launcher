@@ -1,13 +1,13 @@
 {
   "Id": 10000037,
   "PromoteId": 37,
-  "Sort": 26,
+  "Sort": 102037,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Ganyu",
   "SideIcon": "UI_AvatarIcon_Side_Ganyu",
   "Name": "甘雨",
   "Description": "月海亭的秘书，体内流淌着仙兽「麒麟」的血脉。",
-  "BeginTime": "2021-01-12T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 12,
   "BaseValue": {
@@ -335,8 +335,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10371,
         "Name": "流天射术",
@@ -504,8 +503,7 @@
                 10
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10372,
         "Name": "山泽麟迹",
@@ -675,8 +673,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10373,
       "Name": "降众天华",
@@ -699,8 +696,7 @@
                 0.2
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 372101,
         "Name": "唯此一心",
@@ -720,8 +716,7 @@
                 0.2
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 372201,
         "Name": "天地交泰",
@@ -739,8 +734,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 372301,
         "Name": "藏弓待用",
@@ -804,7 +798,8 @@
     "BirthMonth": 12,
     "BirthDay": 2,
     "VisionBefore": "冰",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "仙麟座",
     "CvChinese": "林簌",
     "CvJapanese": "上田丽奈",

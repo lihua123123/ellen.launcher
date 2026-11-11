@@ -1,13 +1,13 @@
 {
   "Id": 10000103,
   "PromoteId": 103,
-  "Sort": 88,
+  "Sort": 501103,
   "Body": 3,
   "Icon": "UI_AvatarIcon_Xilonen",
   "SideIcon": "UI_AvatarIcon_Side_Xilonen",
   "Name": "希诺宁",
   "Description": "纳茨卡延的铸名师，善于在工作的重担与舒适的生活之间找到平衡点。",
-  "BeginTime": "2024-10-08T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 1,
   "BaseValue": {
@@ -334,8 +334,7 @@
                 2.300736
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11031,
         "Name": "锐锋攫猎",
@@ -535,8 +534,7 @@
                 7
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11032,
         "Name": "音火锻淬",
@@ -753,8 +751,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11035,
       "Name": "豹烈律动！",
@@ -777,8 +774,7 @@
                 0.3
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1032101,
         "Name": "四境四象回声",
@@ -800,8 +796,7 @@
                 15
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1032201,
         "Name": "便携铠装护层",
@@ -819,8 +814,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1032301,
         "Name": "夜域赐礼·锻火之祝",
@@ -842,8 +836,7 @@
                 15
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1032501,
         "Name": "丛山锻火驰行",
@@ -907,7 +900,8 @@
     "BirthMonth": 3,
     "BirthDay": 13,
     "VisionBefore": "岩",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "豹猫座",
     "CvChinese": "弭洋",
     "CvJapanese": "菲鲁兹·蓝",
@@ -1248,5 +1242,11 @@
     "Description": "名片纹饰。\n万山回响着希诺宁锻打的律动。当最后一丝回声渐消，那会儿她早已停下工作，寻找午后的日光去小睡了。",
     "Icon": "UI_NameCardIcon_Xilonen",
     "PicturePrefix": "UI_NameCardPic_Xilonen"
+  },
+  "TraceEffect": {
+    "Id": 215024,
+    "Name": "游迹·焮火铸魂",
+    "Description": "希诺宁的绘想游迹。「音乐在天下震动留下波痕，人们在地上行走留下旅迹。」",
+    "Icon": "UI_TraceEffectIcon_Xilonen"
   }
 }

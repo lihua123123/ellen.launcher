@@ -1,13 +1,13 @@
 {
   "Id": 10000109,
   "PromoteId": 109,
-  "Sort": 94,
+  "Sort": 504109,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Mizuki",
   "SideIcon": "UI_AvatarIcon_Side_Mizuki",
   "Name": "梦见月瑞希",
   "Description": "「秋沙钱汤」的股东，梦貘一族的心理诊疗师，致力于驱散噩梦，为人们带来安宁的心境。",
-  "BeginTime": "2025-02-11T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 10,
   "BaseValue": {
@@ -255,8 +255,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11091,
         "Name": "梦我梦心",
@@ -456,8 +455,7 @@
                 0.06
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11092,
         "Name": "秋沙歌枕巡礼",
@@ -465,32 +463,6 @@
         "SpecialEnergyType": 0,
         "Icon": "Skill_S_Mizuki_01",
         "CdTime": 15
-      }
-    ],
-    "SpecialSkills": [
-      {
-        "GroupId": 10951,
-        "Proud": {
-          "Descriptions": [],
-          "Parameters": [
-            {
-              "Id": 1095101,
-              "Level": 1,
-              "Parameters": [
-                10,
-                2.5,
-                0.1,
-                10
-              ]
-            }
-          ],
-          "Display": 3
-        },
-        "Id": 1095101,
-        "Name": "廓然梦生",
-        "Description": "梦见月瑞希在梦浮状态下触发扩散或星扩散反应后，本次梦浮期间，下一次对附近敌人周期性造成的<color=#80FFD7FF>风元素范围伤害</color>将会提升，提升值相当于梦见月瑞希元素精通的1000%，每2.5秒至多触发一次上述效果。\n<color=#FFD780FF>辉映·星扩散</color>：梦见月瑞希对敌人造成上述提升后的<color=#80FFD7FF>风元素范围伤害</color>时，还会基于梦见月瑞希元素精通的1000%，额外造成一次<color=#80FFD7FF>风元素伤害</color>，该伤害视为星扩散反应造成的伤害。\n\n此外，处于梦浮状态下时，队伍中附近的角色的元素精通提升，提升值相当于梦见月瑞希自己的元素精通的10%。\n队伍中的角色在附近触发星扩散反应后的8秒内，梦见月瑞希将会进入<color=#FFD780FF>辉映·星扩散</color>状态。",
-        "SpecialEnergyType": 0,
-        "Icon": "UI_Talent_S_Mizuki_08"
       }
     ],
     "EnergySkill": {
@@ -700,8 +672,7 @@
               993.61127
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11095,
       "Name": "安乐秘汤疗法",
@@ -710,6 +681,26 @@
       "Icon": "Skill_E_Mizuki_01",
       "CdTime": 15
     },
+    "SpecialSkills": [
+      {
+        "GroupId": 10951,
+        "Proud": {
+          "Descriptions": [],
+          "Parameters": [
+            {
+              "Id": 1095101,
+              "Level": 1,
+              "Parameters": []
+            }
+          ]
+        },
+        "Id": 1095101,
+        "Name": "廓然梦生",
+        "Description": "梦见月瑞希在梦浮状态下触发扩散或星扩散反应后，本次梦浮期间，下一次对附近敌人周期性造成的<color=#80FFD7FF>风元素范围伤害</color>将会提升，提升值相当于梦见月瑞希元素精通的1000%，每2.5秒至多触发一次上述效果。\n<color=#FFD780FF>辉映·星扩散</color>：梦见月瑞希对敌人造成上述提升后的<color=#80FFD7FF>风元素范围伤害</color>时，还会基于梦见月瑞希元素精通的1000%，额外造成一次<color=#80FFD7FF>风元素伤害</color>，该伤害视为星扩散反应造成的伤害。\n\n此外，处于梦浮状态下时，队伍中附近的角色的元素精通提升，提升值相当于梦见月瑞希自己的元素精通的10%。\n队伍中的角色在附近触发星扩散反应后的8秒内，梦见月瑞希将会进入<color=#FFD780FF>辉映·星扩散</color>状态。",
+        "SpecialEnergyType": 0,
+        "Icon": "UI_Talent_S_Mizuki_08"
+      }
+    ],
     "Inherents": [
       {
         "GroupId": 10921,
@@ -721,8 +712,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1092101,
         "Name": "名月浮声",
@@ -743,8 +733,7 @@
                 4
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1092201,
         "Name": "昼想夜梦",
@@ -764,8 +753,7 @@
                 0.3
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1092301,
         "Name": "诸病无病",
@@ -779,15 +767,15 @@
         "Id": 1091,
         "Name": "宿雾若水遥",
         "Description": "梦见月瑞希处于梦浮状态下时，每3.5秒将对附近的敌人施加持续3秒的「二十三夜待」效果。处于二十三夜待状态下的敌人受到风元素伤害而触发扩散或星扩散反应时，将移除该效果，使此次扩散/星扩散反应对该敌人造成的伤害提升，提升值分别相当于梦见月瑞希元素精通的1100%/550%。",
-        "SpecialDescription": "梦见月瑞希处于梦浮状态下时，每3.5秒将对附近的敌人施加持续3秒的「二十三夜待」效果。处于二十三夜待状态下的敌人受到风元素伤害而触发扩散或星扩散反应时，将移除该效果，使此次扩散/星扩散反应对该敌人造成的伤害提升，提升值分别相当于梦见月瑞希元素精通的1100%/550%，并对该敌人额外进行一次攻击，造成相当于梦见月瑞希元素精通1000%的<color=#80FFD7FF>风元素伤害</color>。\n<color=#FFD780FF>辉映·星扩散</color>：上述额外伤害转为梦见月瑞希元素精通的400%的<color=#80FFD7FF>风元素伤害</color>，该伤害视为星扩散反应造成的伤害。",
-        "Icon": "UI_Talent_S_Mizuki_01"
+        "Icon": "UI_Talent_S_Mizuki_01",
+        "SpecialDescription": "梦见月瑞希处于梦浮状态下时，每3.5秒将对附近的敌人施加持续3秒的「二十三夜待」效果。处于二十三夜待状态下的敌人受到风元素伤害而触发扩散或星扩散反应时，将移除该效果，使此次扩散/星扩散反应对该敌人造成的伤害提升，提升值分别相当于梦见月瑞希元素精通的1100%/550%，并对该敌人额外进行一次攻击，造成相当于梦见月瑞希元素精通1000%的<color=#80FFD7FF>风元素伤害</color>。\n<color=#FFD780FF>辉映·星扩散</color>：上述额外伤害转为梦见月瑞希元素精通的400%的<color=#80FFD7FF>风元素伤害</color>，该伤害视为星扩散反应造成的伤害。"
       },
       {
         "Id": 1092,
         "Name": "缠忆君影梦相见",
         "Description": "进入梦浮状态时，梦见月瑞希的每点元素精通，会为附近的队伍中所有其他角色提供0.04%<color=#FF9999FF>火元素</color>、<color=#80C0FFFF>水元素</color>、<color=#99FFFFFF>冰元素</color>与<color=#FFACFFFF>雷元素</color>伤害加成，效果持续至梦浮状态结束。",
-        "SpecialDescription": "进入梦浮状态时，梦见月瑞希的每点元素精通，会为附近的队伍中所有其他角色提供0.04%<color=#FF9999FF>火元素</color>、<color=#80C0FFFF>水元素</color>、<color=#99FFFFFF>冰元素</color>与<color=#FFACFFFF>雷元素</color>伤害加成，效果持续至梦浮状态结束。\n此外，梦见月瑞希处于梦浮状态下时，附近敌人的<color=#FF9999FF>火元素抗性</color>、<color=#80C0FFFF>水元素抗性</color>、<color=#99FFFFFF>冰元素抗性</color>、<color=#FFACFFFF>雷元素抗性</color>与<color=#80FFD7FF>风元素抗性</color>降低20%。",
-        "Icon": "UI_Talent_S_Mizuki_02"
+        "Icon": "UI_Talent_S_Mizuki_02",
+        "SpecialDescription": "进入梦浮状态时，梦见月瑞希的每点元素精通，会为附近的队伍中所有其他角色提供0.04%<color=#FF9999FF>火元素</color>、<color=#80C0FFFF>水元素</color>、<color=#99FFFFFF>冰元素</color>与<color=#FFACFFFF>雷元素</color>伤害加成，效果持续至梦浮状态结束。\n此外，梦见月瑞希处于梦浮状态下时，附近敌人的<color=#FF9999FF>火元素抗性</color>、<color=#80C0FFFF>水元素抗性</color>、<color=#99FFFFFF>冰元素抗性</color>、<color=#FFACFFFF>雷元素抗性</color>与<color=#80FFD7FF>风元素抗性</color>降低20%。"
       },
       {
         "Id": 1093,
@@ -803,8 +791,8 @@
         "Id": 1094,
         "Name": "泉轻流花暖",
         "Description": "拾取元素爆发<color=#FFD780FF>安乐秘汤疗法</color>中的<color=#FFD780FF>梦见风名物点心</color>时，将同时造成伤害与治疗，并为梦见月瑞希恢复5点元素能量。一次<color=#FFD780FF>安乐秘汤疗法</color>持续期间，至多通过这种方式恢复4次元素能量。",
-        "SpecialDescription": "拾取元素爆发<color=#FFD780FF>安乐秘汤疗法</color>中的<color=#FFD780FF>梦见风名物点心</color>时，将同时造成伤害与治疗，且会额外治疗队伍中附近的另一名生命值较低的角色，治疗量为梦见月瑞希元素精通的266%，并为梦见月瑞希恢复5点元素能量。一次<color=#FFD780FF>安乐秘汤疗法</color>持续期间，至多通过这种方式恢复4次元素能量。",
-        "Icon": "UI_Talent_S_Mizuki_03"
+        "Icon": "UI_Talent_S_Mizuki_03",
+        "SpecialDescription": "拾取元素爆发<color=#FFD780FF>安乐秘汤疗法</color>中的<color=#FFD780FF>梦见风名物点心</color>时，将同时造成伤害与治疗，且会额外治疗队伍中附近的另一名生命值较低的角色，治疗量为梦见月瑞希元素精通的266%，并为梦见月瑞希恢复5点元素能量。一次<color=#FFD780FF>安乐秘汤疗法</color>持续期间，至多通过这种方式恢复4次元素能量。"
       },
       {
         "Id": 1095,
@@ -820,8 +808,8 @@
         "Id": 1096,
         "Name": "慕念萦心间",
         "Description": "梦见月瑞希处于梦浮状态下时，队伍中附近的角色触发的扩散反应造成的伤害能够造成暴击，暴击率固定为30%，暴击伤害固定为100%，并使这些角色造成的星扩散反应伤害暴击率提升10%，暴击伤害提升20%。",
-        "SpecialDescription": "梦见月瑞希处于梦浮状态下时，队伍中附近的角色触发的扩散反应造成的伤害能够造成暴击，暴击率固定为30%，暴击伤害固定为100%，并使这些角色造成的星扩散反应伤害暴击率提升10%，暴击伤害提升20%。\n基于梦见月瑞希元素精通超过500的部分，每点元素精通都会使梦见月瑞希的暴击率提升0.04%、暴击伤害提升0.16%，至多通过这种方式使梦见月瑞希的暴击率提升20%、暴击伤害提升80%。",
-        "Icon": "UI_Talent_S_Mizuki_04"
+        "Icon": "UI_Talent_S_Mizuki_04",
+        "SpecialDescription": "梦见月瑞希处于梦浮状态下时，队伍中附近的角色触发的扩散反应造成的伤害能够造成暴击，暴击率固定为30%，暴击伤害固定为100%，并使这些角色造成的星扩散反应伤害暴击率提升10%，暴击伤害提升20%。\n基于梦见月瑞希元素精通超过500的部分，每点元素精通都会使梦见月瑞希的暴击率提升0.04%、暴击伤害提升0.16%，至多通过这种方式使梦见月瑞希的暴击率提升20%、暴击伤害提升80%。"
       }
     ]
   },
@@ -833,7 +821,8 @@
     "BirthMonth": 3,
     "BirthDay": 16,
     "VisionBefore": "风",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "貘枕座",
     "CvChinese": "浮梦若薇",
     "CvJapanese": "会泽纱弥",

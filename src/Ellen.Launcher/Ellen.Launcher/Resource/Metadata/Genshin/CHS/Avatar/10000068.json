@@ -1,13 +1,13 @@
 {
   "Id": 10000068,
   "PromoteId": 68,
-  "Sort": 53,
+  "Sort": 300068,
   "Body": 5,
   "Icon": "UI_AvatarIcon_Dori",
   "SideIcon": "UI_AvatarIcon_Side_Dori",
   "Name": "多莉",
   "Description": "神出鬼没的旅行百货商人，最喜欢亮闪闪的摩拉。",
-  "BeginTime": "2022-09-09T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 11,
   "BaseValue": {
@@ -302,8 +302,7 @@
                 4.982145
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10681,
         "Name": "妙显剑舞·改",
@@ -455,8 +454,7 @@
                 9
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10682,
         "Name": "镇灵之灯·烦恼解决炮",
@@ -673,8 +671,7 @@
               80
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10685,
       "Name": "卡萨扎莱宫的无微不至",
@@ -697,8 +694,7 @@
                 3
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 682101,
         "Name": "披沙沥金",
@@ -719,8 +715,7 @@
                 15
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 682201,
         "Name": "利上加利",
@@ -738,8 +733,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 682301,
         "Name": "意外订单",
@@ -803,7 +797,8 @@
     "BirthMonth": 12,
     "BirthDay": 21,
     "VisionBefore": "雷",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "神灯座",
     "CvChinese": "王晓彤",
     "CvJapanese": "金田朋子",

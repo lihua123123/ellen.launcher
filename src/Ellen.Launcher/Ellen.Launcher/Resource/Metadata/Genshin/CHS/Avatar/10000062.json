@@ -1,13 +1,13 @@
 {
   "Id": 10000062,
   "PromoteId": 62,
-  "Sort": 37,
+  "Sort": 201062,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Aloy",
   "SideIcon": "UI_AvatarIcon_Side_Aloy",
   "Name": "埃洛伊",
   "Description": "曾经是流放者，如今则是无比机敏的猎手。随时准备着为了正当之事而挽弓放箭。",
-  "BeginTime": "2021-09-01T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 105,
   "Weapon": 12,
   "BaseValue": {
@@ -286,8 +286,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10621,
         "Name": "快速射击",
@@ -549,8 +548,7 @@
                 20
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10622,
         "Name": "冰尘雪野",
@@ -704,8 +702,7 @@
               40
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10625,
       "Name": "曙光预言",
@@ -728,8 +725,7 @@
                 10
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 622101,
         "Name": "战斗覆盖",
@@ -749,8 +745,7 @@
                 0.035
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 622201,
         "Name": "强力攻击",
@@ -768,8 +763,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 622301,
         "Name": "荒野猎手",
@@ -825,7 +819,8 @@
     "BirthMonth": 4,
     "BirthDay": 4,
     "VisionBefore": "冰",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "诺拉勇者座",
     "CvChinese": "沐霏",
     "CvJapanese": "高垣彩阳",

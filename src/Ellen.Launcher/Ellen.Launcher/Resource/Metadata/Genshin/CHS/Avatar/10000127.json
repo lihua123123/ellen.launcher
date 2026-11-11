@@ -1,13 +1,13 @@
 {
   "Id": 10000127,
   "PromoteId": 127,
-  "Sort": 111,
+  "Sort": 603127,
   "Body": 1,
   "Icon": "UI_AvatarIcon_Illuga",
   "SideIcon": "UI_AvatarIcon_Side_Illuga",
   "Name": "叶洛亚",
   "Description": "调查分队「魇夜之莺」成员，执灯人最年轻的分队长。",
-  "BeginTime": "2026-02-03T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 13,
   "BaseValue": {
@@ -286,8 +286,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11271,
         "Name": "守誓枪术",
@@ -469,8 +468,7 @@
                 15
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11272,
         "Name": "衔莺破晓",
@@ -719,8 +717,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11275,
       "Name": "鉴照无影",
@@ -747,8 +744,7 @@
                 20
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1272101,
         "Name": "铸灯者的盟约",
@@ -773,8 +769,7 @@
                 1.6
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1272201,
         "Name": "狩魔者的黄昏",
@@ -792,8 +787,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1272301,
         "Name": "月兆祝赐·凌冬不凋",
@@ -813,8 +807,7 @@
                 0.1
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1272501,
         "Name": "巡夜者的疾行",
@@ -878,7 +871,8 @@
     "BirthMonth": 12,
     "BirthDay": 23,
     "VisionBefore": "岩",
-    "VisionOverrideUnlocked": "月之轮",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "金莺座",
     "CvChinese": "昱头",
     "CvJapanese": "梅田修一朗",

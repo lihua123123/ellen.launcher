@@ -1,13 +1,13 @@
 {
   "Id": 10000053,
   "PromoteId": 53,
-  "Sort": 35,
+  "Sort": 200053,
   "Body": 5,
   "Icon": "UI_AvatarIcon_Sayu",
   "SideIcon": "UI_AvatarIcon_Side_Sayu",
   "Name": "早柚",
   "Description": "隶属于「终末番」的忍者。身形小巧，总像没睡饱一样。",
-  "BeginTime": "2021-08-10T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 11,
   "BaseValue": {
@@ -318,8 +318,7 @@
                 4.982145
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10531,
         "Name": "忍刀·终末番",
@@ -550,8 +549,7 @@
                 11
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10532,
         "Name": "呜呼流·风隐急进",
@@ -799,8 +797,7 @@
               80
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10535,
       "Name": "呜呼流·影貉缭乱",
@@ -824,8 +821,7 @@
                 2
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 532101,
         "Name": "更加合适的人选",
@@ -845,8 +841,7 @@
                 0.2
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 532201,
         "Name": "早柚不用工作啦",
@@ -864,8 +859,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 532301,
         "Name": "呜呼流·屏息秘传",
@@ -929,7 +923,8 @@
     "BirthMonth": 10,
     "BirthDay": 19,
     "VisionBefore": "风",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "小貉座",
     "CvChinese": "Sakula小舞",
     "CvJapanese": "洲崎绫",

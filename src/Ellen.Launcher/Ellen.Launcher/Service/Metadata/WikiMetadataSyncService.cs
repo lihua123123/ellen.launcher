@@ -55,6 +55,7 @@ public sealed partial class WikiMetadataSyncService : IWikiMetadataSyncService
 
     private long lastBackgroundAttemptUnix;
     private int backgroundRunning;
+    private bool? snapshotBelongsToCurrentVersion;
 
     [GeneratedConstructor]
     public partial WikiMetadataSyncService(IServiceProvider serviceProvider);
@@ -77,7 +78,47 @@ public sealed partial class WikiMetadataSyncService : IWikiMetadataSyncService
 
     public string SyncedLocalizedDataFolder => ResolveSyncedFolder();
 
-    public bool HasSyncedData => File.Exists(Path.Combine(ResolveSyncedFolder(), SentinelFileName));
+    /// <summary>
+    /// 是否存在可直接读取的同步快照。除了哨兵文件存在，还要求它属于当前版本：
+    /// 升级安装后随包数据已经更新，若继续沿用上一个版本留下的旧快照，
+    /// 新角色/新武器会被旧快照整表挡住（快照优先于随包数据），用户会以为「装新版也没新数据」。
+    /// 版本对不上时让位给随包快照，等后台同步重新落一份带当前版本号的快照再接管。
+    /// </summary>
+    public bool HasSyncedData
+    {
+        get
+        {
+            if (!File.Exists(Path.Combine(ResolveSyncedFolder(), SentinelFileName)))
+            {
+                return false;
+            }
+
+            return snapshotBelongsToCurrentVersion ??= ReadSnapshotVersionMatches();
+        }
+    }
+
+    private bool ReadSnapshotVersionMatches()
+    {
+        try
+        {
+            string path = Path.Combine(ResolveSyncedFolder(), SentinelFileName);
+            WikiSnapshotMarker? marker = JsonSerializer.Deserialize<WikiSnapshotMarker>(
+                File.ReadAllText(path), ManifestJsonOptions);
+
+            /* 没有版本号的快照来自旧版客户端，内容不可信，一律让位 */
+            if (marker is null || string.IsNullOrEmpty(marker.AppVersion))
+            {
+                return false;
+            }
+
+            return string.Equals(marker.AppVersion, EllenRuntime.Version.ToString(), StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Exception ex)
+        {
+            logger.LogDebug(ex, "读取元数据快照哨兵失败，按未同步处理");
+            return false;
+        }
+    }
 
     public void SyncInBackground()
     {
@@ -256,12 +297,14 @@ public sealed partial class WikiMetadataSyncService : IWikiMetadataSyncService
             SyncedAt = DateTimeOffset.UtcNow,
             Avatars = manifest.Counts?.Avatar ?? 0,
             Weapons = manifest.Counts?.Weapon ?? 0,
+            AppVersion = EllenRuntime.Version.ToString(),
         };
         File.WriteAllText(Path.Combine(temporary, SentinelFileName), JsonSerializer.Serialize(marker, ManifestJsonOptions));
 
         DeleteDirectory(target);
         Directory.CreateDirectory(Path.GetDirectoryName(target)!);
         Directory.Move(temporary, target);
+        snapshotBelongsToCurrentVersion = true;
 
         /* 新快照带了新的 Assets.json，让图标索引立刻生效，不必重启 */
         Web.Endpoint.Upstream.LauncherAssetMirror.Invalidate();
@@ -374,5 +417,10 @@ public sealed partial class WikiMetadataSyncService : IWikiMetadataSyncService
         public int Avatars { get; set; }
 
         public int Weapons { get; set; }
+
+        /// <summary>
+        /// 落这份快照时的客户端版本。版本对不上说明是升级前的残留，见 <see cref="HasSyncedData"/>。
+        /// </summary>
+        public string AppVersion { get; set; } = string.Empty;
     }
 }

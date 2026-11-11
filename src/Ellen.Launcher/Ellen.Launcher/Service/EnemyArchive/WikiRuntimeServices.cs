@@ -1,5 +1,5 @@
 ﻿// P3 运行时接线：flag 持久化、HTTP 源、增量缓存、后台同步协调器。
-// 默认 flag = legacy-722-bundled，这些服务注册但不触发网络；切 enemy-web-753 才生效。
+// 默认 flag = enemy-web-753（随包数据 + 图片）；只有显式持久化成 legacy-722-bundled 才回退旧图鉴。
 
 using Ellen.Launcher.Core.Setting;
 using Ellen.Launcher.Domain.WikiSource;

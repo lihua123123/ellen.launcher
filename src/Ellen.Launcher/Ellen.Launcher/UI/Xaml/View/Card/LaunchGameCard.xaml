@@ -181,12 +181,16 @@
                             IsEnabled="{Binding GenshinEntry.CanLaunch}"
                             Style="{StaticResource AccentButtonStyle}"
                             Visibility="{Binding GenshinEntry.IsInstalled, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                        <Button
-                            MinHeight="28"
-                            Padding="8,3"
-                            HorizontalAlignment="Stretch"
-                            Command="{Binding SetGenshinGamePathCommand}"
-                            Content="{shuxm:ResourceString Name=ViewCardLaunchGameActionSetPath}"
+                        <!--
+                            未检测到安装时不再给「设置路径」按钮：路径统一在设置页维护，
+                            这里只提示去哪里设置，避免首页出现两套入口。
+                        -->
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="{shuxm:ResourceString Name=ViewCardLaunchGamePathHintInSettings}"
+                            TextWrapping="Wrap"
                             Visibility="{Binding GenshinEntry.IsInstalled, Converter={StaticResource BoolToVisibilityRevertConverter}}"/>
                     </Grid>
                 </Grid>
@@ -236,12 +240,12 @@
                             IsEnabled="{Binding ZenlessZoneZeroEntry.CanLaunch}"
                             Style="{StaticResource AccentButtonStyle}"
                             Visibility="{Binding ZenlessZoneZeroEntry.IsInstalled, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                        <Button
-                            MinHeight="28"
-                            Padding="8,3"
-                            HorizontalAlignment="Stretch"
-                            Command="{Binding SetZenlessZoneZeroGamePathCommand}"
-                            Content="{shuxm:ResourceString Name=ViewCardLaunchGameActionSetPath}"
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="{shuxm:ResourceString Name=ViewCardLaunchGamePathHintInSettings}"
+                            TextWrapping="Wrap"
                             Visibility="{Binding ZenlessZoneZeroEntry.IsInstalled, Converter={StaticResource BoolToVisibilityRevertConverter}}"/>
                     </Grid>
                 </Grid>

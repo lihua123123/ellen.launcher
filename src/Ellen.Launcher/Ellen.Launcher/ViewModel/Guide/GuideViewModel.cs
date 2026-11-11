@@ -86,7 +86,12 @@ public sealed partial class GuideViewModel : Abstraction.ViewModel
 
     public bool IsNextOrCompleteButtonEnabled { get; set => SetProperty(ref field, value); } = true;
 
-    public bool IsSetDataFolderEnabled { get; set => SetProperty(ref field, value); } = true;
+    /// <summary>
+    /// 便携模式下数据目录跟着安装位置走（<c>InitializeDataDirectory</c> 优先认 exe 旁的 portable.json，
+    /// 会忽略这里选定的目录），所以直接把入口关掉 —— 否则用户选完目录、程序重启后路径没变，
+    /// 看起来像「设置没生效」。
+    /// </summary>
+    public bool IsSetDataFolderEnabled { get; set => SetProperty(ref field, value); } = !PortableLayout.IsEnabled;
 
     public partial CultureOptions CultureOptions { get; }
 

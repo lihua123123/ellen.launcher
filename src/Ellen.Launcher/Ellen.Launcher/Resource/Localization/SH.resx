@@ -1138,6 +1138,9 @@
   <data name="ViewCardLaunchGameActionSetPath" xml:space="preserve">
     <value>设置路径</value>
   </data>
+  <data name="ViewCardLaunchGamePathHintInSettings" xml:space="preserve">
+    <value>未找到游戏，请在「设置 → 游戏」里添加安装地址</value>
+  </data>
   <data name="ViewCardLaunchGameElevationCancelled" xml:space="preserve">
     <value>未获得管理员授权，游戏未启动（在 UAC 弹窗里点「是」即可）</value>
   </data>

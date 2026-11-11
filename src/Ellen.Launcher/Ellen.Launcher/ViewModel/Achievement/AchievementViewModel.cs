@@ -11,7 +11,7 @@ using Ellen.Launcher.Core.Logging;
 using Ellen.Launcher.Factory.Picker;
 using Ellen.Launcher.Model.InterChange.Achievement;
 using Ellen.Launcher.Service.Achievement;
-using Ellen.Launcher.Service.Game.Island;
+using Ellen.Launcher.Service.Transfer;
 using Ellen.Launcher.Service.Metadata;
 using Ellen.Launcher.Service.Metadata.ContextAbstraction;
 using Ellen.Launcher.Service.Navigation;
@@ -43,7 +43,7 @@ public sealed partial class AchievementViewModel : Abstraction.ViewModel, INavig
     private readonly ExclusiveTokenProvider achievementsTokenProvider = new();
 
     private readonly AchievementViewModelScopeContext scopeContext;
-    private readonly IEmbeddedYaeGate embeddedYaeGate;
+    private readonly IAchievementTransferService achievementTransferService;
 
     [GeneratedConstructor]
     public partial AchievementViewModel(IServiceProvider serviceProvider);
@@ -221,76 +221,15 @@ public sealed partial class AchievementViewModel : Abstraction.ViewModel, INavig
         }
     }
 
-    [Command("ExportAsUIAFToFileCommand")]
-    private async Task ExportAsUIAFToFileAsync()
-    {
-        SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateUI("Export UIAF file", "AchievementViewModel.Command"));
-
-        if (Archives?.CurrentItem is null || Achievements is null)
-        {
-            return;
-        }
-
-        FileSystemPickerOptions pickerOptions = new()
-        {
-            Title = SH.ViewModelAchievementUIAFExportPickerTitle,
-            DefaultFileName = $"{Archives.CurrentItem.Name}.json",
-            FilterName = SH.ViewModelAchievementExportFileType,
-            FilterType = "*.json",
-        };
-
-        if (scopeContext.FileSystemPickerInteraction.SaveFile(pickerOptions) is not (true, { HasValue: true } file))
-        {
-            return;
-        }
-
-        UIAF uiaf = await scopeContext.AchievementService.ExportToUIAFAsync(Archives.CurrentItem).ConfigureAwait(false);
-
-        InfoBarMessage message = await file.SerializeToJsonNoThrowAsync(uiaf, scopeContext.JsonSerializerOptions).ConfigureAwait(false)
-            ? InfoBarMessage.Success(SH.ViewModelExportSuccessTitle, SH.ViewModelExportSuccessMessage)
-            : InfoBarMessage.Warning(SH.ViewModelExportWarningTitle, SH.ViewModelExportWarningMessage);
-
-        scopeContext.Messenger.Send(message);
-    }
-
-    [Command("ImportUIAFFromEmbeddedYaeCommand")]
-    private async Task ImportUIAFFromEmbeddedYaeAsync()
-    {
-        SentrySdk.AddBreadcrumb(BreadcrumbFactory2.CreateUI("Import UIAF", "AchievementViewModel.Command", [("source", "Embedded Yae")]));
-
-        if (!await embeddedYaeGate.EnsureElevatedAsync().ConfigureAwait(false))
-        {
-            return;
-        }
-
-        if (!await embeddedYaeGate.EnsureConfirmedAsync().ConfigureAwait(false))
-        {
-            return;
-        }
-
-        if (await scopeContext.AchievementImporter.FromEmbeddedYaeAsync(scopeContext).ConfigureAwait(false))
-        {
-            await UpdateAchievementCollectionAsync(Archives?.CurrentItem, achievementsTokenProvider.GetNewToken()).ConfigureAwait(false);
-        }
-    }
+    // 成就的 UIAF 导入导出入口已经统一挪到设置页（Service.Transfer.AchievementTransferService）。
+    // 这里只保留「从剪贴板导入」，因为 AppActivation 的深层链接会导航到本页并触发它。
 
     [Command("ImportUIAFFromClipboardCommand")]
     private async Task ImportUIAFFromClipboardAsync()
     {
         SentrySdk.AddBreadcrumb(BreadcrumbFactory2.CreateUI("Import UIAF", "AchievementViewModel.Command", [("source", "Clipboard")]));
 
-        if (await scopeContext.AchievementImporter.FromClipboardAsync(scopeContext).ConfigureAwait(false))
-        {
-            await UpdateAchievementCollectionAsync(Archives?.CurrentItem, achievementsTokenProvider.GetNewToken()).ConfigureAwait(false);
-        }
-    }
-
-    [Command("ImportUIAFFromFileCommand")]
-    private async Task ImportUIAFFromFileAsync()
-    {
-        SentrySdk.AddBreadcrumb(BreadcrumbFactory2.CreateUI("Import UIAF", "AchievementViewModel.Command", [("source", "File")]));
-
-        if (await scopeContext.AchievementImporter.FromFileAsync(scopeContext).ConfigureAwait(false))
+        if (await achievementTransferService.ImportFromClipboardAsync().ConfigureAwait(false))
         {
             await UpdateAchievementCollectionAsync(Archives?.CurrentItem, achievementsTokenProvider.GetNewToken()).ConfigureAwait(false);
         }

@@ -47,7 +47,7 @@ public static class DependencyInjection
             // Discrete services
             .AddSingleton<IMessenger, WeakReferenceMessenger>()
 
-            // P3 ellen.wiki 数据上游（默认 UI 仍是 legacy-722-bundled；切 enemy-web-753 才启用同步）
+            // P3 ellen.wiki 数据上游（默认 UI 是 enemy-web-753 的随包数据；显式持久化 legacy 才回退）
             // 运行时源默认走真实 HTTP（UA/限速/退避/ETag 增量缓存 + 内容寻址图片缓存）；
             // 设 ELLEN_WIKI_RUNTIME=file 可切回本地镜像（开发/离线测试用），镜像缺失时显式告警。
             .AddSingleton(WikiMirrorPaths.FromEnvironment())
@@ -58,10 +58,12 @@ public static class DependencyInjection
                 WikiSourceFeatureFlag flag = new(sp.GetRequiredService<IWikiFlagStore>());
                 WikiCacheStore cache = sp.GetRequiredService<WikiCacheStore>();
 
-                // P5a 灰度：默认 off（沿用持久化设置）；whitelist 只对白名单安装生效；all 才全量。
+                // P5a 灰度：默认 off（默认 753，只有显式持久化成 legacy 才回退）；whitelist 只对白名单安装生效；all 才全量。
                 // ELLEN_WIKI_UI_SOURCE 仅用于开发/性能演练，优先级最高。
+                // 这里传 PersistedUiSource 而不是 UiSource：后者已经把「没写过设置」补成了默认值，
+                // 传进来就分不清「用户明确选了 legacy」和「从没设置过」。
                 WikiRolloutDecision rollout = WikiRolloutPolicy.Resolve(
-                    flag.UiSource,
+                    flag.PersistedUiSource,
                     WikiRolloutPolicy.ParseMode(Environment.GetEnvironmentVariable(WikiRolloutPolicy.RolloutEnvironment)),
                     WikiRolloutPolicy.ResolveInstallId(),
                     WikiRolloutPolicy.ReadWhitelist(cache.Root),

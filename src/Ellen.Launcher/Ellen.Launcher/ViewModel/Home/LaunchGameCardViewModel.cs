@@ -3,19 +3,15 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Dispatching;
-using Ellen.Launcher.Core.IO;
-using Ellen.Launcher.Factory.Picker;
 using Ellen.Launcher.Model.Metadata.ZZZ;
 using Ellen.Launcher.Service.Game;
 using Ellen.Launcher.Service.Game.FileSystem;
-using Ellen.Launcher.Service.Game.Locator;
 using Ellen.Launcher.Service.Game.QuickLaunch;
 using Ellen.Launcher.Service.Metadata;
 using Ellen.Launcher.Service.Notification;
 using Ellen.Launcher.Service.User;
 using Ellen.Launcher.ViewModel.User;
 using Ellen.Launcher.Web.Hoyolab.Takumi.Binding;
-using System.IO;
 using BindingUser = Ellen.Launcher.ViewModel.User.User;
 
 namespace Ellen.Launcher.ViewModel.Home;
@@ -29,7 +25,13 @@ namespace Ellen.Launcher.ViewModel.Home;
 public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim, IRecipient<UserAndUidChangedMessage>
 {
     private const string GenshinFallbackIconUri = "ms-appx:///Resource/Icon/UI_Icon_Paimon.png";
-    private const string ZenlessZoneZeroFallbackIconUri = "ms-appx:///Resource/ZZZIcon/Element_Ether.png";
+
+    /// <summary>
+    /// 未检测到《绝区零》安装位置时显示的图标。
+    /// 这里必须是游戏图标本身，不能拿元素图标顶替 —— ZZZIcon 目录下是战斗属性
+    /// （物理/火/冰/雷/以太…）与职业图标，用来当游戏卡片封面会显示成一颗紫色星星。
+    /// </summary>
+    private const string ZenlessZoneZeroFallbackIconUri = "ms-appx:///Resource/Icon/UI_GameIcon_Zenless.png";
 
     /// <summary>
     /// 鼠标移入会触发刷新，避免频繁探测注册表与进程。
@@ -41,13 +43,10 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
     /// </summary>
     private static readonly TimeSpan RunningStatePollingInterval = TimeSpan.FromSeconds(2);
 
-    private readonly IServiceProvider serviceProvider;
     private readonly IUserService userService;
     private readonly IGameLaunchService gameLaunchService;
     private readonly IGameInstallationLocator installationLocator;
-    private readonly IGameLocatorFactory gameLocatorFactory;
     private readonly IZZZAvatarCacheService zzzAvatarCacheService;
-    private readonly LaunchOptions launchOptions;
     private readonly ITaskContext taskContext;
     private readonly IMessenger messenger;
 
@@ -135,8 +134,9 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
     }
 
     /// <summary>
-    /// 点击磁贴：已安装则启动，未安装则让用户选择游戏路径。
+    /// 点击磁贴：已安装则启动。
     /// 运行中也可以点：会重新检测进程，游戏已经退出就立刻启动，不用等轮询。
+    /// 未安装时不在这里选路径 —— 安装目录统一在设置页维护，卡片只提示去设置页添加。
     /// </summary>
     [Command("LaunchCommand")]
     private async Task LaunchAsync(GameLaunchEntry? entry)
@@ -148,7 +148,7 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
 
         if (!entry.IsInstalled)
         {
-            await SetGamePathAsync(entry).ConfigureAwait(false);
+            messenger.Send(InfoBarMessage.Warning(SH.ViewCardLaunchGameStartedTitle, SH.ViewCardLaunchGamePathHintInSettings));
             return;
         }
 
@@ -179,18 +179,6 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
             await taskContext.SwitchToMainThreadAsync();
             entry.IsLaunching = false;
         }
-    }
-
-    [Command("SetGenshinGamePathCommand")]
-    private Task SetGenshinGamePathAsync()
-    {
-        return SetGamePathAsync(GenshinEntry);
-    }
-
-    [Command("SetZenlessZoneZeroGamePathCommand")]
-    private Task SetZenlessZoneZeroGamePathAsync()
-    {
-        return SetGamePathAsync(ZenlessZoneZeroEntry);
     }
 
     /// <summary>
@@ -400,45 +388,6 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
     {
         GenshinEntry.IconSource ??= GameIconProvider.CreateBundledIcon(GenshinFallbackIconUri);
         ZenlessZoneZeroEntry.IconSource ??= GameIconProvider.CreateBundledIcon(ZenlessZoneZeroFallbackIconUri);
-    }
-
-    private async Task SetGamePathAsync(GameLaunchEntry entry)
-    {
-        if (entry.Kind is GameLaunchKind.Genshin)
-        {
-            if (await gameLocatorFactory.LocateSingleAsync(GameLocationSourceKind.Manual).ConfigureAwait(false) is not (true, { } genshinPath))
-            {
-                return;
-            }
-
-            await taskContext.SwitchToMainThreadAsync();
-            launchOptions.PerformGamePathEntrySynchronization(genshinPath);
-        }
-        else
-        {
-            IFileSystemPickerInteraction picker = serviceProvider.GetRequiredService<IFileSystemPickerInteraction>();
-            (bool isPickerOk, ValueFile file) = picker.PickFile(
-                SH.ViewPageAnnouncementSetZZZGamePathLabel,
-                SH.ServiceGameLocatorPickerFilterText,
-                GameConstants.ZenlessZoneZeroFileName);
-
-            if (!isPickerOk)
-            {
-                return;
-            }
-
-            if (!string.Equals(Path.GetFileName(file), GameConstants.ZenlessZoneZeroFileName, StringComparison.OrdinalIgnoreCase))
-            {
-                return;
-            }
-
-            await taskContext.SwitchToMainThreadAsync();
-            launchOptions.ZZZGamePath.Value = file;
-        }
-
-        await taskContext.SwitchToMainThreadAsync();
-        messenger.Send(InfoBarMessage.Success(SH.ViewPageAnnouncementSetGamePathSuccessTitle, SH.FormatViewCardLaunchGameSetPathSuccess(entry.Title)));
-        await RefreshAsync(refreshAccount: false, refreshInstallations: true).ConfigureAwait(false);
     }
 
     private void UpdateSummary()

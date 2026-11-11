@@ -17,8 +17,18 @@ public sealed class DiagnosticsSettingsProvider
     {
         if (RuntimeEnvironment.IsUnpackaged)
         {
-            string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string directory = Path.Combine(appData, "EllenLauncher");
+            // 跟着数据目录走：用户把数据目录迁到别处（或便携安装）之后，
+            // 这里再往 %LOCALAPPDATA%\EllenLauncher 写文件就会凭空多出一个目录。
+            string directory;
+            try
+            {
+                directory = EllenRuntime.DataDirectory;
+            }
+            catch (Exception)
+            {
+                directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EllenLauncher");
+            }
+
             Directory.CreateDirectory(directory);
             SettingsFilePath = Path.Combine(directory, "diagnostics_settings.json");
         }

@@ -6,9 +6,7 @@ using Ellen.Launcher.Core;
 using Ellen.Launcher.Core.Setting;
 using Ellen.Launcher.Factory.ContentDialog;
 using Ellen.Launcher.Factory.Picker;
-using Ellen.Launcher.Service.Notification;
 using System.IO;
-using Windows.Storage;
 
 namespace Ellen.Launcher.ViewModel.Setting;
 
@@ -67,20 +65,15 @@ public sealed class SettingStorageSetDataFolderOperation
             }
         }
 
-        try
-        {
-            Directory.SetReadOnly(oldFolderPath, false);
-            StorageFolder oldFolder = await StorageFolder.GetFolderFromPathAsync(oldFolderPath);
-            await oldFolder.CopyAsync(newFolderPath).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            Messenger.Send(InfoBarMessage.Error(ex));
-            return false;
-        }
+        /* 只登记目标目录，真正的搬运放到下一次启动、数据库还没打开的时候做。
+           原因：这里复制时 SQLite 已经把 Userdata.db 打开了，复制出来的是个空壳；
+           更糟的是搬完就切目录，用户看到的是「记录全没了」。 */
+        LocalSetting.Set(SettingKeys.PendingDataDirectory, newFolderPath);
 
-        LocalSetting.Set(SettingKeys.PreviousDataDirectoryToDelete, oldFolderPath);
-        LocalSetting.Set(SettingKeys.DataDirectory, newFolderPath);
+        /* 不再设置 PreviousDataDirectoryToDelete：默认布局下旧目录就是
+           %LOCALAPPDATA%\EllenLauncher，settings.json 也在里面，下次启动把它删掉
+           会连配置一起清空（欢迎页从此每次重启都回到第一步）。
+           旧目录原样保留，当作备份，由用户自己决定什么时候删。 */
         return true;
     }
 }

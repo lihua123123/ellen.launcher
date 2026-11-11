@@ -358,30 +358,6 @@
                             Icon="{shuxm:FontIcon Glyph=&#xE74D;}"
                             Label="{shuxm:ResourceString Name=ViewPageAchievementRemoveArchive}"/>
                         <AppBarSeparator/>
-
-                        <AppBarButton Icon="{shuxm:FontIcon Glyph=&#xE8B5;}" Label="{shuxm:ResourceString Name=ViewPageAchievementImportLabel}">
-                            <AppBarButton.Flyout>
-                                <MenuFlyout Placement="BottomEdgeAlignedRight">
-                                    <MenuFlyoutItem
-                                        Command="{Binding ImportUIAFFromEmbeddedYaeCommand}"
-                                        Icon="{shuxm:FontIcon Glyph=&#xE7FC;}"
-                                        Text="{shuxm:ResourceString Name=ViewPageAchievementImportFromEmbeddedYae}"/>
-                                    <MenuFlyoutItem
-                                        Command="{Binding ImportUIAFFromClipboardCommand}"
-                                        Icon="{shuxm:FontIcon Glyph=&#xE77F;}"
-                                        Text="{shuxm:ResourceString Name=ViewPageAchievementImportFromClipboard}"/>
-                                    <MenuFlyoutItem
-                                        Command="{Binding ImportUIAFFromFileCommand}"
-                                        Icon="{shuxm:FontIcon Glyph=&#xE8E5;}"
-                                        Text="{shuxm:ResourceString Name=ViewPageAchievementImportFromFile}"/>
-                                </MenuFlyout>
-                            </AppBarButton.Flyout>
-                        </AppBarButton>
-                        <AppBarButton
-                            Command="{Binding ExportAsUIAFToFileCommand}"
-                            Icon="{shuxm:FontIcon Glyph=&#xEDE1;}"
-                            Label="{shuxm:ResourceString Name=ViewPageAchievementExportLabel}"/>
-                        <AppBarSeparator/>
                         <AppBarToggleButton
                             Command="{Binding SortUncompletedSwitchCommand}"
                             Icon="{shuxm:FontIcon Glyph=&#xE8CB;}"

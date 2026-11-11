@@ -10,6 +10,7 @@ public static class SettingKeys
     // Application
     public const string LowWindowsVersionWarningShown   = "Ellen::Application::LowWindowsVersionWarningShown";
     public const string DataDirectory                   = "Ellen::Application::DataFolderPath";
+    public const string PendingDataDirectory            = "Ellen::Application::PendingDataFolderPath";
     public const string IsUnpackagedNotificationRegistered = "Ellen::Application::Notification::Unpackaged::Registered";
     public const string OverrideElevationRequirement    = "Ellen::Application::Elevation::Override";
     public const string AutoRestartAsAdmin              = "Ellen::Application::Elevation::AutoRestartAsAdmin";

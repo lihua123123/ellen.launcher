@@ -94,20 +94,22 @@ public sealed class WikiSourceFeatureFlag
     public WikiSourceFeatureFlag(IWikiFlagStore? store = null)
     {
         this.store = store;
-        // 重启保持：只接受两个已知值，未知值回退默认 legacy（不静默接受脏设置）。
+        // 重启保持：只接受两个已知值，未知值按默认处理（不静默接受脏设置）。
+        // 默认是随包的 enemy-web-753 —— 751 条数据 + 图片清单都已经打进安装包，
+        // 全新安装的机器不该因为「没写过设置」就退回条目更少的 722 图鉴。
+        // 只有显式持久化成 legacy-722-bundled 才回退旧视图。
         string? persisted = store?.Read();
-        if (string.Equals(persisted, EnemyWeb753, StringComparison.Ordinal))
-        {
-            UiSource = EnemyWeb753;
-        }
+        UiSource = string.Equals(persisted, Legacy722Bundled, StringComparison.Ordinal)
+            ? Legacy722Bundled
+            : EnemyWeb753;
 
         StartupUiSource = UiSource;
     }
 
     public bool DoubleReadEnabled { get; set; } = true;
 
-    /// <summary>P3 默认仍是旧 722 随包路径；切到 enemy-web-753 才走 ellen.wiki HTTP 源。</summary>
-    public string UiSource { get; private set; } = Legacy722Bundled;
+    /// <summary>默认走随包的 enemy-web-753；只有持久化为 legacy-722-bundled 时才用旧 722 图鉴。</summary>
+    public string UiSource { get; private set; } = EnemyWeb753;
 
     /// <summary>
     /// 进程启动时、任何 <see cref="Switch"/> 之前的生效值。

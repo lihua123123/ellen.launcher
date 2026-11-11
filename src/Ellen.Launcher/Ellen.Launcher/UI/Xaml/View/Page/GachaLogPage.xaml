@@ -265,14 +265,6 @@
                             </MenuFlyout>
                         </AppBarButton.Flyout>
                     </AppBarButton>
-                    <AppBarButton
-                        Command="{Binding ImportUIGFJsonCommand}"
-                        Icon="{shuxm:FontIcon Glyph=&#xE8B5;}"
-                        Label="{shuxm:ResourceString Name=ViewPageGachaLogUIGFImport}"/>
-                    <AppBarButton
-                        Command="{Binding ExportUIGFJsonCommand}"
-                        Icon="{shuxm:FontIcon Glyph=&#xEDE1;}"
-                        Label="{shuxm:ResourceString Name=ViewPageGachaLogUIGFExport}"/>
                     <AppBarSeparator/>
                     <AppBarToggleButton
                         Icon="{shuxm:BitmapIcon Source=ms-appx:///Resource/Icon/UI_ItemIcon_231.png}"

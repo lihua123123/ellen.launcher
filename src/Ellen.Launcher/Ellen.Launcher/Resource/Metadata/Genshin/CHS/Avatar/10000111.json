@@ -1,13 +1,13 @@
 {
   "Id": 10000111,
   "PromoteId": 111,
-  "Sort": 96,
+  "Sort": 505111,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Varesa",
   "SideIcon": "UI_AvatarIcon_Side_Varesa",
   "Name": "瓦雷莎",
   "Description": "悠悠哉哉，无比松弛的「沃陆之邦」战士兼果园主，喜欢充满力量的英雄，还有巨量美食！",
-  "BeginTime": "2025-03-25T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 10,
   "BaseValue": {
@@ -382,8 +382,7 @@
                 7.473218
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11111,
         "Name": "角力搏摔",
@@ -567,8 +566,7 @@
                 9
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11112,
         "Name": "夜虹逐跃",
@@ -770,8 +768,7 @@
               30
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11115,
       "Name": "闪烈降临！",
@@ -794,8 +791,7 @@
                 1.8
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1112101,
         "Name": "连势，三重腾跃！",
@@ -816,8 +812,7 @@
                 12
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1112201,
         "Name": "英雄，二度归来！",
@@ -835,8 +830,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1112301,
         "Name": "夜域赐礼·炬照焚恶",
@@ -857,8 +851,7 @@
                 10
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1112501,
         "Name": "炽心，一往直前！",
@@ -922,7 +915,8 @@
     "BirthMonth": 11,
     "BirthDay": 15,
     "VisionBefore": "雷",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "斗士假面座",
     "CvChinese": "乔苏",
     "CvJapanese": "M・A・O",

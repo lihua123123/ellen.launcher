@@ -1,13 +1,13 @@
 {
   "Id": 10000150,
   "PromoteId": 150,
-  "Sort": 120,
+  "Sort": 700150,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Odette",
   "SideIcon": "UI_AvatarIcon_Side_Odette",
   "Name": "奥黛塔",
   "Description": "至冬知名芭蕾舞者，于冰雪中绽放的凛冽之花。",
-  "BeginTime": "2026-08-11T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 1,
   "BaseValue": {
@@ -302,8 +302,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11501,
         "Name": "雪鹄变奏",
@@ -612,8 +611,7 @@
                 15
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11502,
         "Name": "柔板·幻灵夜舞",
@@ -831,8 +829,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11505,
       "Name": "疾板·苍羽一梦",
@@ -856,8 +853,7 @@
                 1
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1502101,
         "Name": "获选者的春祭",
@@ -879,8 +875,7 @@
                 0.3
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1502201,
         "Name": "赤忱者的悲歌",
@@ -901,8 +896,7 @@
                 0.14
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1502301,
         "Name": "星耀祝礼·银晓之舞",
@@ -923,8 +917,7 @@
                 10
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1502501,
         "Name": "回响中的冬梦",
@@ -988,8 +981,8 @@
     "BirthMonth": 2,
     "BirthDay": 20,
     "VisionBefore": "冰",
-    "VisionOverrideLocked": "星之楔",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "雪鹄座",
     "CvChinese": "潘丹妮",
     "CvJapanese": "上坂堇",

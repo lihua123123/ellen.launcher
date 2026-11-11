@@ -1,13 +1,13 @@
 {
   "Id": 10000098,
   "PromoteId": 98,
-  "Sort": 81,
+  "Sort": 407098,
   "Body": 3,
   "Icon": "UI_AvatarIcon_Clorinde",
   "SideIcon": "UI_AvatarIcon_Side_Clorinde",
   "Name": "克洛琳德",
   "Description": "不败的决斗代理人。以手中的剑维护着枫丹廷的「公义」。",
-  "BeginTime": "2024-06-04T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 1,
   "BaseValue": {
@@ -362,8 +362,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10981,
         "Name": "逐影之誓",
@@ -671,8 +670,7 @@
                 16
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10982,
         "Name": "狩夜之巡",
@@ -842,8 +840,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10985,
       "Name": "残光将终",
@@ -867,8 +864,7 @@
                 0.2
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 982101,
         "Name": "破夜的明焰",
@@ -891,8 +887,7 @@
                 15
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 982201,
         "Name": "契令的酬偿",
@@ -910,8 +905,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 982301,
         "Name": "夜巡之获",
@@ -975,7 +969,8 @@
     "BirthMonth": 9,
     "BirthDay": 20,
     "VisionBefore": "雷",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "迅捷剑座",
     "CvChinese": "赵涵雨",
     "CvJapanese": "石川由依",

@@ -1,13 +1,13 @@
 {
   "Id": 10000079,
   "PromoteId": 79,
-  "Sort": 63,
+  "Sort": 305079,
   "Body": 3,
   "Icon": "UI_AvatarIcon_Dehya",
   "SideIcon": "UI_AvatarIcon_Side_Dehya",
   "Name": "迪希雅",
   "Description": "横行须弥沙漠的佣兵组织「镀金旅团」的成员，勇敢而又强大的战士，在「镀金旅团」内部声名赫赫。",
-  "BeginTime": "2023-02-28T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 11,
   "BaseValue": {
@@ -303,8 +303,7 @@
                 4.982145
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10791,
         "Name": "拂金剑斗术",
@@ -535,8 +534,7 @@
                 20
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10792,
         "Name": "熔铁流狱",
@@ -752,8 +750,7 @@
               70
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10795,
       "Name": "炎啸狮子咬",
@@ -779,8 +776,7 @@
                 18
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 792101,
         "Name": "不吝佑助",
@@ -805,8 +801,7 @@
                 20
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 792201,
         "Name": "崇诚之真",
@@ -826,8 +821,7 @@
                 0.1
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 792301,
         "Name": "日照的正途",
@@ -891,7 +885,8 @@
     "BirthMonth": 4,
     "BirthDay": 7,
     "VisionBefore": "火",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "蝎尾鬃狮座",
     "CvChinese": "陈雨",
     "CvJapanese": "福原绫香",

@@ -1,13 +1,13 @@
 {
   "Id": 10000148,
   "PromoteId": 148,
-  "Sort": 119,
+  "Sort": 700148,
   "Body": 1,
   "Icon": "UI_AvatarIcon_Alyosha",
   "SideIcon": "UI_AvatarIcon_Side_Alyosha",
   "Name": "阿罗夏",
   "Description": "纵横于至冬雪原的「职业猎手」。其冷静的外表下，似乎隐藏着别样炙热的「理想」。",
-  "BeginTime": "2026-08-11T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 13,
   "BaseValue": {
@@ -286,8 +286,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11481,
         "Name": "角枪驰弋",
@@ -487,8 +486,7 @@
                 15
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11482,
         "Name": "伏袭霆击",
@@ -674,8 +672,7 @@
               70
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11485,
       "Name": "守猎进踞",
@@ -697,8 +694,7 @@
                 1.2
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1482101,
         "Name": "惊醒沉睡的林线",
@@ -719,8 +715,7 @@
                 200
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1482201,
         "Name": "告别冬麦与残叶",
@@ -740,8 +735,7 @@
                 0.2
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1482301,
         "Name": "星赴险域",
@@ -759,8 +753,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1482501,
         "Name": "树梢察伺",
@@ -824,7 +817,8 @@
     "BirthMonth": 2,
     "BirthDay": 9,
     "VisionBefore": "雷",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "迅捷犬座",
     "CvChinese": "王辅平",
     "CvJapanese": "佐藤元",

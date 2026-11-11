@@ -1,13 +1,13 @@
 {
   "Id": 10000094,
   "PromoteId": 94,
-  "Sort": 79,
+  "Sort": 405094,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Chiori",
   "SideIcon": "UI_AvatarIcon_Side_Chiori",
   "Name": "千织",
   "Description": "「千织屋」的老板。枫丹著名服装设计师。",
-  "BeginTime": "2024-03-12T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 1,
   "BaseValue": {
@@ -301,8 +301,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10941,
         "Name": "心织刀流",
@@ -516,8 +515,7 @@
                 16
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10942,
         "Name": "羽袖一触",
@@ -686,8 +684,7 @@
               50
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10945,
       "Name": "二刀之形·比翼",
@@ -713,8 +710,7 @@
                 5
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 942101,
         "Name": "量体裁衣",
@@ -735,8 +731,7 @@
                 20
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 942201,
         "Name": "锦上添花",
@@ -754,8 +749,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 942301,
         "Name": "衣香襟影",
@@ -819,7 +813,8 @@
     "BirthMonth": 8,
     "BirthDay": 17,
     "VisionBefore": "岩",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "丝切铗座",
     "CvChinese": "陈阳",
     "CvJapanese": "竹达彩奈",

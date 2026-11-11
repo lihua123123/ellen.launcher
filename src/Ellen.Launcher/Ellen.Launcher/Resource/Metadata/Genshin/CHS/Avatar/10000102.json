@@ -1,13 +1,13 @@
 {
   "Id": 10000102,
   "PromoteId": 102,
-  "Sort": 86,
+  "Sort": 500102,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Mualani",
   "SideIcon": "UI_AvatarIcon_Side_Mualani",
   "Name": "玛拉妮",
   "Description": "纳塔远近闻名的向导，水上用品商店的经营者，精通各类水上运动的逐浪客。",
-  "BeginTime": "2024-08-27T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 10,
   "BaseValue": {
@@ -255,8 +255,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 30000,
         "Name": "降温处理",
@@ -456,8 +455,7 @@
                 6
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 30002,
         "Name": "踏鲨破浪",
@@ -611,8 +609,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 30007,
       "Name": "爆瀑飞弹",
@@ -634,8 +631,7 @@
                 20
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1022101,
         "Name": "耐热型淡水豚豚",
@@ -658,8 +654,7 @@
                 0.45
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1022201,
         "Name": "纳塔最好的向导",
@@ -680,8 +675,7 @@
                 0.65
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1022301,
         "Name": "夜域赐礼·波涛顶底",
@@ -701,8 +695,7 @@
                 15
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1022501,
         "Name": "要诀是保持笑容！",
@@ -766,7 +759,8 @@
     "BirthMonth": 8,
     "BirthDay": 3,
     "VisionBefore": "水",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "浪海豹座",
     "CvChinese": "王晓彤",
     "CvJapanese": "东山奈央",

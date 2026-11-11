@@ -1,13 +1,13 @@
 {
   "Id": 10000104,
   "PromoteId": 104,
-  "Sort": 90,
+  "Sort": 502104,
   "Body": 3,
   "Icon": "UI_AvatarIcon_Chasca",
   "SideIcon": "UI_AvatarIcon_Side_Chasca",
   "Name": "恰斯卡",
   "Description": "特拉洛坎的「调停人」，万千争端的终结者。",
-  "BeginTime": "2024-11-19T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 12,
   "BaseValue": {
@@ -271,8 +271,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11041,
         "Name": "迷羽流击",
@@ -472,8 +471,7 @@
                 6.5
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11042,
         "Name": "灵缰追影",
@@ -659,8 +657,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11045,
       "Name": "索魂命袭",
@@ -687,8 +684,7 @@
                 0.65
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1042101,
         "Name": "子弹的戏法",
@@ -708,8 +704,7 @@
                 1.5
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1042201,
         "Name": "掩护的心意",
@@ -727,8 +722,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1042301,
         "Name": "夜域赐礼·不熄炽心",
@@ -749,8 +743,7 @@
                 12
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1042501,
         "Name": "调停的真意",
@@ -814,7 +807,8 @@
     "BirthMonth": 12,
     "BirthDay": 10,
     "VisionBefore": "风",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "神鹫座",
     "CvChinese": "张若瑜",
     "CvJapanese": "甲斐田裕子",

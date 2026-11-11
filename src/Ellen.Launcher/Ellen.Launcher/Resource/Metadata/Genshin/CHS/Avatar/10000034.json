@@ -1,13 +1,13 @@
 {
   "Id": 10000034,
   "PromoteId": 34,
-  "Sort": 12,
+  "Sort": 100034,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Noel",
   "SideIcon": "UI_AvatarIcon_Side_Noel",
   "Name": "诺艾尔",
   "Description": "「西风骑士团」的可靠女仆，梦想有一天能成为正式的骑士。",
-  "BeginTime": "2020-09-15T04:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 11,
   "BaseValue": {
@@ -36,15 +36,15 @@
         "GroupId": 3431,
         "Proud": {
           "Descriptions": [
-            "一段伤害|{param1:P}",
-            "二段伤害|{param2:P}",
-            "三段伤害|{param3:P}",
+            "一段伤害|{param1:F1P}",
+            "二段伤害|{param2:F1P}",
+            "三段伤害|{param3:F1P}",
             "四段伤害|{param4:P}",
-            "重击循环伤害|{param5:P}",
-            "重击终结伤害|{param6:P}",
+            "重击循环伤害|{param5:F1P}",
+            "重击终结伤害|{param6:F1P}",
             "重击体力消耗|每秒{param7:F1}点",
             "最大持续时间|{param8:F1}秒",
-            "下坠期间伤害|{param9:P}",
+            "下坠期间伤害|{param9:F1P}",
             "低空/高空坠地冲击伤害|{param10:P}/{param11:P}"
           ],
           "Parameters": [
@@ -303,8 +303,7 @@
                 4.982145
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10341,
         "Name": "西风剑术·女仆",
@@ -534,8 +533,7 @@
                 324.44855
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10342,
         "Name": "护心铠",
@@ -549,8 +547,8 @@
       "GroupId": 3439,
       "Proud": {
         "Descriptions": [
-          "爆发伤害|{param1:P}",
-          "技能伤害|{param2:P}",
+          "爆发伤害|{param1:F1P}",
+          "技能伤害|{param2:F1P}",
           "攻击力提高|{param3:P}防御力",
           "持续时间|{param4:F1}秒",
           "冷却时间|{param5:F1}秒",
@@ -737,8 +735,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10343,
       "Name": "大扫除",
@@ -763,8 +760,7 @@
                 60
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 342101,
         "Name": "全心全意",
@@ -784,8 +780,7 @@
                 -1
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 342201,
         "Name": "干净利落",
@@ -803,8 +798,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 342301,
         "Name": "女仆的态度",
@@ -868,7 +862,8 @@
     "BirthMonth": 3,
     "BirthDay": 21,
     "VisionBefore": "岩",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "心护座",
     "CvChinese": "宴宁",
     "CvJapanese": "高尾奏音",

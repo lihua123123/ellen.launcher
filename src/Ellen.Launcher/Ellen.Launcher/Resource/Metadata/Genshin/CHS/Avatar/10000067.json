@@ -1,13 +1,13 @@
 {
   "Id": 10000067,
   "PromoteId": 67,
-  "Sort": 51,
+  "Sort": 300067,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Collei",
   "SideIcon": "UI_AvatarIcon_Side_Collei",
   "Name": "柯莱",
   "Description": "活跃于道成林的见习巡林员，热情的言行背后是一颗依旧稍显内向的心。",
-  "BeginTime": "2022-08-24T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 12,
   "BaseValue": {
@@ -271,8 +271,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10671,
         "Name": "祈颂射艺",
@@ -408,8 +407,7 @@
                 12
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10672,
         "Name": "拂花偈叶",
@@ -595,8 +593,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10675,
       "Name": "猫猫秘宝",
@@ -620,8 +617,7 @@
                 3
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 672101,
         "Name": "飞叶迴斜",
@@ -642,8 +638,7 @@
                 3
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 672201,
         "Name": "徐如旷林",
@@ -661,8 +656,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 672301,
         "Name": "「须弥飞行冠军」",
@@ -726,7 +720,8 @@
     "BirthMonth": 5,
     "BirthDay": 8,
     "VisionBefore": "草",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "薮猫座",
     "CvChinese": "秦文静",
     "CvJapanese": "前川凉子",

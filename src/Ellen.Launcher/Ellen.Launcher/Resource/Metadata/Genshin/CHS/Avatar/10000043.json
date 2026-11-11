@@ -1,13 +1,13 @@
 {
   "Id": 10000043,
   "PromoteId": 43,
-  "Sort": 10,
+  "Sort": 100043,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Sucrose",
   "SideIcon": "UI_AvatarIcon_Side_Sucrose",
   "Name": "砂糖",
   "Description": "对万物充满好奇的炼金术士，「生物炼金」学派的研究者。",
-  "BeginTime": "2020-09-15T04:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 10,
   "BaseValue": {
@@ -38,8 +38,8 @@
           "Descriptions": [
             "一段伤害|{param1:F1P}",
             "二段伤害|{param2:F1P}",
-            "三段伤害|{param3:P}",
-            "四段伤害|{param4:P}",
+            "三段伤害|{param3:F1P}",
+            "四段伤害|{param4:F1P}",
             "重击伤害|{param5:P}",
             "重击体力消耗|{param6:F1}点",
             "下坠期间伤害|{param7:F1P}",
@@ -271,8 +271,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10431,
         "Name": "简式风灵作成",
@@ -408,8 +407,7 @@
                 15
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10432,
         "Name": "风灵作成·陆叁零捌",
@@ -419,38 +417,12 @@
         "CdTime": 15
       }
     ],
-    "SpecialSkills": [
-      {
-        "GroupId": 4351,
-        "Proud": {
-          "Descriptions": [],
-          "Parameters": [
-            {
-              "Id": 435101,
-              "Level": 1,
-              "Parameters": [
-                15,
-                0.057143,
-                20,
-                0.071429
-              ]
-            }
-          ],
-          "Display": 3
-        },
-        "Id": 435101,
-        "Name": "魔女的前夜礼·七循之理",
-        "Description": "完成<color=#FFD780FF>魔女的课业·仙境花之题</color>后，砂糖将成为<color=#FFD780FF>魔导</color>角色。队伍中编入至少2名魔导角色时，将获得<color=#FFD780FF>魔导·秘仪</color>效果，使魔导角色获得强化。\n\n<color=#FFD780FF>魔导·秘仪</color>\n·召唤小型风灵后的15秒内，队伍中附近的角色的普通攻击、重击、下落攻击、元素战技和元素爆发造成的伤害提升5.71428%。\n·召唤大型风灵后的20秒内，队伍中附近的魔导角色的普通攻击、重击、下落攻击、元素战技和元素爆发造成的伤害提升7.14285%。",
-        "SpecialEnergyType": 0,
-        "Icon": "UI_Talent_S_Sucrose_07"
-      }
-    ],
     "EnergySkill": {
       "GroupId": 4339,
       "Proud": {
         "Descriptions": [
           "持续伤害|{param1:P}",
-          "附加元素伤害|{param2:P}",
+          "附加元素伤害|{param2:F1P}",
           "持续时间|{param3:F1}秒",
           "冷却时间|{param4:F1}秒",
           "元素能量|{param5:I}"
@@ -621,8 +593,7 @@
               80
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10435,
       "Name": "禁·风灵作成·柒伍同构贰型",
@@ -631,6 +602,26 @@
       "Icon": "Skill_E_Sucrose_01",
       "CdTime": 20
     },
+    "SpecialSkills": [
+      {
+        "GroupId": 4351,
+        "Proud": {
+          "Descriptions": [],
+          "Parameters": [
+            {
+              "Id": 435101,
+              "Level": 1,
+              "Parameters": []
+            }
+          ]
+        },
+        "Id": 435101,
+        "Name": "魔女的前夜礼·七循之理",
+        "Description": "完成<color=#FFD780FF>魔女的课业·仙境花之题</color>后，砂糖将成为<color=#FFD780FF>魔导</color>角色。队伍中编入至少2名魔导角色时，将获得<color=#FFD780FF>魔导·秘仪</color>效果，使魔导角色获得强化。\n\n<color=#FFD780FF>魔导·秘仪</color>\n·召唤小型风灵后的15秒内，队伍中附近的角色的普通攻击、重击、下落攻击、元素战技和元素爆发造成的伤害提升5.71428%。\n·召唤大型风灵后的20秒内，队伍中附近的魔导角色的普通攻击、重击、下落攻击、元素战技和元素爆发造成的伤害提升7.14285%。",
+        "SpecialEnergyType": 0,
+        "Icon": "UI_Talent_S_Sucrose_07"
+      }
+    ],
     "Inherents": [
       {
         "GroupId": 4321,
@@ -645,8 +636,7 @@
                 8
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 432101,
         "Name": "触媒置换术",
@@ -667,8 +657,7 @@
                 8
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 432201,
         "Name": "小小的慧风",
@@ -686,8 +675,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 432301,
         "Name": "不稳定发现",
@@ -739,8 +727,8 @@
         "Id": 436,
         "Name": "混元熵增论",
         "Description": "<color=#FFD780FF>禁·风灵作成·柒伍同构贰型</color>如果发生了元素转化，则使队伍中所有角色在技能持续时间内获得20%的对应元素伤害加成。",
-        "SpecialDescription": "<color=#FFD780FF>禁·风灵作成·柒伍同构贰型</color>如果发生了元素转化，则使队伍中所有角色在技能持续时间内获得20%的对应元素伤害加成，并使队伍中附近的魔导角色额外获得8.57142%的对应元素伤害加成。",
-        "Icon": "UI_Talent_S_Sucrose_04"
+        "Icon": "UI_Talent_S_Sucrose_04",
+        "SpecialDescription": "<color=#FFD780FF>禁·风灵作成·柒伍同构贰型</color>如果发生了元素转化，则使队伍中所有角色在技能持续时间内获得20%的对应元素伤害加成，并使队伍中附近的魔导角色额外获得8.57142%的对应元素伤害加成。"
       }
     ]
   },
@@ -752,7 +740,8 @@
     "BirthMonth": 11,
     "BirthDay": 26,
     "VisionBefore": "风",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "烧瓶座",
     "CvChinese": "小敢",
     "CvJapanese": "藤田茜",

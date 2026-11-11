@@ -1,13 +1,13 @@
 {
   "Id": 10000115,
   "PromoteId": 115,
-  "Sort": 99,
+  "Sort": 507115,
   "Body": 1,
   "Icon": "UI_AvatarIcon_Dahlia",
   "SideIcon": "UI_AvatarIcon_Side_Dahlia",
   "Name": "塔利雅",
   "Description": "西风教会的助祭，风神在教会的代行人。",
-  "BeginTime": "2025-06-17T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 1,
   "BaseValue": {
@@ -301,8 +301,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11151,
         "Name": "西风剑术·祭仪",
@@ -438,8 +437,7 @@
                 9
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11152,
         "Name": "圣浸的礼典",
@@ -640,8 +638,7 @@
               15
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11155,
       "Name": "纯耀的祷咏",
@@ -663,8 +660,7 @@
                 8
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1152101,
         "Name": "风色柔愿的眷宠",
@@ -681,12 +677,11 @@
               "Id": 1152201,
               "Level": 1,
               "Parameters": [
-                5E-06,
+                0.000005,
                 0.2
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1152201,
         "Name": "黠巧欢愉的祈颂",
@@ -704,8 +699,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1152301,
         "Name": "归风相随的巡礼",
@@ -769,7 +763,8 @@
     "BirthMonth": 5,
     "BirthDay": 25,
     "VisionBefore": "水",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "礼赞歌座",
     "CvChinese": "风袖",
     "CvJapanese": "山本和臣",

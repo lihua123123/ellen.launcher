@@ -1,13 +1,13 @@
 {
   "Id": 10000126,
   "PromoteId": 126,
-  "Sort": 112,
+  "Sort": 603126,
   "Body": 3,
   "Icon": "UI_AvatarIcon_Zibai",
   "SideIcon": "UI_AvatarIcon_Side_Zibai",
   "Name": "兹白",
   "Description": "璃月传说中的白马仙人，其名为兹白，璃月仙话中最神秘的一位。",
-  "BeginTime": "2026-02-03T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 1,
   "BaseValue": {
@@ -301,8 +301,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11261,
         "Name": "金铗点桂",
@@ -596,8 +595,7 @@
                 1.566312
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11262,
         "Name": "天地忽然身",
@@ -767,8 +765,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11265,
       "Name": "三垣威仪法",
@@ -791,8 +788,7 @@
                 4
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1262101,
         "Name": "月下素娥降仙",
@@ -813,8 +809,7 @@
                 60
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1262201,
         "Name": "叠嶂峦岫出云",
@@ -835,8 +830,7 @@
                 0.14
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1262301,
         "Name": "月兆祝赐·浮明若流",
@@ -856,8 +850,7 @@
                 2
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1262501,
         "Name": "花林如霰",
@@ -921,8 +914,8 @@
     "BirthMonth": 5,
     "BirthDay": 15,
     "VisionBefore": "岩",
-    "VisionOverrideLocked": "月之轮",
-    "VisionOverrideUnlocked": "月之轮",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "白驹座",
     "CvChinese": "Mace",
     "CvJapanese": "福圆美里",

@@ -1,13 +1,13 @@
 {
   "Id": 10000066,
   "PromoteId": 66,
-  "Sort": 47,
+  "Sort": 206066,
   "Body": 4,
   "Icon": "UI_AvatarIcon_Ayato",
   "SideIcon": "UI_AvatarIcon_Side_Ayato",
   "Name": "神里绫人",
   "Description": "社奉行神里家年轻有为的现任家主，为人温雅有礼，处事颇有手段。",
-  "BeginTime": "2022-03-30T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 1,
   "BaseValue": {
@@ -287,8 +287,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10661,
         "Name": "神里流·转",
@@ -520,8 +519,7 @@
                 12
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10662,
         "Name": "神里流·镜花",
@@ -707,8 +705,7 @@
               80
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10665,
       "Name": "神里流·水囿",
@@ -731,8 +728,7 @@
                 5
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 662101,
         "Name": "神里流·清泷绕峰",
@@ -754,8 +750,7 @@
                 2
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 662201,
         "Name": "神里流·破月渐盈",
@@ -773,8 +768,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 662301,
         "Name": "神里流·日常茶饭",
@@ -838,7 +832,8 @@
     "BirthMonth": 3,
     "BirthDay": 26,
     "VisionBefore": "水",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "神守柏座",
     "CvChinese": "赵路",
     "CvJapanese": "石田彰",

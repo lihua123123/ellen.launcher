@@ -1,13 +1,13 @@
 {
   "Id": 10000093,
   "PromoteId": 93,
-  "Sort": 78,
+  "Sort": 404093,
   "Body": 3,
   "Icon": "UI_AvatarIcon_Liuyun",
   "SideIcon": "UI_AvatarIcon_Side_Liuyun",
   "Name": "闲云",
   "Description": "绝云仙众「三眼五显仙人」之一，雅号「留云借风真君」。擅使机关奇术，心向红尘烟火，正以「闲云」之名行走人间。",
-  "BeginTime": "2024-01-30T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 10,
   "BaseValue": {
@@ -271,8 +271,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10931,
         "Name": "清风散花词",
@@ -454,8 +453,7 @@
                 12
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10932,
         "Name": "朝起鹤云",
@@ -733,8 +731,7 @@
               70
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10935,
       "Name": "暮集竹星",
@@ -760,8 +757,7 @@
                 20
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 932101,
         "Name": "霜翎高逐祥风势",
@@ -783,8 +779,7 @@
                 0.4
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 932201,
         "Name": "细想应是洞中仙",
@@ -802,8 +797,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 932301,
         "Name": "身形如鹤",
@@ -867,7 +861,8 @@
     "BirthMonth": 4,
     "BirthDay": 11,
     "VisionBefore": "风",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "闲鹤座",
     "CvChinese": "秦紫翼",
     "CvJapanese": "中臣真菜",

@@ -1,13 +1,13 @@
 {
   "Id": 10000122,
   "PromoteId": 122,
-  "Sort": 107,
+  "Sort": 601122,
   "Body": 3,
   "Icon": "UI_AvatarIcon_Nefer",
   "SideIcon": "UI_AvatarIcon_Side_Nefer",
   "Name": "奈芙尔",
   "Description": "神通广大的「秘闻馆」之主。",
-  "BeginTime": "2025-10-21T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 10,
   "BaseValue": {
@@ -303,8 +303,7 @@
                 25
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11221,
         "Name": "游虵吐信",
@@ -597,8 +596,7 @@
                 9
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11222,
         "Name": "弈术·千夜一舞",
@@ -814,8 +812,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11225,
       "Name": "圣约·真眸幻戏",
@@ -842,8 +839,7 @@
                 0.08
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1222101,
         "Name": "月下的豪赌",
@@ -867,8 +863,7 @@
                 0.5
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1222201,
         "Name": "尘沙的女儿",
@@ -889,8 +884,7 @@
                 0.14
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1222301,
         "Name": "月兆祝赐·廊下暮影",
@@ -908,8 +902,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1222501,
         "Name": "金室的密谋",
@@ -973,8 +966,8 @@
     "BirthMonth": 5,
     "BirthDay": 9,
     "VisionBefore": "草",
-    "VisionOverrideLocked": "月之轮",
-    "VisionOverrideUnlocked": "月之轮",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "游棋座",
     "CvChinese": "曾彤",
     "CvJapanese": "水树奈奈",

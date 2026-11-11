@@ -1,9 +1,9 @@
 {
   "version": "7.2.0.3",
-  "publishedAt": "2026-11-11T01:10:51+08:00",
+  "publishedAt": "2026-11-11T11:58:05+08:00",
   "pageUrl": "https://github.com/lihua123123/ellen.launcher/releases/tag/v7.2.0.3",
   "downloadUrl": "https://github.com/lihua123123/ellen.launcher/releases/download/v7.2.0.3/Ellen.Launcher-7.2.0.3-Setup.exe",
-  "sha256": "31d44255b432674c4ac3958439ad28541ed0e28ebbfe660415cab115545364fa",
-  "size": 248097867,
-  "notes": "修复卸载时误删用户数据；更新检查改为多源 latest.json（GitCode / GitHub / COS），只提示不自动安装"
+  "sha256": "9a6535ec117f27d5504b0acf699e87be17b6c1fb941bcf858f834bc55f5cee30",
+  "size": 248248239,
+  "notes": "随包元数据换成 ellen.wiki 产线数据（123 角色 / 254 武器），补上 7.2 的米提亚、瓦列里与秘星典谕；卸载器默认不再删除用户数据；更新检查改为多源 latest.json"
 }

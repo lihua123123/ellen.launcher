@@ -1,13 +1,13 @@
 {
   "Id": 10000014,
   "PromoteId": 14,
-  "Sort": 20,
+  "Sort": 100014,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Barbara",
   "SideIcon": "UI_AvatarIcon_Side_Barbara",
   "Name": "芭芭拉",
   "Description": "蒙德城的大家都喜欢芭芭拉。「偶像」这个词是她从一本杂志里看到的。",
-  "BeginTime": "2020-09-15T04:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 10,
   "BaseValue": {
@@ -38,8 +38,8 @@
           "Descriptions": [
             "一段伤害|{param1:F1P}",
             "二段伤害|{param2:F1P}",
-            "三段伤害|{param3:P}",
-            "四段伤害|{param4:P}",
+            "三段伤害|{param3:F1P}",
+            "四段伤害|{param4:F1P}",
             "重击伤害|{param5:P}",
             "重击体力消耗|{param6:F1}点",
             "下坠期间伤害|{param7:F1P}",
@@ -271,8 +271,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10070,
         "Name": "水之浅唱",
@@ -286,7 +285,7 @@
           "Descriptions": [
             "命中治疗量|{param3:F2P}生命值上限+{param4:I}",
             "持续治疗量|{param1:F2P}生命值上限+{param2:I}",
-            "水珠伤害|{param5:P}",
+            "水珠伤害|{param5:F1P}",
             "持续时间|{param6:F1}秒",
             "冷却时间|{param7:F1}秒"
           ],
@@ -486,8 +485,7 @@
                 32
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10071,
         "Name": "演唱，开始♪",
@@ -656,8 +654,7 @@
               80
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10072,
       "Name": "闪耀奇迹♪",
@@ -679,8 +676,7 @@
                 0.12
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 142101,
         "Name": "光辉的季节",
@@ -701,8 +697,7 @@
                 5
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 142201,
         "Name": "安可",
@@ -720,8 +715,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 142301,
         "Name": "心意♪注入",
@@ -785,7 +779,8 @@
     "BirthMonth": 7,
     "BirthDay": 5,
     "VisionBefore": "水",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "金杯座",
     "CvChinese": "宋媛媛",
     "CvJapanese": "鬼头明里",

@@ -1,13 +1,13 @@
 {
   "Id": 10000056,
   "PromoteId": 56,
-  "Sort": 38,
+  "Sort": 201056,
   "Body": 3,
   "Icon": "UI_AvatarIcon_Sara",
   "SideIcon": "UI_AvatarIcon_Side_Sara",
   "Name": "九条裟罗",
   "Description": "「天领奉行」的大将，杀伐果断，骁勇善战。",
-  "BeginTime": "2021-09-01T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 12,
   "BaseValue": {
@@ -287,8 +287,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10561,
         "Name": "天狗传弓术",
@@ -456,8 +455,7 @@
                 10
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10562,
         "Name": "鸦羽天狗霆雷召咒",
@@ -627,8 +625,7 @@
               80
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10565,
       "Name": "煌煌千道镇式",
@@ -650,8 +647,7 @@
                 0.6
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 562101,
         "Name": "不动心",
@@ -672,8 +668,7 @@
                 3
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 562201,
         "Name": "御公仪",
@@ -691,8 +686,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 562301,
         "Name": "检地",
@@ -756,7 +750,8 @@
     "BirthMonth": 7,
     "BirthDay": 14,
     "VisionBefore": "雷",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "羽团扇座",
     "CvChinese": "杨梦露",
     "CvJapanese": "濑户麻沙美",

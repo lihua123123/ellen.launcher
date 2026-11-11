@@ -1,13 +1,13 @@
 {
   "Id": 10000129,
   "PromoteId": 129,
-  "Sort": 117,
+  "Sort": 606129,
   "Body": 1,
   "Icon": "UI_AvatarIcon_Lohen",
   "SideIcon": "UI_AvatarIcon_Side_Lohen",
   "Name": "洛恩",
   "Description": "西风骑士团远程小队副队长，行事不拘一格，钟情于非常规战术的骑士。",
-  "BeginTime": "2026-06-09T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 13,
   "BaseValue": {
@@ -302,8 +302,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11291,
         "Name": "西风枪术·破誓",
@@ -705,8 +704,7 @@
                 18
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11292,
         "Name": "奇兵诡出",
@@ -714,31 +712,6 @@
         "SpecialEnergyType": 0,
         "Icon": "Skill_S_Lohen_01",
         "CdTime": 18
-      }
-    ],
-    "SpecialSkills": [
-      {
-        "GroupId": 12951,
-        "Proud": {
-          "Descriptions": [],
-          "Parameters": [
-            {
-              "Id": 1295101,
-              "Level": 1,
-              "Parameters": [
-                0.5,
-                0.4,
-                6
-              ]
-            }
-          ],
-          "Display": 3
-        },
-        "Id": 1295101,
-        "Name": "魔女的前夜礼·不愈之刺",
-        "Description": "完成<color=#FFD780FF>魔女的课业·诸敌之题</color>后，洛恩将成为<color=#FFD780FF>魔导</color>角色。队伍中编入至少2名魔导角色时，将获得<color=#FFD780FF>魔导·秘仪</color>效果，使魔导角色获得强化。\n\n<color=#FFD780FF>魔导·秘仪</color>\n特殊元素战技{LINK#N11290002}<color=#FFD780FF>镂骨彻心</color>{/LINK}命中敌人或施放元素爆发<color=#FFD780FF>裁罚遂成</color>时，若{LINK#N11290004}<color=#FFD780FF>争胜</color>{/LINK}至少为上限的50%，则洛恩的普通攻击与重击造成的伤害提升40%，持续6秒。",
-        "SpecialEnergyType": 0,
-        "Icon": "UI_Talent_S_Lohen_07"
       }
     ],
     "EnergySkill": {
@@ -901,8 +874,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11295,
       "Name": "裁罚遂成",
@@ -911,6 +883,26 @@
       "Icon": "Skill_E_Lohen_01",
       "CdTime": 15
     },
+    "SpecialSkills": [
+      {
+        "GroupId": 12951,
+        "Proud": {
+          "Descriptions": [],
+          "Parameters": [
+            {
+              "Id": 1295101,
+              "Level": 1,
+              "Parameters": []
+            }
+          ]
+        },
+        "Id": 1295101,
+        "Name": "魔女的前夜礼·不愈之刺",
+        "Description": "完成<color=#FFD780FF>魔女的课业·诸敌之题</color>后，洛恩将成为<color=#FFD780FF>魔导</color>角色。队伍中编入至少2名魔导角色时，将获得<color=#FFD780FF>魔导·秘仪</color>效果，使魔导角色获得强化。\n\n<color=#FFD780FF>魔导·秘仪</color>\n特殊元素战技{LINK#N11290002}<color=#FFD780FF>镂骨彻心</color>{/LINK}命中敌人或施放元素爆发<color=#FFD780FF>裁罚遂成</color>时，若{LINK#N11290004}<color=#FFD780FF>争胜</color>{/LINK}至少为上限的50%，则洛恩的普通攻击与重击造成的伤害提升40%，持续6秒。",
+        "SpecialEnergyType": 0,
+        "Icon": "UI_Talent_S_Lohen_07"
+      }
+    ],
     "Inherents": [
       {
         "GroupId": 12921,
@@ -925,8 +917,7 @@
                 60
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1292101,
         "Name": "禁问的训诫",
@@ -948,8 +939,7 @@
                 8
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1292201,
         "Name": "戏言的杰作",
@@ -971,8 +961,7 @@
                 18
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1292301,
         "Name": "兴尽且去来",
@@ -1036,7 +1025,8 @@
     "BirthMonth": 4,
     "BirthDay": 3,
     "VisionBefore": "冰",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "狡兔座",
     "CvChinese": "林婧南",
     "CvJapanese": "天崎滉平",

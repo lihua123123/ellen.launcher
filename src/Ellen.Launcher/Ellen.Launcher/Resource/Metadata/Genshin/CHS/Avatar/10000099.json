@@ -1,13 +1,13 @@
 {
   "Id": 10000099,
   "PromoteId": 99,
-  "Sort": 84,
+  "Sort": 408099,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Emilie",
   "SideIcon": "UI_AvatarIcon_Side_Emilie",
   "Name": "艾梅莉埃",
   "Description": "枫丹香水设计师，将秘密藏于瓶中之人。",
-  "BeginTime": "2024-08-06T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 13,
   "BaseValue": {
@@ -271,8 +271,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10991,
         "Name": "逐影枪术·改",
@@ -488,8 +487,7 @@
                 14
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10992,
         "Name": "撷萃调香",
@@ -659,8 +657,7 @@
               50
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10995,
       "Name": "香氛演绎",
@@ -682,8 +679,7 @@
                 6
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 992101,
         "Name": "余薰",
@@ -704,8 +700,7 @@
                 0.36
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 992201,
         "Name": "精馏",
@@ -725,8 +720,7 @@
                 0.85
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 992301,
         "Name": "顶空集香",
@@ -790,7 +784,8 @@
     "BirthMonth": 9,
     "BirthDay": 22,
     "VisionBefore": "草",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "香氛瓶座",
     "CvChinese": "木子橙",
     "CvJapanese": "日笠阳子",

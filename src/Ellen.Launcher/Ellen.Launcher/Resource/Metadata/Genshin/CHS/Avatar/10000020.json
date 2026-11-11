@@ -1,13 +1,13 @@
 {
   "Id": 10000020,
   "PromoteId": 20,
-  "Sort": 19,
+  "Sort": 100020,
   "Body": 1,
   "Icon": "UI_AvatarIcon_Razor",
   "SideIcon": "UI_AvatarIcon_Side_Razor",
   "Name": "雷泽",
   "Description": "住在蒙德地区奔狼领，远离城市与人群，和狼一同生活的少年。直觉锐利，身姿迅捷。",
-  "BeginTime": "2020-09-15T04:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 11,
   "BaseValue": {
@@ -36,11 +36,11 @@
         "GroupId": 2031,
         "Proud": {
           "Descriptions": [
-            "一段伤害|{param1:P}",
-            "二段伤害|{param2:P}",
+            "一段伤害|{param1:F1P}",
+            "二段伤害|{param2:F1P}",
             "三段伤害|{param3:P}",
             "四段伤害|{param4:P}",
-            "重击循环伤害|{param5:P}",
+            "重击循环伤害|{param5:F1P}",
             "重击终结伤害|{param6:P}",
             "重击体力消耗|每秒{param7:F1}点",
             "最大持续时间|{param8:F1}秒",
@@ -303,8 +303,7 @@
                 5.48036
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10201,
         "Name": "钢脊",
@@ -520,8 +519,7 @@
                 10
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10202,
         "Name": "利爪与苍雷",
@@ -529,32 +527,6 @@
         "SpecialEnergyType": 0,
         "Icon": "Skill_S_Razor_01",
         "CdTime": 6
-      }
-    ],
-    "SpecialSkills": [
-      {
-        "GroupId": 2051,
-        "Proud": {
-          "Descriptions": [],
-          "Parameters": [
-            {
-              "Id": 205101,
-              "Level": 1,
-              "Parameters": [
-                0.7,
-                1.5,
-                7,
-                1
-              ]
-            }
-          ],
-          "Display": 3
-        },
-        "Id": 205101,
-        "Name": "魔女的前夜礼·苍雷奔涌",
-        "Description": "完成<color=#FFD780FF>魔女的课业·小狼众之题</color>后，雷泽将成为<color=#FFD780FF>魔导</color>角色。队伍中编入至少2名魔导角色时，将获得<color=#FFD780FF>魔导·秘仪</color>效果，使魔导角色获得强化。\n此外，雷泽的元素爆发<color=#FFD780FF>雷牙</color>获得强化：<color=#FFD780FF>雷狼</color>造成的伤害提升，提升值相当于雷泽的攻击力的70%。\n\n<color=#FFD780FF>魔导·秘仪</color>\n元素爆发<color=#FFD780FF>雷牙</color>唤醒的雷狼存在期间，如果雷泽积攒元素战技<color=#FFD780FF>利爪与苍雷</color>中的雷之印时发生溢出，雷狼将会引下落雷攻击附近的敌人，造成相当于雷泽150%攻击力的雷元素范围伤害，并为雷泽恢复7点元素能量。每1秒至多触发一次该效果。",
-        "SpecialEnergyType": 0,
-        "Icon": "UI_Talent_S_Razor_07"
       }
     ],
     "EnergySkill": {
@@ -765,8 +737,7 @@
               80
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10203,
       "Name": "雷牙",
@@ -775,6 +746,26 @@
       "Icon": "Skill_E_Razor_01",
       "CdTime": 20
     },
+    "SpecialSkills": [
+      {
+        "GroupId": 2051,
+        "Proud": {
+          "Descriptions": [],
+          "Parameters": [
+            {
+              "Id": 205101,
+              "Level": 1,
+              "Parameters": []
+            }
+          ]
+        },
+        "Id": 205101,
+        "Name": "魔女的前夜礼·苍雷奔涌",
+        "Description": "完成<color=#FFD780FF>魔女的课业·小狼众之题</color>后，雷泽将成为<color=#FFD780FF>魔导</color>角色。队伍中编入至少2名魔导角色时，将获得<color=#FFD780FF>魔导·秘仪</color>效果，使魔导角色获得强化。\n此外，雷泽的元素爆发<color=#FFD780FF>雷牙</color>获得强化：<color=#FFD780FF>雷狼</color>造成的伤害提升，提升值相当于雷泽的攻击力的70%。\n\n<color=#FFD780FF>魔导·秘仪</color>\n元素爆发<color=#FFD780FF>雷牙</color>唤醒的雷狼存在期间，如果雷泽积攒元素战技<color=#FFD780FF>利爪与苍雷</color>中的雷之印时发生溢出，雷狼将会引下落雷攻击附近的敌人，造成相当于雷泽150%攻击力的雷元素范围伤害，并为雷泽恢复7点元素能量。每1秒至多触发一次该效果。",
+        "SpecialEnergyType": 0,
+        "Icon": "UI_Talent_S_Razor_07"
+      }
+    ],
     "Inherents": [
       {
         "GroupId": 2021,
@@ -786,8 +777,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 202101,
         "Name": "觉醒",
@@ -805,8 +795,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 202201,
         "Name": "饥饿",
@@ -824,8 +813,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 202301,
         "Name": "奔狼",
@@ -877,8 +865,8 @@
         "Id": 206,
         "Name": "天狼",
         "Description": "每10秒，雷泽的大剑将自动充能，使下一次普通攻击引发落雷，造成100%攻击力的<color=#FFACFFFF>雷元素伤害</color>。\n不处于<color=#FFD780FF>雷牙</color>状态下时，若落雷击中敌人，会为雷泽积攒一个<color=#FFD780FF>利爪与苍雷</color>的雷之印。",
-        "SpecialDescription": "每10秒，雷泽的大剑将自动充能，使下一次普通攻击引发落雷，造成100%攻击力的<color=#FFACFFFF>雷元素伤害</color>。\n不处于<color=#FFD780FF>雷牙</color>状态下时，若落雷击中敌人，会为雷泽积攒三个元素战技<color=#FFD780FF>利爪与苍雷</color>中的雷之印。\n此外，雷泽通过元素战技<color=#FFD780FF>利爪与苍雷</color>积攒雷之印时，会改为为雷泽积攒三个雷之印。\n消耗雷之印后的15秒内，雷泽的暴击率提升10%，暴击伤害提升50%。",
-        "Icon": "UI_Talent_S_Razor_04"
+        "Icon": "UI_Talent_S_Razor_04",
+        "SpecialDescription": "每10秒，雷泽的大剑将自动充能，使下一次普通攻击引发落雷，造成100%攻击力的<color=#FFACFFFF>雷元素伤害</color>。\n不处于<color=#FFD780FF>雷牙</color>状态下时，若落雷击中敌人，会为雷泽积攒三个元素战技<color=#FFD780FF>利爪与苍雷</color>中的雷之印。\n此外，雷泽通过元素战技<color=#FFD780FF>利爪与苍雷</color>积攒雷之印时，会改为为雷泽积攒三个雷之印。\n消耗雷之印后的15秒内，雷泽的暴击率提升10%，暴击伤害提升50%。"
       }
     ]
   },
@@ -890,7 +878,8 @@
     "BirthMonth": 9,
     "BirthDay": 9,
     "VisionBefore": "雷",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "小狼座",
     "CvChinese": "周帅",
     "CvJapanese": "内山昂辉",

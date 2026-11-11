@@ -1,13 +1,13 @@
 {
   "Id": 10000130,
   "PromoteId": 130,
-  "Sort": 114,
+  "Sort": 605130,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Linnea",
   "SideIcon": "UI_AvatarIcon_Side_Linnea",
   "Name": "莉奈娅",
   "Description": "冒险家协会挪德卡莱分会顾问，博物学家。",
-  "BeginTime": "2026-04-07T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 12,
   "BaseValue": {
@@ -255,8 +255,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11301,
         "Name": "捕获方案",
@@ -440,8 +439,7 @@
                 18
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11302,
         "Name": "对策·露米呀吼吼！",
@@ -657,8 +655,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11305,
       "Name": "备忘·绝境生存指南",
@@ -681,8 +678,7 @@
                 0.3
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1302101,
         "Name": "野外观察手记",
@@ -702,8 +698,7 @@
                 0.05
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1302201,
         "Name": "万类博物图鉴",
@@ -724,8 +719,7 @@
                 0.14
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1302301,
         "Name": "月兆祝赐·栖地考察",
@@ -745,8 +739,7 @@
                 0.2
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1302501,
         "Name": "大师级的冒险者",
@@ -810,8 +803,8 @@
     "BirthMonth": 5,
     "BirthDay": 23,
     "VisionBefore": "岩",
-    "VisionOverrideLocked": "月之轮",
-    "VisionOverrideUnlocked": "月之轮",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "启喻鸟座",
     "CvChinese": "周侗",
     "CvJapanese": "白石晴香",

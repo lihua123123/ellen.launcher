@@ -1,13 +1,13 @@
 {
   "Id": 10000110,
   "PromoteId": 110,
-  "Sort": 95,
+  "Sort": 505110,
   "Body": 5,
   "Icon": "UI_AvatarIcon_Iansan",
   "SideIcon": "UI_AvatarIcon_Side_Iansan",
   "Name": "伊安珊",
   "Description": "沃陆之邦健身俱乐部的总教练，闻名纳塔的营养师。",
-  "BeginTime": "2025-03-25T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 13,
   "BaseValue": {
@@ -271,8 +271,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11101,
         "Name": "负重锥击",
@@ -424,8 +423,7 @@
                 16
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11102,
         "Name": "电掣雷驰",
@@ -659,8 +657,7 @@
               70
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11105,
       "Name": "力的三原理",
@@ -686,8 +683,7 @@
                 2.8
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1102101,
         "Name": "强化抗阻练习",
@@ -709,8 +705,7 @@
                 2.8
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1102201,
         "Name": "动能梯度测验",
@@ -728,8 +723,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1102301,
         "Name": "夜域赐礼·勉力传动",
@@ -751,8 +745,7 @@
                 10
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1102501,
         "Name": "热量均衡计划",
@@ -816,7 +809,8 @@
     "BirthMonth": 8,
     "BirthDay": 8,
     "VisionBefore": "雷",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "牨龙座",
     "CvChinese": "真理",
     "CvJapanese": "大桥彩香",

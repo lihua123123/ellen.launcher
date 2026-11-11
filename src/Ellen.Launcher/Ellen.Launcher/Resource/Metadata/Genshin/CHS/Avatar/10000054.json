@@ -1,13 +1,13 @@
 {
   "Id": 10000054,
   "PromoteId": 54,
-  "Sort": 40,
+  "Sort": 201054,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Kokomi",
   "SideIcon": "UI_AvatarIcon_Side_Kokomi",
   "Name": "珊瑚宫心海",
   "Description": "海祇岛的「现人神巫女」，统管海祇岛各项事宜的少女。",
-  "BeginTime": "2021-09-21T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 10,
   "BaseValue": {
@@ -255,8 +255,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10541,
         "Name": "水有常形",
@@ -439,8 +438,7 @@
                 20
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10542,
         "Name": "海月之誓",
@@ -689,8 +687,7 @@
               0.168538
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10545,
       "Name": "海人化羽",
@@ -710,8 +707,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 542101,
         "Name": "匣中玉栉",
@@ -731,8 +727,7 @@
                 0.15
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 542201,
         "Name": "真珠御呗",
@@ -750,8 +745,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 542301,
         "Name": "海祇姬君",
@@ -769,8 +763,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 542501,
         "Name": "庙算无遗",
@@ -834,7 +827,8 @@
     "BirthMonth": 2,
     "BirthDay": 22,
     "VisionBefore": "水",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "眠龙座",
     "CvChinese": "龟娘",
     "CvJapanese": "三森铃子",

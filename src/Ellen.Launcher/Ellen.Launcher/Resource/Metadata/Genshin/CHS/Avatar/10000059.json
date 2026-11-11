@@ -1,13 +1,13 @@
 {
   "Id": 10000059,
   "PromoteId": 59,
-  "Sort": 50,
+  "Sort": 208059,
   "Body": 1,
   "Icon": "UI_AvatarIcon_Heizo",
   "SideIcon": "UI_AvatarIcon_Side_Heizo",
   "Name": "鹿野院平藏",
   "Description": "天领奉行的天才少年侦探，直觉敏锐，心思玲珑。",
-  "BeginTime": "2022-07-13T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 10,
   "BaseValue": {
@@ -317,8 +317,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10591,
         "Name": "不动流格斗术",
@@ -502,8 +501,7 @@
                 60
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10592,
         "Name": "勠心拳",
@@ -673,8 +671,7 @@
               40
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10595,
       "Name": "聚风蹴",
@@ -694,8 +691,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 592101,
         "Name": "反论稽古",
@@ -716,8 +712,7 @@
                 80
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 592201,
         "Name": "因由勘破",
@@ -735,8 +730,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 592301,
         "Name": "在罪之先",
@@ -800,7 +794,8 @@
     "BirthMonth": 7,
     "BirthDay": 24,
     "VisionBefore": "风",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "幼鹿座",
     "CvChinese": "林景",
     "CvJapanese": "井口祐一",

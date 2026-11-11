@@ -1,13 +1,13 @@
 {
   "Id": 10000021,
   "PromoteId": 21,
-  "Sort": 23,
+  "Sort": 100021,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Ambor",
   "SideIcon": "UI_AvatarIcon_Side_Ambor",
   "Name": "安柏",
   "Description": "永远充满活力的女孩，骑士团最优秀，同时也是最后的侦察骑士。",
-  "BeginTime": "2020-09-15T04:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 12,
   "BaseValue": {
@@ -38,10 +38,10 @@
           "Descriptions": [
             "一段伤害|{param1:F1P}",
             "二段伤害|{param2:F1P}",
-            "三段伤害|{param3:P}",
-            "四段伤害|{param4:P}",
-            "五段伤害|{param5:P}",
-            "瞄准射击|{param6:P}",
+            "三段伤害|{param3:F1P}",
+            "四段伤害|{param4:F1P}",
+            "五段伤害|{param5:F1P}",
+            "瞄准射击|{param6:F1P}",
             "满蓄力瞄准射击|{param7:P}",
             "下坠期间伤害|{param8:F1P}",
             "低空/高空坠地冲击伤害|{param9:P}/{param10:P}"
@@ -287,8 +287,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10041,
         "Name": "神射手",
@@ -455,8 +454,7 @@
                 15
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10032,
         "Name": "爆弹玩偶",
@@ -642,8 +640,7 @@
               2
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10017,
       "Name": "箭雨",
@@ -666,8 +663,7 @@
                 0.3
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 212101,
         "Name": "百发百中！",
@@ -688,8 +684,7 @@
                 10
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 212201,
         "Name": "压制射击",
@@ -707,8 +702,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 212301,
         "Name": "飞行冠军",
@@ -772,7 +766,8 @@
     "BirthMonth": 8,
     "BirthDay": 10,
     "VisionBefore": "火",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "小兔座",
     "CvChinese": "蔡书瑾",
     "CvJapanese": "石见舞菜香",

@@ -1,13 +1,13 @@
 {
   "Id": 10000052,
   "PromoteId": 52,
-  "Sort": 39,
+  "Sort": 201052,
   "Body": 3,
   "Icon": "UI_AvatarIcon_Shougun",
   "SideIcon": "UI_AvatarIcon_Side_Shougun",
   "Name": "雷电将军",
   "Description": "其身为御建鸣神主尊大御所大人，许稻妻人民以亘古不变之「永恒」。",
-  "BeginTime": "2021-09-01T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 13,
   "BaseValue": {
@@ -302,8 +302,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10521,
         "Name": "源流",
@@ -487,8 +486,7 @@
                 10
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10522,
         "Name": "神变·恶曜开眼",
@@ -910,8 +908,7 @@
               90
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10525,
       "Name": "奥义·梦想真说",
@@ -934,8 +931,7 @@
                 3
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 522101,
         "Name": "万千的愿望",
@@ -957,8 +953,7 @@
                 0.004
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 522201,
         "Name": "殊胜之御体",
@@ -976,8 +971,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 522301,
         "Name": "暂缺",
@@ -995,8 +989,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 522501,
         "Name": "天下名物狩",
@@ -1060,14 +1053,14 @@
     "BirthMonth": 6,
     "BirthDay": 26,
     "VisionBefore": "雷",
-    "VisionAfter": "雷",
-    "VisionOverrideUnlocked": "神之心",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "天下人座",
-    "ConstellationAfter": "天下人座",
     "CvChinese": "菊花花",
     "CvJapanese": "泽城美雪",
     "CvEnglish": "安妮·雅科",
     "CvKorean": "朴志㣧",
+    "CookBonus": null,
     "Fetters": [
       {
         "Title": "初次见面…",
@@ -1415,7 +1408,9 @@
         "Title": "神之心",
         "Context": "长居「一心净土」之前，影曾为如何安置神之心而感到困扰。\n影不再需要神之心了，但如此重要的东西绝不能随意处置。本想将它改造成供能装置，可她的技术不知为何无法对神之心生效。\n她想到了一个人。狡黠聪慧的八重神子，虽说性格不是那么可靠，但从各方面来说，都是影最好的选择。\n听到这一要求，八重神子忍不住打趣道：「你就不担心我转手把这东西卖掉吗？」\n「你明白神之心的价值。就算要卖，也得找到价值与它相配的交易品才行。那绝非易事。」\n以八重神子这般性格，就算卖掉神之心也没什么奇怪。但她向来不愿吃亏也是事实。\n旧友之间自有默契。八重神子领会影的意思，便笑着接过了那枚贵重的神之心。\n「这话可是你说的。不准反悔哦。」"
       }
-    ]
+    ],
+    "VisionAfter": "雷",
+    "ConstellationAfter": "天下人座"
   },
   "Costumes": [
     {

@@ -1,13 +1,13 @@
 {
   "Id": 10000047,
   "PromoteId": 47,
-  "Sort": 33,
+  "Sort": 106047,
   "Body": 1,
   "Icon": "UI_AvatarIcon_Kazuha",
   "SideIcon": "UI_AvatarIcon_Side_Kazuha",
   "Name": "枫原万叶",
   "Description": "来自稻妻的浪人武士，如今栖身于璃月船队「南十字」中。性情温和而洒脱，心中埋藏着许多往事。",
-  "BeginTime": "2021-06-29T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 1,
   "BaseValue": {
@@ -317,8 +317,7 @@
                 5.466125
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10471,
         "Name": "我流剑术",
@@ -486,8 +485,7 @@
                 9
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10472,
         "Name": "千早振",
@@ -689,8 +687,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10475,
       "Name": "万叶之一刀",
@@ -712,8 +709,7 @@
                 2
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 472101,
         "Name": "相闻之剑法",
@@ -734,8 +730,7 @@
                 8
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 472201,
         "Name": "风物之诗咏",
@@ -753,8 +748,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 472301,
         "Name": "松风霞立",
@@ -818,7 +812,8 @@
     "BirthMonth": 10,
     "BirthDay": 29,
     "VisionBefore": "风",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "枫红座",
     "CvChinese": "斑马",
     "CvJapanese": "岛崎信长",

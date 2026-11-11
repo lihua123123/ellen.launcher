@@ -1,13 +1,13 @@
 {
   "Id": 10000123,
   "PromoteId": 123,
-  "Sort": 109,
+  "Sort": 602123,
   "Body": 1,
   "Icon": "UI_AvatarIcon_Durin",
   "SideIcon": "UI_AvatarIcon_Side_Durin",
   "Name": "杜林",
   "Description": "在魔女M笔下诞生的龙，最终来到了人类的世界。而他的「故事」，也仍在继续。",
-  "BeginTime": "2025-12-02T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 1,
   "BaseValue": {
@@ -286,8 +286,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11231,
         "Name": "芒焰之翼斩",
@@ -485,8 +484,7 @@
                 12
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11232,
         "Name": "二元式·聚分熔炼",
@@ -494,29 +492,6 @@
         "SpecialEnergyType": 0,
         "Icon": "Skill_S_Durin_01",
         "CdTime": 12
-      }
-    ],
-    "SpecialSkills": [
-      {
-        "GroupId": 12351,
-        "Proud": {
-          "Descriptions": [],
-          "Parameters": [
-            {
-              "Id": 1235101,
-              "Level": 1,
-              "Parameters": [
-                0.75
-              ]
-            }
-          ],
-          "Display": 3
-        },
-        "Id": 1235101,
-        "Name": "魔女的前夜礼·升华赞歌",
-        "Description": "完成<color=#FFD780FF>魔女的课业·此世之题</color>后，杜林将成为<color=#FFD780FF>魔导</color>角色。队伍中编入至少2名魔导角色时，将获得<color=#FFD780FF>魔导·秘仪</color>效果，使魔导角色获得强化。\n\n<color=#FFD780FF>魔导·秘仪</color>\n除持续时间外，突破天赋{LINK#P1232101}<color=#FFD780FF>「光灵遵神数显现」</color>{/LINK}中的所有效果提升75%。",
-        "SpecialEnergyType": 0,
-        "Icon": "UI_Talent_S_Durin_03"
       }
     ],
     "EnergySkill": {
@@ -803,8 +778,7 @@
               70
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11235,
       "Name": "白化法·如光流变",
@@ -813,6 +787,26 @@
       "Icon": "Skill_E_Durin_01",
       "CdTime": 18
     },
+    "SpecialSkills": [
+      {
+        "GroupId": 12351,
+        "Proud": {
+          "Descriptions": [],
+          "Parameters": [
+            {
+              "Id": 1235101,
+              "Level": 1,
+              "Parameters": []
+            }
+          ]
+        },
+        "Id": 1235101,
+        "Name": "魔女的前夜礼·升华赞歌",
+        "Description": "完成<color=#FFD780FF>魔女的课业·此世之题</color>后，杜林将成为<color=#FFD780FF>魔导</color>角色。队伍中编入至少2名魔导角色时，将获得<color=#FFD780FF>魔导·秘仪</color>效果，使魔导角色获得强化。\n\n<color=#FFD780FF>魔导·秘仪</color>\n除持续时间外，突破天赋{LINK#P1232101}<color=#FFD780FF>「光灵遵神数显现」</color>{/LINK}中的所有效果提升75%。",
+        "SpecialEnergyType": 0,
+        "Icon": "UI_Talent_S_Durin_03"
+      }
+    ],
     "Inherents": [
       {
         "GroupId": 12321,
@@ -829,8 +823,7 @@
                 0.4
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1232101,
         "Name": "光灵遵神数显现",
@@ -852,8 +845,7 @@
                 10
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1232201,
         "Name": "混沌如黑夜构成",
@@ -871,8 +863,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1232301,
         "Name": "地涌的回音",
@@ -936,7 +927,8 @@
     "BirthMonth": 3,
     "BirthDay": 14,
     "VisionBefore": "火",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "赤龙座",
     "CvChinese": "陶典",
     "CvJapanese": "小林千晃",

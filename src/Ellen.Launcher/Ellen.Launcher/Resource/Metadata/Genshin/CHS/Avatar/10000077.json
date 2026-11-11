@@ -1,13 +1,13 @@
 {
   "Id": 10000077,
   "PromoteId": 77,
-  "Sort": 61,
+  "Sort": 304077,
   "Body": 5,
   "Icon": "UI_AvatarIcon_Yaoyao",
   "SideIcon": "UI_AvatarIcon_Side_Yaoyao",
   "Name": "瑶瑶",
   "Description": "歌尘浪市真君膝下最年幼的弟子，温柔体贴的「小大人」。",
-  "BeginTime": "2023-01-17T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 13,
   "BaseValue": {
@@ -286,8 +286,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10771,
         "Name": "颠扑连环枪",
@@ -486,8 +485,7 @@
                 15
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10772,
         "Name": "云台团团降芦菔",
@@ -720,8 +718,7 @@
               80
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10775,
       "Name": "玉颗珊珊月中落",
@@ -743,8 +740,7 @@
                 0.6
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 772101,
         "Name": "天星漫散",
@@ -766,8 +762,7 @@
                 5
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 772201,
         "Name": "推己及人",
@@ -785,8 +780,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 772301,
         "Name": "踮脚·蹑影轻踪",
@@ -850,7 +844,8 @@
     "BirthMonth": 3,
     "BirthDay": 6,
     "VisionBefore": "草",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "木樨座",
     "CvChinese": "刘颐诺",
     "CvJapanese": "门胁舞以",

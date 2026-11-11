@@ -1,13 +1,13 @@
 {
   "Id": 10000120,
   "PromoteId": 120,
-  "Sort": 104,
+  "Sort": 600120,
   "Body": 4,
   "Icon": "UI_AvatarIcon_Flins",
   "SideIcon": "UI_AvatarIcon_Side_Flins",
   "Name": "菲林斯",
   "Description": "挪德卡莱的「执灯人」，看守着北方小岛上的灯塔与墓地。一位言行举止极富修养的神秘绅士。",
-  "BeginTime": "2025-09-30T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 5,
   "Weapon": 13,
   "BaseValue": {
@@ -287,8 +287,7 @@
                 4.27041
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11201,
         "Name": "扈圣魔枪",
@@ -552,8 +551,7 @@
                 16
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11202,
         "Name": "古律·孤灯遗秘",
@@ -787,8 +785,7 @@
               30
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11205,
       "Name": "旧仪·夜客致访",
@@ -810,8 +807,7 @@
                 0.2
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1202101,
         "Name": "寒冬的交响",
@@ -832,8 +828,7 @@
                 160
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1202201,
         "Name": "幽焰的呢喃",
@@ -854,8 +849,7 @@
                 0.14
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1202301,
         "Name": "月兆祝赐·旧世潜藏",
@@ -873,8 +867,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1202501,
         "Name": "掌灯暗行",
@@ -938,8 +931,8 @@
     "BirthMonth": 10,
     "BirthDay": 31,
     "VisionBefore": "雷",
-    "VisionOverrideLocked": "月之轮",
-    "VisionOverrideUnlocked": "月之轮",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "夜行灯座",
     "CvChinese": "马正阳",
     "CvJapanese": "中村悠一",

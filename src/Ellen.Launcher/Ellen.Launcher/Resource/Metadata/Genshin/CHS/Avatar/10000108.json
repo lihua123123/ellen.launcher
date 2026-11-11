@@ -1,13 +1,13 @@
 {
   "Id": 10000108,
   "PromoteId": 108,
-  "Sort": 93,
+  "Sort": 503108,
   "Body": 2,
   "Icon": "UI_AvatarIcon_Lanyan",
   "SideIcon": "UI_AvatarIcon_Side_Lanyan",
   "Name": "蓝砚",
   "Description": "沉玉谷来的藤编师，神清骨秀，像山间清泉一般灵动。",
-  "BeginTime": "2025-01-21T18:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 10,
   "BaseValue": {
@@ -301,8 +301,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11081,
         "Name": "玄鸾画水",
@@ -485,8 +484,7 @@
                 16
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 11082,
         "Name": "凤缕随翦舞",
@@ -640,8 +638,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 11085,
       "Name": "鹍弦踏月出",
@@ -663,8 +660,7 @@
                 0.5
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1082101,
         "Name": "四戈封刀灵卜",
@@ -685,8 +681,7 @@
                 7.74
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 1082201,
         "Name": "苍翎镇邪敕符",
@@ -704,8 +699,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 1082301,
         "Name": "「心随芳兮意犹绵」",
@@ -769,7 +763,8 @@
     "BirthMonth": 1,
     "BirthDay": 6,
     "VisionBefore": "风",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "玄燕座",
     "CvChinese": "刘十四",
     "CvJapanese": "若山诗音",

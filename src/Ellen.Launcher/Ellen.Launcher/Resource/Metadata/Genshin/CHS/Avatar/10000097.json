@@ -1,13 +1,13 @@
 {
   "Id": 10000097,
   "PromoteId": 97,
-  "Sort": 82,
+  "Sort": 407097,
   "Body": 1,
   "Icon": "UI_AvatarIcon_Sethos",
   "SideIcon": "UI_AvatarIcon_Side_Sethos",
   "Name": "赛索斯",
   "Description": "缄默之殿的继承者。背负着秘密，自沙中而来。",
-  "BeginTime": "2024-06-04T00:00:00+08:00",
+  "BeginTime": "2020-09-28T00:00:00+08:00",
   "Quality": 4,
   "Weapon": 12,
   "BaseValue": {
@@ -301,8 +301,7 @@
                 3.79592
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10971,
         "Name": "王家苇箭术",
@@ -454,8 +453,7 @@
                 8
               ]
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 10972,
         "Name": "古仪·鸣砂掣雷",
@@ -625,8 +623,7 @@
               60
             ]
           }
-        ],
-        "Display": 0
+        ]
       },
       "Id": 10975,
       "Name": "秘仪·瞑光贯影",
@@ -649,8 +646,7 @@
                 0.5
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 972101,
         "Name": "黑鸢的密喻",
@@ -673,8 +669,7 @@
                 4
               ]
             }
-          ],
-          "Display": 1
+          ]
         },
         "Id": 972201,
         "Name": "砂王的赐礼",
@@ -692,8 +687,7 @@
               "Level": 1,
               "Parameters": []
             }
-          ],
-          "Display": 0
+          ]
         },
         "Id": 972301,
         "Name": "猿月的显迹",
@@ -757,7 +751,8 @@
     "BirthMonth": 5,
     "BirthDay": 31,
     "VisionBefore": "雷",
-    "VisionOverrideUnlocked": "神之眼",
+    "VisionOverrideLocked": null,
+    "VisionOverrideUnlocked": null,
     "ConstellationBefore": "圣名环座",
     "CvChinese": "李兰陵",
     "CvJapanese": "千叶翔也",

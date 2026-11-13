@@ -1,6 +1,7 @@
 // Copyright (c) DGP Studio. All rights reserved.
 // Licensed under the MIT license.
 
+using Ellen.Launcher.Domain.GameRecord;
 using Ellen.Launcher.Model;
 using Ellen.Launcher.Model.Entity;
 using Ellen.Launcher.Model.Intrinsic;
@@ -57,7 +58,8 @@ public sealed partial class RoleCombatView : IEntityAccess<RoleCombatEntry?>, IP
     private RoleCombatView(MetadataRoleCombatSchedule roleCombatSchedule, RoleCombatMetadataContext context)
     {
         ScheduleId = roleCombatSchedule.Id;
-        FormattedTime = $"{roleCombatSchedule.Begin:yyyy.MM.dd HH:mm} - {roleCombatSchedule.End:yyyy.MM.dd HH:mm}";
+        ScheduleBegin = roleCombatSchedule.Begin;
+        FormattedTime = ScheduleTimeline.FormatTimeRange(roleCombatSchedule.Begin, roleCombatSchedule.End, SH.ModelEntityScheduleTimeUnknown);
 
         Elements = roleCombatSchedule.Elements;
         SpecialAvatars = roleCombatSchedule.SpecialAvatars.SelectAsArray(static (id, context) => AvatarView.Create(context.GetAvatar(id)), context);
@@ -65,6 +67,11 @@ public sealed partial class RoleCombatView : IEntityAccess<RoleCombatEntry?>, IP
     }
 
     public uint ScheduleId { get; }
+
+    /// <summary>
+    /// 期次开始时间，列表排序与占位卡片插入位置都用它。
+    /// </summary>
+    public DateTimeOffset ScheduleBegin { get; }
 
     public string Schedule { get => SH.FormatModelEntitySpiralAbyssSchedule(ScheduleId); }
 

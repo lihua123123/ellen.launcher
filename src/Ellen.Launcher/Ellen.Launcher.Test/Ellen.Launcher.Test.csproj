@@ -17,6 +17,10 @@
 
   <ItemGroup>
     <None Include="..\Ellen.Launcher\Resource\Metadata\Genshin\CHS\Monster.json" Link="Fixtures\Monster.json" CopyToOutputDirectory="PreserveNewest" />
+    <!-- P1-B fixture：直接用随包的三张排期表，避免测试自己造一份“理想数据”。 -->
+    <None Include="..\Ellen.Launcher\Resource\Metadata\Genshin\CHS\TowerSchedule.json" Link="Fixtures\TowerSchedule.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Ellen.Launcher\Resource\Metadata\Genshin\CHS\RoleCombatSchedule.json" Link="Fixtures\RoleCombatSchedule.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Ellen.Launcher\Resource\Metadata\Genshin\CHS\HardChallengeSchedule.json" Link="Fixtures\HardChallengeSchedule.json" CopyToOutputDirectory="PreserveNewest" />
     <!-- G7a 判定向量：与 gate 的 evaluateOfflineSessions 共用同一份，防两边逻辑漂移。 -->
     <None Include="..\..\..\tools\offline-probe-vectors.json" Link="Fixtures\offline-probe-vectors.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

@@ -254,6 +254,10 @@
   <data name="ModelEntityHardChallengeSchedule" xml:space="preserve">
     <value>第 {0} 期：{1}</value>
   </data>
+  <data name="ModelEntityHardChallengeScheduleUnnamed" xml:space="preserve">
+    <value>第 {0} 期：未命名</value>
+    <comment>期次名称为空时的兜底文案，不得留白</comment>
+  </data>
   <data name="ModelEntityPrimitiveCultivateTypeAvatarAndSkill" xml:space="preserve">
     <value>角色</value>
   </data>
@@ -262,6 +266,10 @@
   </data>
   <data name="ModelEntityPrimitiveCultivateTypeWeapon" xml:space="preserve">
     <value>武器</value>
+  </data>
+  <data name="ModelEntityScheduleTimeUnknown" xml:space="preserve">
+    <value>时间未知</value>
+    <comment>接口未给期次起止时间时的兜底文案，不编造时间</comment>
   </data>
   <data name="ModelEntitySpiralAbyssSchedule" xml:space="preserve">
     <value>第 {0} 期</value>

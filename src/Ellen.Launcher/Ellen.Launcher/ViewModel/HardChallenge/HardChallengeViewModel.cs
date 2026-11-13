@@ -3,6 +3,7 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using Ellen.Launcher.Core.Logging;
+using Ellen.Launcher.Domain.GameRecord;
 using Ellen.Launcher.Model.Endgame;
 using Ellen.Launcher.Service.Endgame;
 using Ellen.Launcher.Service.HardChallenge;
@@ -159,8 +160,12 @@ public sealed partial class HardChallengeViewModel : Abstraction.ViewModel, IRec
                 IAdvancedCollectionView<HardChallengeView> hardChallengeEntries = collection.AsAdvancedCollectionView();
 
                 await taskContext.SwitchToMainThreadAsync();
+                uint? previousId = HardChallengeEntries?.CurrentItem?.ScheduleId;
                 HardChallengeEntries = hardChallengeEntries;
-                HardChallengeEntries.MoveCurrentTo(HardChallengeEntries.Source.FirstOrDefault(s => s.Engaged));
+
+                // 当期还没打过时也要选中最新一期，否则会退回第一期的攻略；
+                // 用户已经翻到某一期时保持不动（刷新不该把选中项顶掉）
+                HardChallengeEntries.MoveCurrentTo(SelectCurrent(HardChallengeEntries, previousId));
 
                 BlingAvatars = blingAvatars;
                 UpdateGuideOnlyMode();
@@ -169,6 +174,17 @@ public sealed partial class HardChallengeViewModel : Abstraction.ViewModel, IRec
         catch (OperationCanceledException)
         {
         }
+    }
+
+    /// <summary>
+    /// 默认选中：保留用户正看着的期次；没有既有选择时选最近一期有记录的；一期记录都没有时选最新一期。
+    /// </summary>
+    private static HardChallengeView? SelectCurrent(IAdvancedCollectionView<HardChallengeView> entries, uint? previousId)
+    {
+        List<ScheduleSelection> items = [.. entries.Source.Select(static view => new ScheduleSelection(view.ScheduleId, view.Engaged))];
+        int index = ScheduleTimeline.SelectDefaultIndex(items, previousId);
+
+        return index >= 0 ? entries.Source[index] : null;
     }
 
     [Command("RefreshCommand")]
@@ -185,6 +201,11 @@ public sealed partial class HardChallengeViewModel : Abstraction.ViewModel, IRec
         {
             if (await userService.GetCurrentUserAndUidAsync().ConfigureAwait(false) is { } userAndUid)
             {
+                await taskContext.SwitchToMainThreadAsync();
+
+                // 刷新会把当前卡片换成新实例，先记住用户选的期次，刷新后按它回选
+                uint? previousId = HardChallengeEntries.CurrentItem?.ScheduleId;
+
                 try
                 {
                     using (await EnterCriticalSectionAsync().ConfigureAwait(false))
@@ -199,7 +220,7 @@ public sealed partial class HardChallengeViewModel : Abstraction.ViewModel, IRec
                 }
 
                 await taskContext.SwitchToMainThreadAsync();
-                HardChallengeEntries.MoveCurrentTo(HardChallengeEntries.Source.FirstOrDefault(s => s.Engaged));
+                HardChallengeEntries.MoveCurrentTo(SelectCurrent(HardChallengeEntries, previousId));
             }
         }
     }

@@ -2,7 +2,9 @@
 // Licensed under the MIT license.
 
 using Ellen.Launcher.Core.DependencyInjection.Abstraction;
+using Ellen.Launcher.Domain.GameRecord;
 using Ellen.Launcher.Model.Entity;
+using Ellen.Launcher.Model.Primitive;
 using Ellen.Launcher.ViewModel.HardChallenge;
 using Ellen.Launcher.ViewModel.User;
 using Ellen.Launcher.Web.Hoyolab;
@@ -24,6 +26,7 @@ public sealed partial class HardChallengeService : IHardChallengeService
     private readonly IHardChallengeRepository hardChallengeRepository;
     private readonly IServiceScopeFactory serviceScopeFactory;
     private readonly ITaskContext taskContext;
+    private readonly ILogger<HardChallengeService> logger;
 
     private readonly ConcurrentDictionary<PlayerUid, ObservableCollection<HardChallengeView>> hardChallengeCollectionCache = [];
     private readonly AsyncLock collectionLock = new();
@@ -57,9 +60,8 @@ public sealed partial class HardChallengeService : IHardChallengeService
                 }
             }
 
-            ObservableCollection<HardChallengeView> result = context.IdHardChallengeScheduleMap.Values
+            ObservableCollection<HardChallengeView> result = OrderedSchedules(context)
                 .Select(sch => HardChallengeView.Create(entryMap.GetValueOrDefault(sch.Id), sch, context))
-                .OrderByDescending(e => e.ScheduleId)
                 .ToObservableCollection();
 
             hardChallengeCollectionCache.TryAdd(userAndUid.Uid, result);
@@ -181,7 +183,7 @@ public sealed partial class HardChallengeService : IHardChallengeService
     }
 
     /// <summary>
-    /// 保证列表里存在指定期次的卡片（按期次 Id 降序插入）。没有个人记录时用空实体卡片占位，供攻略模式展示。
+    /// 保证列表里存在指定期次的卡片（按开始时间倒序插入）。没有个人记录时用空实体卡片占位，供攻略模式展示。
     /// </summary>
     private async ValueTask EnsureScheduleViewAsync(HardChallengeMetadataContext context, UserAndUid userAndUid, uint scheduleId)
     {
@@ -202,23 +204,41 @@ public sealed partial class HardChallengeService : IHardChallengeService
             return;
         }
 
-        int insertAt = 0;
-        while (insertAt < hardChallenges.Count && hardChallenges[insertAt].ScheduleId > scheduleId)
-        {
-            insertAt++;
-        }
+        List<SchedulePeriod> positions = [.. hardChallenges.Select(static view => new SchedulePeriod(view.ScheduleId, view.ScheduleBegin))];
+        int insertAt = ScheduleTimeline.InsertIndex(positions, new SchedulePeriod(scheduleId, meta.Begin));
 
         hardChallenges.Insert(insertAt, HardChallengeView.Create(null, meta, context));
     }
 
     /// <summary>
     /// 静态期次表缺当期时，用接口返回的官方 schedule 名称与起止时间登记，不自行编造期次内容。
+    /// 表内已有该期时只补空名称，其余字段原样保留。
     /// </summary>
-    private static void EnsureScheduleRegistered(HardChallengeMetadataContext context, HardChallengeSchedule schedule)
+    private void EnsureScheduleRegistered(HardChallengeMetadataContext context, HardChallengeSchedule schedule)
     {
-        var map = context.IdHardChallengeScheduleMap;
-        if (map is null || map.ContainsKey(schedule.ScheduleId))
+        ImmutableDictionary<HardChallengeScheduleId, MetadataHardChallengeSchedule>? map = context.IdHardChallengeScheduleMap;
+        if (map is null || !ScheduleTimeline.IsValidId(schedule.ScheduleId.Value))
         {
+            return;
+        }
+
+        if (map.TryGetValue(schedule.ScheduleId, out MetadataHardChallengeSchedule? existing))
+        {
+            string healedName = ScheduleTimeline.ResolveName(existing.Name, schedule.Name);
+            if (string.Equals(healedName, existing.Name, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            context.IdHardChallengeScheduleMap = map.SetItem(schedule.ScheduleId, new MetadataHardChallengeSchedule
+            {
+                Id = existing.Id,
+                Begin = existing.Begin,
+                End = existing.End,
+                Name = healedName,
+            });
+
+            logger.LogInformation("幽境期次 {ScheduleId} 表内名称为空，用接口名称补齐", schedule.ScheduleId.Value);
             return;
         }
 
@@ -227,8 +247,20 @@ public sealed partial class HardChallengeService : IHardChallengeService
             Id = schedule.ScheduleId,
             Begin = ToServerTime(schedule.StartTime, schedule.StartDateTime),
             End = ToServerTime(schedule.EndTime, schedule.EndDateTime),
-            Name = schedule.Name,
+            Name = ScheduleTimeline.ResolveName(null, schedule.Name),
         });
+
+        logger.LogInformation("幽境补登记表外期次 {ScheduleId}（{Name}）", schedule.ScheduleId.Value, schedule.Name);
+    }
+
+    private static List<MetadataHardChallengeSchedule> OrderedSchedules(HardChallengeMetadataContext context)
+    {
+        return
+        [
+            .. ScheduleTimeline
+                .SortDescending(context.IdHardChallengeScheduleMap.Select(static pair => new SchedulePeriod(pair.Key, pair.Value.Begin)))
+                .Select(period => context.IdHardChallengeScheduleMap[period.Id])
+        ];
     }
 
     private static DateTimeOffset ToServerTime(long unixSeconds, GameRecordDateTime fallback)

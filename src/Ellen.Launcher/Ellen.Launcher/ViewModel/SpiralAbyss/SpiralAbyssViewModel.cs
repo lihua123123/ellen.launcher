@@ -3,6 +3,7 @@
 
 using Microsoft.UI.Xaml.Controls;
 using Ellen.Launcher.Core.Logging;
+using Ellen.Launcher.Domain.GameRecord;
 using Ellen.Launcher.Factory.ContentDialog;
 using Ellen.Launcher.Service.Metadata;
 using Ellen.Launcher.Service.Metadata.ContextAbstraction;
@@ -106,12 +107,24 @@ public sealed partial class SpiralAbyssViewModel : Abstraction.ViewModel, IRecip
             IAdvancedCollectionView<SpiralAbyssView> spiralAbyssEntries = collection.AsAdvancedCollectionView();
 
             await taskContext.SwitchToMainThreadAsync();
+            uint? previousId = SpiralAbyssEntries?.CurrentItem?.ScheduleId;
             SpiralAbyssEntries = spiralAbyssEntries;
-            SpiralAbyssEntries.MoveCurrentTo(SpiralAbyssEntries.Source.FirstOrDefault(s => s.Engaged));
+            SpiralAbyssEntries.MoveCurrentTo(SelectCurrent(SpiralAbyssEntries, previousId));
         }
         catch (OperationCanceledException)
         {
         }
+    }
+
+    /// <summary>
+    /// 默认选中：保留用户正看着的期次；没有既有选择时选最近一期有记录的；一期记录都没有时选最新一期。
+    /// </summary>
+    private static SpiralAbyssView? SelectCurrent(IAdvancedCollectionView<SpiralAbyssView> entries, uint? previousId)
+    {
+        List<ScheduleSelection> items = [.. entries.Source.Select(static view => new ScheduleSelection(view.ScheduleId, view.Engaged))];
+        int index = ScheduleTimeline.SelectDefaultIndex(items, previousId);
+
+        return index >= 0 ? entries.Source[index] : null;
     }
 
     [Command("RefreshCommand")]
@@ -128,6 +141,11 @@ public sealed partial class SpiralAbyssViewModel : Abstraction.ViewModel, IRecip
         {
             if (await userService.GetCurrentUserAndUidAsync().ConfigureAwait(false) is { } userAndUid)
             {
+                await taskContext.SwitchToMainThreadAsync();
+
+                // 刷新会把当前卡片换成新实例，先记住用户选的期次，刷新后按它回选
+                uint? previousId = SpiralAbyssEntries.CurrentItem?.ScheduleId;
+
                 try
                 {
                     using (await EnterCriticalSectionAsync().ConfigureAwait(false))
@@ -142,7 +160,7 @@ public sealed partial class SpiralAbyssViewModel : Abstraction.ViewModel, IRecip
                 }
 
                 await taskContext.SwitchToMainThreadAsync();
-                SpiralAbyssEntries.MoveCurrentTo(SpiralAbyssEntries.Source.FirstOrDefault(s => s.Engaged));
+                SpiralAbyssEntries.MoveCurrentTo(SelectCurrent(SpiralAbyssEntries, previousId));
             }
         }
     }

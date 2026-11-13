@@ -254,6 +254,9 @@
   <data name="ModelEntityHardChallengeSchedule" xml:space="preserve">
     <value>Schedule {0}: {1}</value>
   </data>
+  <data name="ModelEntityHardChallengeScheduleUnnamed" xml:space="preserve">
+    <value>Schedule {0}: Unnamed</value>
+  </data>
   <data name="ModelEntityPrimitiveCultivateTypeAvatarAndSkill" xml:space="preserve">
     <value>Character</value>
   </data>
@@ -262,6 +265,9 @@
   </data>
   <data name="ModelEntityPrimitiveCultivateTypeWeapon" xml:space="preserve">
     <value>Weapon</value>
+  </data>
+  <data name="ModelEntityScheduleTimeUnknown" xml:space="preserve">
+    <value>Time unknown</value>
   </data>
   <data name="ModelEntitySpiralAbyssSchedule" xml:space="preserve">
     <value>Schedule {0}</value>

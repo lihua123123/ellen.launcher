@@ -280,7 +280,11 @@ public sealed partial class DescriptionTextBlock : ContentControl
         }
 
         (MiHoYoSyntaxLinkKind kind, uint id) = tuple;
-        LinkContext.TryGetNameAndDescription(kind, id, out string name, out string description);
+        if (!LinkContext.TryGetNameAndDescription(kind, id, out string name, out string description))
+        {
+            // 名字都查不到（数据源还没收录这个 id）就不要弹空框
+            return;
+        }
 
         Flyout flyout = new()
         {

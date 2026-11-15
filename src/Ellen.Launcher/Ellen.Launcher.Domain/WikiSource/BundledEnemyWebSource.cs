@@ -1,7 +1,7 @@
-// P5 客户端 753 条目 JSON 随包：离线首屏数据源（方案 B 地基）。
-// 包裹 HTTP 源：ReadAsync 走线上（同步/回填 HTTP 缓存）；ReadCachedAsync 走离线优先——
-// 先读 HTTP 缓存，空则读随包 753，再空才让上层回退到 legacy 722（显式，不白屏）。
-// 随包缺失时显式记录诊断，不静默丢数据。
+// P5 随包 753 条：HTTP(R2) 为唯一权威源，随包只做离线兜底。
+// 包裹 HTTP 源：ReadAsync 走线上（同步/回填 HTTP 缓存）；ReadCachedAsync 先读 HTTP(R2) 缓存，
+// 缓存为空（首装 / 离线 / 缓存被清）才退回内置 753 兜底，
+// 再空才让上层回退 legacy 722（显式，不白屏）。随包缺失时显式记录诊断，不静默丢数据。
 
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ using Ellen.Launcher.Domain.WikiSource.Contracts;
 namespace Ellen.Launcher.Domain.WikiSource;
 
 /// <summary>
-/// 离线优先的敌人数据源装饰器。随包目录约定：<c>index.json</c> + 扁平的 <c>&lt;slug&gt;.json</c>
+/// 敌人数据源装饰器：HTTP(R2) 为主源，随包仅离线兜底。随包目录约定：<c>index.json</c> + 扁平的 <c>&lt;slug&gt;.json</c>
 /// （文件名即条目 id，与线上 /api/enemies/&lt;slug&gt;.json 一致）。
 /// </summary>
 public sealed class BundledEnemyWebSource : IEnemyWebSource, ICachedEnemyWebSource, IWikiSourceStatsProvider
@@ -58,23 +58,15 @@ public sealed class BundledEnemyWebSource : IEnemyWebSource, ICachedEnemyWebSour
         => inner.ReadAsync(token);
 
     /// <summary>
-    /// 离线优先：① HTTP 缓存有数直接返回；② 缓存空读随包 753；③ 二者皆空返回空（上层按 legacy 722 处理）。
-    /// 默认不把随包内容写回缓存，见 <see cref="SeedCacheEnabled"/>。
+    /// 统一入口：① 先读 HTTP(R2) 缓存（上次同步下来的数据）；② 缓存空才用内置 753 兜底；
+    /// ③ 再空读随包目录；④ 全空返回空（上层显示「后台同步中」）。
+    /// 内置数据只是**离线兜底**，不再优先于线上快照。
     /// </summary>
     public async ValueTask<EnemyWebReadResult> ReadCachedAsync(CancellationToken token = default)
     {
-        /* 数据内置：753 条合并包嵌在程序集里，优先于 HTTP 缓存与安装目录里那 753 个 json。
-           「数据只随安装包更新」因此是硬保证 —— 旧缓存挡不住新包，目录被清也不会退化成 722。
-           图片仍然走外部 assets（随包）与缓存。 */
-        if (!SeedCacheEnabled
-            && TryReadEmbeddedMerged(
-                WikiSourceStamp.FromBundledWeb753("内置 753 基线"),
-                [.. (log?.Records ?? [])],
-                token) is { } baked)
-        {
-            return baked;
-        }
-
+        /* 数据统一：R2 是唯一权威源。首屏先读上次从 R2 同步下来的 HTTP 缓存，
+           只有缓存为空（首装 / 离线 / 缓存被清）才退回程序集内置的 753 条基线，
+           保证不白屏。这样「改 R2 数据」与「客户端看到的数据」始终一致。 */
         EnemyWebReadResult innerCached = inner is ICachedEnemyWebSource cachedSource
             ? await cachedSource.ReadCachedAsync(token).ConfigureAwait(false)
             : await inner.ReadAsync(token).ConfigureAwait(false);
@@ -82,6 +74,18 @@ public sealed class BundledEnemyWebSource : IEnemyWebSource, ICachedEnemyWebSour
         if (innerCached.Items.Count > 0)
         {
             return innerCached;
+        }
+
+        if (!SeedCacheEnabled
+            && TryReadEmbeddedMerged(
+                WikiSourceStamp.FromBundledWeb753("内置 753 兜底"),
+                [.. (log?.Records ?? [])],
+                token) is { } baked)
+        {
+            log?.Add("bundle-fallback-used", baked.Stamp,
+                "HTTP 缓存为空，使用内置 753 条兜底（下次后台同步会写回 R2 数据）",
+                "离线兜底");
+            return baked;
         }
 
         if (!string.IsNullOrEmpty(bundleRoot) && Directory.Exists(bundleRoot))

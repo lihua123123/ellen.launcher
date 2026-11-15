@@ -106,9 +106,6 @@ Name: "{autodesktop}\{#MyAppShortName}"; Filename: "{app}\{#MyAppExeName}"; Task
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#MyAppShortName}}"; Flags: nowait postinstall skipifsilent
 
 [Code]
-var
-  ImageQualityPage: TInputOptionWizardPage;
-
 const
 #ifdef CodeSigningCertificatePath
   CodeSigningCertificateThumbprint = '{#CodeSigningCertificateThumbprint}';
@@ -117,21 +114,11 @@ const
   CertificateTrustMarkerKey = 'Software\EllenProject\Ellen.Launcher';
   CertificateTrustMarkerValue = 'InstallerCreatedTrustedPeopleThumbprint';
 
-{ ---------- 便携布局 + 随包图片资源档位 ---------- }
+{ ---------- 便携布局 ---------- }
 
-{ 安装界面：在「选择安装目录」页之后加一页，选「精简 webp / 原图 PNG」。
-  默认目录仍由 wpSelectDir 选择，即「随包体安装目录安装」。 }
-procedure InitializeWizard;
-begin
-  ImageQualityPage := CreateInputOptionPage(wpSelectDir,
-    '随包图片资源',
-    '选择敌人图鉴一图流使用的资源档位',
-    '安装包只包含精简 webp。原图档位（1920×1080 PNG）尚未接通：当前无论选哪项都按随包 webp 显示，选择会被记录下来，供后续版本使用。',
-    True, False);
-  ImageQualityPage.Add('精简 - 随包 webp（默认，离线可用）');
-  ImageQualityPage.Add('原图 - 一图流 PNG（安装后单独下载）');
-  ImageQualityPage.SelectedValueIndex := 0;
-end;
+{ 安装目录就是数据目录：数据放在安装目录下的 Data 子目录。
+  不再询问图片档位 —— 敌人图鉴的图片已经改成逐张走 R2，
+  安装包里只带精简 webp，档位选择没有意义。 }
 
 { 判断目录里有没有「真正的用户数据」，用来区分全新安装和升级。
   只看标志性文件/目录，避免把安装器刚建出来的空 Data 当成已有数据。 }
@@ -152,16 +139,8 @@ begin
   end;
 end;
 
-function SelectedImageQuality: string;
-begin
-  if ImageQualityPage.SelectedValueIndex = 1 then
-    Result := 'original'
-  else
-    Result := 'compact';
-end;
-
 { 写 exe 旁的 portable.json：应用靠它把 settings.json / 数据库 / 缓存
-  全部定位到安装目录下的 Data 子目录。 }
+  全部定位到安装目录下的 Data 子目录 —— 安装位置就是数据位置。 }
 procedure WritePortableConfig(AppDir, DataDir: string);
 var
   EscapedDir, Json: string;
@@ -169,8 +148,7 @@ begin
   EscapedDir := DataDir;
   StringChangeEx(EscapedDir, '\', '\\', True);
   Json := '{' + #13#10
-    + '  "dataDir": "' + EscapedDir + '",' + #13#10
-    + '  "imageQuality": "' + SelectedImageQuality() + '"' + #13#10
+    + '  "dataDir": "' + EscapedDir + '"' + #13#10
     + '}' + #13#10;
   SaveStringToFile(AppDir + '\portable.json', Json, False);
 end;

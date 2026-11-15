@@ -206,8 +206,6 @@ public static class SettingKeys
     // Web
     public const string AlphaBuildUseCnPatchEndpoint            = "Ellen::Web::AlphaBuild::Endpoint::UseCNPatch";
     public const string AlphaBuildUseFjPatchEndpoint            = "Ellen::Web::AlphaBuild::Endpoint::UseFJPatch";
-    public const string StaticResourceImageQuality              = "Ellen::Web::StaticResource::ImageQuality";
-    public const string StaticResourceImageArchive              = "Ellen::Web::StaticResource::ImageArchive";
     public const string BridgeShareSaveType                     = "Ellen::Web::WebView::BridgeShare::SaveType";
     public const string CompactWebView2WindowInactiveOpacity    = "Ellen::Web::WebView::Compact::InactiveOpacity";
     public const string CompactWebView2WindowPreviousSourceUrl  = "Ellen::Web::WebView::Compact::PreviousSourceUrl";

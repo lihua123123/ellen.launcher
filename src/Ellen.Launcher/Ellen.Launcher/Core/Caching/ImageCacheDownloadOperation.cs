@@ -108,7 +108,6 @@ public sealed partial class ImageCacheDownloadOperation : IImageCacheDownloadOpe
         HttpRequestMessageBuilder requestMessageBuilder = httpRequestMessageBuilderFactory
             .Create()
             .SetRequestUri(uri)
-            .SetStaticResourceControlHeadersIfRequired()
             .Get();
 
         using (HttpRequestMessage requestMessage = requestMessageBuilder.HttpRequestMessage)

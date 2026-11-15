@@ -1,4 +1,4 @@
-﻿// Copyright (c) DGP Studio. All rights reserved.
+// Copyright (c) DGP Studio. All rights reserved.
 // Licensed under the MIT license.
 
 namespace Ellen.Launcher.Web.Endpoint.Upstream;
@@ -25,15 +25,5 @@ public static class StaticResourcesEndpoints
 
         LauncherAssetMirror.RecordFallback(category);
         return string.Intern($"{Root}/static/raw/{category}/{fileName}");
-    }
-
-    public static string StaticZip(string fileName)
-    {
-        return $"{Root}/static/zip/{fileName}.zip";
-    }
-
-    public static string StaticSize()
-    {
-        return $"{Root}/static/size";
     }
 }

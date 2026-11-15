@@ -19,7 +19,6 @@ using Ellen.Launcher.Web.Hoyolab;
 using Ellen.Launcher.Web.Upstream;
 using Ellen.Launcher.Web.Upstream.Response;
 using Ellen.Launcher.Web.Response;
-using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 
 namespace Ellen.Launcher.ViewModel.Guide;
@@ -31,7 +30,6 @@ public sealed partial class GuideViewModel : Abstraction.ViewModel
     private readonly IFileSystemPickerInteraction fileSystemPickerInteraction;
     private readonly IContentDialogFactory contentDialogFactory;
     private readonly IServiceProvider serviceProvider;
-    private readonly ITaskContext taskContext;
     private readonly IMessenger messenger;
     private readonly IShellLinkInterop shellLinkInterop;
 
@@ -49,6 +47,15 @@ public sealed partial class GuideViewModel : Abstraction.ViewModel
         {
             GuideState state = UnsafeLocalSetting.Get(SettingKeys.GuideState, GuideState.Language);
 
+            // 图像资源的两步（选质量/档案、按分类下载）已经随「图片逐张走 R2」下线：
+            // 老版本可能正好停在这两个状态，读到时直接推进到 Completed，
+            // 否则 SwitchPresenter 找不到对应分支，欢迎页会是一片空白。
+            if (state is GuideState.StaticResourceSetting or GuideState.StaticResourceBegin)
+            {
+                state = GuideState.Completed;
+                LocalSetting.Set(SettingKeys.GuideState, (uint)state);
+            }
+
             switch (state)
             {
                 case GuideState.Document:
@@ -58,10 +65,6 @@ public sealed partial class GuideViewModel : Abstraction.ViewModel
                     IsOpenSourceLicenseAgreed = false;
                     IsDownStreamAgreed = false;
                     (NextOrCompleteButtonText, IsNextOrCompleteButtonEnabled) = (SH.ViewModelGuideActionNext, false);
-                    break;
-                case GuideState.StaticResourceBegin:
-                    (NextOrCompleteButtonText, IsNextOrCompleteButtonEnabled) = (SH.ViewModelGuideActionStaticResourceBegin, false);
-                    DownloadStaticResourceAsync().SafeForget();
                     break;
                 case GuideState.Completed:
                     (NextOrCompleteButtonText, IsNextOrCompleteButtonEnabled) = (SH.ViewModelGuideActionComplete, true);
@@ -79,8 +82,15 @@ public sealed partial class GuideViewModel : Abstraction.ViewModel
             value = Math.Clamp(value, 0, (uint)GuideState.Completed);
             LocalSetting.Set(SettingKeys.GuideState, value);
             OnPropertyChanged();
+            OnPropertyChanged(nameof(ProgressIndex));
         }
     }
+
+    /// <summary>
+    /// 底部步骤指示器用：可见的只有 5 步（语言/文档/环境/数据文件夹/常用设置），
+    /// 完成后停在最后一步。直接绑 <see cref="State"/> 会在 Completed 时越界。
+    /// </summary>
+    public int ProgressIndex => (int)Math.Min(State, (uint)GuideState.CommonSetting);
 
     public string NextOrCompleteButtonText { get; set => SetProperty(ref field, value); } = SH.ViewModelGuideActionNext;
 
@@ -98,8 +108,6 @@ public sealed partial class GuideViewModel : Abstraction.ViewModel
     public partial RuntimeOptions RuntimeOptions { get; }
 
     public partial AppOptions AppOptions { get; }
-
-    public partial StaticResourceOptions StaticResourceOptions { get; }
 
     // TODO: Replace with IObservableProperty
     public NameCultureInfoValue? SelectedCulture
@@ -192,14 +200,29 @@ public sealed partial class GuideViewModel : Abstraction.ViewModel
 
     #endregion
 
-    public bool AgreementUseGrid => CultureOptions.LocaleName.StartsWith("zh", StringComparison.OrdinalIgnoreCase);
-
-    public ObservableCollection<DownloadSummary>? DownloadSummaries { get; set => SetProperty(ref field, value); }
-
-    [ObservableProperty]
-    public partial bool IsDownloading { get; set; }
-
-    private CancellationTokenSource? downloadCts;
+    /// <summary>
+    /// 条款页的一次性勾选：一项等于下面五项。
+    /// 逐条属性保留 —— 历史上「复制声明」那一项在中文布局里绑的是不存在的
+    /// <c>IsAgreementCopyAgreed</c>，永远勾不上 <see cref="IsDownStreamAgreed"/>，
+    /// 中文用户会被卡在条款页。合并成一项后这条死路一并消失。
+    /// </summary>
+    public bool IsAllAgreementsAccepted
+    {
+        get => IsTermOfServiceAgreed
+            && IsPrivacyPolicyAgreed
+            && IsIssueReportAgreed
+            && IsOpenSourceLicenseAgreed
+            && IsDownStreamAgreed;
+        set
+        {
+            IsTermOfServiceAgreed = value;
+            IsPrivacyPolicyAgreed = value;
+            IsIssueReportAgreed = value;
+            IsOpenSourceLicenseAgreed = value;
+            IsDownStreamAgreed = value;
+            OnPropertyChanged();
+        }
+    }
 
     private void OnAgreementStateChanged()
     {
@@ -217,6 +240,9 @@ public sealed partial class GuideViewModel : Abstraction.ViewModel
         {
             IsNextOrCompleteButtonEnabled = IsTermOfServiceAgreed && IsPrivacyPolicyAgreed && IsIssueReportAgreed && IsOpenSourceLicenseAgreed;
         }
+
+        // 总勾选框是计算属性，子项被 State getter 重置时不会自动通知。
+        OnPropertyChanged(nameof(IsAllAgreementsAccepted));
     }
 
     [Command("NextOrCompleteCommand")]
@@ -224,7 +250,25 @@ public sealed partial class GuideViewModel : Abstraction.ViewModel
     {
         SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateUI("Increase guide state", "GuideViewModel.Command"));
 
-        ++State;
+        // 常用设置是最后一屏。再点一步就完成：Completed 本身是空分屏（没有界面），
+        // 和旧版下载完成后的行为一致 —— 直接重启，让 AppActivation 走主界面。
+        if (State >= (uint)GuideState.CommonSetting)
+        {
+            State = (uint)GuideState.Completed;
+
+            try
+            {
+                AppInstance.Restart(string.Empty);
+            }
+            catch (COMException ex)
+            {
+                messenger.Send(InfoBarMessage.Error(ex));
+            }
+
+            return;
+        }
+
+        State += 1;
     }
 
     [Command("CreateGameLaunchShortcutCommand")]
@@ -284,59 +328,6 @@ public sealed partial class GuideViewModel : Abstraction.ViewModel
         {
             IsSetDataFolderEnabled = true;
         }
-    }
-
-    [Command("SkipDownloadCommand")]
-    private void SkipDownload()
-    {
-        SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateUI("Skip static resource download", "GuideViewModel.Command"));
-        downloadCts?.Cancel();
-        IsDownloading = false;
-    }
-
-    [SuppressMessage("", "SH003")]
-    private async Task DownloadStaticResourceAsync()
-    {
-        DownloadSummaries = GetUnfulfilledCategoryCollection(serviceProvider);
-        IsDownloading = true;
-
-        try
-        {
-            downloadCts = new CancellationTokenSource();
-            CancellationToken token = downloadCts.Token;
-
-            // Pass a collection copy, so that we can remove element in loop
-            await Parallel.ForEachAsync((DownloadSummary[])[.. DownloadSummaries], async (summary, ct) =>
-            {
-                if (await summary.DownloadAndExtractAsync(token).ConfigureAwait(true))
-                {
-                    taskContext.InvokeOnMainThread(() => DownloadSummaries.Remove(summary));
-                }
-            }).ConfigureAwait(false);
-        }
-        catch (OperationCanceledException)
-        {
-            // User skipped, proceed to completion with whatever was downloaded
-        }
-        finally
-        {
-            await taskContext.SwitchToMainThreadAsync();
-            IsDownloading = false;
-            downloadCts?.Dispose();
-            downloadCts = null;
-        }
-
-        StaticResource.FulfillAll();
-        UnsafeLocalSetting.Set(SettingKeys.GuideState, GuideState.Completed);
-        AppInstance.Restart(string.Empty);
-    }
-
-    private static ObservableCollection<DownloadSummary> GetUnfulfilledCategoryCollection(IServiceProvider serviceProvider)
-    {
-        return StaticResource
-            .GetUnfulfilledCategorySet()
-            .Select(category => new DownloadSummary(serviceProvider, category))
-            .ToObservableCollection();
     }
 
     protected override ValueTask<bool> LoadOverrideAsync(CancellationToken token)

@@ -286,16 +286,18 @@ public sealed partial class AppActivation : IAppActivation
         // Increase launch times
         LocalSetting.Update(SettingKeys.LaunchTimes, 0, static x => unchecked(x + 1));
 
-        // If the guide is completed, we check if there's any unfulfilled resource category present.
-        if (UnsafeLocalSetting.Get(SettingKeys.GuideState, GuideState.Language) >= GuideState.StaticResourceBegin)
+        // 图片改为逐张走 R2（/api/launcher/assets/...）之后，不再有「按分类下载静态资源」
+        // 这一步，也就不会因为资源没下完把已经完成引导的用户拉回欢迎页。
+        // 老版本可能正停在这两个已下线的状态（选档位 / 开始下载），这里直接推进到完成，
+        // 否则欢迎页既没有对应分屏、也不会自己往前走，用户会看到一片空白。
+        GuideState guideState = UnsafeLocalSetting.Get(SettingKeys.GuideState, GuideState.Language);
+        if (guideState is GuideState.StaticResourceSetting or GuideState.StaticResourceBegin)
         {
-            if (StaticResource.IsAnyUnfulfilledCategoryPresent())
-            {
-                UnsafeLocalSetting.Set(SettingKeys.GuideState, GuideState.StaticResourceBegin);
-            }
+            guideState = GuideState.Completed;
+            UnsafeLocalSetting.Set(SettingKeys.GuideState, guideState);
         }
 
-        if (UnsafeLocalSetting.Get(SettingKeys.GuideState, GuideState.Language) < GuideState.Completed)
+        if (guideState < GuideState.Completed)
         {
             await WaitWindowAsync<GuideWindow>().ConfigureAwait(false);
             return;

@@ -281,11 +281,14 @@ public sealed class HttpEnemyWebSource : IEnemyWebSource, ICachedEnemyWebSource,
         cache.SetDatasetDigest("enemies", enemiesDigest);
         await cache.SaveAsync(token).ConfigureAwait(false);
 
-        if (items.Count != EnemyItemSchema.ExpectedItemCount)
+        // 契约校验基准 = 上游索引实际声明的条目数（动态），索引异常为空时才退回历史常量。
+        // 这样数据条数变化不会误报，而「索引有 N 条却只解析出 M 条」仍然会被抓出来。
+        int expectedItemCount = index.Enemies.Count > 0 ? index.Enemies.Count : EnemyItemSchema.ExpectedItemCount;
+        if (items.Count != expectedItemCount)
         {
             log.Add("enemy-count-mismatch", effectiveStamp,
-                $"DTO 级解析 {items.Count}/{EnemyItemSchema.ExpectedItemCount}；文件级统计不能当契约验收",
-                "敌人条目不足 753");
+                $"DTO 级解析 {items.Count}/{expectedItemCount}；文件级统计不能当契约验收",
+                $"敌人条目不足（期望 {expectedItemCount}）");
         }
 
         return new EnemyWebReadResult { Index = index, Items = items, Stamp = effectiveStamp, Diagnostics = log.Records };

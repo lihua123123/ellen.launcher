@@ -213,6 +213,24 @@ public class P4AssetManifestTest
             {
                 Add(portrait.GetString());
             }
+
+            // 多阶段（state-p2-avatar / state-p2-skill-N）：产线 build-enemy-assets.mjs 会把
+            // states[].icon 与 states[].skills[].icon 收进白名单，这里必须同源同口径，
+            // 否则会把产线正常收录的 193 个多阶段图误判成 orphan。
+            if (root.TryGetProperty("states", out System.Text.Json.JsonElement states) && states.ValueKind == System.Text.Json.JsonValueKind.Array)
+            {
+                foreach (System.Text.Json.JsonElement st in states.EnumerateArray())
+                {
+                    if (st.ValueKind != System.Text.Json.JsonValueKind.Object) continue;
+                    if (st.TryGetProperty("icon", out System.Text.Json.JsonElement stIcon)) Add(stIcon.GetString());
+                    if (!st.TryGetProperty("skills", out System.Text.Json.JsonElement stSkills)
+                        || stSkills.ValueKind != System.Text.Json.JsonValueKind.Array) continue;
+                    foreach (System.Text.Json.JsonElement s in stSkills.EnumerateArray())
+                    {
+                        if (s.TryGetProperty("icon", out System.Text.Json.JsonElement si)) Add(si.GetString());
+                    }
+                }
+            }
         }
 
         return keys;

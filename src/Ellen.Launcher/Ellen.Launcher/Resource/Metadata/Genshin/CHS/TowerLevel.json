@@ -28680,5 +28680,494 @@
         ]
       }
     ]
+  },
+  {
+    "Id": 424,
+    "GroupId": 142,
+    "Index": 1,
+    "MonsterLevel": 72,
+    "Goal": 0,
+    "FirstMonsters": [],
+    "FirstWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 51301,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 51303,
+            "Count": 1
+          }
+        ]
+      }
+    ],
+    "SecondWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 30851,
+            "Count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Id": 425,
+    "GroupId": 142,
+    "Index": 2,
+    "MonsterLevel": 72,
+    "Goal": 0,
+    "FirstMonsters": [],
+    "FirstWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 51301,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 51313,
+            "Count": 1
+          }
+        ]
+      }
+    ],
+    "SecondWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 30853,
+            "Count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Id": 426,
+    "GroupId": 142,
+    "Index": 3,
+    "MonsterLevel": 72,
+    "Goal": 0,
+    "FirstMonsters": [],
+    "FirstWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 51380,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 51370,
+            "Count": 1
+          }
+        ]
+      }
+    ],
+    "SecondWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 30853,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 30851,
+            "Count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Id": 427,
+    "GroupId": 143,
+    "Index": 1,
+    "MonsterLevel": 80,
+    "Goal": 0,
+    "FirstMonsters": [],
+    "FirstWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 51311,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 51315,
+            "Count": 1
+          }
+        ]
+      }
+    ],
+    "SecondWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 30791,
+            "Count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Id": 428,
+    "GroupId": 143,
+    "Index": 2,
+    "MonsterLevel": 80,
+    "Goal": 0,
+    "FirstMonsters": [],
+    "FirstWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 51326,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 51328,
+            "Count": 1
+          }
+        ]
+      }
+    ],
+    "SecondWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 30793,
+            "Count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Id": 429,
+    "GroupId": 143,
+    "Index": 3,
+    "MonsterLevel": 80,
+    "Goal": 0,
+    "FirstMonsters": [],
+    "FirstWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 51350,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 51351,
+            "Count": 1
+          }
+        ]
+      }
+    ],
+    "SecondWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 30793,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 30791,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 30771,
+            "Count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Id": 430,
+    "GroupId": 144,
+    "Index": 1,
+    "MonsterLevel": 88,
+    "Goal": 0,
+    "FirstMonsters": [],
+    "FirstWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 51337,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 51336,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 51328,
+            "Count": 1
+          }
+        ]
+      }
+    ],
+    "SecondWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 10204,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 10206,
+            "Count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Id": 431,
+    "GroupId": 144,
+    "Index": 2,
+    "MonsterLevel": 88,
+    "Goal": 0,
+    "FirstMonsters": [],
+    "FirstWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 63108,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 51370,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 63104,
+            "Count": 1
+          }
+        ]
+      }
+    ],
+    "SecondWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 40301,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 40101,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 40302,
+            "Count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Id": 432,
+    "GroupId": 144,
+    "Index": 3,
+    "MonsterLevel": 88,
+    "Goal": 0,
+    "FirstMonsters": [],
+    "FirstWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 62602,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 41101,
+            "Count": 1
+          }
+        ]
+      }
+    ],
+    "SecondWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 40303,
+            "Count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Id": 433,
+    "GroupId": 145,
+    "Index": 1,
+    "MonsterLevel": 95,
+    "Goal": 0,
+    "FirstMonsters": [],
+    "FirstWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 51371,
+            "Count": 1
+          }
+        ]
+      }
+    ],
+    "SecondWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 812,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 61602,
+            "Count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Id": 434,
+    "GroupId": 145,
+    "Index": 2,
+    "MonsterLevel": 95,
+    "Goal": 0,
+    "FirstMonsters": [],
+    "FirstWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 51330,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 51329,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 51331,
+            "Count": 1
+          }
+        ]
+      }
+    ],
+    "SecondWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 62203,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 62202,
+            "Count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Id": 435,
+    "GroupId": 145,
+    "Index": 3,
+    "MonsterLevel": 95,
+    "Goal": 0,
+    "FirstMonsters": [],
+    "FirstWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 63110,
+            "Count": 1
+          }
+        ]
+      }
+    ],
+    "SecondWaves": [
+      {
+        "Type": 0,
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 30901,
+            "Count": 1
+          }
+        ]
+      }
+    ]
   }
 ]

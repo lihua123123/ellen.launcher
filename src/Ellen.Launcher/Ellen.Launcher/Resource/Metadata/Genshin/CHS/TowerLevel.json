@@ -28444,13 +28444,50 @@
     "FirstWaves": [
       {
         "Type": 0,
-        "Monsters": []
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 30731,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 30701,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 30801,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 30804,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 30802,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 30805,
+            "Count": 1
+          }
+        ]
       }
     ],
     "SecondWaves": [
       {
         "Type": 0,
-        "Monsters": []
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 111,
+            "Count": 1
+          }
+        ]
       }
     ]
   },
@@ -28464,13 +28501,35 @@
     "FirstWaves": [
       {
         "Type": 0,
-        "Monsters": []
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 10402,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 63002,
+            "Count": 1
+          }
+        ]
       }
     ],
     "SecondWaves": [
       {
         "Type": 0,
-        "Monsters": []
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 20501,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 20502,
+            "Count": 1
+          }
+        ]
       }
     ]
   },
@@ -28484,13 +28543,35 @@
     "FirstWaves": [
       {
         "Type": 0,
-        "Monsters": []
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 30793,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 30791,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 63001,
+            "Count": 1
+          }
+        ]
       }
     ],
     "SecondWaves": [
       {
         "Type": 0,
-        "Monsters": []
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 61801,
+            "Count": 1
+          }
+        ]
       }
     ]
   },
@@ -28504,13 +28585,35 @@
     "FirstWaves": [
       {
         "Type": 0,
-        "Monsters": []
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 51338,
+            "Count": 1
+          }
+        ]
       }
     ],
     "SecondWaves": [
       {
         "Type": 0,
-        "Monsters": []
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 21003,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 20701,
+            "Count": 1
+          },
+          {
+            "AttackMonolith": false,
+            "Id": 20703,
+            "Count": 1
+          }
+        ]
       }
     ]
   },
@@ -28524,13 +28627,25 @@
     "FirstWaves": [
       {
         "Type": 0,
-        "Monsters": []
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 63011,
+            "Count": 1
+          }
+        ]
       }
     ],
     "SecondWaves": [
       {
         "Type": 0,
-        "Monsters": []
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 56001,
+            "Count": 1
+          }
+        ]
       }
     ]
   },
@@ -28544,13 +28659,25 @@
     "FirstWaves": [
       {
         "Type": 0,
-        "Monsters": []
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 63105,
+            "Count": 1
+          }
+        ]
       }
     ],
     "SecondWaves": [
       {
         "Type": 0,
-        "Monsters": []
+        "Monsters": [
+          {
+            "AttackMonolith": false,
+            "Id": 40905,
+            "Count": 1
+          }
+        ]
       }
     ]
   }

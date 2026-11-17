@@ -1,5 +1,5 @@
 // Ellen.Launcher
-// 多源读取 latest.json：GitCode / COS / GitHub 三处放同一份清单，谁先回谁生效。
+// 多源读取 latest.json：GitCode / GitHub 两处放同一份清单，谁先回谁生效。
 // 目的不是负载均衡，而是——任一平台被墙、限流、或临时抽风时，更新检查仍能给出结论。
 
 using System.Net.Http;
@@ -13,14 +13,13 @@ public sealed record UpdateManifestFetchResult(UpdateManifest? Manifest, string?
 public sealed partial class UpdateManifestClient
 {
     /// <summary>
-    /// 按国内可达性排序：GitCode 实测直连 0.2~0.4s，COS 同区域更快但依赖已上传，
+    /// 按国内可达性排序：GitCode 实测直连 0.2~0.4s，
     /// GitHub raw 作为最后兜底（实测 0.5~0.6s，个别网络下不可达）。
-    /// 清单内容三处必须一致，改一处就要同步其余两处。
+    /// 清单内容两处必须一致，改一处就要同步其余一处。
     /// </summary>
     public static readonly IReadOnlyList<string> Sources =
     [
         "https://raw.gitcode.com/EllenMeansLove/ellen.launcher/raw/master/latest.json",
-        "https://ellen-launcher-1327452638.cos.ap-guangzhou.myqcloud.com/latest.json",
         "https://raw.githubusercontent.com/lihua123123/ellen.launcher/main/latest.json",
     ];
 

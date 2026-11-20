@@ -11,7 +11,11 @@ public sealed class UIGFView
 
     public static UIGFView Create(string json)
     {
-        using JsonDocument document = JsonDocument.Parse(json);
+        using JsonDocument document = JsonDocument.Parse(json, new JsonDocumentOptions
+        {
+            AllowTrailingCommas = true,
+            CommentHandling = JsonCommentHandling.Skip,
+        });
 
         if (document.RootElement.TryGetProperty("info"u8, out JsonElement info))
         {

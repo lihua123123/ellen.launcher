@@ -8,6 +8,7 @@ Extra:{ "Namespace": "Ellen.Launcher.Web.Endpoint.Hoyolab" }
 "string AccountGetActionTicketInfo()",,https://sg-public-api.hoyoverse.com/account/ma-verifier/api/getActionTicketInfo,
 "string AccountGetCookieTokenBySToken()",https://passport-api.mihoyo.com/account/auth/api/getCookieAccountInfoBySToken,https://api-account-os.hoyoverse.com/account/auth/api/getCookieAccountInfoBySToken
 "string AccountGetLTokenBySToken()",https://passport-api.mihoyo.com/account/auth/api/getLTokenBySToken,https://api-account-os.hoyoverse.com/account/auth/api/getLTokenBySToken
+"string AccountExchangeWebToken()",https://passport-api.mihoyo.com/account/ma-cn-session/app/exchange,
 "string AccountGetSTokenByGameToken()",https://passport-api.mihoyo.com/account/ma-cn-session/app/getTokenByGameToken,
 "string AccountGetSTokenByOldToken()",https://passport-api.mihoyo.com/account/ma-cn-session/app/getTokenBySToken,
 "string AccountLoginByMobileCaptcha()",https://passport-api.mihoyo.com/account/ma-cn-passport/app/loginByMobileCaptcha,
@@ -86,6 +87,8 @@ Extra:{ "Namespace": "Ellen.Launcher.Web.Endpoint.Hoyolab" }
 "string MiyoliveRefreshCode()",https://api-takumi-static.mihoyo.com/event/miyolive/refreshCode?time={DateTimeOffset.Now.ToUnixTimeSeconds()},
 "string QrCodeFetch()",https://hk4e-sdk.mihoyo.com/hk4e_cn/combo/panda/qrcode/fetch,
 "string QrCodeQuery()",https://hk4e-sdk.mihoyo.com/hk4e_cn/combo/panda/qrcode/query,
+"string RedeemCdkeyGenshin(string cdkey, string gameBiz, string region, string uid, long timestamp)",https://hk4e-api.mihoyo.com/common/apicdkey/api/webExchangeCdkey?cdkey={cdkey}&game_biz={gameBiz}&region={region}&uid={uid}&lang=zh-cn&t={timestamp},
+"string RedeemCdkeyZenlessZoneZero(string cdkey, string gameBiz, string region, string uid, long timestamp)",https://public-operation-nap.mihoyo.com/common/apicdkey/api/webExchangeCdkey?cdkey={cdkey}&game_biz={gameBiz}&region={region}&uid={uid}&lang=zh-cn&t={timestamp},
 "string SophonChunkGetBuild(Ellen.Launcher.Web.Hoyolab.HoyoPlay.Connect.Branch.BranchWrapper branch)",https://downloader-api.mihoyo.com/downloader/sophon_chunk/api/getBuild?branch={branch.Branch}&package_id={branch.PackageId}&password={branch.Password}&tag={branch.Tag},https://sg-downloader-api.hoyoverse.com/downloader/sophon_chunk/api/getBuild?branch={branch.Branch}&package_id={branch.PackageId}&password={branch.Password}&tag={branch.Tag}
 "string SophonChunkGetBuildNoTag(Ellen.Launcher.Web.Hoyolab.HoyoPlay.Connect.Branch.BranchWrapper branch)",https://downloader-api.mihoyo.com/downloader/sophon_chunk/api/getBuild?branch={branch.Branch}&package_id={branch.PackageId}&password={branch.Password},https://sg-downloader-api.hoyoverse.com/downloader/sophon_chunk/api/getBuild?branch={branch.Branch}&package_id={branch.PackageId}&password={branch.Password}
 "string SophonChunkGetPatchBuild()",https://downloader-api.mihoyo.com/downloader/sophon_chunk/api/getPatchBuild,https://sg-downloader-api.hoyoverse.com/downloader/sophon_chunk/api/getPatchBuild

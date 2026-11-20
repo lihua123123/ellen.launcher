@@ -47,11 +47,6 @@ public class Response : ICommonResponse<Response>
         string message = SH.FormatWebResponseRequestException(callerName, TypeNameHelper.GetTypeDisplayName(typeof(TResponse)));
         response ??= TResponse.CreateDefault(publicFailure, message);
 
-        if ((KnownReturnCode)response.ReturnCode is KnownReturnCode.PleaseLogin or KnownReturnCode.RET_TOKEN_INVALID)
-        {
-            response.Message = SH.FormatWebResponseRefreshCookieHint(response.Message);
-        }
-
         switch ((KnownReturnCode)response.ReturnCode)
         {
             case KnownReturnCode.PleaseLogin:
@@ -61,6 +56,14 @@ public class Response : ICommonResponse<Response>
             case KnownReturnCode.SignInError:
                 response.Message = SH.FormatWebResponseSignInErrorHint(response.Message);
                 break;
+        }
+
+        // Diagnostic: label non-success responses with the calling API method so that
+        // raw upstream codes (e.g. 464/1002) can be traced to the exact endpoint from
+        // the InfoBar alone. Skip publicFailure — that path already embeds callerName.
+        if (response.ReturnCode is not 0 and not publicFailure)
+        {
+            response.Message = $"[{callerName}] {response.Message}";
         }
     }
 

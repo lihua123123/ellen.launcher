@@ -60,13 +60,8 @@ public sealed partial class AutoSignInService : IAutoSignInService
 
             foreach (BindingUser user in snapshot)
             {
-                // 这个账号今天已经逐个确认过：连角色列表都不用查，零请求。
-                // 新加的账号不在账本里，不会被跳过，只会补签它自己缺的部分。
-                if (ledger.IsAccountCompleted(user.InnerId))
-                {
-                    continue;
-                }
-
+                // 每次启动都重新取角色列表，避免「账号已完成」标记遮住当天新绑定的游戏角色。
+                // 已处理的旧角色由账号 + 游戏 + UID 账本逐角色跳过。
                 // 一个账号下所有已注册的游戏：原神 / 崩坏：星穹铁道 / 绝区零
                 ImmutableArray<SignInGameRole> roles = await roleCollectionService.GetRolesAsync(user, token).ConfigureAwait(false);
                 if (roles.IsEmpty)
@@ -74,17 +69,15 @@ public sealed partial class AutoSignInService : IAutoSignInService
                     failures.Add(SH.FormatServiceSignInAutoSignInFailedItem(
                         user.UserInfo?.Nickname ?? SH.ServiceSignInAutoSignInFailedUnknownUser,
                         SH.ServiceSignInAutoSignInNoGameRole));
-                    ledger.MarkAccountIncomplete(user.InnerId);
                     continue;
                 }
 
                 ISignInClient signInClient = signInClientFactory.Create(user.IsOversea);
-                bool allRolesHandled = true;
 
                 foreach (SignInGameRole role in roles)
                 {
-                    // 这个角色今天已经确认签过（本次签的、或用户手动签的）：直接跳过。
-                    if (ledger.IsRoleHandled(role))
+                    // 这个账号下的角色今天已经确认签过（本次签的、或用户手动签的）：直接跳过。
+                    if (ledger.IsRoleHandled(user.InnerId, role))
                     {
                         continue;
                     }
@@ -92,7 +85,7 @@ public sealed partial class AutoSignInService : IAutoSignInService
                     // 先问一次「今天签了没」：已经签过的只记账，不再白发一遍签到请求。
                     if (await IsSignedTodayAsync(signInClient, user.Entity, role, token).ConfigureAwait(false))
                     {
-                        ledger.MarkRoleHandled(role);
+                        ledger.MarkRoleHandled(user.InnerId, role);
                         continue;
                     }
 
@@ -102,23 +95,11 @@ public sealed partial class AutoSignInService : IAutoSignInService
                     // reported as a failure.
                     if (response.ReturnCode is 0 || (KnownReturnCode)response.ReturnCode is KnownReturnCode.AlreadySignedIn)
                     {
-                        ledger.MarkRoleHandled(role);
+                        ledger.MarkRoleHandled(user.InnerId, role);
                         continue;
                     }
 
-                    allRolesHandled = false;
                     failures.Add(SH.FormatServiceSignInAutoSignInFailedItem(role.DisplayName, response.Message));
-                }
-
-                // 整个账号的角色都确认签过才记账：下次启动直接整体跳过；
-                // 只要有一个角色失败就不记，下次只补签失败的那几个。
-                if (allRolesHandled)
-                {
-                    ledger.MarkAccountCompleted(user.InnerId);
-                }
-                else
-                {
-                    ledger.MarkAccountIncomplete(user.InnerId);
                 }
             }
         }

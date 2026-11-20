@@ -234,7 +234,7 @@
                             Margin="0"
                             Padding="16,16"
                             BorderThickness="0"
-                            Header="祈愿记录">
+                            Header="抽卡记录">
                             <cwc:SettingsCard.HeaderIcon>
                                 <FontIcon Glyph="&#xE8B5;" />
                             </cwc:SettingsCard.HeaderIcon>
@@ -242,7 +242,7 @@
                                 <TextBlock
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                     Style="{StaticResource CaptionTextBlockStyle}"
-                                    Text="用 UIGF 4.2 文件搬运祈愿记录（原神 / 绝区零）。导入时会列出文件里的 UID，由你决定合并哪几个。"
+                                    Text="将原神祈愿或绝区零调频记录导出为 UIGF 4.2，也可将两款游戏放在同一文件中。导入和导出均可按游戏和 UID 选择账号。"
                                     TextWrapping="Wrap" />
                             </cwc:SettingsCard.Description>
                             <StackPanel Orientation="Horizontal" Spacing="8">

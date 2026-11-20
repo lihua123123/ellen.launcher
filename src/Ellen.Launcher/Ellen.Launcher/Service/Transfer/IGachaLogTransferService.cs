@@ -13,7 +13,7 @@ namespace Ellen.Launcher.Service.Transfer;
 public interface IGachaLogTransferService
 {
     /// <summary>
-    /// 选择 UIGF JSON 文件并按用户勾选的 UID 导入。返回是否真的写入了数据。
+    /// 选择 UIGF JSON 文件，按游戏和 UID 合并记录。返回操作是否成功。
     /// </summary>
     ValueTask<bool> ImportAsync();
 

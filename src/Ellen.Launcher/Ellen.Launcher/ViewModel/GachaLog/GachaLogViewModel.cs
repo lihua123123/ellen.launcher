@@ -21,6 +21,7 @@ using Ellen.Launcher.Service.GachaLog.QueryProvider;
 using Ellen.Launcher.Service.Metadata;
 using Ellen.Launcher.Service.Metadata.ContextAbstraction;
 using Ellen.Launcher.Service.Notification;
+using Ellen.Launcher.Service.Transfer;
 using Ellen.Launcher.Service.UIGF;
 using Ellen.Launcher.UI.Xaml.Data;
 using Ellen.Launcher.UI.Xaml.View.Dialog;
@@ -247,6 +248,24 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
         {
             suppressCurrentItemChangedHandling = false;
         }
+    }
+
+    [Command("ImportUigfCommand")]
+    private async Task ImportUigfAsync()
+    {
+        IGachaLogTransferService transfer = serviceProvider.GetRequiredService<IGachaLogTransferService>();
+        if (await transfer.ImportAsync().ConfigureAwait(false))
+        {
+            await taskContext.SwitchToMainThreadAsync();
+            await SwitchGameAsync(SelectedGame.Value).ConfigureAwait(false);
+        }
+    }
+
+    [Command("ExportUigfCommand")]
+    private async Task ExportUigfAsync()
+    {
+        IGachaLogTransferService transfer = serviceProvider.GetRequiredService<IGachaLogTransferService>();
+        await transfer.ExportAsync(UIGFVersion.UIGF42).ConfigureAwait(false);
     }
 
     [Command("RefreshByWebCacheCommand")]

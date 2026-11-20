@@ -99,6 +99,8 @@ public static class SettingKeys
     public const string HomeCardTravelersDiaryOrder        = "Ellen::UI::Home::Card::TravelersDiary::Order";
     public const string IsHomeCardTravelersDiaryPresented  = "Ellen::UI::Home::Card::TravelersDiary::Presented";
     public const string HomeAnnouncementActPreviewEnabled  = "Ellen::UI::Home::Announcement::ActPreviewEnabled";
+    public const string HomeRedeemGenshinNotice             = "Ellen::UI::Home::Redeem::GenshinNotice";
+    public const string HomeRedeemZenlessNotice             = "Ellen::UI::Home::Redeem::ZenlessNotice";
     public const string IsHomeAnnouncementActivityCalendarPresented = "Ellen::UI::Home::Announcement::ActivityCalendar::Presented";
 
     // HotKey

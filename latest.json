@@ -1,9 +1,9 @@
 {
-  "version": "7.2.0.3",
-  "publishedAt": "2026-11-11T11:58:05+08:00",
-  "pageUrl": "https://github.com/lihua123123/ellen.launcher/releases/tag/v7.2.0.3",
-  "downloadUrl": "https://github.com/lihua123123/ellen.launcher/releases/download/v7.2.0.3/Ellen.Launcher-7.2.0.3-Setup.exe",
-  "sha256": "9a6535ec117f27d5504b0acf699e87be17b6c1fb941bcf858f834bc55f5cee30",
-  "size": 248248239,
-  "notes": "随包元数据换成 ellen.wiki 产线数据（123 角色 / 254 武器），补上 7.2 的米提亚、瓦列里与秘星典谕；卸载器默认不再删除用户数据；更新检查改为多源 latest.json"
+  "version": "7.2.0.5",
+  "publishedAt": "2026-11-21T04:56:22+08:00",
+  "pageUrl": "https://github.com/lihua123123/ellen.launcher/releases/tag/v7.2.0.5",
+  "downloadUrl": "https://github.com/lihua123123/ellen.launcher/releases/download/v7.2.0.5/Ellen.Launcher-7.2.0.5-Setup.exe",
+  "sha256": "D6FD1B576CA32AD22E5252C1EB5DF267DCC5E845890F41602A1A4EDD098885FB",
+  "size": 251833858,
+  "notes": "修复国服登录换票；新增原神/绝区零兑换码分栏、新码按钮提示、手动兑换与重复领取提示；修复绝区零 UID 读取；完善双游戏多 UID UIGF 导入导出；自动签到账本改为按角色记录。"
 }

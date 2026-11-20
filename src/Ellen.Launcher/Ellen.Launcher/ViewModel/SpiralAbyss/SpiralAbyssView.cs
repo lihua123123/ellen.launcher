@@ -1,6 +1,7 @@
 // Copyright (c) DGP Studio. All rights reserved.
 // Licensed under the MIT license.
 
+using Ellen.Launcher.Domain.GameRecord;
 using Ellen.Launcher.Model;
 using Ellen.Launcher.Model.Entity;
 using Ellen.Launcher.Model.Metadata.Tower;
@@ -48,7 +49,8 @@ public sealed partial class SpiralAbyssView : IEntityAccess<SpiralAbyssEntry?>, 
     private SpiralAbyssView(TowerSchedule towerSchedule, SpiralAbyssMetadataContext context)
     {
         ScheduleId = towerSchedule.Id;
-        FormattedTime = $"{towerSchedule.Open:yyyy.MM.dd HH:mm} - {towerSchedule.Close:yyyy.MM.dd HH:mm}";
+        ScheduleBegin = towerSchedule.Open;
+        FormattedTime = ScheduleTimeline.FormatTimeRange(towerSchedule.Open, towerSchedule.Close, SH.ModelEntityScheduleTimeUnknown);
 
         BlessingName = towerSchedule.BuffName;
         Blessings = towerSchedule.Descriptions;
@@ -56,6 +58,11 @@ public sealed partial class SpiralAbyssView : IEntityAccess<SpiralAbyssEntry?>, 
     }
 
     public uint ScheduleId { get; }
+
+    /// <summary>
+    /// 期次开始时间，列表排序与占位卡片插入位置都用它。
+    /// </summary>
+    public DateTimeOffset ScheduleBegin { get; }
 
     public string Schedule { get => SH.FormatModelEntitySpiralAbyssSchedule(ScheduleId); }
 

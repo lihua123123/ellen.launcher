@@ -27,36 +27,125 @@ public sealed partial class PassportClient : IPassportClient
     [GeneratedConstructor]
     public partial PassportClient(IServiceProvider serviceProvider, HttpClient httpClient);
 
+    // Passport V2 exchange protocol, ported from TeyvatGuide (BTMuli/TeyvatGuide,
+    // src/request/passportReq.ts, Beta v0.13.2). The legacy endpoints
+    // /account/auth/api/getLTokenBySToken and getCookieAccountInfoBySToken now return
+    // retcode 1002 ("系统异常") since late 2026; the mihoyo BBS app itself uses the
+    // ma-cn-session/app/exchange endpoint below to trade an SToken for other tokens.
+    private const string PassportAppVersion = "2.119.0";
+    private const string PassportSdkVersion = "2.44.0";
+    private const string PassportUserAgent = "Mozilla/5.0 (Linux; Android 12) Mobile miHoYoBBS/2.119.0";
+    private static readonly string PassportLifecycleId = Guid.NewGuid().ToString();
+
     public async ValueTask<Response<UidCookieToken>> GetCookieAccountInfoBySTokenAsync(User user, CancellationToken token = default)
     {
-        HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()
-            .SetRequestUri(apiEndpoints.AccountGetCookieTokenBySToken())
-            .SetUserCookieAndFpHeader(user, CookieType.SToken)
-            .Get();
+        Response<WebTokenExchangeData> response = await ExchangeWebTokenAsync(user, PassportTokenType.CookieToken, token).ConfigureAwait(false);
+        if (response.ReturnCode is not 0)
+        {
+            return Response.Response.CloneReturnCodeAndMessage<UidCookieToken, WebTokenExchangeData>(response);
+        }
 
+        WebTokenExchangeData? data = response.Data;
+        string? uid = !string.IsNullOrEmpty(data?.UserInfo?.Aid) ? data.UserInfo.Aid : user.Aid;
+        return new(response.ReturnCode, response.Message, new UidCookieToken
+        {
+            Uid = uid ?? string.Empty,
+            CookieToken = data?.Token?.Token ?? string.Empty,
+        });
+    }
+
+    public async ValueTask<Response<LTokenWrapper>> GetLTokenBySTokenAsync(User user, CancellationToken token = default)
+    {
+        Response<WebTokenExchangeData> response = await ExchangeWebTokenAsync(user, PassportTokenType.LToken, token).ConfigureAwait(false);
+        if (response.ReturnCode is not 0)
+        {
+            return Response.Response.CloneReturnCodeAndMessage<LTokenWrapper, WebTokenExchangeData>(response);
+        }
+
+        return new(response.ReturnCode, response.Message, new LTokenWrapper
+        {
+            LToken = response.Data?.Token?.Token ?? string.Empty,
+        });
+    }
+
+    private async ValueTask<Response<WebTokenExchangeData>> ExchangeWebTokenAsync(User user, PassportTokenType destination, CancellationToken token)
+    {
+        string? stoken = user.SToken?.GetValueOrDefault(Cookie.STOKEN);
+        ArgumentException.ThrowIfNullOrEmpty(stoken);
+        ArgumentException.ThrowIfNullOrEmpty(user.Mid);
+
+        // Build the exact JSON body string ourselves. TeyvatGuide escapes < > & ' = \u2028 \u2029
+        // after JSON.stringify, and the DS signature is computed over that exact string.
+        string body = BuildExchangeBody(destination, stoken, user.Mid);
+
+        HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()
+            .SetRequestUri(apiEndpoints.AccountExchangeWebToken())
+            .SetHeader("User-Agent", PassportUserAgent)
+            .SetHeader("Accept", "application/json")
+            .SetHeader("x-rpc-app_version", PassportAppVersion)
+            .SetHeader("x-rpc-client_type", "2")
+            .SetHeader("x-rpc-app_id", "bll8iq97cem8")
+            .SetHeader("x-rpc-sdk_version", PassportSdkVersion)
+            .SetHeader("x-rpc-account_version", PassportSdkVersion)
+            .SetHeader("x-rpc-lifecycle_id", PassportLifecycleId)
+            .SetHeader("x-rpc-game_biz", "bbs_cn")
+            .SetHeader("x-rpc-sys_version", "12")
+            .SetStringContent(body, Encoding.UTF8, "application/json")
+            .Post();
+
+        // SignDataAsync reads the content as string, so the DS "b=" matches body exactly.
         await builder.SignDataAsync(DataSignAlgorithmVersion.Gen2, SaltType.PROD, true).ConfigureAwait(false);
 
-        Response<UidCookieToken>? resp = await builder
-            .SendAsync<Response<UidCookieToken>>(httpClient, token)
+        Response<WebTokenExchangeData>? resp = await builder
+            .SendAsync<Response<WebTokenExchangeData>>(httpClient, token)
             .ConfigureAwait(false);
 
         return Response.Response.DefaultIfNull(resp);
     }
 
-    public async ValueTask<Response<LTokenWrapper>> GetLTokenBySTokenAsync(User user, CancellationToken token = default)
+    private static string BuildExchangeBody(PassportTokenType destination, string stoken, string mid)
     {
-        HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()
-            .SetRequestUri(apiEndpoints.AccountGetLTokenBySToken())
-            .SetUserCookieAndFpHeader(user, CookieType.SToken)
-            .Get();
+        return string.Concat(
+            "{\"dst_token_type\":", ((int)destination).ToString(CultureInfo.InvariantCulture),
+            ",\"src_token\":{\"token\":\"", EscapeJson(stoken),
+            "\",\"token_type\":", ((int)PassportTokenType.SToken).ToString(CultureInfo.InvariantCulture),
+            "},\"mid\":\"", EscapeJson(mid), "\"}");
+    }
 
-        await builder.SignDataAsync(DataSignAlgorithmVersion.Gen2, SaltType.PROD, true).ConfigureAwait(false);
-
-        Response<LTokenWrapper>? resp = await builder
-            .SendAsync<Response<LTokenWrapper>>(httpClient, token)
-            .ConfigureAwait(false);
-
-        return Response.Response.DefaultIfNull(resp);
+    private static string EscapeJson(string value)
+    {
+        StringBuilder builder = new(value.Length);
+        foreach (char c in value)
+        {
+            switch (c)
+            {
+                case '"': builder.Append("\\\""); break;
+                case '\\': builder.Append("\\\\"); break;
+                case '\b': builder.Append("\\b"); break;
+                case '\f': builder.Append("\\f"); break;
+                case '\n': builder.Append("\\n"); break;
+                case '\r': builder.Append("\\r"); break;
+                case '\t': builder.Append("\\t"); break;
+                case '<': builder.Append("\\u003c"); break;
+                case '>': builder.Append("\\u003e"); break;
+                case '&': builder.Append("\\u0026"); break;
+                case '\'': builder.Append("\\u0027"); break;
+                case '=': builder.Append("\\u003d"); break;
+                case '\u2028': builder.Append("\\u2028"); break;
+                case '\u2029': builder.Append("\\u2029"); break;
+                default:
+                    if (c < 0x20)
+                    {
+                        builder.Append("\\u").Append(((int)c).ToString("x4", CultureInfo.InvariantCulture));
+                    }
+                    else
+                    {
+                        builder.Append(c);
+                    }
+                    break;
+            }
+        }
+        return builder.ToString();
     }
 
     public async ValueTask<Response<UserInfoWrapper>> VerifyLtokenAsync(User user, CancellationToken token = default)

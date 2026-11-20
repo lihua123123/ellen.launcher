@@ -23,6 +23,18 @@ public class HttpWikiSourceTest
 
     private static string NewCache() => Path.Combine(Path.GetTempPath(), "EllenP3Test", Guid.NewGuid().ToString("N"));
 
+    /// <summary>
+    /// dist 里真实的敌人条目数（排除 index / assets-manifest 两个索引文件）。
+    /// 断言「DTO 解析条数 == 文件条数」的语义不变，但不再硬编码数字——数据增删后无需改测试。
+    /// </summary>
+    private static int EnemyItemCount()
+    {
+        const string itemsDir = DistRoot + "/api/enemies";
+        return Directory.EnumerateFiles(itemsDir, "*.json")
+            .Select(Path.GetFileNameWithoutExtension)
+            .Count(name => name is not "index" and not "assets-manifest");
+    }
+
     private static HttpWikiSourceOptions Options(HttpMessageHandler handler, string cacheRoot) => new()
     {
         Endpoint = "https://ellen.wiki",
@@ -42,11 +54,12 @@ public class HttpWikiSourceTest
 
         EnemyWebReadResult result = await source.ReadAsync().ConfigureAwait(false);
 
-        Assert.AreEqual(753, result.Items.Count, "HTTP 源必须 DTO 级 753/753，不能复用文件级数字");
+        int expected = EnemyItemCount();
+        Assert.AreEqual(expected, result.Items.Count, $"HTTP 源必须 DTO 级 {expected}/{expected}，不能复用文件级数字");
         Assert.AreEqual(0, result.Diagnostics.Count(d => d.Kind == "item-parse"), "含 duration union 也不能丢条目");
         Assert.AreEqual(0, result.Diagnostics.Count(d => d.Kind == "enemy-count-mismatch"));
         Assert.AreEqual(0, result.Diagnostics.Count(d => d.Kind == "item-fallback"));
-        Assert.IsTrue(handler.RequestCount >= 754, "index + 753 items 都要请求");
+        Assert.IsTrue(handler.RequestCount >= expected + 1, $"index + {expected} items 都要请求");
     }
 
     [TestMethod]
@@ -57,7 +70,7 @@ public class HttpWikiSourceTest
         WikiCacheStats coldStats;
         using (HttpEnemyWebSource s1 = new(Options(first, cacheRoot), new WikiCacheStore(cacheRoot)))
         {
-            Assert.AreEqual(753, (await s1.ReadAsync().ConfigureAwait(false)).Items.Count);
+            Assert.AreEqual(EnemyItemCount(), (await s1.ReadAsync().ConfigureAwait(false)).Items.Count);
             coldStats = s1.Stats;
         }
 
@@ -69,9 +82,10 @@ public class HttpWikiSourceTest
         using HttpEnemyWebSource s2 = new(Options(second, cacheRoot), cache, log);
         EnemyWebReadResult result = await s2.ReadAsync().ConfigureAwait(false);
 
-        Assert.AreEqual(753, result.Items.Count);
+        int expected = EnemyItemCount();
+        Assert.AreEqual(expected, result.Items.Count);
         Assert.AreEqual(coldRequests, second.RequestCount, "二次启动仍要问 ETag，但不应重新下载内容");
-        Assert.IsTrue(s2.Stats.NotModified >= 753, "753 个 item 应全部 304 NotModified");
+        Assert.IsTrue(s2.Stats.NotModified >= expected, $"{expected} 个 item 应全部 304 NotModified");
         Assert.AreEqual(0, s2.Stats.Downloads, "二次启动 0 下载");
         Assert.AreEqual(0, s2.Stats.BytesDownloaded, "二次启动 0 字节下载");
         Assert.AreEqual(0, result.Diagnostics.Count(d => d.Kind == "item-fallback"));
@@ -100,20 +114,21 @@ public class HttpWikiSourceTest
     [TestMethod]
     public async Task NetworkFailureFallsBackToCacheExplicitly()
     {
+        int expected = EnemyItemCount();
         string cacheRoot = NewCache();
         using (LocalMirrorHandler first = new(DistRoot))
         using (HttpEnemyWebSource s1 = new(Options(first, cacheRoot), new WikiCacheStore(cacheRoot)))
         {
-            Assert.AreEqual(753, (await s1.ReadAsync().ConfigureAwait(false)).Items.Count);
+            Assert.AreEqual(expected, (await s1.ReadAsync().ConfigureAwait(false)).Items.Count);
         }
 
-        // 第二次：handler 全部 500，应从缓存读出 753 条并逐条记录降级
+        // 第二次：handler 全部 500，应从缓存读出全部条目并逐条记录降级
         using FailingHandler failing = new();
         WikiDiagnosticsLog log = new();
         using HttpEnemyWebSource s2 = new(Options(failing, cacheRoot), new WikiCacheStore(cacheRoot), log);
         EnemyWebReadResult result = await s2.ReadAsync().ConfigureAwait(false);
 
-        Assert.AreEqual(753, result.Items.Count, "网络失败时用缓存，不空屏");
+        Assert.AreEqual(expected, result.Items.Count, "网络失败时用缓存，不空屏");
         Assert.IsTrue(result.Diagnostics.Any(d => d.Kind == "item-fallback"), "降级必须有显式诊断");
         Assert.IsTrue(result.Diagnostics.Any(d => d.Kind == "index-fallback"));
         Assert.AreEqual(0, result.Diagnostics.Count(d => d.Kind == "item-parse"), "缓存内容仍应能 DTO 解析");

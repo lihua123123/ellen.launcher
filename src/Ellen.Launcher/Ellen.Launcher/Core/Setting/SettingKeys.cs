@@ -10,6 +10,7 @@ public static class SettingKeys
     // Application
     public const string LowWindowsVersionWarningShown   = "Ellen::Application::LowWindowsVersionWarningShown";
     public const string DataDirectory                   = "Ellen::Application::DataFolderPath";
+    public const string PendingDataDirectory            = "Ellen::Application::PendingDataFolderPath";
     public const string IsUnpackagedNotificationRegistered = "Ellen::Application::Notification::Unpackaged::Registered";
     public const string OverrideElevationRequirement    = "Ellen::Application::Elevation::Override";
     public const string AutoRestartAsAdmin              = "Ellen::Application::Elevation::AutoRestartAsAdmin";
@@ -98,6 +99,8 @@ public static class SettingKeys
     public const string HomeCardTravelersDiaryOrder        = "Ellen::UI::Home::Card::TravelersDiary::Order";
     public const string IsHomeCardTravelersDiaryPresented  = "Ellen::UI::Home::Card::TravelersDiary::Presented";
     public const string HomeAnnouncementActPreviewEnabled  = "Ellen::UI::Home::Announcement::ActPreviewEnabled";
+    public const string HomeRedeemGenshinNotice             = "Ellen::UI::Home::Redeem::GenshinNotice";
+    public const string HomeRedeemZenlessNotice             = "Ellen::UI::Home::Redeem::ZenlessNotice";
     public const string IsHomeAnnouncementActivityCalendarPresented = "Ellen::UI::Home::Announcement::ActivityCalendar::Presented";
 
     // HotKey
@@ -205,8 +208,6 @@ public static class SettingKeys
     // Web
     public const string AlphaBuildUseCnPatchEndpoint            = "Ellen::Web::AlphaBuild::Endpoint::UseCNPatch";
     public const string AlphaBuildUseFjPatchEndpoint            = "Ellen::Web::AlphaBuild::Endpoint::UseFJPatch";
-    public const string StaticResourceImageQuality              = "Ellen::Web::StaticResource::ImageQuality";
-    public const string StaticResourceImageArchive              = "Ellen::Web::StaticResource::ImageArchive";
     public const string BridgeShareSaveType                     = "Ellen::Web::WebView::BridgeShare::SaveType";
     public const string CompactWebView2WindowInactiveOpacity    = "Ellen::Web::WebView::Compact::InactiveOpacity";
     public const string CompactWebView2WindowPreviousSourceUrl  = "Ellen::Web::WebView::Compact::PreviousSourceUrl";

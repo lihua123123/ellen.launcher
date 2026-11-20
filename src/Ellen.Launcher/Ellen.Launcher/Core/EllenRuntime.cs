@@ -147,14 +147,30 @@ public static class EllenRuntime
             return portableDirectory;
         }
 
+        // 用户在欢迎页/设置页选好了新目录：此刻数据库还没打开，可以安全地整体搬运。
+        // 之前是在运行期复制，那时 Userdata.db 已被 SQLite 打开，复制出来的是空壳。
+        ApplyPendingDataDirectory();
+
         // Delete the previous data folder if it exists
         try
         {
             string previousDirectory = LocalSetting.Get(SettingKeys.PreviousDataDirectoryToDelete, string.Empty);
             if (!string.IsNullOrEmpty(previousDirectory) && Directory.Exists(previousDirectory))
             {
-                Directory.SetReadOnly(previousDirectory, false);
-                Directory.Delete(previousDirectory, true);
+                /* 默认布局下 settings.json 就放在这个目录里，删了它欢迎页会从头再来一遍，
+                   而用户看到的就是「一直重启、打不开」。宁可留着占点空间。 */
+                string settingsStore = Path.GetFullPath(Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EllenLauncher"));
+
+                if (string.Equals(Path.GetFullPath(previousDirectory), settingsStore, StringComparison.OrdinalIgnoreCase))
+                {
+                    Debug.WriteLine($"跳过删除配置目录: {previousDirectory}");
+                }
+                else
+                {
+                    Directory.SetReadOnly(previousDirectory, false);
+                    Directory.Delete(previousDirectory, true);
+                }
             }
         }
         finally
@@ -208,6 +224,80 @@ public static class EllenRuntime
 
         LocalSetting.Set(SettingKeys.DataDirectory, path);
         return path;
+    }
+
+    /// <summary>
+    /// 执行「切换数据目录」的搬运阶段。
+    /// 欢迎页/设置页只登记目标路径（<see cref="SettingKeys.PendingDataDirectory"/>），
+    /// 真正的复制放到下一次启动、数据库尚未打开时进行：
+    /// 运行期复制 Userdata.db 会得到空壳，用户会以为祈愿记录被清空了。
+    /// </summary>
+    private static void ApplyPendingDataDirectory()
+    {
+        string pending = LocalSetting.Get(SettingKeys.PendingDataDirectory, string.Empty);
+        if (string.IsNullOrWhiteSpace(pending))
+        {
+            return;
+        }
+
+        try
+        {
+            string destination = Path.GetFullPath(pending);
+            string source = LocalSetting.Get(SettingKeys.DataDirectory, string.Empty);
+
+            if (string.IsNullOrWhiteSpace(source))
+            {
+                source = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EllenLauncher");
+            }
+
+            source = Path.GetFullPath(source);
+
+            bool sameOrNested = string.Equals(source, destination, StringComparison.OrdinalIgnoreCase)
+                || UrlPath.IsEqualOrSubdirectory(source, destination)
+                || UrlPath.IsEqualOrSubdirectory(destination, source);
+
+            if (!sameOrNested && Directory.Exists(source))
+            {
+                CopyDirectory(source, destination);
+            }
+
+            Directory.CreateDirectory(destination);
+            LocalSetting.Set(SettingKeys.DataDirectory, destination);
+        }
+        catch (Exception ex)
+        {
+            /* 搬不动就留在原目录，绝不能因为换目录把程序卡在启动阶段 */
+            Debug.WriteLine($"迁移数据目录失败，继续使用原目录: {ex}");
+        }
+        finally
+        {
+            LocalSetting.Set(SettingKeys.PendingDataDirectory, string.Empty);
+        }
+    }
+
+    private static void CopyDirectory(string source, string destination)
+    {
+        Directory.CreateDirectory(destination);
+
+        foreach (string directory in Directory.EnumerateDirectories(source, "*", SearchOption.AllDirectories))
+        {
+            Directory.CreateDirectory(Path.Combine(destination, Path.GetRelativePath(source, directory)));
+        }
+
+        foreach (string file in Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories))
+        {
+            /* settings.json 由 LocalSetting 单独管理，固定放在 %LOCALAPPDATA%\EllenLauncher。
+               数据目录里那份是历史副本，跟着复制会把当前配置覆盖成旧的。 */
+            string fileName = Path.GetFileName(file);
+            if (string.Equals(fileName, "settings.json", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(fileName, "settings.json.tmp", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            File.Copy(file, Path.Combine(destination, Path.GetRelativePath(source, file)), overwrite: true);
+        }
     }
 
     private static string InitializeDeviceId()

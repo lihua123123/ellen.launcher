@@ -74,7 +74,7 @@ public sealed partial class WikiEnemyCatalogService : IWikiEnemyCatalogService
             return hit;
         }
 
-        // 首屏走纯缓存读取（HTTP 源不触网、File 源直接读镜像），保证启动不被同步阻塞。
+        // 首屏走缓存读取：优先上次从 R2 同步下来的 HTTP 缓存（不触网），空才用内置 753 兜底。
         if (cache.RecoveryNote is { Length: > 0 } recovery)
         {
             log.Add("cache-index-recovered", WikiSourceStamp.FromBundled("缓存索引恢复"),
@@ -91,7 +91,7 @@ public sealed partial class WikiEnemyCatalogService : IWikiEnemyCatalogService
         if (web.Items.Count == 0)
         {
             unavailableReason = enemyWebSource is ICachedEnemyWebSource
-                ? "本地缓存为空，后台同步中（首屏保持 legacy，不阻塞启动）"
+                ? "R2 缓存与内置兜底均为空，后台同步中（首屏保持 legacy，不阻塞启动）"
                 : "敌人数据源返回 0 条（检查网络/镜像与缓存），页面保持 legacy";
             log.Add("enemy-source-empty", web.Stamp, unavailableReason, unavailableReason);
             return null;

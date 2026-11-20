@@ -144,9 +144,9 @@ public class WikiP2HarnessTest
             new WikiEnemyViewItem { Id = "b", Name = "史莱姆", CategoryKey = "Slimes", CategoryLabel = "史莱姆", SearchTokens = ["史莱姆", "Slime"], BaseValueText = "HP 100" },
         ];
 
-        Assert.AreEqual(2, WikiEnemyCatalog.Filter(items, string.Empty, []).Count);
-        Assert.AreEqual(1, WikiEnemyCatalog.Filter(items, "Hilichurls", []).Count);
-        Assert.AreEqual(1, WikiEnemyCatalog.Filter(items, string.Empty, ["旧ID_A"]).Count);
+        Assert.AreEqual(2, WikiEnemyCatalog.Filter(items, string.Empty, null, []).Count);
+        Assert.AreEqual(1, WikiEnemyCatalog.Filter(items, "Hilichurls", null, []).Count);
+        Assert.AreEqual(1, WikiEnemyCatalog.Filter(items, string.Empty, null, ["旧ID_A"]).Count);
         Assert.AreEqual("未知", items[0].BaseValueText);
         Assert.IsFalse(items[0].BaseValueText.Contains("NaN", StringComparison.Ordinal));
     }

@@ -17,20 +17,19 @@ namespace Ellen.Launcher.Service.SignIn;
 /// </summary>
 internal sealed class AutoSignInLedger
 {
-    private const string VersionTag = "v1";
+    private const string VersionTag = "v2";
+    private const string LegacyVersionTag = "v1";
     private const string DateFormat = "yyyy-MM-dd";
     private const char FieldSeparator = '|';
     private const char ItemSeparator = ',';
 
     private readonly HashSet<string> handledRoles;
-    private readonly HashSet<Guid> completedAccounts;
     private bool dirty;
 
-    private AutoSignInLedger(DateOnly date, HashSet<string> handledRoles, HashSet<Guid> completedAccounts, bool dirty)
+    private AutoSignInLedger(DateOnly date, HashSet<string> handledRoles, bool dirty)
     {
         Date = date;
         this.handledRoles = handledRoles;
-        this.completedAccounts = completedAccounts;
         this.dirty = dirty;
     }
 
@@ -47,63 +46,44 @@ internal sealed class AutoSignInLedger
         string raw = LocalSetting.Get(SettingKeys.SignInAutoSignInLedger, string.Empty);
         if (string.IsNullOrEmpty(raw))
         {
-            return new(today, [], [], false);
+            return new(today, [], false);
         }
 
         string[] fields = raw.Split(FieldSeparator);
-        if (fields.Length is not 4 || fields[0] != VersionTag)
+        bool isCurrentVersion = fields.Length is 3 && fields[0] == VersionTag;
+        bool isLegacyVersion = fields.Length is 4 && fields[0] == LegacyVersionTag;
+        if (!isCurrentVersion && !isLegacyVersion)
         {
-            return new(today, [], [], true);
+            return new(today, [], true);
         }
 
         if (!DateOnly.TryParseExact(fields[1], DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly date)
             || date != today)
         {
-            return new(today, [], [], true);
+            return new(today, [], true);
         }
 
-        HashSet<string> roles = new(fields[2].Split(ItemSeparator, StringSplitOptions.RemoveEmptyEntries), StringComparer.Ordinal);
-
-        HashSet<Guid> accounts = [];
-        foreach (string item in fields[3].Split(ItemSeparator, StringSplitOptions.RemoveEmptyEntries))
-        {
-            if (Guid.TryParse(item, out Guid accountId))
-            {
-                accounts.Add(accountId);
-            }
-        }
-
-        return new(today, roles, accounts, false);
+        HashSet<string> roles = isCurrentVersion
+            ? new(fields[2].Split(ItemSeparator, StringSplitOptions.RemoveEmptyEntries), StringComparer.Ordinal)
+            : [];
+        // v1 stored account completion, which could hide roles added later, and its role keys had no
+        // account ID. Drop that ambiguous cache and recheck server status before any sign-in request.
+        return new(today, roles, isLegacyVersion);
     }
 
-    public static string GetRoleKey(SignInGameRole role)
+    public static string GetRoleKey(Guid accountId, SignInGameRole role)
     {
-        return $"{role.Game}:{role.Uid}";
+        return $"{accountId:N}:{role.Game}:{role.Region}:{role.Uid}";
     }
 
-    public bool IsRoleHandled(SignInGameRole role)
+    public bool IsRoleHandled(Guid accountId, SignInGameRole role)
     {
-        return handledRoles.Contains(GetRoleKey(role));
+        return handledRoles.Contains(GetRoleKey(accountId, role));
     }
 
-    public void MarkRoleHandled(SignInGameRole role)
+    public void MarkRoleHandled(Guid accountId, SignInGameRole role)
     {
-        dirty |= handledRoles.Add(GetRoleKey(role));
-    }
-
-    public bool IsAccountCompleted(Guid accountId)
-    {
-        return completedAccounts.Contains(accountId);
-    }
-
-    public void MarkAccountCompleted(Guid accountId)
-    {
-        dirty |= completedAccounts.Add(accountId);
-    }
-
-    public void MarkAccountIncomplete(Guid accountId)
-    {
-        dirty |= completedAccounts.Remove(accountId);
+        dirty |= handledRoles.Add(GetRoleKey(accountId, role));
     }
 
     /// <summary>
@@ -118,13 +98,11 @@ internal sealed class AutoSignInLedger
         }
 
         string roles = string.Join(ItemSeparator, handledRoles.Order(StringComparer.Ordinal));
-        string accounts = string.Join(ItemSeparator, completedAccounts.Order().Select(static id => id.ToString("D")));
         string value = string.Join(
             FieldSeparator,
             VersionTag,
             Date.ToString(DateFormat, CultureInfo.InvariantCulture),
-            roles,
-            accounts);
+            roles);
 
         LocalSetting.Set(SettingKeys.SignInAutoSignInLedger, value);
         dirty = false;

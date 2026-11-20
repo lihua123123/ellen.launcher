@@ -17,4 +17,12 @@ public sealed partial class AnnouncementPage : ScopedPage
     {
         InitializeDataContext<AnnouncementViewModel>();
     }
+
+    private void RedeemFlyout_Opened(object sender, object e)
+    {
+        if (DataContext is AnnouncementViewModel viewModel)
+        {
+            viewModel.MarkLiveRedeemCodesViewed();
+        }
+    }
 }

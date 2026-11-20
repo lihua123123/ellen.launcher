@@ -15,39 +15,31 @@ namespace Ellen.Launcher.UI.Xaml.View.Dialog;
 public sealed partial class UIGFImportDialog : ContentDialog
 {
     private readonly IContentDialogFactory contentDialogFactory;
-    private ImmutableArray<uint> selectedUids = [];
+    private ImmutableArray<(GachaGameType Game, ulong Uid)> selectedAccounts = [];
 
-    public UIGFImportDialog(IServiceProvider serviceProvider, UIGF4 uigf)
+    public UIGFImportDialog(IServiceProvider serviceProvider, UIGF4 uigf, ImmutableArray<UIGFUidSelection> accounts)
     {
         InitializeComponent();
         contentDialogFactory = serviceProvider.GetRequiredService<IContentDialogFactory>();
-
         UIGF = uigf;
-
-        ImmutableArray<UIGFUidSelection> genshin = uigf.Hk4e
-            .SelectAsArray(static item => UIGFUidSelection.Create(item.Uid, GachaGameType.Genshin));
-
-        // 绝区零调频记录在 UIGF v4.2 中以 nap 字段导出
-        ImmutableArray<UIGFUidSelection> zzz = uigf is UIGF42 uigf42
-            ? uigf42.Nap.SelectAsArray(static item => UIGFUidSelection.Create(item.Uid, GachaGameType.ZZZ))
-            : [];
-
-        ItemsSource = [.. genshin, .. zzz];
+        ItemsSource = accounts;
+        IsPrimaryButtonEnabled = false;
     }
 
-    public async ValueTask<ValueResult<bool, HashSet<uint>>> GetSelectedUidsAsync()
+    public async ValueTask<ValueResult<bool, HashSet<(GachaGameType Game, ulong Uid)>>> GetSelectedAccountsAsync()
     {
         if (await contentDialogFactory.EnqueueAndShowAsync(this).ShowTask.ConfigureAwait(false) is ContentDialogResult.Primary)
         {
             await contentDialogFactory.TaskContext.SwitchToMainThreadAsync();
-            return new(true, selectedUids.ToHashSet());
+            return new(true, selectedAccounts.ToHashSet());
         }
 
-        return new(false, default!);
+        return new(false, []);
     }
 
     private void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        selectedUids = UIGFUidSelection.GetSelectedUidArray(sender.As<ListViewBase>());
+        selectedAccounts = UIGFUidSelection.GetSelectedAccounts(sender.As<ListViewBase>());
+        IsPrimaryButtonEnabled = selectedAccounts.Length > 0;
     }
 }

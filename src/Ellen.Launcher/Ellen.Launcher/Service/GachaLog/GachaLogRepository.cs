@@ -84,11 +84,6 @@ public sealed partial class GachaLogRepository : IGachaLogRepository
         return this.SingleOrDefault<GachaArchive>(a => a.InnerId == archiveId);
     }
 
-    public GachaArchive? GetGachaArchiveByUid(string uid)
-    {
-        return this.SingleOrDefault<GachaArchive>(a => a.Uid == uid);
-    }
-
     public GachaArchive? GetGachaArchiveByUidAndGame(string uid, GachaGameType game)
     {
         return this.SingleOrDefault<GachaArchive>(a => a.Uid == uid && a.Game == game);
@@ -104,10 +99,9 @@ public sealed partial class GachaLogRepository : IGachaLogRepository
         this.Delete<GachaItem>(i => i.ArchiveId == archiveId && i.QueryType == queryType && i.Id >= endId);
     }
 
-    public ImmutableArray<string> GetGachaArchiveUidImmutableArray()
+    public ImmutableArray<string> GetGachaArchiveUidImmutableArray(GachaGameType game)
     {
-        // UIGF 交换格式只适用于原神
-        return this.ImmutableArray<GachaArchive, string>(query => query.Where(archive => archive.Game == GachaGameType.Genshin).Select(archive => archive.Uid));
+        return this.ImmutableArray<GachaArchive, string>(query => query.Where(archive => archive.Game == game).Select(archive => archive.Uid));
     }
 
     public void AddBeyondGachaItemRange(IEnumerable<BeyondGachaItem> items)

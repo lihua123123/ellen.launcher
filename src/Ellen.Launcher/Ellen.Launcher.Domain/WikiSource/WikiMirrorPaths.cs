@@ -17,19 +17,22 @@ public static class WikiMirrorPaths
         if (string.IsNullOrWhiteSpace(root))
         {
             // 开发环境默认：与两个仓库同级的 workspace/wiki-migration 报告 + ellen-wiki 源。
-            // 打包安装后该目录不存在 → IsComplete=false → 显式告警，UI 保持 legacy。
-            root = "D:/EllenDB";
+            // 别人机器上这个目录根本不存在，此时 root 留空，所有派生路径也留空 →
+            // IsComplete=false（UI 保持 legacy）、HasBundled753 走安装目录里的随包数据。
+            // 不再无条件拼 "D:/EllenDB"，否则别的机器上会拿开发路径去探文件。
+            const string DevRoot = "D:/EllenDB";
+            root = Directory.Exists(DevRoot) ? DevRoot : string.Empty;
         }
 
-        string reports = Path.Combine(root, "workspace", "wiki-migration", "reports");
+        string Combine(string relative) => string.IsNullOrEmpty(root) ? string.Empty : Path.Combine(root, relative);
+
+        string reports = Combine("workspace/wiki-migration/reports");
         return new WikiP2Paths
         {
-            EnemyDataRoot = Environment.GetEnvironmentVariable("ELLEN_WIKI_ENEMIES")
-                ?? Path.Combine(root, "ellen-wiki", "src", "data", "enemies"),
-            SnapshotManifestPath = Environment.GetEnvironmentVariable("ELLEN_WIKI_MANIFEST")
-                ?? Path.Combine(root, "ellen-wiki", "dist", "api", "launcher", "manifest.json"),
-            AliasMapPath = Path.Combine(reports, "alias-statekey-map.json"),
-            OrphanListPath = Path.Combine(reports, "orphan-images.json"),
+            EnemyDataRoot = Environment.GetEnvironmentVariable("ELLEN_WIKI_ENEMIES") ?? Combine("ellen-wiki/src/data/enemies"),
+            SnapshotManifestPath = Environment.GetEnvironmentVariable("ELLEN_WIKI_MANIFEST") ?? Combine("ellen-wiki/dist/api/launcher/manifest.json"),
+            AliasMapPath = string.IsNullOrEmpty(reports) ? string.Empty : Path.Combine(reports, "alias-statekey-map.json"),
+            OrphanListPath = string.IsNullOrEmpty(reports) ? string.Empty : Path.Combine(reports, "orphan-images.json"),
             ImageCacheRoot = Environment.GetEnvironmentVariable("ELLEN_WIKI_IMAGE_CACHE") ?? string.Empty,
             // P5：753 条目 JSON 随包目录。顺序：环境变量 → **安装目录旁的 Resource**（真实安装版）
             // → 开发仓库的发布暂存目录。
@@ -56,7 +59,9 @@ public static class WikiMirrorPaths
             return installed;
         }
 
-        return Path.Combine(root, "ellen-launcher", "Installer", "Publish", "Resource", "EnemyArchives", "Web753");
+        return string.IsNullOrEmpty(root)
+            ? string.Empty
+            : Path.Combine(root, "ellen-launcher", "Installer", "Publish", "Resource", "EnemyArchives", "Web753");
     }
 
     private static string ResolveBundledAssetsRoot(string root)
@@ -73,6 +78,8 @@ public static class WikiMirrorPaths
             return installed;
         }
 
-        return Path.Combine(root, "ellen-launcher", "Installer", "Publish", "Resource", "EnemyArchives", "Web753", "assets");
+        return string.IsNullOrEmpty(root)
+            ? string.Empty
+            : Path.Combine(root, "ellen-launcher", "Installer", "Publish", "Resource", "EnemyArchives", "Web753", "assets");
     }
 }

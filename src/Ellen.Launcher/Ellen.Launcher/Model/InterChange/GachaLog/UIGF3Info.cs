@@ -7,7 +7,7 @@ public sealed class UIGF3Info
 {
     [JsonPropertyName("uid")]
     [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.WriteAsString)]
-    public uint Uid { get; init; }
+    public ulong Uid { get; init; }
 
     [JsonPropertyName("lang")]
     public string? Lang { get; init; }
@@ -28,5 +28,5 @@ public sealed class UIGF3Info
     public string UigfVersion { get; init; } = default!;
 
     [JsonPropertyName("region_time_zone")]
-    public int RegionTimeZone { get; init; }
+    public int? RegionTimeZone { get; init; }
 }

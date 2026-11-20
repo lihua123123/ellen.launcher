@@ -4,7 +4,7 @@
 using Ellen.Launcher.Core;
 using Ellen.Launcher.Model.Entity;
 using Ellen.Launcher.Model.InterChange.GachaLog;
-using Ellen.Launcher.Model.Metadata.Abstraction;
+using Ellen.Launcher.Model.Intrinsic;
 using Ellen.Launcher.Service.GachaLog;
 using Ellen.Launcher.Service.Metadata;
 using Ellen.Launcher.Service.Metadata.ContextAbstraction;
@@ -29,12 +29,25 @@ public abstract partial class AbstractUIGF3ExportService : IUIGFExportService
     {
         await taskContext.SwitchToBackgroundAsync();
 
-        GachaLogServiceMetadataContext metadataContext = await metadataService.GetContextAsync<GachaLogServiceMetadataContext>(token).ConfigureAwait(false);
+        (GachaGameType game, ulong uid) = exportOptions.Accounts.Single();
+        if (game is not GachaGameType.Genshin)
+        {
+            throw new InvalidOperationException(SH.ViewModelUIGFImportNoHk4eEntry);
+        }
 
-        // Legacy format only supports single UID
-        uint uid = exportOptions.GachaArchiveUids.Length > 0 ? exportOptions.GachaArchiveUids[0] : 0;
+        IGachaLogRepository repository = serviceProvider.GetRequiredService<IGachaLogRepository>();
+        GachaArchive? archive = repository.GetGachaArchiveByUidAndGame($"{uid}", game);
+        ArgumentNullException.ThrowIfNull(archive);
 
-        Model.InterChange.GachaLog.UIGF3 uigf = new()
+        ImmutableArray<GachaItem> items = repository.GetGachaItemImmutableArrayByArchiveId(archive.InnerId);
+        if (items.IsDefaultOrEmpty)
+        {
+            throw new InvalidOperationException(SH.ViewModelUIGFImportNoHk4eEntry);
+        }
+
+        int timezone = items[0].Time.Offset.Hours;
+        GachaLogServiceMetadataContext metadata = await metadataService.GetContextAsync<GachaLogServiceMetadataContext>(token).ConfigureAwait(false);
+        UIGF3 uigf = new()
         {
             Info = new()
             {
@@ -44,53 +57,12 @@ public abstract partial class AbstractUIGF3ExportService : IUIGFExportService
                 ExportTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds(),
                 ExportTime = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                 UigfVersion = Version,
-                RegionTimeZone = InferRegionTimeZone(uid),
+                RegionTimeZone = timezone,
             },
+            List = items.SelectAsArray(item => AbstractUIGF40ExportService.ExportGenshinItem(item, metadata, timezone)),
         };
 
-        ExportGachaItems(uigf, uid, metadataContext);
-
-        using (FileStream stream = File.Create(exportOptions.FilePath))
-        {
-            await JsonSerializer.SerializeAsync(stream, uigf, jsonOptions, token).ConfigureAwait(false);
-        }
-    }
-
-    protected virtual void ExportGachaItems(Model.InterChange.GachaLog.UIGF3 uigf, uint uid, GachaLogServiceMetadataContext metadataContext)
-    {
-        if (uid == 0)
-        {
-            return;
-        }
-
-        IGachaLogRepository gachaLogRepository = serviceProvider.GetRequiredService<IGachaLogRepository>();
-
-        GachaArchive? archive = gachaLogRepository.GetGachaArchiveByUid($"{uid}");
-        ArgumentNullException.ThrowIfNull(archive);
-
-        ImmutableArray<GachaItem> dbItems = gachaLogRepository.GetGachaItemImmutableArrayByArchiveId(archive.InnerId);
-
-        uigf.List = dbItems.SelectAsArray(item =>
-        {
-            INameQualityAccess nameQuality = metadataContext.GetNameQualityByItemId(item.ItemId);
-            string itemType = item.ItemId.StringLength switch
-            {
-                8U => SH.ModelInterchangeUIGFItemTypeAvatar,
-                5U => SH.ModelInterchangeUIGFItemTypeWeapon,
-                _ => string.Empty,
-            };
-            return Hk4eItem.From(item, nameQuality.Name, itemType, ((int)nameQuality.Quality).ToString(), InferRegionTimeZone(uid));
-        });
-    }
-
-    protected static int InferRegionTimeZone(uint uid)
-    {
-        char first = $"{uid}"[0];
-        return first switch
-        {
-            '6' => -5,
-            '7' => 1,
-            _ => 8,
-        };
+        using FileStream stream = File.Create(exportOptions.FilePath);
+        await JsonSerializer.SerializeAsync(stream, uigf, jsonOptions, token).ConfigureAwait(false);
     }
 }

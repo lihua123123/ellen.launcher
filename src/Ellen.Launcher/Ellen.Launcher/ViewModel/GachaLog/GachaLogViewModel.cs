@@ -21,6 +21,7 @@ using Ellen.Launcher.Service.GachaLog.QueryProvider;
 using Ellen.Launcher.Service.Metadata;
 using Ellen.Launcher.Service.Metadata.ContextAbstraction;
 using Ellen.Launcher.Service.Notification;
+using Ellen.Launcher.Service.Transfer;
 using Ellen.Launcher.Service.UIGF;
 using Ellen.Launcher.UI.Xaml.Data;
 using Ellen.Launcher.UI.Xaml.View.Dialog;
@@ -48,9 +49,7 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
     private readonly IMetadataService metadataService;
     private readonly ITaskContext taskContext;
     private readonly IMessenger messenger;
-    private readonly IFileSystemPickerInteraction fileSystemPickerInteraction;
     private readonly IGachaLogRepository gachaLogRepository;
-    private readonly IUIGFService uigfService;
     private readonly IZZZGachaMetadataService zzzGachaMetadataService;
 
     private bool suppressCurrentItemChangedHandling;
@@ -249,6 +248,24 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
         {
             suppressCurrentItemChangedHandling = false;
         }
+    }
+
+    [Command("ImportUigfCommand")]
+    private async Task ImportUigfAsync()
+    {
+        IGachaLogTransferService transfer = serviceProvider.GetRequiredService<IGachaLogTransferService>();
+        if (await transfer.ImportAsync().ConfigureAwait(false))
+        {
+            await taskContext.SwitchToMainThreadAsync();
+            await SwitchGameAsync(SelectedGame.Value).ConfigureAwait(false);
+        }
+    }
+
+    [Command("ExportUigfCommand")]
+    private async Task ExportUigfAsync()
+    {
+        IGachaLogTransferService transfer = serviceProvider.GetRequiredService<IGachaLogTransferService>();
+        await transfer.ExportAsync(UIGFVersion.UIGF42).ConfigureAwait(false);
     }
 
     [Command("RefreshByWebCacheCommand")]
@@ -464,139 +481,6 @@ public sealed partial class GachaLogViewModel : Abstraction.ViewModel
         using (await EnterCriticalSectionAsync().ConfigureAwait(false))
         {
             await gachaLogService.RemoveArchiveAsync(Archives.CurrentItem).ConfigureAwait(false);
-        }
-    }
-
-    [Command("ImportUIGFJsonCommand")]
-    private async Task ImportUIGFJsonAsync()
-    {
-        SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateUI("Import UIGF file", "GachaLogViewModel.Command"));
-
-        FileSystemPickerOptions pickerOptions = new()
-        {
-            Title = SH.ViewModelGachaUIGFImportPickerTitile,
-            FilterName = SH.ViewModelGachaLogExportFileType,
-            FilterType = "*.json",
-        };
-
-        if (fileSystemPickerInteraction.PickFile(pickerOptions) is not (true, { HasValue: true } file))
-        {
-            return;
-        }
-
-        if (!uigfService.Parse(await File.ReadAllTextAsync(file).ConfigureAwait(false), out UIGF4? uigf))
-        {
-            messenger.Send(InfoBarMessage.Error(SH.ViewModelImportWarningTitle, SH.ViewModelImportWarningMessage));
-            return;
-        }
-
-        bool hasGenshin = !uigf!.Hk4e.IsDefaultOrEmpty;
-        bool hasZZZ = uigf is UIGF42 uigf42 && !uigf42.Nap.IsDefaultOrEmpty;
-
-        // UIGF v4.2 的绝区零记录位于 nap 字段；原神记录位于 hk4e 字段。两者任一存在即可导入。
-        if (!hasGenshin && !hasZZZ)
-        {
-            messenger.Send(InfoBarMessage.Warning(SH.ViewModelUIGFImportNoHk4eEntry));
-            return;
-        }
-
-        if (uigf.Hk4e.Select(entry => entry.Uid).ToHashSet().Count != uigf.Hk4e.Length)
-        {
-            messenger.Send(InfoBarMessage.Warning(SH.ViewModelUIGFImportDuplicatedHk4eEntry));
-            return;
-        }
-
-        UIGFImportDialog importDialog = await contentDialogFactory.CreateInstanceAsync<UIGFImportDialog>(serviceProvider, uigf).ConfigureAwait(false);
-        if (await importDialog.GetSelectedUidsAsync().ConfigureAwait(false) is not (true, { } uids))
-        {
-            return;
-        }
-
-        if (uids is null or { Count: 0 })
-        {
-            messenger.Send(InfoBarMessage.Warning(SH.ViewModelUIGFImportNoSelectedEntry));
-            return;
-        }
-
-        UIGFImportOptions options = new()
-        {
-            UIGF = uigf,
-            GachaArchiveUids = uids,
-        };
-
-        ContentDialog dialog = await contentDialogFactory
-            .CreateForIndeterminateProgressAsync(SH.ViewModelUIGFImportingProgressTitle)
-            .ConfigureAwait(false);
-
-        using (await contentDialogFactory.BlockAsync(dialog).ConfigureAwait(false))
-        {
-            try
-            {
-                await uigfService.ImportAsync(options).ConfigureAwait(false);
-                messenger.Send(InfoBarMessage.Success(SH.ViewModelUIGFImportSuccess));
-                await ReloadArchivesAsync().ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                messenger.Send(InfoBarMessage.Error(SH.ViewModelUIGFImportError, ex));
-            }
-        }
-    }
-
-    [Command("ExportUIGFJsonCommand")]
-    private async Task ExportUIGFJsonAsync()
-    {
-        SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateUI("Export UIGF file", "GachaLogViewModel.Command"));
-
-        FileSystemPickerOptions pickerOptions = new()
-        {
-            Title = SH.ViewModelGachaLogUIGFExportPickerTitle,
-            DefaultFileName = $"Ellen Launcher {SelectedUIGFVersion}.json",
-            FilterName = SH.ViewModelGachaLogExportFileType,
-            FilterType = "*.json",
-        };
-
-        if (fileSystemPickerInteraction.SaveFile(pickerOptions) is not (true, { HasValue: true } file))
-        {
-            return;
-        }
-
-        ImmutableArray<uint> allUids = [.. gachaLogRepository.GetGachaArchiveUidImmutableArray().Select(uint.Parse)];
-        bool isLegacyVersion = SelectedUIGFVersion is UIGFVersion.UIGF22 or UIGFVersion.UIGF23 or UIGFVersion.UIGF24 or UIGFVersion.UIGF30;
-        UIGFExportDialog exportDialog = await contentDialogFactory.CreateInstanceAsync<UIGFExportDialog>(serviceProvider, allUids, isLegacyVersion).ConfigureAwait(false);
-        if (await exportDialog.GetSelectedUidsAsync().ConfigureAwait(false) is not (true, { } uids))
-        {
-            return;
-        }
-
-        UIGFExportOptions options = new()
-        {
-            FilePath = file,
-            GachaArchiveUids = uids,
-            Version = SelectedUIGFVersion,
-        };
-
-        try
-        {
-            await uigfService.ExportAsync(options).ConfigureAwait(false);
-            messenger.Send(InfoBarMessage.Success(SH.ViewModelUIGFExportSuccess));
-        }
-        catch (Exception ex)
-        {
-            messenger.Send(InfoBarMessage.Error(SH.ViewModelUIGFExportError, ex));
-        }
-    }
-
-    private async ValueTask ReloadArchivesAsync()
-    {
-        using (await EnterCriticalSectionAsync().ConfigureAwait(false))
-        {
-            // UIGF 导入是通过独立作用域写入数据库的，缓存里的存档集合快照不会包含新行，
-            // 因此这里必须强制重新查询，否则会出现「提示导入成功但列表仍为空」。
-            IAdvancedDbCollectionView<GachaArchive> archives = await gachaLogService.ReloadArchiveCollectionAsync(SelectedGame.Value).ConfigureAwait(false);
-            await taskContext.SwitchToMainThreadAsync();
-            Archives = archives;
-            Archives.MoveCurrentTo(Archives.Source.SelectedOrFirstOrDefault());
         }
     }
 

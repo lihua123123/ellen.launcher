@@ -254,6 +254,10 @@
   <data name="ModelEntityHardChallengeSchedule" xml:space="preserve">
     <value>第 {0} 期：{1}</value>
   </data>
+  <data name="ModelEntityHardChallengeScheduleUnnamed" xml:space="preserve">
+    <value>第 {0} 期：未命名</value>
+    <comment>期次名称为空时的兜底文案，不得留白</comment>
+  </data>
   <data name="ModelEntityPrimitiveCultivateTypeAvatarAndSkill" xml:space="preserve">
     <value>角色</value>
   </data>
@@ -262,6 +266,10 @@
   </data>
   <data name="ModelEntityPrimitiveCultivateTypeWeapon" xml:space="preserve">
     <value>武器</value>
+  </data>
+  <data name="ModelEntityScheduleTimeUnknown" xml:space="preserve">
+    <value>时间未知</value>
+    <comment>接口未给期次起止时间时的兜底文案，不编造时间</comment>
   </data>
   <data name="ModelEntitySpiralAbyssSchedule" xml:space="preserve">
     <value>第 {0} 期</value>
@@ -1137,6 +1145,9 @@
   </data>
   <data name="ViewCardLaunchGameActionSetPath" xml:space="preserve">
     <value>设置路径</value>
+  </data>
+  <data name="ViewCardLaunchGamePathHintInSettings" xml:space="preserve">
+    <value>未找到游戏，请在「设置 → 游戏」里添加安装地址</value>
   </data>
   <data name="ViewCardLaunchGameElevationCancelled" xml:space="preserve">
     <value>未获得管理员授权，游戏未启动（在 UAC 弹窗里点「是」即可）</value>
@@ -2036,13 +2047,13 @@
     <value>导出成功</value>
   </data>
   <data name="ViewModelUIGFImportDuplicatedHk4eEntry" xml:space="preserve">
-    <value>导入的 UIGF 文件中包含 UID 重复的祈愿记录项</value>
+    <value>同一游戏在此文件中包含重复的 UID 分组，请合并分组后再导入。</value>
   </data>
   <data name="ViewModelUIGFImportError" xml:space="preserve">
     <value>导入失败</value>
   </data>
   <data name="ViewModelUIGFImportNoHk4eEntry" xml:space="preserve">
-    <value>导入的 UIGF 文件中不包含祈愿数据</value>
+    <value>没有可处理的原神或绝区零抽卡记录。</value>
   </data>
   <data name="ViewModelUIGFImportNoSelectedEntry" xml:space="preserve">
     <value>请选择至少一个 UID 以导入数据</value>
@@ -3696,5 +3707,80 @@
   </data>
   <data name="ViewPageGachaLogPivotZZZWEngine" xml:space="preserve">
     <value>音擎 / 邦布</value>
+  </data>
+  <data name="ViewRedeemTitle" xml:space="preserve">
+    <value>兑换码</value>
+  </data>
+  <data name="ViewRedeemLiveSection" xml:space="preserve">
+    <value>前瞻兑换码</value>
+  </data>
+  <data name="ViewRedeemLiveEmpty" xml:space="preserve">
+    <value>暂无前瞻兑换码</value>
+  </data>
+  <data name="ViewRedeemManualCode" xml:space="preserve">
+    <value>手动兑换</value>
+  </data>
+  <data name="ViewRedeemManualCodePlaceholder" xml:space="preserve">
+    <value>输入或粘贴兑换码</value>
+  </data>
+  <data name="ViewRedeemManualCodeInvalid" xml:space="preserve">
+    <value>请输入一条有效格式的兑换码（字母、数字、连字符或下划线）。</value>
+  </data>
+  <data name="ViewRedeemNoMatchingRole" xml:space="preserve">
+    <value>当前米游社账号没有找到该游戏可兑换的国服角色。</value>
+  </data>
+  <data name="ViewRedeemAccountChanged" xml:space="preserve">
+    <value>当前账号已切换，未提交兑换。请确认账号后重试。</value>
+  </data>
+  <data name="ViewRedeemRoleLoadFailed" xml:space="preserve">
+    <value>无法读取兑换角色，未提交兑换。请检查网络后重试。</value>
+  </data>
+  <data name="ViewRedeemRefresh" xml:space="preserve">
+    <value>刷新前瞻兑换码</value>
+  </data>
+  <data name="ViewRedeemSubmit" xml:space="preserve">
+    <value>兑换</value>
+  </data>
+  <data name="ViewRedeemNoUser" xml:space="preserve">
+    <value>请先登录米游社账号</value>
+  </data>
+  <data name="ViewRedeemRoleRequired" xml:space="preserve">
+    <value>请先选择兑换角色</value>
+  </data>
+  <data name="ViewRedeemOverseaUnsupported" xml:space="preserve">
+    <value>兑换码功能仅支持国服账号</value>
+  </data>
+  <data name="ViewRedeemUnsupportedRegion" xml:space="preserve">
+    <value>当前角色区服不支持兑换</value>
+  </data>
+  <data name="ViewRedeemSuccess" xml:space="preserve">
+    <value>兑换成功，请到游戏邮件领取奖励</value>
+  </data>
+  <data name="ViewRedeemExpired" xml:space="preserve">
+    <value>兑换码已过期</value>
+  </data>
+  <data name="ViewRedeemInvalid" xml:space="preserve">
+    <value>无效的兑换码</value>
+  </data>
+  <data name="ViewRedeemCooldown" xml:space="preserve">
+    <value>兑换冷却中，请稍后重试</value>
+  </data>
+  <data name="ViewRedeemAlreadyUsed" xml:space="preserve">
+    <value>该兑换码已被使用，不能重复领取。</value>
+  </data>
+  <data name="ViewRedeemLoginExpired" xml:space="preserve">
+    <value>登录已失效，请重新登录</value>
+  </data>
+  <data name="ViewRedeemVerifyFailed" xml:space="preserve">
+    <value>登录验证失败，请重新登录</value>
+  </data>
+  <data name="ViewRedeemNeedVerify" xml:space="preserve">
+    <value>需要完成安全验证，请重新登录</value>
+  </data>
+  <data name="ViewRedeemUnknown" xml:space="preserve">
+    <value>兑换失败（业务码 {0}）</value>
+  </data>
+  <data name="ViewRedeemResultUnknown" xml:space="preserve">
+    <value>兑换结果未知，请先检查游戏邮件后再重试</value>
   </data>
 </root>

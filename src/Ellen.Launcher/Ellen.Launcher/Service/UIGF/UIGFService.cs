@@ -3,6 +3,8 @@
 
 using Ellen.Launcher.Model.InterChange.GachaLog;
 using Ellen.Launcher.Service.Notification;
+using Ellen.Launcher.Web.Hoyolab;
+using System.Collections.Immutable;
 
 namespace Ellen.Launcher.Service.UIGF;
 
@@ -24,14 +26,7 @@ public sealed partial class UIGFService : IUIGFService
 
     public ValueTask ImportAsync(UIGFImportOptions importOptions, CancellationToken token = default)
     {
-        UIGFVersion version = importOptions.UIGF.Info.Version switch
-        {
-            "v2.0" or "v2.1" or "v2.2" or "v2.3" or "v2.4" or "v3.0" => UIGFVersion.UIGF30,
-            "v4.0" => UIGFVersion.UIGF40,
-            "v4.1" => UIGFVersion.UIGF41,
-            "v4.2" => UIGFVersion.UIGF42,
-            _ => UIGFVersion.None,
-        };
+        UIGFVersion version = GetImportVersion(importOptions.UIGF.Info.Version);
 
         IUIGFImportService importService = serviceProvider.GetRequiredKeyedService<IUIGFImportService>(version);
         return importService.ImportAsync(importOptions, token);
@@ -40,31 +35,56 @@ public sealed partial class UIGFService : IUIGFService
     public bool Parse(string json, out UIGF4? uigf)
     {
         uigf = null;
-        UIGFView? view = null;
         try
         {
-            view = UIGFView.Create(json);
-            if (view.Version is not null)
+            UIGFView view = UIGFView.Create(json);
+            uigf = (GetImportVersion(view.Version), view.IsLegacy) switch
             {
-                if (view.IsLegacy)
+                (UIGFVersion.UIGF30, true) => ConvertFromLegacy(JsonSerializer.Deserialize<UIGF3>(json, jsonOptions)!),
+                (UIGFVersion.UIGF40 or UIGFVersion.UIGF41, false) => JsonSerializer.Deserialize<UIGF4>(json, jsonOptions),
+                (UIGFVersion.UIGF42, false) => JsonSerializer.Deserialize<UIGF42>(json, jsonOptions),
+                _ => null,
+            };
+
+            if (uigf is not null)
+            {
+                ValidateAccounts(uigf.Hk4e);
+                ValidateAccounts(uigf.Nap);
+                if (uigf is UIGF42 modern)
                 {
-                    UIGF3? legacy = JsonSerializer.Deserialize<UIGF3>(json, jsonOptions);
-                    if (legacy is not null)
-                    {
-                        uigf = ConvertFromLegacy(legacy);
-                    }
-                }
-                else
-                {
-                    uigf = JsonSerializer.Deserialize<UIGF42>(json, jsonOptions);
+                    ValidateAccounts(modern.Hk4eUgc);
                 }
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            messenger.Send(InfoBarMessage.Error($"uigf version: {view?.Version}", ex));
+            uigf = null;
+            messenger.Send(InfoBarMessage.Error(SH.ViewModelImportWarningTitle, ex));
         }
         return uigf is not null;
+    }
+
+    private static UIGFVersion GetImportVersion(string? version)
+    {
+        return version switch
+        {
+            "v2.0" or "v2.1" or "v2.2" or "v2.3" or "v2.4" or "v3.0" => UIGFVersion.UIGF30,
+            "v4.0" => UIGFVersion.UIGF40,
+            "v4.1" => UIGFVersion.UIGF41,
+            "v4.2" => UIGFVersion.UIGF42,
+            _ => UIGFVersion.None,
+        };
+    }
+
+    private static void ValidateAccounts<TItem>(ImmutableArray<UIGFEntry<TItem>> entries)
+    {
+        foreach (UIGFEntry<TItem> entry in entries.AsSpan())
+        {
+            if (entry.Uid is 0 || entry.TimeZone is < -14 or > 14 || entry.List.IsDefault)
+            {
+                throw new JsonException(SH.ViewModelImportWarningMessage);
+            }
+        }
     }
 
     private static UIGF4 ConvertFromLegacy(UIGF3 legacy)
@@ -85,7 +105,7 @@ public sealed partial class UIGFService : IUIGFService
             UIGFEntry<Hk4eItem> entry = new()
             {
                 Uid = legacy.Info.Uid,
-                TimeZone = legacy.Info.RegionTimeZone,
+                TimeZone = legacy.Info.RegionTimeZone ?? InferLegacyTimeZone(legacy.Info.Uid),
                 Language = legacy.Info.Lang,
                 List = legacy.List,
             };
@@ -94,5 +114,11 @@ public sealed partial class UIGFService : IUIGFService
         }
 
         return result;
+    }
+
+    private static int InferLegacyTimeZone(ulong uid)
+    {
+        string playerUid = $"{uid}";
+        return HoyolabRegex.UidRegex.IsMatch(playerUid) ? PlayerUid.GetRegionTimeZoneUtcOffsetForUid(playerUid).Hours : 8;
     }
 }

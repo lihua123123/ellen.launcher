@@ -16,15 +16,4 @@ public sealed class CodeWrapper
 
     [JsonPropertyName("to_get_time")]
     public required long ToGetTime { get; init; }
-
-    public CodeWrapper WithTitle(string title)
-    {
-        return new()
-        {
-            Title = title,
-            Code = Code,
-            Image = Image,
-            ToGetTime = ToGetTime,
-        };
-    }
 }

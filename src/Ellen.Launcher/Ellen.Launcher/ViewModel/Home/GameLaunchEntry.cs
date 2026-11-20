@@ -59,14 +59,9 @@ public sealed partial class GameLaunchEntry : ObservableObject
     {
         get
         {
-            if (!IsInstalled)
-            {
-                return SH.ViewCardLaunchGameStatusNotInstalled;
-            }
-
-            return string.IsNullOrEmpty(AccountUid)
-                ? SH.ViewCardLaunchGameNeedsInGameLogin
-                : SH.FormatViewCardLaunchGameUid(AccountUid);
+            return AccountUid is { Length: > 0 } uid
+                ? SH.FormatViewCardLaunchGameUid(uid)
+                : IsInstalled ? SH.ViewCardLaunchGameNeedsInGameLogin : SH.ViewCardLaunchGameStatusNotInstalled;
         }
     }
 
@@ -97,20 +92,16 @@ public sealed partial class GameLaunchEntry : ObservableObject
     }
 
     /// <summary>
-    /// 悬停提示：版本 + 可执行文件路径。
+    /// 悬停提示：完整角色 UID、版本与可执行文件路径。
     /// </summary>
     public string ToolTipText
     {
         get
         {
-            if (!IsInstalled)
-            {
-                return SH.ViewCardLaunchGamePathNotSet;
-            }
-
-            return string.IsNullOrEmpty(Version)
-                ? ExecutablePath ?? SH.ViewCardLaunchGamePathNotSet
-                : $"{Version} · {ExecutablePath}";
+            string details = !IsInstalled || string.IsNullOrEmpty(ExecutablePath)
+                ? SH.ViewCardLaunchGamePathNotSet
+                : string.IsNullOrEmpty(Version) ? ExecutablePath : $"{Version} · {ExecutablePath}";
+            return AccountUid is { Length: > 0 } uid ? $"{SH.FormatViewCardLaunchGameUid(uid)}\n{details}" : details;
         }
     }
 

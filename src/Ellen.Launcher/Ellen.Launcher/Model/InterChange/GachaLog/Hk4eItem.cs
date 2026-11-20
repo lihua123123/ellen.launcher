@@ -18,8 +18,8 @@ public sealed class Hk4eItem : IJsonOnDeserialized
     public required GachaType GachaType { get; init; }
 
     [JsonPropertyName("item_id")]
-    [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.WriteAsString)]
-    public required uint ItemId { get; init; }
+    [JsonConverter(typeof(ItemIdConverter))]
+    public uint ItemId { get; init; }
 
     [JsonPropertyName("count")]
     public string Count { get; init; } = "1";
@@ -45,7 +45,7 @@ public sealed class Hk4eItem : IJsonOnDeserialized
     [JsonEnumHandling(JsonEnumHandling.NumberString)]
     public required UIGFGachaType UIGFGachaType { get; init; }
 
-    public static Hk4eItem From(GachaItem item, string name, string itemType, string rankType, int timezone)
+    public static Hk4eItem From(GachaItem item, string? name, string? itemType, string? rankType, int timezone)
     {
         return new()
         {
@@ -59,6 +59,26 @@ public sealed class Hk4eItem : IJsonOnDeserialized
             RankType = rankType,
             Id = item.Id,
         };
+    }
+
+    public sealed class ItemIdConverter : JsonConverter<uint>
+    {
+        public override uint Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            return reader.TokenType switch
+            {
+                JsonTokenType.String when reader.GetString() is "" => 0,
+                JsonTokenType.String when uint.TryParse(reader.GetString(), out uint id) => id,
+                JsonTokenType.Number when reader.TryGetUInt32(out uint id) => id,
+                JsonTokenType.Null => 0,
+                _ => throw new JsonException(),
+            };
+        }
+
+        public override void Write(Utf8JsonWriter writer, uint value, JsonSerializerOptions options)
+        {
+            writer.WriteStringValue(value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        }
     }
 
     public void OnDeserialized()

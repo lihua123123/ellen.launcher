@@ -243,6 +243,8 @@
                         <!--  ReSharper disable once Xaml.RedundantResource  -->
                         <Thickness x:Key="CommandBarBorderThicknessOpen">0</Thickness>
                     </CommandBar.Resources>
+                    <AppBarButton Command="{Binding ImportUigfCommand}" Icon="{shuxm:FontIcon Glyph=&#xE8B5;}" Label="{shuxm:ResourceString Name=ViewPageGachaLogUIGFImport}"/>
+                    <AppBarButton Command="{Binding ExportUigfCommand}" Icon="{shuxm:FontIcon Glyph=&#xE74E;}" Label="{shuxm:ResourceString Name=ViewPageGachaLogUIGFExport}"/>
                     <AppBarButton Icon="{shuxm:FontIcon Glyph=&#xE72C;}" Label="{shuxm:ResourceString Name=ViewPageGachaLogRefresh}">
                         <AppBarButton.Flyout>
                             <MenuFlyout Placement="Bottom">
@@ -265,14 +267,6 @@
                             </MenuFlyout>
                         </AppBarButton.Flyout>
                     </AppBarButton>
-                    <AppBarButton
-                        Command="{Binding ImportUIGFJsonCommand}"
-                        Icon="{shuxm:FontIcon Glyph=&#xE8B5;}"
-                        Label="{shuxm:ResourceString Name=ViewPageGachaLogUIGFImport}"/>
-                    <AppBarButton
-                        Command="{Binding ExportUIGFJsonCommand}"
-                        Icon="{shuxm:FontIcon Glyph=&#xEDE1;}"
-                        Label="{shuxm:ResourceString Name=ViewPageGachaLogUIGFExport}"/>
                     <AppBarSeparator/>
                     <AppBarToggleButton
                         Icon="{shuxm:BitmapIcon Source=ms-appx:///Resource/Icon/UI_ItemIcon_231.png}"

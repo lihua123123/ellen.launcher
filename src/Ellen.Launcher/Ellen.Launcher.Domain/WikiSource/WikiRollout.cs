@@ -120,7 +120,8 @@ public sealed class WikiRolloutDecision
 }
 
 /// <summary>
-/// P5a 灰度：默认 off（沿用用户持久化的 flag），whitelist 只对白名单安装生效，all 才全量。
+/// P5a 灰度：默认 off，含义是「不做放量、按持久化设置走」——而没设置过时默认就是 753；
+/// whitelist 只对白名单安装生效，all 才强制全量。
 /// 环境变量：<c>ELLEN_WIKI_ENEMY_ROLLOUT</c> = off|whitelist|all；
 /// 白名单文件：缓存根目录下 <c>rollout-whitelist.json</c>（安装 ID 的 SHA256 前 16 位）。
 /// </summary>
@@ -217,12 +218,14 @@ public static class WikiRolloutPolicy
                 };
 
             default:
-                // 3) 未放量：只听持久化设置（只接受 enemy-web-753，其余一律 legacy）。
-                bool persistedWeb = string.Equals(persistedFlag, WikiSourceFeatureFlag.EnemyWeb753, StringComparison.Ordinal);
+                // 3) 未放量：默认 753（数据与图片都随包）。只有持久化里明确写了 legacy-722-bundled
+                //    才回退旧图鉴 —— 否则全新安装的机器会退到条目更少的 722，
+                //    表现就是「新装的版本功能比开发机少一块」。
+                bool persistedLegacy = string.Equals(persistedFlag, WikiSourceFeatureFlag.Legacy722Bundled, StringComparison.Ordinal);
                 return new WikiRolloutDecision
                 {
-                    Source = persistedWeb ? WikiSourceFeatureFlag.EnemyWeb753 : WikiSourceFeatureFlag.Legacy722Bundled,
-                    Reason = "rollout=off",
+                    Source = persistedLegacy ? WikiSourceFeatureFlag.Legacy722Bundled : WikiSourceFeatureFlag.EnemyWeb753,
+                    Reason = persistedLegacy ? "rollout=off/persisted-legacy" : "rollout=off",
                     InstallId = id,
                 };
         }

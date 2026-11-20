@@ -83,28 +83,6 @@
                     </StackPanel>
                 </Grid>
             </DataTemplate>
-
-            <DataTemplate x:Key="DownloadSummaryTemplate" x:DataType="shvg:DownloadSummary">
-                <Border
-                    Width="220"
-                    Margin="0,0,4,4"
-                    Style="{StaticResource BorderCardStyle}">
-                    <StackPanel Margin="8">
-                        <TextBlock Text="{Binding FileName}"/>
-                        <ProgressBar
-                            Margin="0,4,0,0"
-                            Maximum="1"
-                            Value="{Binding ProgressValue}"/>
-                        <TextBlock
-                            Opacity="0.6"
-                            Style="{StaticResource CaptionTextBlockStyle}">
-                            <Run Text="{Binding Description}"/>
-                            <Run Text=" "/>
-                            <Run Text="{Binding Speed}"/>
-                        </TextBlock>
-                    </StackPanel>
-                </Border>
-            </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -247,141 +225,33 @@
                                 <Setter Property="FontWeight" Value="SemiBold"/>
                             </Style>
                         </StackPanel.Resources>
-                        <!--  Agreement checkboxes: grid for Chinese locales (zh*), vertical stack for others  -->
-                        <Grid
+                        <!-- 条款：一次性勾选，单个链接可分别打开；逐条勾选已废弃。 -->
+                        <CheckBox
                             Margin="0,8,0,0"
-                            ColumnSpacing="12"
-                            RowSpacing="4"
-                            Visibility="{Binding AgreementUseGrid, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-
-                            <CheckBox
-                                Grid.Row="0"
-                                Grid.Column="0"
-                                IsChecked="{Binding IsTermOfServiceAgreed, Mode=TwoWay}">
-                                <TextBlock>
-                                    <TextBlock.Inlines>
-                                        <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementIHaveReadText}"/>
-                                        <Hyperlink NavigateUri="https://snaphutaorp.org/statements/tos.html">
-                                            <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementTermOfService}"/>
-                                        </Hyperlink>
-                                    </TextBlock.Inlines>
-                                </TextBlock>
-                            </CheckBox>
-
-                            <CheckBox
-                                Grid.Row="0"
-                                Grid.Column="1"
-                                IsChecked="{Binding IsPrivacyPolicyAgreed, Mode=TwoWay}">
-                                <TextBlock>
-                                    <TextBlock.Inlines>
-                                        <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementIHaveReadText}"/>
-                                        <Hyperlink NavigateUri="https://snaphutaorp.org/statements/privacy-notice.html">
-                                            <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementPrivacyPolicy}"/>
-                                        </Hyperlink>
-                                    </TextBlock.Inlines>
-                                </TextBlock>
-                            </CheckBox>
-
-                            <CheckBox
-                                Grid.Row="1"
-                                Grid.Column="0"
-                                IsChecked="{Binding IsIssueReportAgreed, Mode=TwoWay}">
-                                <TextBlock>
-                                    <TextBlock.Inlines>
-                                        <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementIHaveReadText}"/>
-                                        <Hyperlink NavigateUri="https://snaphutaorp.org/statements/bug-report.html">
-                                            <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementIssueReport}"/>
-                                        </Hyperlink>
-                                    </TextBlock.Inlines>
-                                </TextBlock>
-                            </CheckBox>
-
-                            <CheckBox
-                                Grid.Row="1"
-                                Grid.Column="1"
-                                IsChecked="{Binding IsOpenSourceLicenseAgreed, Mode=TwoWay}">
-                                <TextBlock>
-                                    <TextBlock.Inlines>
-                                        <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementIHaveReadText}"/>
-                                        <Hyperlink NavigateUri="https://github.com/SnapHutaoRemasteringProject/Ellen.Launcher/blob/main/LICENSE">
-                                            <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementOpenSourceLicense}"/>
-                                        </Hyperlink>
-                                    </TextBlock.Inlines>
-                                </TextBlock>
-                            </CheckBox>
-
-                            <CheckBox
-                                Grid.Row="2"
-                                Grid.Column="0"
-                                Grid.ColumnSpan="2"
-                                IsChecked="{Binding IsAgreementCopyAgreed, Mode=TwoWay}">
-                                <TextBlock Text="{Binding AgreementCopyTarget}" TextWrapping="Wrap"/>
-                            </CheckBox>
-                        </Grid>
-
-                        <!--  Vertical layout for non-Chinese locales  -->
-                        <StackPanel Margin="0,8,0,0" Visibility="{Binding AgreementUseGrid, Converter={StaticResource BoolToVisibilityRevertConverter}}">
-                            <CheckBox Margin="0,4,0,0" IsChecked="{Binding IsTermOfServiceAgreed, Mode=TwoWay}">
-                                <TextBlock>
-                                    <TextBlock.Inlines>
-                                        <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementIHaveReadText}"/>
-                                        <Hyperlink NavigateUri="https://snaphutaorp.org/statements/tos.html">
-                                            <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementTermOfService}"/>
-                                        </Hyperlink>
-                                    </TextBlock.Inlines>
-                                </TextBlock>
-                            </CheckBox>
-
-                            <CheckBox Margin="0,4,0,0" IsChecked="{Binding IsPrivacyPolicyAgreed, Mode=TwoWay}">
-                                <TextBlock>
-                                    <TextBlock.Inlines>
-                                        <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementIHaveReadText}"/>
-                                        <Hyperlink NavigateUri="https://snaphutaorp.org/statements/privacy-notice.html">
-                                            <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementPrivacyPolicy}"/>
-                                        </Hyperlink>
-                                    </TextBlock.Inlines>
-                                </TextBlock>
-                            </CheckBox>
-
-                            <CheckBox Margin="0,4,0,0" IsChecked="{Binding IsIssueReportAgreed, Mode=TwoWay}">
-                                <TextBlock>
-                                    <TextBlock.Inlines>
-                                        <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementIHaveReadText}"/>
-                                        <Hyperlink NavigateUri="https://snaphutaorp.org/statements/bug-report.html">
-                                            <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementIssueReport}"/>
-                                        </Hyperlink>
-                                    </TextBlock.Inlines>
-                                </TextBlock>
-                            </CheckBox>
-
-                            <CheckBox Margin="0,4,0,0" IsChecked="{Binding IsOpenSourceLicenseAgreed, Mode=TwoWay}">
-                                <TextBlock>
-                                    <TextBlock.Inlines>
-                                        <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementIHaveReadText}"/>
-                                        <Hyperlink NavigateUri="https://github.com/SnapHutaoRemasteringProject/Ellen.Launcher/blob/main/LICENSE">
-                                            <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementOpenSourceLicense}"/>
-                                        </Hyperlink>
-                                    </TextBlock.Inlines>
-                                </TextBlock>
-                            </CheckBox>
-
-                            <CheckBox Margin="0,4,0,0" IsChecked="{Binding IsDownStreamAgreed, Mode=TwoWay}">
-                                <TextBlock>
-                                    <TextBlock.Inlines>
-                                        <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementDownStream}"/>
-                                    </TextBlock.Inlines>
-                                </TextBlock>
-                            </CheckBox>
-                        </StackPanel>
+                            IsChecked="{Binding IsAllAgreementsAccepted, Mode=TwoWay}">
+                            <TextBlock TextWrapping="Wrap">
+                                <TextBlock.Inlines>
+                                    <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementIHaveReadText}"/>
+                                    <Hyperlink NavigateUri="https://snaphutaorp.org/statements/tos.html">
+                                        <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementTermOfService}"/>
+                                    </Hyperlink>
+                                    <Run Text=" · "/>
+                                    <Hyperlink NavigateUri="https://snaphutaorp.org/statements/privacy-notice.html">
+                                        <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementPrivacyPolicy}"/>
+                                    </Hyperlink>
+                                    <Run Text=" · "/>
+                                    <Hyperlink NavigateUri="https://snaphutaorp.org/statements/bug-report.html">
+                                        <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementIssueReport}"/>
+                                    </Hyperlink>
+                                    <Run Text=" · "/>
+                                    <Hyperlink NavigateUri="https://github.com/SnapHutaoRemasteringProject/Ellen.Launcher/blob/main/LICENSE">
+                                        <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementOpenSourceLicense}"/>
+                                    </Hyperlink>
+                                    <Run Text=" · "/>
+                                    <Run Text="{shuxm:ResourceString Name=ViewGuideStepAgreementDownStream}"/>
+                                </TextBlock.Inlines>
+                            </TextBlock>
+                        </CheckBox>
                     </StackPanel>
                 </Grid>
             </cwc:Case>
@@ -548,142 +418,6 @@
                 </Grid>
             </cwc:Case>
 
-            <!--  StaticResourceSetting  -->
-            <cwc:Case Value="{shuxm:UInt32 Value=5}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition Height="auto"/>
-                    </Grid.RowDefinitions>
-
-                    <Grid
-                        Grid.Row="0"
-                        Margin="72"
-                        HorizontalAlignment="Center"
-                        ColumnSpacing="32">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <cwc:ConstrainedBox Grid.Column="0" AspectRatio="1:1">
-                            <Border cw:Effects.Shadow="{ThemeResource CompatCardShadow}">
-                                <Grid
-                                    BorderBrush="{x:Null}"
-                                    BorderThickness="0"
-                                    Style="{ThemeResource GridCardStyle}">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition/>
-                                        <RowDefinition Height="auto"/>
-                                    </Grid.RowDefinitions>
-                                    <Grid Grid.Row="0">
-                                        <Image
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Source="ms-appx:///Resource/GuideStaticResourceQualityComparison.png"/>
-                                        <Rectangle
-                                            Width="2"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Stretch"
-                                            Fill="White"/>
-                                    </Grid>
-                                    <Grid
-                                        Grid.Row="1"
-                                        Padding="16"
-                                        HorizontalAlignment="Stretch"
-                                        VerticalAlignment="Bottom"
-                                        Background="{ThemeResource ContentDialogBackground}"
-                                        BorderThickness="0,1,0,0"
-                                        CornerRadius="{ThemeResource ControlCornerRadiusBottom}"
-                                        Style="{ThemeResource GridCardStyle}">
-                                        <StackPanel HorizontalAlignment="Left" Orientation="Vertical">
-                                            <TextBlock Text="{shuxm:ResourceString Name=ViewModelGuideStaticResourceQualityHigh}" TextAlignment="Left"/>
-                                            <TextBlock Text="233 KB" TextAlignment="Left"/>
-                                        </StackPanel>
-                                        <StackPanel HorizontalAlignment="Right" Orientation="Vertical">
-                                            <TextBlock Text="{shuxm:ResourceString Name=ViewModelGuideStaticResourceQualityRaw}" TextAlignment="Right"/>
-                                            <TextBlock Text="1030 KB" TextAlignment="Right"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </Grid>
-                            </Border>
-                        </cwc:ConstrainedBox>
-                        <StackPanel Grid.Column="1" VerticalAlignment="Top">
-                            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{shuxm:ResourceString Name=ViewGuideStepStaticResourceSettingQualityHeader}"/>
-                            <ListView
-                                MinWidth="320"
-                                Margin="0,8,0,32"
-                                DisplayMemberPath="Name"
-                                ItemsSource="{Binding StaticResourceOptions.ImageQualities}"
-                                SelectedItem="{Binding StaticResourceOptions.ImageQuality, Mode=TwoWay}"/>
-                            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{shuxm:ResourceString Name=ViewGuideStepStaticResourceSettingMinimumHeader}"/>
-                            <ListView
-                                MinWidth="320"
-                                Margin="0,8,0,32"
-                                DisplayMemberPath="Name"
-                                ItemsSource="{Binding StaticResourceOptions.ImageArchives}"
-                                SelectedItem="{Binding StaticResourceOptions.ImageArchive, Mode=TwoWay}"/>
-                            <TextBlock Margin="0,16,0,0" Text="{Binding StaticResourceOptions.SizeInformationText, Mode=OneWay}"/>
-                        </StackPanel>
-                    </Grid>
-
-                    <TextBlock
-                        Grid.Row="1"
-                        Margin="16"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Foreground="{ThemeResource SystemFillColorCriticalBrush}"
-                        HorizontalTextAlignment="Center"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="{shuxm:ResourceString Name=ViewGuideStepStaticResourceSettingHint}"/>
-                </Grid>
-            </cwc:Case>
-
-            <!--  StaticResourceBegin  -->
-            <cwc:Case Value="{shuxm:UInt32 Value=6}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition/>
-                        <RowDefinition Height="auto"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock
-                        Grid.Row="0"
-                        Margin="33,16,0,5"
-                        Style="{StaticResource BaseTextBlockStyle}"
-                        Text="{shuxm:ResourceString Name=ViewWelcomeBase}"/>
-
-                    <ScrollViewer
-                        Grid.Row="1"
-                        Margin="32,0"
-                        HorizontalAlignment="Left">
-                        <ItemsControl
-                            Margin="0,0,-4,0"
-                            HorizontalAlignment="Left"
-                            ItemContainerTransitions="{StaticResource ListViewLikeThemeTransitions}"
-                            ItemTemplate="{StaticResource DownloadSummaryTemplate}"
-                            ItemsPanel="{StaticResource WrapPanelSpacing0Template}"
-                            ItemsSource="{Binding DownloadSummaries}"/>
-                    </ScrollViewer>
-
-                    <Grid Grid.Row="2" Margin="16">
-                        <TextBlock
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            HorizontalTextAlignment="Center"
-                            Style="{StaticResource CaptionTextBlockStyle}"
-                            Text="{shuxm:ResourceString Name=ViewGuideStepStaticResourceDownloadIncompleteHint}"/>
-                        <Button
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            Command="{Binding SkipDownloadCommand}"
-                            Content="{shuxm:ResourceString Name=ViewModelGuideActionSkipDownload}"
-                            Style="{ThemeResource AccentButtonStyle}"
-                            Visibility="{Binding IsDownloading, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                    </Grid>
-                </Grid>
-
-            </cwc:Case>
-
             <!--  Complete - empty case for fallback  -->
             <cwc:Case Value="{shuxm:UInt32 Value=7}"/>
         </cwc:SwitchPresenter>
@@ -693,14 +427,12 @@
                     Margin="16"
                     HorizontalAlignment="Center"
                     IsHitTestVisible="False"
-                    SelectedIndex="{Binding State, Mode=TwoWay}">
+                    SelectedIndex="{Binding ProgressIndex, Mode=OneWay}">
                     <cwc:SegmentedItem Icon="{shuxm:FontIcon Glyph=&#xF2B7;}"/>
                     <cwc:SegmentedItem Icon="{shuxm:FontIcon Glyph=&#xF28B;}"/>
                     <cwc:SegmentedItem Icon="{shuxm:FontIcon Glyph=&#xE81E;}"/>
                     <cwc:SegmentedItem Icon="{shuxm:FontIcon Glyph=&#xE8B7;}"/>
                     <cwc:SegmentedItem Icon="{shuxm:FontIcon Glyph=&#xE713;}"/>
-                    <cwc:SegmentedItem Icon="{shuxm:FontIcon Glyph=&#xE8BA;}"/>
-                    <cwc:SegmentedItem Icon="{shuxm:FontIcon Glyph=&#xE8B9;}"/>
                 </cwc:Segmented>
                 <Button
                     Command="{Binding NextOrCompleteCommand}"

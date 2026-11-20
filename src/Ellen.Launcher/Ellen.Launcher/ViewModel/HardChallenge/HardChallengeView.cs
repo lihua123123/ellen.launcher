@@ -1,6 +1,7 @@
 // Copyright (c) DGP Studio. All rights reserved.
 // Licensed under the MIT license.
 
+using Ellen.Launcher.Domain.GameRecord;
 using Ellen.Launcher.Model;
 using Ellen.Launcher.Model.Entity;
 using Ellen.Launcher.Model.Intrinsic;
@@ -58,15 +59,29 @@ public sealed partial class HardChallengeView : IEntityAccess<HardChallengeEntry
     private HardChallengeView(MetadataHardChallengeSchedule hardChallengeSchedule, HardChallengeMetadataContext context)
     {
         ScheduleId = hardChallengeSchedule.Id;
-        ScheduleName = hardChallengeSchedule.Name;
-        FormattedTime = $"{hardChallengeSchedule.Begin:yyyy.MM.dd HH:mm} - {hardChallengeSchedule.End:yyyy.MM.dd HH:mm}";
+        ScheduleBegin = hardChallengeSchedule.Begin;
+        ScheduleName = ScheduleTimeline.ResolveName(hardChallengeSchedule.Name, null);
+        FormattedTime = ScheduleTimeline.FormatTimeRange(hardChallengeSchedule.Begin, hardChallengeSchedule.End, SH.ModelEntityScheduleTimeUnknown);
     }
 
     public uint ScheduleId { get; }
 
+    /// <summary>
+    /// 期次开始时间，列表排序与占位卡片插入位置都用它。
+    /// </summary>
+    public DateTimeOffset ScheduleBegin { get; }
+
     public string ScheduleName { get; }
 
-    public string Schedule { get => SH.FormatModelEntityHardChallengeSchedule(ScheduleId - 5269000, ScheduleName); }
+    /// <summary>
+    /// 期次名称为空（静态表与接口都没给）时走兜底文案，不留空白。
+    /// </summary>
+    public string Schedule
+    {
+        get => ScheduleName.Length == 0
+            ? SH.FormatModelEntityHardChallengeScheduleUnnamed(ScheduleId - 5269000)
+            : SH.FormatModelEntityHardChallengeSchedule(ScheduleId - 5269000, ScheduleName);
+    }
 
     public string FormattedTime { get; }
 

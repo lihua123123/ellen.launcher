@@ -3,19 +3,18 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Dispatching;
-using Ellen.Launcher.Core.IO;
-using Ellen.Launcher.Factory.Picker;
 using Ellen.Launcher.Model.Metadata.ZZZ;
 using Ellen.Launcher.Service.Game;
 using Ellen.Launcher.Service.Game.FileSystem;
-using Ellen.Launcher.Service.Game.Locator;
 using Ellen.Launcher.Service.Game.QuickLaunch;
 using Ellen.Launcher.Service.Metadata;
 using Ellen.Launcher.Service.Notification;
+using Ellen.Launcher.Service.SignIn;
 using Ellen.Launcher.Service.User;
 using Ellen.Launcher.ViewModel.User;
 using Ellen.Launcher.Web.Hoyolab.Takumi.Binding;
-using System.IO;
+using Ellen.Launcher.Web.Hoyolab.Takumi.Event.BbsSignReward;
+using System.Collections.Immutable;
 using BindingUser = Ellen.Launcher.ViewModel.User.User;
 
 namespace Ellen.Launcher.ViewModel.Home;
@@ -26,10 +25,17 @@ namespace Ellen.Launcher.ViewModel.Home;
 /// </summary>
 [BindableCustomPropertyProvider]
 [Service(ServiceLifetime.Transient)]
+[SuppressMessage("", "CA1001", Justification = "角色查询自行释放令牌源，卡片卸载时取消查询。")]
 public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim, IRecipient<UserAndUidChangedMessage>
 {
     private const string GenshinFallbackIconUri = "ms-appx:///Resource/Icon/UI_Icon_Paimon.png";
-    private const string ZenlessZoneZeroFallbackIconUri = "ms-appx:///Resource/ZZZIcon/Element_Ether.png";
+
+    /// <summary>
+    /// 未检测到《绝区零》安装位置时显示的图标。
+    /// 这里必须是游戏图标本身，不能拿元素图标顶替 —— ZZZIcon 目录下是战斗属性
+    /// （物理/火/冰/雷/以太…）与职业图标，用来当游戏卡片封面会显示成一颗紫色星星。
+    /// </summary>
+    private const string ZenlessZoneZeroFallbackIconUri = "ms-appx:///Resource/Icon/UI_GameIcon_Zenless.png";
 
     /// <summary>
     /// 鼠标移入会触发刷新，避免频繁探测注册表与进程。
@@ -41,19 +47,20 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
     /// </summary>
     private static readonly TimeSpan RunningStatePollingInterval = TimeSpan.FromSeconds(2);
 
-    private readonly IServiceProvider serviceProvider;
     private readonly IUserService userService;
     private readonly IGameLaunchService gameLaunchService;
     private readonly IGameInstallationLocator installationLocator;
-    private readonly IGameLocatorFactory gameLocatorFactory;
     private readonly IZZZAvatarCacheService zzzAvatarCacheService;
-    private readonly LaunchOptions launchOptions;
+    private readonly IGameRoleCollectionService gameRoleCollectionService;
     private readonly ITaskContext taskContext;
     private readonly IMessenger messenger;
 
     private DispatcherQueueTimer? runningStateTimer;
     private bool isPollingRunningState;
     private long lastRefreshTimestamp;
+    private long accountMessageVersion;
+    private Guid? displayedAccountId;
+    private CancellationTokenSource? zenlessRoleRequest;
 
     [GeneratedConstructor(CallBaseConstructor = true)]
     public partial LaunchGameCardViewModel(IServiceProvider serviceProvider);
@@ -93,8 +100,17 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
     /// </summary>
     public void Receive(UserAndUidChangedMessage message)
     {
-        taskContext.InvokeOnMainThread(() => ApplyAccount(message.User));
-        ResolveZenlessZoneZeroAccountAsync(message.User).SafeForget();
+        taskContext.InvokeOnMainThread(() =>
+        {
+            if (IsViewUnloaded.Value)
+            {
+                return;
+            }
+
+            accountMessageVersion++;
+            ApplyAccount(message.User);
+            UpdateRunningStatesAsync().SafeForget();
+        });
     }
 
     /// <inheritdoc/>
@@ -108,7 +124,10 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
             await RefreshAsync(refreshAccount: true, refreshInstallations: true).ConfigureAwait(false);
 
             await taskContext.SwitchToMainThreadAsync();
-            StartRunningStatePolling();
+            if (!IsViewUnloaded.Value)
+            {
+                StartRunningStatePolling();
+            }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -135,8 +154,9 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
     }
 
     /// <summary>
-    /// 点击磁贴：已安装则启动，未安装则让用户选择游戏路径。
+    /// 点击磁贴：已安装则启动。
     /// 运行中也可以点：会重新检测进程，游戏已经退出就立刻启动，不用等轮询。
+    /// 未安装时不在这里选路径 —— 安装目录统一在设置页维护，卡片只提示去设置页添加。
     /// </summary>
     [Command("LaunchCommand")]
     private async Task LaunchAsync(GameLaunchEntry? entry)
@@ -148,7 +168,7 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
 
         if (!entry.IsInstalled)
         {
-            await SetGamePathAsync(entry).ConfigureAwait(false);
+            messenger.Send(InfoBarMessage.Warning(SH.ViewCardLaunchGameStartedTitle, SH.ViewCardLaunchGamePathHintInSettings));
             return;
         }
 
@@ -181,23 +201,13 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
         }
     }
 
-    [Command("SetGenshinGamePathCommand")]
-    private Task SetGenshinGamePathAsync()
-    {
-        return SetGamePathAsync(GenshinEntry);
-    }
-
-    [Command("SetZenlessZoneZeroGamePathCommand")]
-    private Task SetZenlessZoneZeroGamePathAsync()
-    {
-        return SetGamePathAsync(ZenlessZoneZeroEntry);
-    }
-
     /// <summary>
-    /// 卡片从可视树卸载时停止轮询。
+    /// 卡片从可视树卸载时停止轮询和角色查询。
     /// </summary>
     public void StopRunningStatePolling()
     {
+        CancelZenlessRoleRequest();
+
         if (runningStateTimer is null)
         {
             return;
@@ -238,34 +248,15 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
 
     private async Task RefreshAccountAsync()
     {
+        await taskContext.SwitchToMainThreadAsync();
+        long observedVersion = accountMessageVersion;
         BindingUser? user = await userService.GetCurrentUserAsync().ConfigureAwait(false);
 
-        // 绝区零角色走「我的角色」的本地缓存，避免切换账号时再发一次网络请求
-        string? zenlessZoneZeroUid = user is null ? null : ResolveZenlessZoneZeroUid(user.InnerId);
-
         await taskContext.SwitchToMainThreadAsync();
-        ApplyAccount(user);
-        ZenlessZoneZeroEntry.AccountUid = zenlessZoneZeroUid;
-    }
-
-    private async Task ResolveZenlessZoneZeroAccountAsync(BindingUser? user)
-    {
-        try
+        // 读取期间如果已经收到较新的切换消息，不再应用这次读取的账号。
+        if (accountMessageVersion == observedVersion && !IsViewUnloaded.Value)
         {
-            string? zenlessZoneZeroUid = null;
-            if (user is not null)
-            {
-                Guid innerId = user.InnerId;
-                await taskContext.SwitchToBackgroundAsync();
-                zenlessZoneZeroUid = ResolveZenlessZoneZeroUid(innerId);
-                await taskContext.SwitchToMainThreadAsync();
-            }
-
-            ZenlessZoneZeroEntry.AccountUid = zenlessZoneZeroUid;
-            await UpdateRunningStatesAsync().ConfigureAwait(false);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
+            ApplyAccount(user);
         }
     }
 
@@ -274,6 +265,14 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
     /// </summary>
     private void ApplyAccount(BindingUser? user)
     {
+        Guid? accountId = user?.InnerId;
+        if (displayedAccountId != accountId)
+        {
+            CancelZenlessRoleRequest();
+            displayedAccountId = accountId;
+            ZenlessZoneZeroEntry.AccountUid = null;
+        }
+
         IsLoggedIn = user is not null;
         if (user is null)
         {
@@ -282,7 +281,6 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
             AccountUidText = null;
             AccountAvatarUrl = null;
             GenshinEntry.AccountUid = null;
-            ZenlessZoneZeroEntry.AccountUid = null;
             return;
         }
 
@@ -294,23 +292,60 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
         AccountUidText = role is null ? null : SH.FormatViewCardLaunchGameUid(role.GameUid);
         AccountAvatarUrl = role?.ProfilePictureIcon;
         GenshinEntry.AccountUid = role?.GameUid;
+
+        if (zenlessRoleRequest is null)
+        {
+            ResolveZenlessZoneZeroAccountAsync(user).SafeForget();
+        }
     }
 
-    private string? ResolveZenlessZoneZeroUid(Guid userInnerId)
+    private async Task ResolveZenlessZoneZeroAccountAsync(BindingUser user)
     {
-        ZZZRoleCache? cache = zzzAvatarCacheService.LoadRoles(userInnerId);
-        if (cache is null || cache.Roles.Count is 0)
+        using CancellationTokenSource request = new();
+        zenlessRoleRequest = request;
+        CancellationToken token = request.Token;
+        try
         {
-            return null;
-        }
+            await taskContext.SwitchToBackgroundAsync();
+            ZZZRoleCache? cache = zzzAvatarCacheService.LoadRoles(user.InnerId);
+            string? preferredUid = cache?.SelectedGameUid;
+            string? cachedUid = cache?.Roles.FirstOrDefault(role => !string.IsNullOrWhiteSpace(role.GameUid) && role.GameUid == preferredUid)?.GameUid
+                ?? cache?.Roles.FirstOrDefault(role => !string.IsNullOrWhiteSpace(role.GameUid))?.GameUid;
 
-        if (cache.SelectedGameUid is { Length: > 0 } selectedUid)
+            await taskContext.SwitchToMainThreadAsync();
+            if (zenlessRoleRequest != request || IsViewUnloaded.Value)
+            {
+                return;
+            }
+
+            // 先显示同一账号的离线缓存，随后以实际绑定的角色为准。
+            ZenlessZoneZeroEntry.AccountUid ??= cachedUid;
+
+            ImmutableArray<SignInGameRole> roles = await gameRoleCollectionService.GetRolesAsync(user, token).ConfigureAwait(false);
+            IEnumerable<SignInGameRole> zenlessRoles = roles.Where(static role => role.Game is SignInGame.ZenlessZoneZero && !string.IsNullOrWhiteSpace(role.Uid));
+            string? boundUid = zenlessRoles.FirstOrDefault(role => role.Uid == preferredUid)?.Uid ?? zenlessRoles.FirstOrDefault()?.Uid;
+
+            await taskContext.SwitchToMainThreadAsync();
+            if (zenlessRoleRequest == request && !IsViewUnloaded.Value && boundUid is not null)
+            {
+                ZenlessZoneZeroEntry.AccountUid = boundUid;
+            }
+        }
+        finally
         {
-            ZZZUserGameRole? selected = cache.Roles.FirstOrDefault(role => role.GameUid == selectedUid);
-            return selected?.GameUid ?? cache.Roles[0].GameUid;
+            await taskContext.SwitchToMainThreadAsync();
+            if (zenlessRoleRequest == request)
+            {
+                zenlessRoleRequest = null;
+            }
         }
+    }
 
-        return cache.Roles[0].GameUid;
+    private void CancelZenlessRoleRequest()
+    {
+        CancellationTokenSource? request = zenlessRoleRequest;
+        zenlessRoleRequest = null;
+        request?.Cancel();
     }
 
     private async Task RefreshInstallationsAsync()
@@ -400,45 +435,6 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
     {
         GenshinEntry.IconSource ??= GameIconProvider.CreateBundledIcon(GenshinFallbackIconUri);
         ZenlessZoneZeroEntry.IconSource ??= GameIconProvider.CreateBundledIcon(ZenlessZoneZeroFallbackIconUri);
-    }
-
-    private async Task SetGamePathAsync(GameLaunchEntry entry)
-    {
-        if (entry.Kind is GameLaunchKind.Genshin)
-        {
-            if (await gameLocatorFactory.LocateSingleAsync(GameLocationSourceKind.Manual).ConfigureAwait(false) is not (true, { } genshinPath))
-            {
-                return;
-            }
-
-            await taskContext.SwitchToMainThreadAsync();
-            launchOptions.PerformGamePathEntrySynchronization(genshinPath);
-        }
-        else
-        {
-            IFileSystemPickerInteraction picker = serviceProvider.GetRequiredService<IFileSystemPickerInteraction>();
-            (bool isPickerOk, ValueFile file) = picker.PickFile(
-                SH.ViewPageAnnouncementSetZZZGamePathLabel,
-                SH.ServiceGameLocatorPickerFilterText,
-                GameConstants.ZenlessZoneZeroFileName);
-
-            if (!isPickerOk)
-            {
-                return;
-            }
-
-            if (!string.Equals(Path.GetFileName(file), GameConstants.ZenlessZoneZeroFileName, StringComparison.OrdinalIgnoreCase))
-            {
-                return;
-            }
-
-            await taskContext.SwitchToMainThreadAsync();
-            launchOptions.ZZZGamePath.Value = file;
-        }
-
-        await taskContext.SwitchToMainThreadAsync();
-        messenger.Send(InfoBarMessage.Success(SH.ViewPageAnnouncementSetGamePathSuccessTitle, SH.FormatViewCardLaunchGameSetPathSuccess(entry.Title)));
-        await RefreshAsync(refreshAccount: false, refreshInstallations: true).ConfigureAwait(false);
     }
 
     private void UpdateSummary()

@@ -17,5 +17,11 @@ public class UIGF4
     // ReSharper disable once InconsistentNaming
     [JsonPropertyName("hk4e")]
     [JsonPropertyOrder(1)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public ImmutableArray<UIGFEntry<Hk4eItem>> Hk4e { get; set; }
+
+    [JsonPropertyName("nap")]
+    [JsonPropertyOrder(3)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public ImmutableArray<UIGFEntry<NapItem>> Nap { get; set; }
 }

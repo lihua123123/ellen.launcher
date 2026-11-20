@@ -11,7 +11,12 @@ namespace Ellen.Launcher.Domain.WikiSource;
 
 public sealed class EnemyAdapter
 {
-    private const string ImageBase = "https://ellen.wiki/images/enemies";
+    /// <summary>
+    /// 敌人图片基址。默认与 <see cref="HttpWikiSourceOptions.DefaultEndpoint"/> 同源，
+    /// 不再重复硬编码域名；宿主/测试可覆盖（镜像或离线演练用）。
+    /// </summary>
+    public static string ImageBase { get; set; } =
+        HttpWikiSourceOptions.DefaultEndpoint.TrimEnd('/') + "/images/enemies";
 
     private static readonly Dictionary<string, string> TierNames = new(StringComparer.Ordinal)
     {

@@ -24,6 +24,7 @@
                         <Border
                             Grid.Row="1"
                             Padding="8"
+                            Visibility="{TemplateBinding DescriptionVisibility}"
                             Style="{ThemeResource AcrylicBorderCardStyle}">
                             <shuxct:DescriptionTextBlock Description="{TemplateBinding LinkDescription}" LinkContext="{TemplateBinding LinkContext}"/>
                         </Border>

@@ -34,12 +34,17 @@ public enum GuideState : uint
     CommonSetting,
 
     /// <summary>
-    /// 查看图像资源设置
+    /// 查看图像资源设置（已下线）
+    /// <para>
+    /// 图片改为逐张走 R2 后不再有「选画质/档案」这一步，界面已删除。
+    /// 数值保留：老版本的 settings.json 里可能还存着 5，一旦重排就会错位。
+    /// </para>
     /// </summary>
     StaticResourceSetting,
 
     /// <summary>
-    /// 开始下载图像资源
+    /// 开始下载图像资源（已下线）
+    /// <para>同上，数值仅为兼容历史存档保留；读到时会自动推进到 <see cref="Completed"/>。</para>
     /// </summary>
     StaticResourceBegin,
 

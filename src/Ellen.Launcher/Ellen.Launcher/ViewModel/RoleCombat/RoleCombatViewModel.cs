@@ -4,6 +4,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Controls;
 using Ellen.Launcher.Core.Logging;
+using Ellen.Launcher.Domain.GameRecord;
 using Ellen.Launcher.Service.Metadata;
 using Ellen.Launcher.Service.Metadata.ContextAbstraction;
 using Ellen.Launcher.Service.Notification;
@@ -88,12 +89,24 @@ public sealed partial class RoleCombatViewModel : Abstraction.ViewModel, IRecipi
             IAdvancedCollectionView<RoleCombatView> roleCombatEntries = collection.AsAdvancedCollectionView();
 
             await taskContext.SwitchToMainThreadAsync();
+            uint? previousId = RoleCombatEntries?.CurrentItem?.ScheduleId;
             RoleCombatEntries = roleCombatEntries;
-            RoleCombatEntries.MoveCurrentTo(RoleCombatEntries.Source.FirstOrDefault(s => s.Engaged));
+            RoleCombatEntries.MoveCurrentTo(SelectCurrent(RoleCombatEntries, previousId));
         }
         catch (OperationCanceledException)
         {
         }
+    }
+
+    /// <summary>
+    /// 默认选中：保留用户正看着的期次；没有既有选择时选最近一期有记录的；一期记录都没有时选最新一期。
+    /// </summary>
+    private static RoleCombatView? SelectCurrent(IAdvancedCollectionView<RoleCombatView> entries, uint? previousId)
+    {
+        List<ScheduleSelection> items = [.. entries.Source.Select(static view => new ScheduleSelection(view.ScheduleId, view.Engaged))];
+        int index = ScheduleTimeline.SelectDefaultIndex(items, previousId);
+
+        return index >= 0 ? entries.Source[index] : null;
     }
 
     [Command("RefreshCommand")]
@@ -110,6 +123,11 @@ public sealed partial class RoleCombatViewModel : Abstraction.ViewModel, IRecipi
         {
             if (await userService.GetCurrentUserAndUidAsync().ConfigureAwait(false) is { } userAndUid)
             {
+                await taskContext.SwitchToMainThreadAsync();
+
+                // 刷新会把当前卡片换成新实例，先记住用户选的期次，刷新后按它回选
+                uint? previousId = RoleCombatEntries.CurrentItem?.ScheduleId;
+
                 try
                 {
                     using (await EnterCriticalSectionAsync().ConfigureAwait(false))
@@ -124,7 +142,7 @@ public sealed partial class RoleCombatViewModel : Abstraction.ViewModel, IRecipi
                 }
 
                 await taskContext.SwitchToMainThreadAsync();
-                RoleCombatEntries.MoveCurrentTo(RoleCombatEntries.Source.FirstOrDefault(s => s.Engaged));
+                RoleCombatEntries.MoveCurrentTo(SelectCurrent(RoleCombatEntries, previousId));
             }
         }
     }

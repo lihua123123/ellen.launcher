@@ -1,0 +1,897 @@
+{
+  "name": "Ellen Wiki · Launcher Metadata",
+  "schema": "snap-metadata-compatible",
+  "generator": "ellen-wiki/scripts/build-launcher-metadata.mjs",
+  "generatedAt": "2026-11-16T01:05:06.305Z",
+  "locale": "CHS",
+  "counts": {
+    "avatar": 123,
+    "weapon": 254,
+    "material": 10673,
+    "attachment": 129
+  },
+  "digest": "ed7ed0a094130d52e3ac397c9fa030dd522f71ab1d42ac86356b47e6ace6b2ab",
+  "archive": {
+    "path": "launcher-metadata.zip",
+    "size": 3242532,
+    "sha256": "7af5d8cd0d48d9aa6005fc546570cdabe7a159215800b305900bba613d41ea31",
+    "entries": 145
+  },
+  "files": [
+    {
+      "path": "Avatar/10000137.json",
+      "size": 74648,
+      "sha256": "1c194465df41618130a93baf59625bc30d4e15d3aa172a67ac696b2aafc3ed2e"
+    },
+    {
+      "path": "Avatar/10000136.json",
+      "size": 69673,
+      "sha256": "5b61ce1db4bbc4335c6d7612e6a03242c8f4c0287ac3ae65b8163133590de429"
+    },
+    {
+      "path": "Avatar/10000143.json",
+      "size": 71754,
+      "sha256": "4bf8a22ea727c2de5cc2bd97e87413e687020736c3149d1d118910806d013da0"
+    },
+    {
+      "path": "Avatar/10000140.json",
+      "size": 63831,
+      "sha256": "763c42263684e356ca7d76369bc2419ef61a55098f90360565f0115854287905"
+    },
+    {
+      "path": "Avatar/10000150.json",
+      "size": 67084,
+      "sha256": "14833b7e7768a7af62e731c8a8739f3a421584fa130c55e969a0eb02b3c8b0db"
+    },
+    {
+      "path": "Avatar/10000148.json",
+      "size": 65462,
+      "sha256": "609782f696567c8431db75d07fec95ad4522ec24c57ceb4e0bc05d0e412ff008"
+    },
+    {
+      "path": "Avatar/10000005.json",
+      "size": 207271,
+      "sha256": "6ed319b1159f4d8c3072a51cf523f46e8646c09ade77a344280e1be83be737c2"
+    },
+    {
+      "path": "Avatar/10000133.json",
+      "size": 65522,
+      "sha256": "c02f64f797f3e221924f43206ff5a6ee959c07ed6e7b108174354d4cff40fbf2"
+    },
+    {
+      "path": "Avatar/10000132.json",
+      "size": 64187,
+      "sha256": "160c0c45af98b19be0f1ef3bb9659c90c561a7699d6f83e84fd1dc995ca76840"
+    },
+    {
+      "path": "Avatar/10000131.json",
+      "size": 61569,
+      "sha256": "d7994d6ebedb2f5ec1b654a80948afe2205240665586c261148c6d063ab94748"
+    },
+    {
+      "path": "Avatar/10000129.json",
+      "size": 73643,
+      "sha256": "6ef0291eeef6e6cc02c292327ac203b996029c62df373bed02a840af07233fac"
+    },
+    {
+      "path": "Avatar/10000130.json",
+      "size": 62913,
+      "sha256": "41010eec7a78717c4c70a9e66ca120ea9d7df0e8a9c801dafc0cd566a4ef60e9"
+    },
+    {
+      "path": "Avatar/10000128.json",
+      "size": 80136,
+      "sha256": "0a8c2b6b9c003deadad02ca6227cbd4ff97097372eb85ec71b298bbb379a1c4c"
+    },
+    {
+      "path": "Avatar/10000127.json",
+      "size": 62524,
+      "sha256": "317dd397d2f9381435a3ce82997cc5a199e724dfed5e7b593b1c2fc7840d7ae1"
+    },
+    {
+      "path": "Avatar/10000126.json",
+      "size": 55967,
+      "sha256": "d640d61999e2d067692f569365c4de31e477cc1a2e736cf18a3dfe5f58f0b5d8"
+    },
+    {
+      "path": "Avatar/10000125.json",
+      "size": 61740,
+      "sha256": "a0f066b549ce855059bec3928d6e23a268a36b5e97ff4a8a08521a1dd51228fe"
+    },
+    {
+      "path": "Avatar/10000124.json",
+      "size": 59116,
+      "sha256": "7173135cd166b19d29142f57b3102f1941cc9a1ea21553669aec2c7df0cc7cbd"
+    },
+    {
+      "path": "Avatar/10000123.json",
+      "size": 72919,
+      "sha256": "12b93591b24cc8f0447fa824a86a7dfa3ccbc1a2a7581098fa770f1837a7e00b"
+    },
+    {
+      "path": "Avatar/10000122.json",
+      "size": 64657,
+      "sha256": "2cdd69098d434416d52e612a3d515a3a8630b9a3f004ef8554551b51d94f08a6"
+    },
+    {
+      "path": "Avatar/10000121.json",
+      "size": 52831,
+      "sha256": "d3fae2e5321732d42115ec0a2e719bfd77ee14def190433253bee3d68924e558"
+    },
+    {
+      "path": "Avatar/10000120.json",
+      "size": 67332,
+      "sha256": "a79e2f55f4e383bf7bf25f222456a408142e42c3260c589dca3eb1c4abf74230"
+    },
+    {
+      "path": "Avatar/10000119.json",
+      "size": 55891,
+      "sha256": "a8dd68628192d86a3ab4af0b91abad87bf5d55a799e20e6685a6169230df9c7d"
+    },
+    {
+      "path": "Avatar/10000116.json",
+      "size": 58398,
+      "sha256": "9a37248203a4233eaf399986c23a567329346deb30ebeeae20f2eb9fe4329e27"
+    },
+    {
+      "path": "Avatar/10000115.json",
+      "size": 52936,
+      "sha256": "36a7019f2fa641fe48f368f3acd4a8aaba04596d0b856fbf952d42e028dc789c"
+    },
+    {
+      "path": "Avatar/10000114.json",
+      "size": 59563,
+      "sha256": "fd7903977aa48cb6ccf922f371280a789f865cf1d639174c249567ea6a7950db"
+    },
+    {
+      "path": "Avatar/10000113.json",
+      "size": 49449,
+      "sha256": "fb47ea690900dad0913aef83c6d57095765756d741172ac049d3b0746c144ad5"
+    },
+    {
+      "path": "Avatar/10000112.json",
+      "size": 72942,
+      "sha256": "56dae79c91b7a3347de1dced9cbb43b6f03d72206d0eb5decd8fee21b0a1cf21"
+    },
+    {
+      "path": "Avatar/10000111.json",
+      "size": 78613,
+      "sha256": "336f7ec96ba28536aaec6e0b5ac13f85833bc437eaf88fa400c2017c7d1aad5a"
+    },
+    {
+      "path": "Avatar/10000110.json",
+      "size": 68570,
+      "sha256": "b75aab624dc40161765d0f5d52a3f4209f09d03574242921d668371fa1414888"
+    },
+    {
+      "path": "Avatar/10000109.json",
+      "size": 68944,
+      "sha256": "7c0f3c8ba028bdabb95cbe0b3de04a8eb6e63f278399774db3471d06d833ee5c"
+    },
+    {
+      "path": "Avatar/10000108.json",
+      "size": 52953,
+      "sha256": "32735b42769a21d05ee412162404cf0b18bf2365a49613b1848b8958da0765ae"
+    },
+    {
+      "path": "Avatar/10000107.json",
+      "size": 65473,
+      "sha256": "930c6ad5134f16c522f965d845eea8512f90d9480ab5fcbad4abc027173963fb"
+    },
+    {
+      "path": "Avatar/10000106.json",
+      "size": 66356,
+      "sha256": "360c2dcc7f82fa4e5f5121e0d8462eb634a0c42cab7cd116f8d66223a8010e4d"
+    },
+    {
+      "path": "Avatar/10000105.json",
+      "size": 53212,
+      "sha256": "2eb28c5b316279f34843715cd4849161f9669a61df786d15835f95795d1e9c81"
+    },
+    {
+      "path": "Avatar/10000104.json",
+      "size": 64993,
+      "sha256": "1674baa0a719c70994b6cf3bab02fbefdb27c105fed12830c827c77ef32d0314"
+    },
+    {
+      "path": "Avatar/10000103.json",
+      "size": 68169,
+      "sha256": "ccc8006841ff1bfc6d18e065c4c380d4427e48036381eff00fb763bd9f0607d1"
+    },
+    {
+      "path": "Avatar/10000102.json",
+      "size": 62392,
+      "sha256": "811527a3816061b362c6b5923ca34b25a96d5f7c40df1aadde887de1b0cf2252"
+    },
+    {
+      "path": "Avatar/10000101.json",
+      "size": 62595,
+      "sha256": "7daae648787ccbab3b4efcffa957c90c7299c4f28fa6034c863221a2b69522b5"
+    },
+    {
+      "path": "Avatar/10000100.json",
+      "size": 55453,
+      "sha256": "880a4b569946d5e375aca32c8e4f7c1ace75ec8fc53b5cd90c9ce754f85354dc"
+    },
+    {
+      "path": "Avatar/10000099.json",
+      "size": 52583,
+      "sha256": "43c620d9a06b0b768e729b06e4ae13e90110ade39c04a263bfb4e2107a31d1d4"
+    },
+    {
+      "path": "Avatar/10000098.json",
+      "size": 65654,
+      "sha256": "a76e8a8787b46063441fa454ecc7eb14ffe406cfe63b376a6f46cba7ad1070f0"
+    },
+    {
+      "path": "Avatar/10000097.json",
+      "size": 54453,
+      "sha256": "3d1eade0eaeb96e6d3ade7a95c2bacf42397e5d9b4e3c1cdc3cdc50feea866e4"
+    },
+    {
+      "path": "Avatar/10000095.json",
+      "size": 64159,
+      "sha256": "41fa4ad55a50e3654b88524641474b93f3f2aed812b62bf580d3a6a308449a32"
+    },
+    {
+      "path": "Avatar/10000096.json",
+      "size": 57613,
+      "sha256": "29cba604aa5352e1363feeb1794dd99a7cd1caa4283b1c1623617887f6449175"
+    },
+    {
+      "path": "Avatar/10000094.json",
+      "size": 55388,
+      "sha256": "c5fddba0d1cd69d6e1945b7ef28417a17f86b4944d2f921183ac5076c1785420"
+    },
+    {
+      "path": "Avatar/10000093.json",
+      "size": 57178,
+      "sha256": "68c5adfb000bd1561869b69797c1ef69ea804432880a0660d4fc026c4144cc3d"
+    },
+    {
+      "path": "Avatar/10000092.json",
+      "size": 56000,
+      "sha256": "828c23c7a3fcca6747b0f565955f45b5480ce8620e3c49e59ae1110001985d61"
+    },
+    {
+      "path": "Avatar/10000091.json",
+      "size": 55867,
+      "sha256": "080d5bebf88670070071245cb39c6f957ed0565413b2b8cbfa6dee16d0954a46"
+    },
+    {
+      "path": "Avatar/10000090.json",
+      "size": 56656,
+      "sha256": "69fce9927aa2224c09f4a4372347ae195417528b7c651505b6eba642966c153d"
+    },
+    {
+      "path": "Avatar/10000089.json",
+      "size": 61701,
+      "sha256": "b84dc7b367ad80881cfbdf4b21d988b5384a02b8f3251037b5a288f88782c031"
+    },
+    {
+      "path": "Avatar/10000088.json",
+      "size": 61945,
+      "sha256": "125a895df8bc5164ff5796f216d431eeb85fdfaf07e36908a914141e2bb7e27b"
+    },
+    {
+      "path": "Avatar/10000087.json",
+      "size": 52696,
+      "sha256": "c9b1a70de524dd7bbd31b85b8f03be189635e970735ce550c8a83067752cb31d"
+    },
+    {
+      "path": "Avatar/10000086.json",
+      "size": 57510,
+      "sha256": "fa7b35aa5ed3a3c504c9e42d1d81deb4606f7443bf9a413b766275d98cd30e04"
+    },
+    {
+      "path": "Avatar/10000085.json",
+      "size": 59022,
+      "sha256": "9176e67feccaf38463af0e1d2214462a48bcb74cf2f3577b7b07c1a2d95687db"
+    },
+    {
+      "path": "Avatar/10000084.json",
+      "size": 59099,
+      "sha256": "d4c9db1cf5309303d9bcf4c185cb32c9bd722cf43d029d10fdca277a5bb4ea99"
+    },
+    {
+      "path": "Avatar/10000083.json",
+      "size": 53906,
+      "sha256": "a3a2ac458730e9b518f1cfa02d94d141019579be8abb4e303206a9b1bd98d411"
+    },
+    {
+      "path": "Avatar/10000061.json",
+      "size": 57253,
+      "sha256": "d55c5a332c663c2e4b45d52834696f40b83c4bf0236b9bcdb8e481075033e11f"
+    },
+    {
+      "path": "Avatar/10000082.json",
+      "size": 56592,
+      "sha256": "3c41be7ddb1669600f421b27f6c6ec7f9ac5bf46d46603704ba96d6ae739345d"
+    },
+    {
+      "path": "Avatar/10000081.json",
+      "size": 61346,
+      "sha256": "01548315e03e23820f66faca4e87cf6054b14af9982d1ba9d8156577d6266f65"
+    },
+    {
+      "path": "Avatar/10000080.json",
+      "size": 57088,
+      "sha256": "b4f14e6ad769b0b6c898bcfedccdb71af9685d7392ddbf7f2684acaa0d067a5d"
+    },
+    {
+      "path": "Avatar/10000079.json",
+      "size": 55024,
+      "sha256": "5b937d69555601aee121638cb5f32526a0bd712c01ad6373371bba5f5492dec9"
+    },
+    {
+      "path": "Avatar/10000078.json",
+      "size": 53497,
+      "sha256": "c11d8ac464d51540b9d187d29279e5ed9a2ec9312f0303e6b6e7d7f24a37ab18"
+    },
+    {
+      "path": "Avatar/10000077.json",
+      "size": 51387,
+      "sha256": "1a20b168947953dba4aaecbb0a948bea02664f37668c990adeef7803f14df0bf"
+    },
+    {
+      "path": "Avatar/10000076.json",
+      "size": 50079,
+      "sha256": "eb9cd5b52a1503720c35731f335c5aee44019dc0ddb4bf14fe077c550e971ac9"
+    },
+    {
+      "path": "Avatar/10000075.json",
+      "size": 51629,
+      "sha256": "70c09e40aeb91e95168695caacffff47ddbf0937c8583e7a05db294d2e89acb9"
+    },
+    {
+      "path": "Avatar/10000074.json",
+      "size": 48273,
+      "sha256": "ff46161a2261ef7465ca4d9b375ba2faac997b3553f0bcc272634bc958078b69"
+    },
+    {
+      "path": "Avatar/10000073.json",
+      "size": 52080,
+      "sha256": "dbb1b01d8cd0f0bb89665f9d50517a578f7313f5c2b85c117128cbae2540c33c"
+    },
+    {
+      "path": "Avatar/10000072.json",
+      "size": 44726,
+      "sha256": "1042e191e665cc45e74044686e71e685d80884eb8bfcc6febcc5f16dc25910d0"
+    },
+    {
+      "path": "Avatar/10000071.json",
+      "size": 57148,
+      "sha256": "ee848ac157271c4c2c527041c9aa65dba6e905eb467089ffb21195a6b6e60976"
+    },
+    {
+      "path": "Avatar/10000070.json",
+      "size": 46895,
+      "sha256": "a9505d8e3f3bff6453915527a2a35187253109912edd6ac4b3ed11986e968788"
+    },
+    {
+      "path": "Avatar/10000069.json",
+      "size": 52725,
+      "sha256": "c294d080466e485444cdef9a152aaebb78293499a323e9e49c551584ec527287"
+    },
+    {
+      "path": "Avatar/10000068.json",
+      "size": 47199,
+      "sha256": "e389d09a26b0867078d2b23867a43788ff496a54990bff7edacf3118769712c6"
+    },
+    {
+      "path": "Avatar/10000067.json",
+      "size": 47855,
+      "sha256": "486622c557229b47690e7d3a05b7f16ffbdfffbabb0f3c93948c982c9e9f1218"
+    },
+    {
+      "path": "Avatar/10000059.json",
+      "size": 54646,
+      "sha256": "110f6a19ff9ffa4e5d62391e99c5367e65cab868a076332f415f4abf8dd49b3a"
+    },
+    {
+      "path": "Avatar/10000065.json",
+      "size": 47889,
+      "sha256": "195e451bbaeeaa34b2894c05b37404cd42b3178eaef6289ed398473c5b8d061a"
+    },
+    {
+      "path": "Avatar/10000060.json",
+      "size": 49706,
+      "sha256": "cd56626d7ed319b51f01be499add6eb3d0c46c166ee36c72f0b84346880fca9d"
+    },
+    {
+      "path": "Avatar/10000066.json",
+      "size": 51214,
+      "sha256": "6ec9cfe911828f80a2b5590d588a703cca41804b359d19cdb77b68efc6ab6cee"
+    },
+    {
+      "path": "Avatar/10000058.json",
+      "size": 51942,
+      "sha256": "2c0f83d3c024958848d2ec7b49e1cd23047b52b7e7319c00782f332a603dbf67"
+    },
+    {
+      "path": "Avatar/10000064.json",
+      "size": 44479,
+      "sha256": "b49162527db8b2226838a9dde75bb1fc2df558ae74e48e23f035d5dc873e0c91"
+    },
+    {
+      "path": "Avatar/10000063.json",
+      "size": 47042,
+      "sha256": "88c7451f92cf3e7728167de5a7b986ddcc953fa7e92cde2d18f900990f880483"
+    },
+    {
+      "path": "Avatar/10000057.json",
+      "size": 50739,
+      "sha256": "427d3dd6f0c88bab968b36efa0a136ef6c533608872502600696737c202ef7ff"
+    },
+    {
+      "path": "Avatar/10000055.json",
+      "size": 43541,
+      "sha256": "ef4fd2269eee6043be2ff929d6dd511ee2d71c69ff9c4d8ad36e2e8590d2c121"
+    },
+    {
+      "path": "Avatar/10000050.json",
+      "size": 46227,
+      "sha256": "91ceb05c9f6974d45e42fa17e79b2c59122d54035ba1e0bb2e18e0a94d8d5fde"
+    },
+    {
+      "path": "Avatar/10000062.json",
+      "size": 33638,
+      "sha256": "b6fb33285994c8d08bc3aaa8f9f2a86df0111d9faa90a929d03d2980dd937c68"
+    },
+    {
+      "path": "Avatar/10000056.json",
+      "size": 45551,
+      "sha256": "c6c32066ee30c7f35bfd697090643f1940e364c336b02c63afee708a8d2340bc"
+    },
+    {
+      "path": "Avatar/10000054.json",
+      "size": 43716,
+      "sha256": "e0ac949ece843f2823d223e76deb934c193aaf9638d70723cc9a7ca14167e85d"
+    },
+    {
+      "path": "Avatar/10000052.json",
+      "size": 53188,
+      "sha256": "9a63d04c1afaf338990c7698da12a8d22c34b486f7697c4a9510554b5795d4d0"
+    },
+    {
+      "path": "Avatar/10000053.json",
+      "size": 47576,
+      "sha256": "e281935a50f3df014fcc9212b5615629ca11d5142501846419c106011df01f47"
+    },
+    {
+      "path": "Avatar/10000049.json",
+      "size": 51860,
+      "sha256": "8b46c4846a430fc72a104e0bf674635f5433a81dda4fbca0795e35985f0fc901"
+    },
+    {
+      "path": "Avatar/10000002.json",
+      "size": 44740,
+      "sha256": "449e7d1b4baca2639044cff21017ba9c943e5746bc15a013018abd110c88ebcc"
+    },
+    {
+      "path": "Avatar/10000047.json",
+      "size": 46462,
+      "sha256": "cceb28af65d33109f74347e5e1601b9e7568f4e8c4ecca670ee2c74b4aaab467"
+    },
+    {
+      "path": "Avatar/10000051.json",
+      "size": 55637,
+      "sha256": "8ab006d6d5d0630cf799b04b8e52f1bad225e598719ddea9bdad571ddd1e3035"
+    },
+    {
+      "path": "Avatar/10000048.json",
+      "size": 48615,
+      "sha256": "db47f5881035ea6ebd958894380a1f4164472978202c9f4a4ca6919780f0c675"
+    },
+    {
+      "path": "Avatar/10000045.json",
+      "size": 39688,
+      "sha256": "194d16fc77415529af9c9ebd0a436df3d688335711a8540e82288c27b1d4e2ac"
+    },
+    {
+      "path": "Avatar/10000046.json",
+      "size": 46936,
+      "sha256": "2603de41e852c3293dd5735dca5e16f11aa48bba6b06f20421028c4ba4ebbd18"
+    },
+    {
+      "path": "Avatar/10000026.json",
+      "size": 39732,
+      "sha256": "9f123f4790ed785ee33ad72def098320b82b09ecab3ff04c25f957069ced4cd6"
+    },
+    {
+      "path": "Avatar/10000038.json",
+      "size": 45949,
+      "sha256": "7b10a4158737d44170bfa4978244e068702feaafe29d7d133aed22c17547eb07"
+    },
+    {
+      "path": "Avatar/10000037.json",
+      "size": 46303,
+      "sha256": "1bda0bc19024bc5e6ea0a4e57ac47de25bf9dfb32a3bc92c5f554b4195bcb2da"
+    },
+    {
+      "path": "Avatar/10000044.json",
+      "size": 48055,
+      "sha256": "6d0cb926401ab069035770e7c8368ef70a58351a78c3f7c75cf4103361924f88"
+    },
+    {
+      "path": "Avatar/10000039.json",
+      "size": 47307,
+      "sha256": "3165fd680ccd4875b31cf1cda42692bd19a0fc30e1921871845049ae34dde546"
+    },
+    {
+      "path": "Avatar/10000033.json",
+      "size": 52327,
+      "sha256": "401946122341260fad9bc5198cdc5be8a5b43490737392dfc58983f4214bcb79"
+    },
+    {
+      "path": "Avatar/10000030.json",
+      "size": 48959,
+      "sha256": "59507e089d563519184b39870782de1cab9cec4eed3fe540cff6a48194440f19"
+    },
+    {
+      "path": "Avatar/10000043.json",
+      "size": 46305,
+      "sha256": "631375be4bf77c7602a7130db694dd8346a5ff6cdc307c45c568f610e0356e83"
+    },
+    {
+      "path": "Avatar/10000042.json",
+      "size": 50193,
+      "sha256": "bc5401e7e02df5c64f4e25b4588bb49f58f73a3efa3309098d163acdfe0a5742"
+    },
+    {
+      "path": "Avatar/10000041.json",
+      "size": 47750,
+      "sha256": "2df22ef9f976fd6ee72c0665ff78236d676d026494a2be2dee92d227ac91c5dc"
+    },
+    {
+      "path": "Avatar/10000036.json",
+      "size": 40777,
+      "sha256": "38a07378f5a71dc133e847153616336d992d23b131b61992868932b69ebe1f38"
+    },
+    {
+      "path": "Avatar/10000035.json",
+      "size": 41573,
+      "sha256": "080ace384112101df409f1b348f607902cd27fed6e01fe75fbed539788b98967"
+    },
+    {
+      "path": "Avatar/10000034.json",
+      "size": 47105,
+      "sha256": "e0085f0fb10b40d2178406de9fff5c127fa7ac3ef3d8744c4610b0ac9575541f"
+    },
+    {
+      "path": "Avatar/10000032.json",
+      "size": 45391,
+      "sha256": "cdafced3c35f815f2255917c5df57ffc7d13a09bc0638b1444deaaece990e473"
+    },
+    {
+      "path": "Avatar/10000031.json",
+      "size": 48146,
+      "sha256": "afc20057d8333998d00048512ab99bcb550fdcee97c73627ac808babdd217337"
+    },
+    {
+      "path": "Avatar/10000029.json",
+      "size": 43161,
+      "sha256": "ba84c7e34bea00360b6c1ae511179bfff8acbfe063897db3ea107129553ec0f1"
+    },
+    {
+      "path": "Avatar/10000027.json",
+      "size": 41868,
+      "sha256": "e01520c1abc97871099d9268b5bba43546ede87b73e9b9d2fc76be18a8f3d11f"
+    },
+    {
+      "path": "Avatar/10000025.json",
+      "size": 44152,
+      "sha256": "77f351d639a0c7565206f6ad2df7cbe86bc491602e501c3e53b534bae0fe1cd1"
+    },
+    {
+      "path": "Avatar/10000024.json",
+      "size": 44285,
+      "sha256": "3867a4cb082a51c454f9c241f133983ec08fa2b980b94d45ba0cde8b7e0441e8"
+    },
+    {
+      "path": "Avatar/10000023.json",
+      "size": 42076,
+      "sha256": "03099b4c0ba55aeb61419bb9783af9ff7ebf086ecadf5b650d9b749b87019209"
+    },
+    {
+      "path": "Avatar/10000022.json",
+      "size": 47106,
+      "sha256": "9825cd2727eda9e54d44df2fb955d5ef8fdb91a666b3457cdaf4a3c386dcbc99"
+    },
+    {
+      "path": "Avatar/10000021.json",
+      "size": 39052,
+      "sha256": "92a19e241de8532b86306befd22cba26f3f46c2afe5adcd3898c95fa7080e51c"
+    },
+    {
+      "path": "Avatar/10000020.json",
+      "size": 38488,
+      "sha256": "b59d080fc79d74f602b5fd05265eb73c5dfb21cf01798cdd0dca62533a1a0810"
+    },
+    {
+      "path": "Avatar/10000016.json",
+      "size": 40948,
+      "sha256": "e7ce3b59dfd018279b12e746e39d1a5d27bcb5826170220623040e29eabe3ff0"
+    },
+    {
+      "path": "Avatar/10000015.json",
+      "size": 40142,
+      "sha256": "3e98e0be509679719508d99b8f2834cb04445f9329ceb7b0f8d9824e7896ee43"
+    },
+    {
+      "path": "Avatar/10000014.json",
+      "size": 38861,
+      "sha256": "d93a98f33e636f09fca5962f073e55a54b85a282243e5ebb365a466bc5a8463c"
+    },
+    {
+      "path": "Avatar/10000006.json",
+      "size": 38883,
+      "sha256": "c254b972a721ba0862fe1ac6306ce38f1d3f92fa765f95cdcfd74e359c40a378"
+    },
+    {
+      "path": "Avatar/10000003.json",
+      "size": 42923,
+      "sha256": "49f72fbe2845311229f64f31ae54ccdac58ae8a5eb5d6a5319a6cdf923983deb"
+    },
+    {
+      "path": "Weapon.json",
+      "size": 588995,
+      "sha256": "c9d875caaf6890a6981522625ad4cd75efafd40c4a2f477d633a7cab54306815"
+    },
+    {
+      "path": "Material.json",
+      "size": 4567589,
+      "sha256": "2888075c09d096754eab4c2884e3c639bbf368d42cc4d840dac402dc32bce4a8"
+    },
+    {
+      "path": "AvatarPromote.json",
+      "size": 273891,
+      "sha256": "ef374aace99f8de189ec3533582d43d68f9ee451862996e62b8805b22ba2e433"
+    },
+    {
+      "path": "WeaponPromote.json",
+      "size": 640888,
+      "sha256": "c2a6734f900eba8e84ff2375ea1c9346787705557b18385c9d8c40813e16e731"
+    },
+    {
+      "path": "HyperLinkName.json",
+      "size": 29624,
+      "sha256": "a963c81ab89291d510bba62528818a8c5e5df20a90b55ce78cc7a761aaafd7a8"
+    },
+    {
+      "path": "Attachment.json",
+      "size": 169959,
+      "sha256": "f4211df28f49c9d0eee54d12925bd6f7650ddb578c95c2d301f0dff4b0b5058d"
+    },
+    {
+      "path": "Assets.json",
+      "size": 12000,
+      "sha256": "111b625c2d0d15a1162bec3c20ec8160f509f0696fec91fef462c29aeb979f8e"
+    },
+    {
+      "path": "MonsterCurve.json",
+      "size": 231545,
+      "sha256": "93649a5967f5a0aba2764fb2989aa81c1ad3868123ba272b36c0bab0c9ff7edb"
+    },
+    {
+      "path": "AvatarCurve.json",
+      "size": 28645,
+      "sha256": "a0cfee87748b59dfba20fbfcd56a29e3915b585c89d2dd58881d3ce532336bd6"
+    },
+    {
+      "path": "WeaponCurve.json",
+      "size": 116073,
+      "sha256": "0dad356b1a90e95c5aa7114e32769329005bbbaeaf388ebb443eb67d313d5a95"
+    },
+    {
+      "path": "DisplayItem.json",
+      "size": 76683,
+      "sha256": "742af3f4553587457847fdb986128b78a8610ef49f646f1de0a55f7294240e63"
+    },
+    {
+      "path": "Monster.json",
+      "size": 577248,
+      "sha256": "c0d2c22523ed102e7f0cdd679960cf68873cc7328b45e19a1bff426218b9611d"
+    },
+    {
+      "path": "Reliquary.json",
+      "size": 322365,
+      "sha256": "12a6c4830ebd4f0d21713b6423dd40812343b52de8c9dd553bac0c9ceb3885a7"
+    },
+    {
+      "path": "ReliquarySet.json",
+      "size": 32698,
+      "sha256": "d3ca2d78891d58c056643088e15ef4066af40e3ea0d385023eb06e763a7f89a2"
+    },
+    {
+      "path": "ReliquaryMainAffix.json",
+      "size": 2679,
+      "sha256": "9491b2739df0f63995378da141685d946fa41de09496eb90ee39dc549e712558"
+    },
+    {
+      "path": "ReliquaryMainAffixLevel.json",
+      "size": 126286,
+      "sha256": "837e31e911b7ef1aa614afaaa1df7f3abd4c205dd5cb3a4f374ae5b4fdabc894"
+    },
+    {
+      "path": "ReliquarySubAffix.json",
+      "size": 21621,
+      "sha256": "383c486d523ebfa38a6c08007d092339e2e861d1edd85e965ad747f6b73b5509"
+    },
+    {
+      "path": "CookRecipe.json",
+      "size": 292841,
+      "sha256": "071244461e66773486c2cbc4121c57ecc8d33048ef884d6e1001c263257d3078"
+    },
+    {
+      "path": "Combine.json",
+      "size": 189816,
+      "sha256": "28f38955d43a0586c4d2e410e4bc26b7566fa5cf52a1431b38b29e3a391310cf"
+    },
+    {
+      "path": "TowerSchedule.json",
+      "size": 62568,
+      "sha256": "223ec2aeddffe91236898f749ddd9d51aeadb4b47664ea18cd44f4469afef8d2"
+    },
+    {
+      "path": "RoleCombatSchedule.json",
+      "size": 11993,
+      "sha256": "940c5cbe810bbdd593a049bec2d8e618cebe4f83b2ef41e4eec604b1d7083e44"
+    },
+    {
+      "path": "HardChallengeSchedule.json",
+      "size": 1783,
+      "sha256": "a8a0efb2286e7336f12e6252ddf6fc19fed1c8fa141e142ed387decb660e0772"
+    }
+  ],
+  "sharedTables": [
+    "MonsterCurve.json",
+    "AvatarCurve.json",
+    "WeaponCurve.json",
+    "DisplayItem.json",
+    "Monster.json"
+  ],
+  "supportTables": [
+    {
+      "name": "Reliquary.json",
+      "hash": "12a6c4830ebd4f0d21713b6423dd40812343b52de8c9dd553bac0c9ceb3885a7",
+      "size": 322365,
+      "schema_version": 1,
+      "generated_at": "2026-11-16T01:05:05.556Z",
+      "source": "launcher-bundled",
+      "entries": 890,
+      "derived": 0,
+      "carried": 890,
+      "notes": [
+        "AOG 侧无同构 DTO，按随包表原样下发；更新节奏跟随 Launcher 发版时的表"
+      ]
+    },
+    {
+      "name": "ReliquarySet.json",
+      "hash": "d3ca2d78891d58c056643088e15ef4066af40e3ea0d385023eb06e763a7f89a2",
+      "size": 32698,
+      "schema_version": 1,
+      "generated_at": "2026-11-16T01:05:05.556Z",
+      "source": "launcher-bundled",
+      "entries": 66,
+      "derived": 0,
+      "carried": 66,
+      "notes": [
+        "AOG 侧无同构 DTO，按随包表原样下发；更新节奏跟随 Launcher 发版时的表"
+      ]
+    },
+    {
+      "name": "ReliquaryMainAffix.json",
+      "hash": "9491b2739df0f63995378da141685d946fa41de09496eb90ee39dc549e712558",
+      "size": 2679,
+      "schema_version": 1,
+      "generated_at": "2026-11-16T01:05:05.556Z",
+      "source": "launcher-bundled",
+      "entries": 66,
+      "derived": 0,
+      "carried": 66,
+      "notes": [
+        "AOG 侧无同构 DTO，按随包表原样下发；更新节奏跟随 Launcher 发版时的表"
+      ]
+    },
+    {
+      "name": "ReliquaryMainAffixLevel.json",
+      "hash": "837e31e911b7ef1aa614afaaa1df7f3abd4c205dd5cb3a4f374ae5b4fdabc894",
+      "size": 126286,
+      "schema_version": 1,
+      "generated_at": "2026-11-16T01:05:05.556Z",
+      "source": "launcher-bundled",
+      "entries": 101,
+      "derived": 0,
+      "carried": 101,
+      "notes": [
+        "AOG 侧无同构 DTO，按随包表原样下发；更新节奏跟随 Launcher 发版时的表"
+      ]
+    },
+    {
+      "name": "ReliquarySubAffix.json",
+      "hash": "383c486d523ebfa38a6c08007d092339e2e861d1edd85e965ad747f6b73b5509",
+      "size": 21621,
+      "schema_version": 1,
+      "generated_at": "2026-11-16T01:05:05.556Z",
+      "source": "launcher-bundled",
+      "entries": 350,
+      "derived": 0,
+      "carried": 350,
+      "notes": [
+        "AOG 侧无同构 DTO，按随包表原样下发；更新节奏跟随 Launcher 发版时的表"
+      ]
+    },
+    {
+      "name": "CookRecipe.json",
+      "hash": "071244461e66773486c2cbc4121c57ecc8d33048ef884d6e1001c263257d3078",
+      "size": 292841,
+      "schema_version": 1,
+      "generated_at": "2026-11-16T01:05:05.556Z",
+      "source": "launcher-bundled",
+      "entries": 284,
+      "derived": 0,
+      "carried": 284,
+      "notes": [
+        "AOG 侧无同构 DTO，按随包表原样下发；更新节奏跟随 Launcher 发版时的表"
+      ]
+    },
+    {
+      "name": "Combine.json",
+      "hash": "28f38955d43a0586c4d2e410e4bc26b7566fa5cf52a1431b38b29e3a391310cf",
+      "size": 189816,
+      "schema_version": 1,
+      "generated_at": "2026-11-16T01:05:05.556Z",
+      "source": "launcher-bundled",
+      "entries": 593,
+      "derived": 0,
+      "carried": 593,
+      "notes": [
+        "AOG 侧无同构 DTO，按随包表原样下发；更新节奏跟随 Launcher 发版时的表"
+      ]
+    },
+    {
+      "name": "TowerSchedule.json",
+      "hash": "223ec2aeddffe91236898f749ddd9d51aeadb4b47664ea18cd44f4469afef8d2",
+      "size": 62568,
+      "schema_version": 1,
+      "generated_at": "2026-11-16T01:05:05.556Z",
+      "source": "launcher-bundled",
+      "entries": 124,
+      "derived": 0,
+      "carried": 124,
+      "notes": [
+        "锚定：123 期与随包同 id 且起止时间一致",
+        "1 期时间不一致，已保留随包值"
+      ]
+    },
+    {
+      "name": "RoleCombatSchedule.json",
+      "hash": "940c5cbe810bbdd593a049bec2d8e618cebe4f83b2ef41e4eec604b1d7083e44",
+      "size": 11993,
+      "schema_version": 1,
+      "generated_at": "2026-11-16T01:05:05.556Z",
+      "source": "launcher-bundled",
+      "entries": 32,
+      "derived": 0,
+      "carried": 32,
+      "notes": [
+        "锚定偏移 +0（30 期起始时间对齐）"
+      ]
+    },
+    {
+      "name": "HardChallengeSchedule.json",
+      "hash": "a8a0efb2286e7336f12e6252ddf6fc19fed1c8fa141e142ed387decb660e0772",
+      "size": 1783,
+      "schema_version": 1,
+      "generated_at": "2026-11-16T01:05:05.556Z",
+      "source": "launcher-bundled+wiki-derived",
+      "entries": 13,
+      "derived": 1,
+      "carried": 12,
+      "notes": [
+        "新增期次 5269013"
+      ]
+    }
+  ]
+}

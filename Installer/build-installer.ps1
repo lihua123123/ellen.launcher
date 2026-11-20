@@ -31,7 +31,7 @@ if (-not $SkipBuild) {
 }
 
 Write-Host "[2/4] robocopy /MIR $outDir -> $publish"
-& robocopy $outDir $publish /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
+& robocopy $outDir $publish /MIR /XD "BuildHost-net472" "BuildHost-netcore" /NFL /NDL /NJH /NJS /NP | Out-Null
 if ($LASTEXITCODE -gt 7) { Write-Error "robocopy failed ($LASTEXITCODE)"; exit 1 }
 
 Write-Host "[3/4] regenerate bundled 753 (json + assets)"

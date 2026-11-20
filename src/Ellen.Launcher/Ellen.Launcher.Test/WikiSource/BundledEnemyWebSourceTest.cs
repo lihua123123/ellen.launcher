@@ -168,7 +168,10 @@ public class BundledEnemyWebSourceTest
 
         EnemyWebReadResult result = await source.ReadCachedAsync().ConfigureAwait(false);
 
-        Assert.AreEqual(753, result.Items.Count, "真实随包必须 DTO 级 753/753");
+        Assert.IsNotNull(result.Index, "真实随包必须带 index");
+        Assert.IsTrue(result.Index.Enemies.Count > 0, "真实随包的 index 不应为空");
+        Assert.AreEqual(result.Index.Enemies.Count, result.Items.Count,
+            "真实随包必须 DTO 级全量解析（index 声明 N 条就要解析出 N 条，不能静默丢条目）");
         Assert.AreEqual(WikiSourceStamp.Bundled753, result.Stamp.Contract);
         Assert.IsFalse(result.Diagnostics.Any(d => d.Kind == "bundle-item-parse"), "随包条目不应有解析失败");
     }

@@ -22,16 +22,6 @@ public sealed partial class EllenInfrastructureClient
     [GeneratedConstructor]
     public partial EllenInfrastructureClient(IServiceProvider serviceProvider, HttpClient httpClient);
 
-    public async ValueTask<EllenResponse<StaticResourceSizeInformation>> GetStaticSizeAsync(CancellationToken token = default)
-    {
-        HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()
-            .SetRequestUri(StaticResourcesEndpoints.StaticSize())
-            .Get();
-
-        EllenResponse<StaticResourceSizeInformation>? resp = await builder.SendAsync<EllenResponse<StaticResourceSizeInformation>>(httpClient, token).ConfigureAwait(false);
-        return Web.Response.Response.DefaultIfNull(resp);
-    }
-
     public async ValueTask<EllenResponse<IPInformation>> GetIPInformationAsync(CancellationToken token = default)
     {
         HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()

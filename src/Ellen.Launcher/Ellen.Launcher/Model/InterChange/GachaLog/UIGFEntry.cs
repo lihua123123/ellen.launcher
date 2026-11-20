@@ -1,7 +1,6 @@
 // Copyright (c) DGP Studio. All rights reserved.
 // Licensed under the MIT license.
 
-using JetBrains.Annotations;
 using System.Collections.Immutable;
 
 namespace Ellen.Launcher.Model.InterChange.GachaLog;
@@ -11,7 +10,7 @@ public sealed class UIGFEntry<TItem>
 {
     [JsonPropertyName("uid")]
     [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.WriteAsString)]
-    public required uint Uid { get; init; }
+    public required ulong Uid { get; init; }
 
     [JsonPropertyName("timezone")]
     public required int TimeZone { get; init; }
@@ -21,8 +20,4 @@ public sealed class UIGFEntry<TItem>
 
     [JsonPropertyName("list")]
     public required ImmutableArray<TItem> List { get; init; }
-
-    [JsonIgnore]
-    [UsedImplicitly]
-    public bool IsSelected { get; set; }
 }

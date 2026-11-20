@@ -47,8 +47,8 @@ public sealed class ZZZGachaLogPage : IJsonOnDeserialized
     {
         return region switch
         {
-            "prod_gf_us" => TimeSpan.FromHours(-5),
-            "prod_gf_eu" => TimeSpan.FromHours(1),
+            "prod_gf_us" or "prod_os_usa" => TimeSpan.FromHours(-5),
+            "prod_gf_eu" or "prod_os_euro" => TimeSpan.FromHours(1),
             "prod_gf_jp" => TimeSpan.FromHours(9),
             "prod_gf_sg" => TimeSpan.FromHours(8),
             _ => TimeSpan.FromHours(8), // prod_gf_cn 与其他未知区服默认 +8

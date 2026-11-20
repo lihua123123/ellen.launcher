@@ -22,11 +22,9 @@ public interface IGachaLogRepository : IRepository<GachaArchive>, IRepository<Ga
 
     GachaArchive? GetGachaArchiveById(Guid archiveId);
 
-    GachaArchive? GetGachaArchiveByUid(string uid);
-
     GachaArchive? GetGachaArchiveByUidAndGame(string uid, GachaGameType game);
 
-    ImmutableArray<string> GetGachaArchiveUidImmutableArray();
+    ImmutableArray<string> GetGachaArchiveUidImmutableArray(GachaGameType game);
 
     ObservableCollection<GachaArchive> GetGachaArchiveCollection();
 

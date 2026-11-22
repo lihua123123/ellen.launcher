@@ -9,12 +9,16 @@ using Ellen.Launcher.Web.Request.Builder.Abstraction;
 using Ellen.Launcher.Web.Response;
 using System.Collections.Immutable;
 using System.Net.Http;
+using System.Text;
 
 namespace Ellen.Launcher.Web.Hoyolab.Takumi.Event.Calculate;
 
 [HttpClient(HttpClientConfiguration.Default)]
 public sealed partial class CalculateClient
 {
+    private const int BatchComputeChunkSize = 30;
+    private const string ChineseCalculatorReferer = "https://act.mihoyo.com/";
+
     private readonly IHttpRequestMessageBuilderFactory httpRequestMessageBuilderFactory;
     private readonly IApiEndpointsFactory apiEndpointsFactory;
     private readonly IServiceProvider serviceProvider;
@@ -31,9 +35,78 @@ public sealed partial class CalculateClient
 
     public async ValueTask<Response<BatchConsumption>> BatchComputeAsync(UserAndUid userAndUid, ImmutableArray<AvatarPromotionDelta> deltas, bool syncInventory = false, CancellationToken token = default)
     {
+        if (deltas.IsEmpty)
+        {
+            return new Response<BatchConsumption>(-1, SH.ServiceInventoryCalculatorNoDeltas, default);
+        }
+
+        if (deltas.Length <= BatchComputeChunkSize)
+        {
+            return await SendBatchComputeAsync(userAndUid, deltas, syncInventory, token).ConfigureAwait(false);
+        }
+
+        List<Response<BatchConsumption>> responses = [];
+        for (int offset = 0; offset < deltas.Length; offset += BatchComputeChunkSize)
+        {
+            int count = Math.Min(BatchComputeChunkSize, deltas.Length - offset);
+            ImmutableArray<AvatarPromotionDelta> chunk = Slice(deltas, offset, count);
+
+            Response<BatchConsumption> response = await ComputeChunkWithRetryAsync(
+                userAndUid,
+                chunk,
+                syncInventory,
+                token).ConfigureAwait(false);
+
+            if (response.ReturnCode is not 0)
+            {
+                return response;
+            }
+
+            responses.Add(response);
+        }
+
+        return MergeResponses(responses);
+    }
+
+    private async ValueTask<Response<BatchConsumption>> ComputeChunkWithRetryAsync(
+        UserAndUid userAndUid,
+        ImmutableArray<AvatarPromotionDelta> deltas,
+        bool syncInventory,
+        CancellationToken token)
+    {
+        Response<BatchConsumption> response = await SendBatchComputeAsync(userAndUid, deltas, syncInventory, token).ConfigureAwait(false);
+        if (response.ReturnCode is 0 || deltas.Length <= 1)
+        {
+            return response;
+        }
+
+        await Task.Delay(300, token).ConfigureAwait(false);
+
+        int leftCount = deltas.Length / 2;
+        ImmutableArray<AvatarPromotionDelta> left = Slice(deltas, 0, leftCount);
+        ImmutableArray<AvatarPromotionDelta> right = Slice(deltas, leftCount, deltas.Length - leftCount);
+
+        Response<BatchConsumption> leftResponse = await SendBatchComputeAsync(userAndUid, left, syncInventory, token).ConfigureAwait(false);
+        Response<BatchConsumption> rightResponse = await SendBatchComputeAsync(userAndUid, right, syncInventory, token).ConfigureAwait(false);
+
+        if (leftResponse.ReturnCode is 0 && rightResponse.ReturnCode is 0)
+        {
+            return MergeResponses([leftResponse, rightResponse]);
+        }
+
+        return leftResponse.ReturnCode is not 0 ? leftResponse : rightResponse;
+    }
+
+    private async ValueTask<Response<BatchConsumption>> SendBatchComputeAsync(
+        UserAndUid userAndUid,
+        ImmutableArray<AvatarPromotionDelta> deltas,
+        bool syncInventory,
+        CancellationToken token)
+    {
         BatchConsumptionData data = new()
         {
             Items = deltas,
+            Lang = "zh-cn",
             Region = syncInventory ? userAndUid.Uid.Region : default!,
             Uid = syncInventory ? userAndUid.Uid.ToString() : default!,
         };
@@ -43,14 +116,100 @@ public sealed partial class CalculateClient
         HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()
             .SetRequestUri(apiEndpoints.CalculateBatchCompute())
             .SetUserCookieAndFpHeader(userAndUid.User, CookieType.Cookie)
-            .SetReferer(userAndUid.IsOversea ? apiEndpoints.ActHoyolabReferer() : apiEndpoints.WebStaticReferer())
-            .PostJson(data);
+            .SetReferer(userAndUid.IsOversea ? apiEndpoints.ActHoyolabReferer() : ChineseCalculatorReferer)
+            .SetHeader("x-rpc-device_id", HoyolabOptions.DeviceId36)
+            .SetHeader("x-rpc-platform", "4")
+            .SetHeader("x-rpc-lrsag", string.Empty)
+            .SetHeader("x-rpc-page", "__#")
+            .SetHeader("x-rpc-cal_type", "0")
+            .SetHeader("x-rpc-stat_platform", "PC")
+            .PostJson(data, Encoding.UTF8);
 
         Response<BatchConsumption>? resp = await builder
             .SendAsync<Response<BatchConsumption>>(httpClient, token)
             .ConfigureAwait(false);
 
-        return Response.Response.DefaultIfNull(resp);
+        return Response.Response.DefaultIfNull(resp, nameof(BatchComputeAsync));
+    }
+
+    private static Response<BatchConsumption> MergeResponses(IEnumerable<Response<BatchConsumption>> responses)
+    {
+        List<Consumption> items = [];
+        Dictionary<uint, Item> overallConsume = [];
+        Dictionary<uint, Item> availableMaterial = [];
+        bool hasUserInfo = false;
+
+        foreach (Response<BatchConsumption> response in responses)
+        {
+            if (response.Data is not { } data)
+            {
+                continue;
+            }
+
+            hasUserInfo |= data.HasUserInfo;
+
+            if (!data.Items.IsDefault)
+            {
+                items.AddRange(data.Items);
+            }
+
+            MergeItems(overallConsume, data.OverallConsume);
+            MergeItems(availableMaterial, data.AvailableMaterial);
+        }
+
+        BatchConsumption merged = new()
+        {
+            HasUserInfo = hasUserInfo,
+        };
+
+        if (items.Count > 0)
+        {
+            merged.Items = [.. items];
+        }
+
+        if (availableMaterial.Count > 0)
+        {
+            merged.AvailableMaterial = [.. availableMaterial.Values];
+        }
+
+        if (overallConsume.Count > 0)
+        {
+            merged.OverallConsume = [.. overallConsume.Values];
+        }
+
+        return new Response<BatchConsumption>(0, "OK", merged);
+    }
+
+    private static void MergeItems(Dictionary<uint, Item> target, ImmutableArray<Item> source)
+    {
+        if (source.IsDefault)
+        {
+            return;
+        }
+
+        foreach (Item item in source)
+        {
+            if (!target.TryGetValue(item.Id, out Item? existing) || GetOwnedCount(item) > GetOwnedCount(existing))
+            {
+                target[item.Id] = item;
+            }
+        }
+    }
+
+    private static int GetOwnedCount(Item item)
+    {
+        return (int)item.Num - item.LackNum;
+    }
+
+    private static ImmutableArray<AvatarPromotionDelta> Slice(ImmutableArray<AvatarPromotionDelta> source, int start, int length)
+    {
+        ImmutableArray<AvatarPromotionDelta>.Builder builder = ImmutableArray.CreateBuilder<AvatarPromotionDelta>(length);
+        for (int i = start; i < start + length; i++)
+        {
+            builder.Add(source[i]);
+        }
+
+        return builder.ToImmutable();
     }
 
     public async ValueTask<ImmutableArray<Avatar>> GetAvatarsAsync(UserAndUid userAndUid, CancellationToken token = default)
@@ -252,6 +411,9 @@ public sealed partial class CalculateClient
     {
         [JsonPropertyName("items")]
         public required ImmutableArray<AvatarPromotionDelta> Items { get; init; }
+
+        [JsonPropertyName("lang")]
+        public string Lang { get; init; } = "zh-cn";
 
         [JsonPropertyName("region")]
         public required Region Region { get; init; }

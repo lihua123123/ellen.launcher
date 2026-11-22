@@ -63,39 +63,17 @@ public static class OfflineCalculator
 
     private static ImmutableArray<Item> CalculateAvatarConsumption(AvatarPromotionDelta delta, MetadataAvatar avatar)
     {
-        Dictionary<uint, uint> itemCounts = [];
+        ElementType element = ElementNameIconConverter.ElementNameToElementType(avatar.FetterInfo.Vision);
 
-        // 计算 95 级上限突破
-        if (delta is { AvatarLevelCurrent: <= 90, AvatarLevelTarget: >= 95U })
+        return CalculateCustomAvatarConsumption(delta, new()
         {
-            AddOrUpdateItem(itemCounts, MaterialIds.MasterlessStellaFortuna, 1U);
-        }
-
-        // 计算 100 级上限突破
-        if (delta is { AvatarLevelCurrent: <= 95, AvatarLevelTarget: >= 100U })
-        {
-            AddOrUpdateItem(itemCounts, MaterialIds.MasterlessStellaFortuna, 2U);
-        }
-
-        // 计算角色经验
-        if (delta.AvatarLevelCurrent < delta.AvatarLevelTarget)
-        {
-            CalculateAvatarExperience(delta, itemCounts);
-        }
-
-        // 计算角色突破
-        if (delta.AvatarLevelCurrent <= delta.AvatarLevelTarget)
-        {
-            CalculateAvatarAscension(delta, avatar, itemCounts);
-        }
-
-        // 计算天赋升级
-        if (delta.SkillList.Length > 0)
-        {
-            CalculateAvatarTalents(delta, avatar, itemCounts);
-        }
-
-        return ConvertToItems(itemCounts);
+            GemBaseId = ElementGemBaseIds[element],
+            BossMaterialId = avatar.CultivationItems.Length > 1 ? avatar.CultivationItems[1] : 0,
+            SpecialtyId = avatar.CultivationItems.Length > 2 ? avatar.CultivationItems[2] : 0,
+            TalentBookIds = avatar.CultivationItems.Length > 4 ? CreateSeries(avatar.CultivationItems[4], 3) : [],
+            MonsterMaterialIds = avatar.CultivationItems.Length > 3 ? CreateSeries(avatar.CultivationItems[3], 3) : [],
+            WeeklyBossMaterialId = avatar.CultivationItems.Length > 5 ? avatar.CultivationItems[5] : 0,
+        });
     }
 
     private static ImmutableArray<Item> CalculateWeaponConsumption(AvatarPromotionDelta delta, MetadataWeapon weapon)
@@ -105,18 +83,91 @@ public static class OfflineCalculator
             return [];
         }
 
-        Dictionary<uint, uint> itemCounts = [];
-
-        // 计算武器经验
-        if (delta.Weapon.LevelCurrent < delta.Weapon.LevelTarget)
+        return CalculateCustomWeaponConsumption(delta, new()
         {
-            CalculateWeaponExperience(weapon.RankLevel, delta.Weapon, itemCounts);
+            Quality = weapon.RankLevel,
+            AscensionMaterialSeries = weapon.CultivationItems.Length >= 3
+                ? [CreateSeries(weapon.CultivationItems[0], 4), CreateSeries(weapon.CultivationItems[1], 4), CreateSeries(weapon.CultivationItems[2], 4)]
+                : [],
+        });
+    }
+
+    /// <summary>由最高品质 ID 构造一个从低到高的连续品质系列。</summary>
+    private static ImmutableArray<uint> CreateSeries(uint highestId, int length)
+    {
+        if (highestId is 0)
+        {
+            return [];
         }
 
-        // 计算武器突破
+        ImmutableArray<uint>.Builder builder = ImmutableArray.CreateBuilder<uint>(length);
+        for (int i = length - 1; i >= 0; i--)
+        {
+            builder.Add(highestId - (uint)i);
+        }
+
+        return builder.ToImmutable();
+    }
+
+    /// <summary>
+    /// 自定义材料计划（角色）：等级决定数量，材料种类由用户选择。
+    /// 摩拉 / 经验书 / 智识之冕仍按模板算，其余材料按用户选中的 ID 代入既有消耗表。
+    /// </summary>
+    public static ImmutableArray<Item> CalculateCustomAvatarConsumption(AvatarPromotionDelta delta, CustomAvatarMaterialSelection materials)
+    {
+        Dictionary<uint, uint> itemCounts = [];
+
+        // 计算 95 / 100 级上限突破
+        if (delta is { AvatarLevelCurrent: <= 90, AvatarLevelTarget: >= 95U })
+        {
+            AddOrUpdateItem(itemCounts, MaterialIds.MasterlessStellaFortuna, 1U);
+        }
+
+        if (delta is { AvatarLevelCurrent: <= 95, AvatarLevelTarget: >= 100U })
+        {
+            AddOrUpdateItem(itemCounts, MaterialIds.MasterlessStellaFortuna, 2U);
+        }
+
+        // 经验书与摩拉按模板算
+        if (delta.AvatarLevelCurrent < delta.AvatarLevelTarget)
+        {
+            CalculateAvatarExperience(delta, itemCounts);
+        }
+
+        if (delta.AvatarLevelCurrent <= delta.AvatarLevelTarget)
+        {
+            CalculateCustomAvatarAscension(delta, itemCounts, materials);
+        }
+
+        if (delta.SkillList.Length > 0)
+        {
+            CalculateCustomAvatarTalents(delta, itemCounts, materials);
+        }
+
+        return ConvertToItems(itemCounts);
+    }
+
+    /// <summary>
+    /// 自定义材料计划（武器）：武器品质与等级决定数量，突破材料种类由用户选择。
+    /// 摩拉 / 精锻用魔矿按模板算。
+    /// </summary>
+    public static ImmutableArray<Item> CalculateCustomWeaponConsumption(AvatarPromotionDelta delta, CustomWeaponMaterialSelection materials)
+    {
+        if (delta.Weapon is null)
+        {
+            return [];
+        }
+
+        Dictionary<uint, uint> itemCounts = [];
+
+        if (delta.Weapon.LevelCurrent < delta.Weapon.LevelTarget)
+        {
+            CalculateWeaponExperience(materials.Quality, delta.Weapon, itemCounts);
+        }
+
         if (delta.Weapon.LevelCurrent <= delta.Weapon.LevelTarget)
         {
-            CalculateWeaponAscension(delta.Weapon, weapon, itemCounts);
+            CalculateCustomWeaponAscension(delta.Weapon, itemCounts, materials.Quality, materials.AscensionMaterialSeries);
         }
 
         return ConvertToItems(itemCounts);
@@ -130,14 +181,8 @@ public static class OfflineCalculator
         AddOrUpdateItem(itemCounts, MaterialIds.HeroesWit, expItemCount);
     }
 
-    private static void CalculateAvatarAscension(AvatarPromotionDelta delta, MetadataAvatar avatar, Dictionary<uint, uint> itemCounts)
+    private static void CalculateCustomAvatarAscension(AvatarPromotionDelta delta, Dictionary<uint, uint> itemCounts, CustomAvatarMaterialSelection materials)
     {
-        /* 培养材料是 6 槽契约；新角色可能还没被数据源收录，缺槽时跳过材料而不是越界 */
-        if (avatar.CultivationItems.Length < 6)
-        {
-            return;
-        }
-
         ImmutableArray<int> requiredAscensions = Ascension.GetRequiredLevels(AscensionLevels, delta);
         if (requiredAscensions.IsEmpty)
         {
@@ -148,25 +193,18 @@ public static class OfflineCalculator
         {
             int ascensionIndex = AvatarAscensionIndices[requiredAscension];
 
-            // 添加摩拉消耗
+            // 摩拉与经验书按模板算；材料种类来自用户选择，数量仍用同一张消耗表
             AddOrUpdateItem(itemCounts, MaterialIds.Mora, (uint)AvatarAscensionMoraCosts[ascensionIndex]);
-
-            // 添加元素宝石 根据突破等级选择宝石品质和数量
-            ElementType element = ElementNameIconConverter.ElementNameToElementType(avatar.FetterInfo.Vision);
-            AddOrUpdateItem(itemCounts, AvatarGemConsumption[ascensionIndex].Positive(ElementGemBaseIds[element]));
-
-            // 添加 BOSS 材料
-            AddOrUpdateItem(itemCounts, avatar.CultivationItems[1], AvatarBossMaterialCounts[ascensionIndex]);
-
-            // 添加特产材料
-            AddOrUpdateItem(itemCounts, avatar.CultivationItems[2], AvatarSpecialtyCounts[ascensionIndex]);
-
-            // 添加怪物材料
-            AddOrUpdateItem(itemCounts, AvatarMonsterMaterialConsumption[ascensionIndex].Negative(avatar.CultivationItems[3]));
+            AddOrUpdateItem(itemCounts, AvatarGemConsumption[ascensionIndex].Positive(materials.GemBaseId));
+            AddOrUpdateItem(itemCounts, materials.BossMaterialId, AvatarBossMaterialCounts[ascensionIndex]);
+            AddOrUpdateItem(itemCounts, materials.SpecialtyId, AvatarSpecialtyCounts[ascensionIndex]);
+            AddOrUpdateItem(itemCounts,
+                CustomAvatarMaterialSelection.GetIdByQualityOffset(materials.MonsterMaterialIds, AvatarMonsterMaterialConsumption[ascensionIndex].QualityOffset),
+                AvatarMonsterMaterialConsumption[ascensionIndex].Count);
         }
     }
 
-    private static void CalculateAvatarTalents(AvatarPromotionDelta delta, MetadataAvatar avatar, Dictionary<uint, uint> itemCounts)
+    private static void CalculateCustomAvatarTalents(AvatarPromotionDelta delta, Dictionary<uint, uint> itemCounts, CustomAvatarMaterialSelection materials)
     {
         foreach (PromotionDelta skill in delta.SkillList)
         {
@@ -175,11 +213,11 @@ public static class OfflineCalculator
                 continue;
             }
 
-            CalculateAvatarTalent(skill, avatar, itemCounts);
+            CalculateCustomAvatarTalent(skill, itemCounts, materials);
         }
     }
 
-    private static void CalculateAvatarTalent(PromotionDelta delta, MetadataAvatar avatar, Dictionary<uint, uint> itemCounts)
+    private static void CalculateCustomAvatarTalent(PromotionDelta delta, Dictionary<uint, uint> itemCounts, CustomAvatarMaterialSelection materials)
     {
         uint currentLevel = delta.LevelCurrent;
         uint targetLevel = delta.LevelTarget;
@@ -191,19 +229,16 @@ public static class OfflineCalculator
 
         foreach (int upgradeIndex in Enumerable.Sequence((int)currentLevel, (int)(targetLevel - 1), 1))
         {
-            // 添加摩拉消耗
+            // 摩拉与智识之冠按模板算；材料种类来自用户选择，按品质偏移从系列直接取 ID
             AddOrUpdateItem(itemCounts, MaterialIds.Mora, (uint)TalentMoraCosts[upgradeIndex]);
+            AddOrUpdateItem(itemCounts,
+                CustomAvatarMaterialSelection.GetIdByQualityOffset(materials.TalentBookIds, TalentBookConsumption[upgradeIndex].QualityOffset),
+                TalentBookConsumption[upgradeIndex].Count);
+            AddOrUpdateItem(itemCounts,
+                CustomAvatarMaterialSelection.GetIdByQualityOffset(materials.MonsterMaterialIds, TalentMonsterMaterialConsumption[upgradeIndex].QualityOffset),
+                TalentMonsterMaterialConsumption[upgradeIndex].Count);
+            AddOrUpdateItem(itemCounts, materials.WeeklyBossMaterialId, WeeklyBossCounts[upgradeIndex]);
 
-            // 添加天赋书
-            AddOrUpdateItem(itemCounts, TalentBookConsumption[upgradeIndex].Negative(avatar.CultivationItems[4]));
-
-            // 添加怪物材料
-            AddOrUpdateItem(itemCounts, TalentMonsterMaterialConsumption[upgradeIndex].Negative(avatar.CultivationItems[3]));
-
-            // 添加周常BOSS材料
-            AddOrUpdateItem(itemCounts, avatar.CultivationItems[5], WeeklyBossCounts[upgradeIndex]);
-
-            // 添加智识之冠
             if (upgradeIndex is 9)
             {
                 AddOrUpdateItem(itemCounts, MaterialIds.CrownOfInsight, 1U);
@@ -219,18 +254,15 @@ public static class OfflineCalculator
         AddOrUpdateItem(itemCounts, MaterialIds.MysticEnhancementOre, expItemCount);
     }
 
-    private static void CalculateWeaponAscension(PromotionDelta delta, MetadataWeapon weapon, Dictionary<uint, uint> itemCounts)
+    private static void CalculateCustomWeaponAscension(PromotionDelta delta, Dictionary<uint, uint> itemCounts, QualityType quality, ImmutableArray<ImmutableArray<uint>> materialSeries)
     {
-        /* 同上：武器是 3 槽契约 */
-        if (weapon.CultivationItems.Length < 3)
+        if (materialSeries.Length < 3)
         {
             return;
         }
 
-        QualityType quality = weapon.RankLevel;
-
         ImmutableArray<int> requiredAscensions = Ascension.GetRequiredLevels(AscensionLevels, delta);
-        Debug.Assert(weapon.RankLevel >= QualityType.QUALITY_BLUE || !requiredAscensions.Contains(80));
+        Debug.Assert(quality >= QualityType.QUALITY_BLUE || !requiredAscensions.Contains(80));
 
         if (requiredAscensions.IsEmpty)
         {
@@ -241,23 +273,24 @@ public static class OfflineCalculator
         {
             int ascensionIndex = AscensionLevels.IndexOf(requiredAscension);
 
-            // 添加摩拉消耗
+            // 摩拉按模板算；三个突破槽的材料种类来自用户选择，按品质偏移从各自系列直接取 ID
             AddOrUpdateItem(itemCounts, MaterialIds.Mora, (uint)WeaponAscensionMoraCosts[quality][ascensionIndex]);
-
-            // 添加武器突破材料
-            AddOrUpdateItem(itemCounts, WeaponMaterialConsumption[quality][ascensionIndex].Negative(weapon.CultivationItems[0]));
-
-            // 添加A怪物材料
-            AddOrUpdateItem(itemCounts, WeaponMonsterMaterialAConsumption[quality][ascensionIndex].Negative(weapon.CultivationItems[1]));
-
-            // 添加B怪物材料
-            AddOrUpdateItem(itemCounts, WeaponMonsterMaterialBConsumption[quality][ascensionIndex].Negative(weapon.CultivationItems[2]));
+            AddOrUpdateItem(itemCounts,
+                CustomWeaponMaterialSelection.GetIdByQualityOffset(materialSeries[0], WeaponMaterialConsumption[quality][ascensionIndex].QualityOffset),
+                WeaponMaterialConsumption[quality][ascensionIndex].Count);
+            AddOrUpdateItem(itemCounts,
+                CustomWeaponMaterialSelection.GetIdByQualityOffset(materialSeries[1], WeaponMonsterMaterialAConsumption[quality][ascensionIndex].QualityOffset),
+                WeaponMonsterMaterialAConsumption[quality][ascensionIndex].Count);
+            AddOrUpdateItem(itemCounts,
+                CustomWeaponMaterialSelection.GetIdByQualityOffset(materialSeries[2], WeaponMonsterMaterialBConsumption[quality][ascensionIndex].QualityOffset),
+                WeaponMonsterMaterialBConsumption[quality][ascensionIndex].Count);
         }
     }
 
     private static void AddOrUpdateItem(Dictionary<uint, uint> items, uint id, uint count)
     {
-        if (count is 0)
+        // 自定义计划里可能有未选材料的空槽，MaterialId 0 不是有效材料，直接跳过
+        if (count is 0 || id is 0)
         {
             return;
         }

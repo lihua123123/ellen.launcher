@@ -15,6 +15,8 @@ public sealed partial class CultivateTypeIconConverter : ValueConverter<Cultivat
         KeyValuePair.Create(SH.ModelEntityPrimitiveCultivateTypeAvatarAndSkill, CultivateType.AvatarAndSkill),
         KeyValuePair.Create(SH.ModelEntityPrimitiveCultivateTypeWeapon, CultivateType.Weapon),
         KeyValuePair.Create(SH.ModelEntityPrimitiveCultivateTypeFurniture, CultivateType.Furniture),
+        KeyValuePair.Create(SH.ModelEntityPrimitiveCultivateTypeCustomAvatarMaterial, CultivateType.CustomAvatarMaterial),
+        KeyValuePair.Create(SH.ModelEntityPrimitiveCultivateTypeCustomWeaponMaterial, CultivateType.CustomWeaponMaterial),
     ]);
 
     public static Uri CultivateTypeNameToIconUri(string cultivateTypeName)
@@ -29,6 +31,8 @@ public sealed partial class CultivateTypeIconConverter : ValueConverter<Cultivat
             CultivateType.AvatarAndSkill => "UI_BtnIcon_PlayerGirl.png",
             CultivateType.Weapon => "UI_BagTabIcon_Weapon.png",
             CultivateType.Furniture => "UI_BtnIcon_Homeworld.png",
+            CultivateType.CustomAvatarMaterial => "UI_ItemIcon_201.png",
+            CultivateType.CustomWeaponMaterial => "UI_ItemIcon_210.png",
             _ => throw EllenException.NotSupported(),
         };
 

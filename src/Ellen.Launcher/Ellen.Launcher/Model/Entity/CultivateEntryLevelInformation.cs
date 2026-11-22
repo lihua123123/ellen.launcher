@@ -69,6 +69,28 @@ public sealed class CultivateEntryLevelInformation
                 WeaponLevelTo = source.WeaponLevelTo,
                 WeaponIsPromoting = source.WeaponIsPromoting,
             },
+
+            // 自定义材料计划不绑定具体角色/武器，但保留模板等级，便于条目描述展示。
+            CultivateType.CustomAvatarMaterial => new()
+            {
+                EntryId = entryId,
+                AvatarLevelFrom = source.AvatarLevelFrom,
+                AvatarLevelTo = source.AvatarLevelTo,
+                AvatarIsPromoting = source.AvatarIsPromoting,
+                SkillALevelFrom = source.SkillALevelFrom,
+                SkillALevelTo = source.SkillALevelTo,
+                SkillELevelFrom = source.SkillELevelFrom,
+                SkillELevelTo = source.SkillELevelTo,
+                SkillQLevelFrom = source.SkillQLevelFrom,
+                SkillQLevelTo = source.SkillQLevelTo,
+            },
+            CultivateType.CustomWeaponMaterial => new()
+            {
+                EntryId = entryId,
+                WeaponLevelFrom = source.WeaponLevelFrom,
+                WeaponLevelTo = source.WeaponLevelTo,
+                WeaponIsPromoting = source.WeaponIsPromoting,
+            },
             _ => throw EllenException.NotSupported($"不支持的养成类型{type}"),
         };
     }

@@ -69,12 +69,17 @@ public sealed partial class CultivationResinStatisticsService : ICultivationResi
                             if (!item.IsFinished)
                             {
                                 double times = GetStatisticsCultivateItemTimes(item);
-                                _ = item.Inner.RankLevel switch
+                                // 元数据里 Boss / 周本材料 RankLevel 可能缺失（恒为 QUALITY_WHITE），
+                                // 未知品质跳过，避免统计刷新抛异常。
+                                switch (item.Inner.RankLevel)
                                 {
-                                    QualityType.QUALITY_PURPLE => statistics.NormalBoss.RawItemCount += times,
-                                    QualityType.QUALITY_ORANGE => statistics.WeeklyBoss.RawItemCount += times,
-                                    _ => throw EllenException.NotSupported(),
-                                };
+                                    case QualityType.QUALITY_PURPLE:
+                                        statistics.NormalBoss.RawItemCount += times;
+                                        break;
+                                    case QualityType.QUALITY_ORANGE:
+                                        statistics.WeeklyBoss.RawItemCount += times;
+                                        break;
+                                }
                             }
                         }
 
@@ -90,29 +95,44 @@ public sealed partial class CultivationResinStatisticsService : ICultivationResi
                         double purpleItems = 0D;
                         double orangeItems = 0D;
 
-                        // ABCDE -> B
-                        ResinStatisticsItem targetStatisticsItem = ((rank / 1000) % 10) switch
+                        // ABCDE -> B；未知分类（如智识之冕等 rank 非天赋书/武器突破的材料）跳过，
+                        // 避免自定义材料计划带来的新种类触发 NotSupported 崩溃。
+                        ResinStatisticsItem? targetStatisticsItem = ((rank / 1000) % 10) switch
                         {
                             3 => statistics.TalentAscension,
                             5 => statistics.WeaponAscension,
-                            _ => throw EllenException.NotSupported(),
+                            _ => null,
                         };
+
+                        if (targetStatisticsItem is null)
+                        {
+                            break;
+                        }
 
                         foreach (StatisticsCultivateItem item in items)
                         {
                             // IsFinished is implicitly calculated in AlchemyCrafting
                             double times = GetStatisticsCultivateItemTimes(item);
-                            _ = item.Inner.RankLevel switch
+                            // 元数据里部分材料（尤其自定义材料计划涉及的树脂素材）RankLevel 缺失
+                            // （恒为 QUALITY_WHITE），未知品质直接跳过，避免统计刷新时抛异常导致崩溃。
+                            switch (item.Inner.RankLevel)
                             {
-                                QualityType.QUALITY_GREEN => greenItems += times,
-                                QualityType.QUALITY_BLUE => blueItems += times,
-                                QualityType.QUALITY_PURPLE => purpleItems += times,
-                                QualityType.QUALITY_ORANGE => orangeItems += times,
-                                _ => throw EllenException.NotSupported(),
-                            };
+                                case QualityType.QUALITY_GREEN:
+                                    greenItems += times;
+                                    break;
+                                case QualityType.QUALITY_BLUE:
+                                    blueItems += times;
+                                    break;
+                                case QualityType.QUALITY_PURPLE:
+                                    purpleItems += times;
+                                    break;
+                                case QualityType.QUALITY_ORANGE:
+                                    orangeItems += times;
+                                    break;
+                            }
                         }
 
-                        targetStatisticsItem.RawItemCount += AlchemyCrafting.UnWeighted(orangeItems, purpleItems, blueItems, greenItems);
+                        targetStatisticsItem!.RawItemCount += AlchemyCrafting.UnWeighted(orangeItems, purpleItems, blueItems, greenItems);
                         break;
                     }
             }

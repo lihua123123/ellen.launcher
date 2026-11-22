@@ -166,11 +166,22 @@ public sealed partial class UserViewModel : ObservableObject
         return AddUserByManualInputCookieAsync(true).AsTask();
     }
 
+    [Command("LoginByPasswordCommand")]
+    private Task LoginByPasswordAsync()
+    {
+        SentrySdk.AddBreadcrumb(BreadcrumbFactory2.CreateUI("Add chinese user", "UserViewModel.Command", [("source", "Password")]));
+        return LoginByPasswordAsync(false);
+    }
+
     [Command("LoginByPasswordOverseaCommand")]
-    private async Task LoginByPasswordOverseaAsync()
+    private Task LoginByPasswordOverseaAsync()
     {
         SentrySdk.AddBreadcrumb(BreadcrumbFactory2.CreateUI("Add oversea user", "UserViewModel.Command", [("source", "Password")]));
+        return LoginByPasswordAsync(true);
+    }
 
+    private async Task LoginByPasswordAsync(bool isOversea)
+    {
         await taskContext.SwitchToMainThreadAsync();
 
         using (IServiceScope scope = serviceProvider.CreateScope())
@@ -178,12 +189,12 @@ public sealed partial class UserViewModel : ObservableObject
             UserAccountPasswordDialog dialog = await contentDialogFactory
                 .CreateInstanceAsync<UserAccountPasswordDialog>(scope.ServiceProvider)
                 .ConfigureAwait(false);
-            ValueResult<bool, LoginResult?> result = await dialog.LoginAsync(true).ConfigureAwait(false);
+            ValueResult<bool, LoginResult?> result = await dialog.LoginAsync(isOversea).ConfigureAwait(false);
 
             if (result.TryGetValue(out LoginResult? loginResult))
             {
                 Cookie stokenV2 = Cookie.FromLoginResult(loginResult);
-                (UserOptionResultKind optionResult, string? uid) = await userService.ProcessInputCookieAsync(InputCookie.CreateForDeviceFpInference(stokenV2, true)).ConfigureAwait(false);
+                (UserOptionResultKind optionResult, string? uid) = await userService.ProcessInputCookieAsync(InputCookie.CreateForDeviceFpInference(stokenV2, isOversea)).ConfigureAwait(false);
                 HandleUserOptionResult(optionResult, uid);
             }
         }

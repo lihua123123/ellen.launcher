@@ -28,6 +28,11 @@ public sealed partial class CultivateEntryView : Item, IPropertyValuesProvider
         Type = entry.Type;
 
         Description = ParseDescription(entry);
+        if (entry.Type is CultivateType.CustomAvatarMaterial or CultivateType.CustomWeaponMaterial)
+        {
+            Description = ParseCustomMaterialDescription(entry, items.Length);
+        }
+
         IsToday = items.Any(i => i.IsToday);
         RotationalItemIds = [.. items.Where(i => i.DaysOfWeek is not DaysOfWeek.Any).Select(i => i.Inner.Id)];
         DaysOfWeek = MaterialIds.GetDaysOfWeek(RotationalItemIds.AsSpan());
@@ -99,6 +104,35 @@ public sealed partial class CultivateEntryView : Item, IPropertyValuesProvider
             }
 
             return string.Empty;
+        }
+
+        static string ParseCustomMaterialDescription(CultivateEntry entry, int itemCount)
+        {
+            StringBuilder stringBuilder = new();
+            stringBuilder.Append(SH.FormatViewModelCultivationCustomMaterialDescription(itemCount));
+
+            if (entry.LevelInformation is not { } info)
+            {
+                return stringBuilder.ToString();
+            }
+
+            if (entry.Type is CultivateType.CustomAvatarMaterial)
+            {
+                if (info.AvatarLevelFrom != info.AvatarLevelTo)
+                {
+                    stringBuilder.Append(" · Lv.").Append(info.AvatarLevelFrom).Append(" → Lv.").Append(info.AvatarLevelTo);
+                }
+
+                stringBuilder.Append(" · A").Append(info.SkillALevelFrom).Append("→").Append(info.SkillALevelTo)
+                    .Append(" E").Append(info.SkillELevelFrom).Append("→").Append(info.SkillELevelTo)
+                    .Append(" Q").Append(info.SkillQLevelFrom).Append("→").Append(info.SkillQLevelTo);
+            }
+            else if (info.WeaponLevelFrom != info.WeaponLevelTo)
+            {
+                stringBuilder.Append(" · Lv.").Append(info.WeaponLevelFrom).Append(" → Lv.").Append(info.WeaponLevelTo);
+            }
+
+            return stringBuilder.ToString();
         }
     }
 

@@ -793,7 +793,7 @@
                 <TextBlock
                     Opacity="0.7"
                     Style="{StaticResource CaptionTextBlockStyle}"
-                    Text="{shuxm:ResourceString Name=ViewPageDailyNoteZenlessLoadFailed}"
+                    Text="{Binding LoadFailedText}"
                     TextWrapping="Wrap"
                     Visibility="{Binding HasNote, Converter={StaticResource BoolToVisibilityRevertConverter}}"/>
             </StackPanel>

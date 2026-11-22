@@ -8,6 +8,7 @@ using Ellen.Launcher.Core.ExceptionService;
 using Ellen.Launcher.Core.Logging;
 using Ellen.Launcher.Factory.ContentDialog;
 using Ellen.Launcher.Model.Entity;
+using Ellen.Launcher.Model.Entity.Primitive;
 using Ellen.Launcher.Model.Primitive;
 using Ellen.Launcher.Service.AvatarInfo;
 using Ellen.Launcher.Service.Backpack;
@@ -31,6 +32,7 @@ using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using AvatarPromotionDelta = Ellen.Launcher.Web.Hoyolab.Takumi.Event.Calculate.AvatarPromotionDelta;
 using CalculateBatchConsumption = Ellen.Launcher.Web.Hoyolab.Takumi.Event.Calculate.BatchConsumption;
+using CalculateItem = Ellen.Launcher.Web.Hoyolab.Takumi.Event.Calculate.Item;
 using DetailedCharacter = Ellen.Launcher.Web.Hoyolab.Takumi.GameRecord.Avatar.DetailedCharacter;
 using PromotionDelta = Ellen.Launcher.Web.Hoyolab.Takumi.Event.Calculate.PromotionDelta;
 
@@ -159,6 +161,59 @@ public sealed partial class CultivationViewModel : Abstraction.ViewModel
         };
 
         messenger.Send(message);
+    }
+
+    /// <summary>
+    /// 添加自定义材料计划：弹窗里输入等级模板参数并自选材料种类，
+    /// 数量由离线计算器按既有等级模板算表推导，落在两个自定义养成条目上。
+    /// 后续的统计、合成展开和背包抵扣都沿用现有规则。
+    /// </summary>
+    [Command("AddCustomMaterialCommand")]
+    private async Task AddCustomMaterialAsync()
+    {
+        SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateUI("Add custom material plan", "CultivationViewModel.Command"));
+
+        CustomMaterialPlanDialog dialog = await contentDialogFactory
+            .CreateInstanceAsync<CustomMaterialPlanDialog>(serviceProvider)
+            .ConfigureAwait(false);
+        (bool isOk, CustomMaterialPlanResult result) = await dialog.SelectAsync().ConfigureAwait(false);
+        if (!isOk)
+        {
+            return;
+        }
+
+        if (result.AvatarDelta is { } avatarDelta && result.AvatarSelection is { } avatarSelection)
+        {
+            ImmutableArray<CalculateItem> items = OfflineCalculator.CalculateCustomAvatarConsumption(avatarDelta, avatarSelection);
+            await SaveCustomMaterialsAsync(items, LevelInformation.From(avatarDelta), CultivateType.CustomAvatarMaterial).ConfigureAwait(false);
+        }
+
+        if (result.WeaponDelta is { } weaponDelta && result.WeaponSelection is { } weaponSelection)
+        {
+            ImmutableArray<CalculateItem> items = OfflineCalculator.CalculateCustomWeaponConsumption(weaponDelta, weaponSelection);
+            await SaveCustomMaterialsAsync(items, LevelInformation.From(weaponDelta), CultivateType.CustomWeaponMaterial).ConfigureAwait(false);
+        }
+
+        await taskContext.SwitchToMainThreadAsync();
+        messenger.Send(InfoBarMessage.Success(SH.ViewModelCultivationCustomMaterialAdded));
+        await UpdateEntryCollectionAsync(Projects?.CurrentItem).ConfigureAwait(false);
+    }
+
+    private async ValueTask SaveCustomMaterialsAsync(ImmutableArray<CalculateItem> items, LevelInformation levelInformation, CultivateType type)
+    {
+        if (items.IsEmpty)
+        {
+            return;
+        }
+
+        await cultivationService.SaveConsumptionAsync(new InputConsumption
+        {
+            Type = type,
+            ItemId = 0,
+            Items = items,
+            LevelInformation = levelInformation,
+            Strategy = ConsumptionSaveStrategyKind.CreateNewEntry,
+        }).ConfigureAwait(false);
     }
 
     [Command("RemoveProjectCommand")]

@@ -23,6 +23,14 @@ public sealed class CardVerificationHeaders
         return Create(apiEndpoints.GameRecordDailyNotePath());
     }
 
+    /// <summary>
+    /// 绝区零便笺的人机验证参数：挑战路径是 zzz/note，游戏编号为绝区零。
+    /// </summary>
+    public static CardVerificationHeaders CreateForZZZNote()
+    {
+        return Create("/event/game_record_zzz/api/zzz/note", $"{HoyolabOptions.ToolVersion}_#/zzz", 9);
+    }
+
     public static CardVerificationHeaders CreateForIndex(IApiEndpoints apiEndpoints)
     {
         return Create(apiEndpoints.GameRecordIndexPath());
@@ -53,11 +61,11 @@ public sealed class CardVerificationHeaders
         return Create(apiEndpoints.GameRecordHardChallengePath());
     }
 
-    private static CardVerificationHeaders Create(string path, string page = $"{HoyolabOptions.ToolVersion}_#/ys")
+    private static CardVerificationHeaders Create(string path, string page = $"{HoyolabOptions.ToolVersion}_#/ys", int challengeGame = 2)
     {
         return new()
         {
-            ChallengeGame = 2,
+            ChallengeGame = challengeGame,
             ChallengePath = path,
             Page = page,
         };

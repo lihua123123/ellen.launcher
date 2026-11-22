@@ -146,11 +146,14 @@
                         <mxi:ControlStoryboardAction Storyboard="{StaticResource ButtonPanelCollapsedStoryboard}"/>
                     </mxi:EventTriggerBehavior>
                 </mxi:Interaction.Behaviors>
-                <PersonPicture
+                <shuxci:CachedImage
+                    Width="32"
                     Height="32"
                     Margin="2,0"
                     HorizontalAlignment="Left"
-                    ProfilePicture="{Binding UserInfo.AvatarUri, Mode=OneWay}"/>
+                    Background="#FF6E6E6E"
+                    CornerRadius="{ThemeResource CornerRadiusAll16}"
+                    Source="{Binding AvatarUri, Mode=OneWay}"/>
                 <TextBlock
                     Grid.Column="1"
                     Margin="12,0,0,0"
@@ -268,12 +271,14 @@
                         <ColumnDefinition/>
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
-                    <PersonPicture
+                    <shuxci:CachedImage
                         Width="36"
                         Height="36"
                         Margin="1,1,6,1"
                         HorizontalAlignment="Left"
-                        ProfilePicture="{Binding Users.CurrentItem.UserInfo.AvatarUri, Mode=OneWay}"/>
+                        Background="#FF6E6E6E"
+                        CornerRadius="18"
+                        Source="{Binding Users.CurrentItem.AvatarUri, Mode=OneWay}"/>
                     <TextBlock
                         Grid.Column="1"
                         Margin="1,0,0,0"
@@ -330,6 +335,13 @@
                                                 Command="{Binding LoginByMobileCaptchaCommand}"
                                                 Icon="{shuxm:FontIcon Glyph=&#xE8EA;}"
                                                 Label="{shuxm:ResourceString Name=ViewUserCookieOperationLoginMobileCaptchaAction}"/>
+                                            <AppBarButton
+                                                Width="{StaticResource LargeAppBarButtonWidth}"
+                                                MaxWidth="{StaticResource LargeAppBarButtonWidth}"
+                                                Margin="0,-4"
+                                                Command="{Binding LoginByPasswordCommand}"
+                                                Icon="{shuxm:FontIcon Glyph={StaticResource FontIconContentOtherUser}}"
+                                                Label="{shuxm:ResourceString Name=ViewUserCookieOperationLoginByPasswordAction}"/>
                                             <AppBarButton
                                                 Width="{StaticResource LargeAppBarButtonWidth}"
                                                 MaxWidth="{StaticResource LargeAppBarButtonWidth}"

@@ -3,6 +3,7 @@
 
 using Ellen.Launcher.Core.DependencyInjection.Annotation.HttpClient;
 using Ellen.Launcher.Model.Entity;
+using Ellen.Launcher.Service.Geetest;
 using Ellen.Launcher.Web.Endpoint.Hoyolab;
 using Ellen.Launcher.Web.Hoyolab.DataSigning;
 using Ellen.Launcher.Web.Request.Builder;
@@ -22,6 +23,7 @@ public sealed partial class ZZZGameRecordClient : IZZZGameRecordClient
 {
     private readonly IHttpRequestMessageBuilderFactory httpRequestMessageBuilderFactory;
     private readonly IApiEndpointsFactory apiEndpointsFactory;
+    private readonly IServiceProvider serviceProvider;
     private readonly HttpClient httpClient;
 
     [GeneratedConstructor]
@@ -90,6 +92,19 @@ public sealed partial class ZZZGameRecordClient : IZZZGameRecordClient
         Response<Zenless.ZenlessDailyNote>? response = await builder
             .SendAsync<Response<Zenless.ZenlessDailyNote>>(httpClient, token)
             .ConfigureAwait(false);
+
+        // 绝区零便笺和原神便笺一样可能触发 1034 人机验证，验证后重签重试一次，
+        // 否则页面上只会一直显示「暂时无法获取」。
+        if (response?.ReturnCode is (int)KnownReturnCode.CODE1034)
+        {
+            IGeetestService geetestService = serviceProvider.GetRequiredService<IGeetestService>();
+            if (await geetestService.TryVerifyXrpcChallengeAsync(user, CardVerificationHeaders.CreateForZZZNote(), token).ConfigureAwait(false) is { } challenge)
+            {
+                builder.Resurrect().SetXrpcChallenge(challenge);
+                await builder.SignDataAsync(DataSignAlgorithmVersion.Gen2, user.IsOversea ? SaltType.OSX4 : SaltType.X4, false).ConfigureAwait(false);
+                response = await builder.SendAsync<Response<Zenless.ZenlessDailyNote>>(httpClient, token).ConfigureAwait(false);
+            }
+        }
 
         return Response.Response.DefaultIfNull(response);
     }

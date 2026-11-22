@@ -92,7 +92,7 @@
                         Height="36"
                         Background="#FFDAB79B"
                         CornerRadius="18"
-                        Source="{Binding AccountAvatarUrl, Converter={StaticResource AvatarIconCircleConverter}}"/>
+                        Source="{Binding AccountAvatarUri}"/>
 
                     <StackPanel
                         Grid.Column="1"
@@ -101,12 +101,6 @@
                         <TextBlock
                             Style="{StaticResource BodyStrongTextBlockStyle}"
                             Text="{Binding AccountNickname}"
-                            TextTrimming="CharacterEllipsis"
-                            TextWrapping="NoWrap"/>
-                        <TextBlock
-                            Opacity="0.7"
-                            Style="{StaticResource CaptionTextBlockStyle}"
-                            Text="{Binding AccountAttribution}"
                             TextTrimming="CharacterEllipsis"
                             TextWrapping="NoWrap"/>
                     </StackPanel>

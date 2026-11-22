@@ -636,6 +636,7 @@
                                 <MenuFlyoutItem
                                     Command="{Binding RefreshInventoryByCalculatorCommand}"
                                     Icon="{shuxm:FontIcon Glyph=&#xE8EF;}"
+                                    IsEnabled="False"
                                     Text="{shuxm:ResourceString Name=ViewPageCultivationRefreshInventoryByCalculator}"/>
                             </MenuFlyout>
                         </AppBarButton.Flyout>
@@ -648,6 +649,10 @@
                         Command="{Binding AddProjectCommand}"
                         Icon="{shuxm:FontIcon Glyph=&#xE710;}"
                         Label="{shuxm:ResourceString Name=ViewPageCultivationAddProject}"/>
+                    <AppBarButton
+                        Command="{Binding AddCustomMaterialCommand}"
+                        Icon="{shuxm:FontIcon Glyph=&#xE8B7;}"
+                        Label="{shuxm:ResourceString Name=ViewPageCultivationAddCustomMaterialLabel}"/>
                     <AppBarButton
                         Command="{Binding RemoveProjectCommand}"
                         CommandParameter="{Binding Projects.CurrentItem, Mode=OneWay}"
@@ -703,6 +708,13 @@
                                         Description="{shuxm:ResourceString Name=ViewPageCultivationAvatarPropertyDescription}"
                                         Header="{shuxm:ResourceString Name=ViewAvatarPropertyHeader}"
                                         HeaderIcon="{shuxm:BitmapIcon Source=ms-appx:///Resource/Navigation/Cultivation.png}"
+                                        IsClickEnabled="True"/>
+                                    <cwcont:SettingsCard
+                                        ActionIconToolTip="{shuxm:ResourceString Name=ViewPageCultivationNavigateAction}"
+                                        Command="{Binding AddCustomMaterialCommand}"
+                                        Description="{shuxm:ResourceString Name=ViewPageCultivationAddCustomMaterialDescription}"
+                                        Header="{shuxm:ResourceString Name=ViewPageCultivationAddCustomMaterialLabel}"
+                                        HeaderIcon="{shuxm:BitmapIcon Source=ms-appx:///Resource/Icon/UI_ItemIcon_201.png}"
                                         IsClickEnabled="True"/>
                                 </StackPanel>
                             </Border>

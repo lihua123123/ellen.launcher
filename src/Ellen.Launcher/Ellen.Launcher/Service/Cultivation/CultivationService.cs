@@ -5,6 +5,7 @@ using Ellen.Launcher.Core.Database;
 using Ellen.Launcher.Model.Calculable;
 using Ellen.Launcher.Model.Entity;
 using Ellen.Launcher.Model.Entity.Primitive;
+using Ellen.Launcher.Model.Entity.Primitive.Converter;
 using Ellen.Launcher.Model.Intrinsic;
 using Ellen.Launcher.Model.Metadata;
 using Ellen.Launcher.Model.Primitive;
@@ -81,6 +82,18 @@ public sealed partial class CultivationService : ICultivationService
                 {
                     CultivateType.AvatarAndSkill => context.GetAvatarItem(entry.Id),
                     CultivateType.Weapon => context.GetWeaponItem(entry.Id),
+
+                    // 自定义材料计划没有对应的角色/武器元数据，用分类名 + 分类图标构造展示项
+                    CultivateType.CustomAvatarMaterial or CultivateType.CustomWeaponMaterial => new ModelItem
+                    {
+                        Id = entry.Id,
+                        Name = entry.Type is CultivateType.CustomAvatarMaterial
+                            ? SH.ModelEntityPrimitiveCultivateTypeCustomAvatarMaterial
+                            : SH.ModelEntityPrimitiveCultivateTypeCustomWeaponMaterial,
+                        Icon = CultivateTypeIconConverter.CultivateTypeToIconUri(entry.Type),
+                        Badge = CultivateTypeIconConverter.CultivateTypeToIconUri(entry.Type),
+                        Quality = QualityType.QUALITY_PURPLE,
+                    },
 
                     // TODO: support furniture calc
                     _ => default!,

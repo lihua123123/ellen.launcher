@@ -67,8 +67,6 @@ public sealed partial class AnnouncementViewModel : Abstraction.ViewModel, IReci
     private readonly CultureOptions cultureOptions;
     private readonly ITaskContext taskContext;
     private readonly INetworkRetryCoordinator networkRetryCoordinator;
-    private readonly IGameLocatorFactory gameLocatorFactory;
-    private readonly LaunchOptions launchOptions;
 
     private IDisposable? homeRetryRegistration;
     private int shouldRefreshDashboardOnSuccess;
@@ -447,48 +445,6 @@ public sealed partial class AnnouncementViewModel : Abstraction.ViewModel, IReci
             ActivityCalendar = calendar;
             UpdateDisplayedActivityCards();
             IsActivityCalendarLoading = false;
-        }
-    }
-
-    [Command("SetGamePathCommand")]
-    private async Task SetGamePathAsync()
-    {
-        SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateUI("Set game path", "AnnouncementViewModel.Command"));
-
-        if (await gameLocatorFactory.LocateSingleAsync(GameLocationSourceKind.Manual).ConfigureAwait(false) is not (true, { } path))
-        {
-            return;
-        }
-
-        await taskContext.SwitchToMainThreadAsync();
-        launchOptions.PerformGamePathEntrySynchronization(path);
-        serviceProvider.GetRequiredService<IMessenger>().Send(InfoBarMessage.Success(SH.ViewPageAnnouncementSetGamePathSuccessTitle, SH.FormatViewPageAnnouncementSetGamePathSuccessMessage(path)));
-    }
-
-    /// <summary>
-    /// 设置绝区零游戏路径，供网页缓存方式获取调频记录使用（本启动器不启动绝区零）。
-    /// 适配 Starward 等非官方启动器安装位置，注册表查不到时由用户手动指定。
-    /// </summary>
-    [Command("SetZZZGamePathCommand")]
-    private async Task SetZZZGamePathAsync()
-    {
-        SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateUI("Set ZZZ game path", "AnnouncementViewModel.Command"));
-
-        IFileSystemPickerInteraction fileSystemPickerInteraction = serviceProvider.GetRequiredService<IFileSystemPickerInteraction>();
-        (bool isPickerOk, ValueFile file) = fileSystemPickerInteraction.PickFile(
-            SH.ViewPageAnnouncementSetZZZGamePathLabel,
-            SH.ServiceGameLocatorPickerFilterText,
-            GameConstants.ZenlessZoneZeroFileName);
-
-        if (isPickerOk)
-        {
-            string fileName = Path.GetFileName(file);
-            if (fileName.ToUpperInvariant() is GameConstants.ZenlessZoneZeroFileNameUpper)
-            {
-                await taskContext.SwitchToMainThreadAsync();
-                launchOptions.ZZZGamePath.Value = file;
-                serviceProvider.GetRequiredService<IMessenger>().Send(InfoBarMessage.Success(SH.ViewPageAnnouncementSetGamePathSuccessTitle, SH.FormatViewPageAnnouncementSetZZZGamePathSuccessMessage(file)));
-            }
         }
     }
 

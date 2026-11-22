@@ -100,6 +100,25 @@ public sealed partial class ZenlessNoteEntry : ObservableObject
     public partial DateTimeOffset RefreshTime { get; set; }
 
     /// <summary>
+    /// 最近一次拉取失败时接口返回的信息；成功时为 null。
+    /// 展示出来便于定位是签名、验证还是区服参数的问题，而不是只显示笼统的"获取失败"。
+    /// </summary>
+    [ObservableProperty]
+    public partial string? ErrorMessage { get; set; }
+
+    partial void OnErrorMessageChanged(string? value)
+    {
+        OnPropertyChanged(nameof(LoadFailedText));
+    }
+
+    public string LoadFailedText
+    {
+        get => string.IsNullOrWhiteSpace(ErrorMessage)
+            ? SH.ViewPageDailyNoteZenlessLoadFailed
+            : $"{SH.ViewPageDailyNoteZenlessLoadFailed}（{ErrorMessage}）";
+    }
+
+    /// <summary>
     /// 是否已经拿到过一次数据（决定显示内容还是「获取失败」提示）。
     /// </summary>
     public bool HasNote
@@ -122,10 +141,13 @@ public sealed partial class ZenlessNoteEntry : ObservableObject
 
         if (!ResponseValidator.TryValidateWithoutUINotification(response, out ZenlessDailyNote? note))
         {
+            await taskContext.SwitchToMainThreadAsync();
+            ErrorMessage = response?.Message ?? SH.ViewPageDailyNoteZenlessLoadFailed;
             return;
         }
 
         await taskContext.SwitchToMainThreadAsync();
+        ErrorMessage = null;
         Note = note;
         RefreshTime = DateTimeOffset.Now;
         OnPropertyChanged(nameof(HasNote));

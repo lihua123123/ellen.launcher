@@ -39,10 +39,15 @@ public sealed partial class PromotionDeltaFactory
             }
 
             ImmutableArray<ICultivationItemsAccess> cultivationItemsEntryList = Create(context, calculableAvatars, calculableWeapons).Sort(CultivationItemsAccessComparer.Shared);
+            Dictionary<uint, ElementAttributeId> elementAttributes = [];
+            foreach (ref readonly CalculableAvatar avatar in calculableAvatars.AsSpan())
+            {
+                elementAttributes[avatar.Id] = avatar.ElementAttrId;
+            }
 
             using (ValueStopwatch.MeasureExecution(logger))
             {
-                return ToPromotionDeltaArray(cultivationItemsEntryList);
+                return ToPromotionDeltaArray(cultivationItemsEntryList, elementAttributes);
             }
         }).ConfigureAwait(false);
 
@@ -71,7 +76,9 @@ public sealed partial class PromotionDeltaFactory
         return cultivationItems.ToImmutable();
     }
 
-    private static ImmutableArray<AvatarPromotionDelta> ToPromotionDeltaArray(ImmutableArray<ICultivationItemsAccess> cultivationItems)
+    private static ImmutableArray<AvatarPromotionDelta> ToPromotionDeltaArray(
+        ImmutableArray<ICultivationItemsAccess> cultivationItems,
+        IReadOnlyDictionary<uint, ElementAttributeId> elementAttributes)
     {
         List<AvatarPromotionDelta> deltas = [];
         int currentWeaponEmptyAvatarIndex = 0;
@@ -81,7 +88,13 @@ public sealed partial class PromotionDeltaFactory
             switch (item)
             {
                 case MetadataAvatar avatar:
-                    deltas.Add(AvatarPromotionDelta.CreateForAvatarMaxConsumption(avatar));
+                    AvatarPromotionDelta avatarDelta = AvatarPromotionDelta.CreateForAvatarMaxConsumption(avatar);
+                    if (elementAttributes.TryGetValue(avatar.Id.Value, out ElementAttributeId elementAttrId))
+                    {
+                        avatarDelta.ElementAttrId = elementAttrId;
+                    }
+
+                    deltas.Add(avatarDelta);
 
                     break;
 

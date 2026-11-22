@@ -1,9 +1,9 @@
 {
-  "version": "7.2.0.5",
-  "publishedAt": "2026-11-21T04:56:22+08:00",
-  "pageUrl": "https://github.com/lihua123123/ellen.launcher/releases/tag/v7.2.0.5",
-  "downloadUrl": "https://github.com/lihua123123/ellen.launcher/releases/download/v7.2.0.5/Ellen.Launcher-7.2.0.5-Setup.exe",
-  "sha256": "D6FD1B576CA32AD22E5252C1EB5DF267DCC5E845890F41602A1A4EDD098885FB",
-  "size": 251833858,
-  "notes": "修复国服登录换票；新增原神/绝区零兑换码分栏、新码按钮提示、手动兑换与重复领取提示；修复绝区零 UID 读取；完善双游戏多 UID UIGF 导入导出；自动签到账本改为按角色记录。"
+  "version": "7.2.0.6",
+  "publishedAt": "2026-11-23T04:03:36+08:00",
+  "pageUrl": "https://github.com/lihua123123/ellen.launcher/releases/tag/v7.2.0.6",
+  "downloadUrl": "https://github.com/lihua123123/ellen.launcher/releases/download/v7.2.0.6/Ellen.Launcher-7.2.0.6-Setup.exe",
+  "sha256": "49815F42F68588ECBA6F67CA0D78C78B771440DDB3C9564F7819F564743E3EB9",
+  "size": 221608452,
+  "notes": "修复实时便笺异常、主页路径入口与启动卡片信息、用户头像和账密登录；新增自定义材料计划（等级模板、元素种类、材料分类整理）；修复 XAML 与树脂统计崩溃；养成计算器同步背包接口已失效，入口标记为故障并禁用，请改用嵌入式 Yae 或背包存档同步。"
 }

@@ -998,14 +998,7 @@
                                     </Flyout>
                                 </AppBarButton.Flyout>
                             </AppBarButton>
-                            <AppBarButton
-                                Command="{Binding SetGamePathCommand}"
-                                Icon="{shuxm:FontIcon Glyph=&#xE8B7;}"
-                                Label="{shuxm:ResourceString Name=ViewPageAnnouncementSetGamePathLabel}"/>
-                            <AppBarButton
-                                Command="{Binding SetZZZGamePathCommand}"
-                                Icon="{shuxm:FontIcon Glyph=&#xE8B7;}"
-                                Label="{shuxm:ResourceString Name=ViewPageAnnouncementSetZZZGamePathLabel}"/>
+                            <!--  原神/绝区零路径设置已统一移到「设置」页，主页不再提供入口  -->
                             <AppBarElementContainer>
                                 <!--
                                     下次启动时自动申请管理员权限（Bootstrap 读 LocalSetting 决定是否重启提权）。

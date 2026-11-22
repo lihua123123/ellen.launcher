@@ -267,6 +267,12 @@
   <data name="ModelEntityPrimitiveCultivateTypeWeapon" xml:space="preserve">
     <value>武器</value>
   </data>
+  <data name="ModelEntityPrimitiveCultivateTypeCustomAvatarMaterial" xml:space="preserve">
+    <value>自定义角色材料</value>
+  </data>
+  <data name="ModelEntityPrimitiveCultivateTypeCustomWeaponMaterial" xml:space="preserve">
+    <value>自定义武器材料</value>
+  </data>
   <data name="ModelEntityScheduleTimeUnknown" xml:space="preserve">
     <value>时间未知</value>
     <comment>接口未给期次起止时间时的兜底文案，不编造时间</comment>
@@ -1010,6 +1016,9 @@
   </data>
   <data name="ServiceGitRepositoryOperationFailed" xml:space="preserve">
     <value>操作失败 一般故障</value>
+  </data>
+  <data name="ServiceInventoryCalculatorNoDeltas" xml:space="preserve">
+    <value>没有获取到可用于同步的角色或武器，请刷新 Cookie 后重试</value>
   </data>
     <data name="ServiceInventoryRefreshByEmbeddedYaeErrorMessage" xml:space="preserve">
     <value>请使用其他方法同步背包物品</value>
@@ -2400,6 +2409,99 @@
   <data name="ViewPageCultivationAddProjectDescription" xml:space="preserve">
     <value>稍后可以前往其他页面添加养成计划项</value>
   </data>
+  <data name="ViewPageCultivationAddCustomMaterialLabel" xml:space="preserve">
+    <value>自定义材料计划</value>
+  </data>
+  <data name="ViewPageCultivationAddCustomMaterialDescription" xml:space="preserve">
+    <value>按等级模板自选角色或武器材料种类，数量自动计算，沿用已有统计与合成规则</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanTitle" xml:space="preserve">
+    <value>自定义材料计划</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanAvatarLevelHeader" xml:space="preserve">
+    <value>角色等级模板</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanAvatarLevelLabel" xml:space="preserve">
+    <value>角色等级</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanTalentLevelHeader" xml:space="preserve">
+    <value>天赋等级模板</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanAvatarMaterialsHeader" xml:space="preserve">
+    <value>角色材料种类</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanGemLabel" xml:space="preserve">
+    <value>元素晶石</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanElementLabel" xml:space="preserve">
+    <value>元素种类</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanElementPlaceholder" xml:space="preserve">
+    <value>选择元素</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanBossLabel" xml:space="preserve">
+    <value>Boss 掉落</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanSpecialtyLabel" xml:space="preserve">
+    <value>地区特产</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanTalentBookLabel" xml:space="preserve">
+    <value>天赋材料</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanMonsterLabel" xml:space="preserve">
+    <value>怪物掉落材料</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeeklyBossLabel" xml:space="preserve">
+    <value>周本材料</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanPlaceholder" xml:space="preserve">
+    <value>选择材料</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanQualityHint" xml:space="preserve">
+    <value>同系列的不同品质材料已合并为一个条目，选中后按等级模板自动推导各品质用量。除元素外其余材料均可留空；摩拉、经验书、智识之冕、魔矿等通用材料无需选择，按模板计算。</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanPreviewHeader" xml:space="preserve">
+    <value>材料清单预览</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeaponLevelHeader" xml:space="preserve">
+    <value>武器等级模板</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeaponQualityLabel" xml:space="preserve">
+    <value>武器品质</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeaponLevelLabel" xml:space="preserve">
+    <value>武器等级</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeaponMaterialsHeader" xml:space="preserve">
+    <value>武器突破材料种类</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeaponMaterial1Label" xml:space="preserve">
+    <value>突破材料 ①</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeaponMaterial2Label" xml:space="preserve">
+    <value>突破材料 ②</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeaponMaterial3Label" xml:space="preserve">
+    <value>突破材料 ③</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanAvatarTab" xml:space="preserve">
+    <value>角色材料</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeaponTab" xml:space="preserve">
+    <value>武器材料</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanCountHeader" xml:space="preserve">
+    <value>数量</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanNoSelection" xml:space="preserve">
+    <value>请至少填写一种材料的数量</value>
+  </data>
+  <data name="ViewModelCultivationCustomMaterialAdded" xml:space="preserve">
+    <value>自定义材料计划已添加</value>
+  </data>
+  <data name="ViewModelCultivationCustomMaterialDescription" xml:space="preserve">
+    <value>自选材料 {0} 项</value>
+  </data>
   <data name="ViewPageCultivationAvatarPropertyDescription" xml:space="preserve">
     <value>添加我的角色与武器到养成计划</value>
   </data>
@@ -2434,7 +2536,7 @@
     <value>同步背包物品</value>
   </data>
   <data name="ViewPageCultivationRefreshInventoryByCalculator" xml:space="preserve">
-    <value>通过养成计算器同步</value>
+    <value>从养成计算器同步（故障）</value>
   </data>
   <data name="ViewPageCultivationRefreshInventoryByEmbeddedYae" xml:space="preserve">
     <value>通过 Embedded Yae 同步</value>

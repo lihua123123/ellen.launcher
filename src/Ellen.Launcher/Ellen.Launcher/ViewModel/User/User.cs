@@ -31,6 +31,15 @@ public sealed partial class User : IEntityAccess<EntityUser>,
 
     public UserInfo? UserInfo { get; set; }
 
+    /// <summary>
+    /// 米游社头像地址。暴露为 User 的属性，方便列表模板用 CachedImage 直接绑定，
+    /// 避免 PersonPicture 对远程 Uri 的兼容性问题导致头像显示成灰色圆。
+    /// </summary>
+    public Uri? AvatarUri
+    {
+        get => UserInfo?.AvatarUri;
+    }
+
 #pragma warning disable SA1500
 #pragma warning disable SA1513
     public IAdvancedCollectionView<UserGameRole> UserGameRoles

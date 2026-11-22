@@ -14,18 +14,22 @@ public sealed partial class AvatarPromotionDelta : ObservableObject
 {
     [ObservableProperty]
     [JsonPropertyName("avatar_id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public partial AvatarId AvatarId { get; set; }
 
     [ObservableProperty]
     [JsonPropertyName("avatar_level_current")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public partial uint AvatarLevelCurrent { get; set; }
 
     [ObservableProperty]
     [JsonPropertyName("avatar_level_target")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public partial uint AvatarLevelTarget { get; set; }
 
     [ObservableProperty]
     [JsonPropertyName("element_attr_id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public partial ElementAttributeId ElementAttrId { get; set; }
 
     [ObservableProperty]
@@ -39,10 +43,12 @@ public sealed partial class AvatarPromotionDelta : ObservableObject
 
     [ObservableProperty]
     [JsonPropertyName("from_user_sync")]
-    public partial bool FromUserSync { get; set; } = true;
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public partial bool FromUserSync { get; set; }
 
     [ObservableProperty]
     [JsonPropertyName("avatar_promote_level")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public partial uint AvatarPromoteLevel { get; set; }
 
     public IProperty<bool> IsViewUnloaded { get; } = Property.Create(false);
@@ -69,6 +75,7 @@ public sealed partial class AvatarPromotionDelta : ObservableObject
             AvatarId = avatar.Id,
             AvatarLevelCurrent = 1,
             AvatarLevelTarget = 90,
+            FromUserSync = false,
             SkillList = avatar.SkillDepot.CompositeSkillsNoInherents.SelectAsArray(static skill => new PromotionDelta
             {
                 Id = skill.GroupId,

@@ -266,6 +266,12 @@
   <data name="ModelEntityPrimitiveCultivateTypeWeapon" xml:space="preserve">
     <value>Weapon</value>
   </data>
+  <data name="ModelEntityPrimitiveCultivateTypeCustomAvatarMaterial" xml:space="preserve">
+    <value>Custom character materials</value>
+  </data>
+  <data name="ModelEntityPrimitiveCultivateTypeCustomWeaponMaterial" xml:space="preserve">
+    <value>Custom weapon materials</value>
+  </data>
   <data name="ModelEntityScheduleTimeUnknown" xml:space="preserve">
     <value>Time unknown</value>
   </data>
@@ -1008,6 +1014,9 @@ Space Available: {2}</value>
   </data>
   <data name="ServiceGitRepositoryOperationFailed" xml:space="preserve">
     <value>Operation Failed</value>
+  </data>
+  <data name="ServiceInventoryCalculatorNoDeltas" xml:space="preserve">
+    <value>No characters or weapons available for calculator sync. Please refresh the cookie and retry.</value>
   </data>
     <data name="ServiceInventoryRefreshByEmbeddedYaeErrorMessage" xml:space="preserve">
     <value>Please use other ways to sync the package items</value>
@@ -2197,6 +2206,99 @@ Space Available: {2}</value>
   <data name="ViewPageCultivationAddProjectDescription" xml:space="preserve">
     <value>You can add development plan items later from other pages</value>
   </data>
+  <data name="ViewPageCultivationAddCustomMaterialLabel" xml:space="preserve">
+    <value>Custom material plan</value>
+  </data>
+  <data name="ViewPageCultivationAddCustomMaterialDescription" xml:space="preserve">
+    <value>Pick character or weapon material types with a level template; counts are calculated automatically using the existing statistics and combining rules</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanTitle" xml:space="preserve">
+    <value>Custom material plan</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanAvatarLevelHeader" xml:space="preserve">
+    <value>Character level template</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanAvatarLevelLabel" xml:space="preserve">
+    <value>Character level</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanTalentLevelHeader" xml:space="preserve">
+    <value>Talent level template</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanAvatarMaterialsHeader" xml:space="preserve">
+    <value>Character material types</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanGemLabel" xml:space="preserve">
+    <value>Element gem</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanElementLabel" xml:space="preserve">
+    <value>Element</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanElementPlaceholder" xml:space="preserve">
+    <value>Select element</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanBossLabel" xml:space="preserve">
+    <value>Boss drop</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanSpecialtyLabel" xml:space="preserve">
+    <value>Local specialty</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanTalentBookLabel" xml:space="preserve">
+    <value>Talent book</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanMonsterLabel" xml:space="preserve">
+    <value>Monster drop</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeeklyBossLabel" xml:space="preserve">
+    <value>Weekly boss material</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanPlaceholder" xml:space="preserve">
+    <value>Select material</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanQualityHint" xml:space="preserve">
+    <value>Different quality tiers of the same series are merged into one entry; required amounts for each tier are derived from the level template. All materials except the element can be left empty. Common materials such as Mora, EXP books, Crowns of Insight and enhancement ore are calculated automatically.</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanPreviewHeader" xml:space="preserve">
+    <value>Material list preview</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeaponLevelHeader" xml:space="preserve">
+    <value>Weapon level template</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeaponQualityLabel" xml:space="preserve">
+    <value>Weapon rarity</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeaponLevelLabel" xml:space="preserve">
+    <value>Weapon level</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeaponMaterialsHeader" xml:space="preserve">
+    <value>Weapon ascension material types</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeaponMaterial1Label" xml:space="preserve">
+    <value>Ascension material 1</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeaponMaterial2Label" xml:space="preserve">
+    <value>Ascension material 2</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeaponMaterial3Label" xml:space="preserve">
+    <value>Ascension material 3</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanAvatarTab" xml:space="preserve">
+    <value>Character materials</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanWeaponTab" xml:space="preserve">
+    <value>Weapon materials</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanCountHeader" xml:space="preserve">
+    <value>Count</value>
+  </data>
+  <data name="ViewDialogCustomMaterialPlanNoSelection" xml:space="preserve">
+    <value>Enter a count for at least one material</value>
+  </data>
+  <data name="ViewModelCultivationCustomMaterialAdded" xml:space="preserve">
+    <value>Custom material plan added</value>
+  </data>
+  <data name="ViewModelCultivationCustomMaterialDescription" xml:space="preserve">
+    <value>{0} custom materials</value>
+  </data>
   <data name="ViewPageCultivationAvatarPropertyDescription" xml:space="preserve">
     <value>Add my characters and weapons to Development Plan</value>
   </data>
@@ -2231,7 +2333,7 @@ Space Available: {2}</value>
     <value>Sync Inventory Items</value>
   </data>
   <data name="ViewPageCultivationRefreshInventoryByCalculator" xml:space="preserve">
-    <value>Sync by cultivating calculator</value>
+    <value>Sync by cultivating calculator (broken)</value>
   </data>
   <data name="ViewPageCultivationRefreshInventoryByEmbeddedYae" xml:space="preserve">
     <value>Sync by Embedded Yae</value>

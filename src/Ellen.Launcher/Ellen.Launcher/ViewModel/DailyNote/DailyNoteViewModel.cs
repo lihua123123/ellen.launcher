@@ -95,8 +95,9 @@ public sealed partial class DailyNoteViewModel : Abstraction.ViewModel
             // 和下方绝区零便笺「进页面即拉取」的表现保持一致。
             ObservableCollection<DailyNoteEntry> entries = await dailyNoteService.GetDailyNoteEntryCollectionAsync(metadataContext, true, token).ConfigureAwait(false);
 
-            // 绝区零便笺只在内存里，失败不影响原神部分
-            ObservableCollection<ZenlessNoteEntry> zenlessEntries = await CreateZenlessNoteEntriesAsync(users.Source, token).ConfigureAwait(false);
+            // 绝区零便笺只在内存里，失败不影响原神部分。
+            // 与原神便笺共用「是否添加过便笺」这一开关：没添加便笺的账号不显示绝区零列。
+            ObservableCollection<ZenlessNoteEntry> zenlessEntries = await CreateZenlessNoteEntriesAsync(users.Source, entries, token).ConfigureAwait(false);
 
             await taskContext.SwitchToMainThreadAsync();
             Users = users;
@@ -105,8 +106,8 @@ public sealed partial class DailyNoteViewModel : Abstraction.ViewModel
 
             RebuildCards();
 
-            // 添加 / 移除角色后重新分组
-            entries.CollectionChanged += (_, _) => RebuildCards();
+            // 添加 / 移除原神便笺后，绝区零便笺的可见账号集合也会变化，一并重建卡片
+            entries.CollectionChanged += (_, _) => RefreshZenlessEntriesAsync().SafeForget();
             return true;
         }
         catch (EllenException ex)
@@ -146,26 +147,48 @@ public sealed partial class DailyNoteViewModel : Abstraction.ViewModel
         SentrySdk.AddBreadcrumb(BreadcrumbFactory.CreateUI("Refresh daily note", "DailyNoteViewModel.Command"));
         await dailyNoteService.RefreshDailyNotesAsync().ConfigureAwait(false);
 
-        // 绝区零便笺只在内存里，单独刷一遍；失败保持原来的数据不动
-        if (ZenlessNoteEntries is { Count: > 0 } zenlessEntries)
+        // 绝区零便笺只在内存里，按当前已添加便笺的账号重建并重新拉取一次，
+        // 这样刚添加的账号也会出现绝区零列，移除后也会随之消失。
+        await RefreshZenlessEntriesAsync().ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// 重新创建绝区零便笺卡片：只对已经添加过实时便笺的账号显示。
+    /// 失败的角色保留错误信息，不影响原神便笺。
+    /// </summary>
+    private async Task RefreshZenlessEntriesAsync()
+    {
+        if (Users is null)
         {
-            await Task.WhenAll(zenlessEntries.Select(entry => entry.UpdateAsync().AsTask())).ConfigureAwait(false);
+            return;
         }
+
+        ObservableCollection<DailyNoteEntry>? genshinEntries = DailyNoteEntries;
+        ObservableCollection<ZenlessNoteEntry> entries = await CreateZenlessNoteEntriesAsync(Users.Source, genshinEntries ?? []).ConfigureAwait(false);
+
+        await taskContext.SwitchToMainThreadAsync();
+        ZenlessNoteEntries = entries;
+        RebuildCards();
     }
 
     /// <summary>
     /// 为一个米游社账号下的每个绝区零角色建一张便笺卡片。
     /// 角色优先取「我的角色」的本地缓存（零网络），没有缓存时回退到绑定接口（有 5 分钟缓存）。
+    /// 只有 <paramref name="genshinEntries"/> 中包含的账号（即用户手动添加过实时便笺的账号）才会生成卡片。
     /// </summary>
-    private async ValueTask<ObservableCollection<ZenlessNoteEntry>> CreateZenlessNoteEntriesAsync(IEnumerable<BindingUser> users, CancellationToken token)
+    private async ValueTask<ObservableCollection<ZenlessNoteEntry>> CreateZenlessNoteEntriesAsync(
+        IEnumerable<BindingUser> users,
+        IEnumerable<DailyNoteEntry> genshinEntries,
+        CancellationToken token = default)
     {
+        HashSet<Guid> trackedUserIds = genshinEntries.Select(static entry => entry.UserId).ToHashSet();
         List<ZenlessNoteEntry> entries = [];
 
         foreach (BindingUser user in users)
         {
-            if (user.Entity.IsOversea)
+            if (user.Entity.IsOversea || !trackedUserIds.Contains(user.InnerId))
             {
-                // 国际服 fp 逻辑与国服不同，先只做国服
+                // 国际服 fp 逻辑与国服不同，先只做国服；未添加便笺的账号也不显示绝区零列
                 continue;
             }
 

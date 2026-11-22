@@ -86,8 +86,11 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
     [ObservableProperty]
     public partial string? AccountUidText { get; set; }
 
+    /// <summary>
+    /// 米游社账号头像（远程图片地址），不是游戏角色的元素头像。
+    /// </summary>
     [ObservableProperty]
-    public partial string? AccountAvatarUrl { get; set; }
+    public partial Uri? AccountAvatarUri { get; set; }
 
     [ObservableProperty]
     public partial string? SummaryText { get; set; }
@@ -279,18 +282,19 @@ public sealed partial class LaunchGameCardViewModel : Abstraction.ViewModelSlim,
             AccountNickname = null;
             AccountAttribution = null;
             AccountUidText = null;
-            AccountAvatarUrl = null;
+            AccountAvatarUri = null;
             GenshinEntry.AccountUid = null;
             return;
         }
 
         UserGameRole? role = user.UserGameRoles.CurrentItem;
 
-        // 角色列表尚未拉取时仍展示账号本身，避免卡片出现空白区域
-        AccountNickname = role?.Nickname ?? user.UserInfo?.Nickname ?? SH.ViewCardLaunchGameAccountFallback;
-        AccountAttribution = role?.Description;
-        AccountUidText = role is null ? null : SH.FormatViewCardLaunchGameUid(role.GameUid);
-        AccountAvatarUrl = role?.ProfilePictureIcon;
+        // 卡片展示的是米游社账号本身（头像、昵称、米游社 UID），不是游戏角色的头像/昵称/游戏 UID。
+        // 原神角色的 UID 只用于启动账号绑定，仍由下面的 entry 保留。
+        AccountNickname = user.UserInfo?.Nickname ?? SH.ViewCardLaunchGameAccountFallback;
+        AccountAttribution = null;
+        AccountUidText = string.IsNullOrEmpty(user.UserInfo?.Uid) ? null : SH.FormatViewCardLaunchGameUid(user.UserInfo!.Uid!);
+        AccountAvatarUri = user.UserInfo?.AvatarUri;
         GenshinEntry.AccountUid = role?.GameUid;
 
         if (zenlessRoleRequest is null)

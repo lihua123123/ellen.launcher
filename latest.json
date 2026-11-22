@@ -1,9 +1,9 @@
 {
   "version": "7.2.0.6",
-  "publishedAt": "2026-11-23T04:03:36+08:00",
+  "publishedAt": "2026-11-23T04:08:49+08:00",
   "pageUrl": "https://github.com/lihua123123/ellen.launcher/releases/tag/v7.2.0.6",
   "downloadUrl": "https://github.com/lihua123123/ellen.launcher/releases/download/v7.2.0.6/Ellen.Launcher-7.2.0.6-Setup.exe",
-  "sha256": "49815F42F68588ECBA6F67CA0D78C78B771440DDB3C9564F7819F564743E3EB9",
-  "size": 221608452,
+  "sha256": "A1816971133476591500E20C026B08F8D9A13F88BE7E3055EB2B2F489EA51B70",
+  "size": 251875059,
   "notes": "修复实时便笺异常、主页路径入口与启动卡片信息、用户头像和账密登录；新增自定义材料计划（等级模板、元素种类、材料分类整理）；修复 XAML 与树脂统计崩溃；养成计算器同步背包接口已失效，入口标记为故障并禁用，请改用嵌入式 Yae 或背包存档同步。"
 }

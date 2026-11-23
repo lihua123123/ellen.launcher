@@ -2517,6 +2517,9 @@
   <data name="ViewPageCultivationMaterialList" xml:space="preserve">
     <value>材料清单</value>
   </data>
+  <data name="ViewPageCultivationMaterialListAutoSynthesisLabel" xml:space="preserve">
+    <value>自动合成</value>
+  </data>
   <data name="ViewPageCultivationMaterialListIncompleteFirstLabel" xml:space="preserve">
     <value>未集齐优先</value>
   </data>
@@ -2536,7 +2539,7 @@
     <value>同步背包物品</value>
   </data>
   <data name="ViewPageCultivationRefreshInventoryByCalculator" xml:space="preserve">
-    <value>从养成计算器同步（故障）</value>
+    <value>从养成计算器同步</value>
   </data>
   <data name="ViewPageCultivationRefreshInventoryByEmbeddedYae" xml:space="preserve">
     <value>通过 Embedded Yae 同步</value>

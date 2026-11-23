@@ -9,15 +9,16 @@ using Ellen.Launcher.Web.Request.Builder.Abstraction;
 using Ellen.Launcher.Web.Response;
 using System.Collections.Immutable;
 using System.Net.Http;
-using System.Text;
 
 namespace Ellen.Launcher.Web.Hoyolab.Takumi.Event.Calculate;
 
 [HttpClient(HttpClientConfiguration.Default)]
 public sealed partial class CalculateClient
 {
-    private const int BatchComputeChunkSize = 30;
-    private const string ChineseCalculatorReferer = "https://act.mihoyo.com/";
+    /* 50 条一批是实测能通过的最大量级（响应约 4.8 MB）。
+       再往上单次响应会到十几 MB，没必要；分得太小又会低估「持有量」——
+       因为 overall_consume 的 num - lack_num 实际是 min(持有, 该批需求)。 */
+    private const int BatchComputeChunkSize = 50;
 
     private readonly IHttpRequestMessageBuilderFactory httpRequestMessageBuilderFactory;
     private readonly IApiEndpointsFactory apiEndpointsFactory;
@@ -75,9 +76,26 @@ public sealed partial class CalculateClient
         CancellationToken token)
     {
         Response<BatchConsumption> response = await SendBatchComputeAsync(userAndUid, deltas, syncInventory, token).ConfigureAwait(false);
-        if (response.ReturnCode is 0 || deltas.Length <= 1)
+        if (response.ReturnCode is 0)
         {
             return response;
+        }
+
+        if (deltas.Length <= 1)
+        {
+            if (deltas.IsEmpty)
+            {
+                return response;
+            }
+
+            /* 单条仍然失败：几乎都是 skill_list 里的技能分组 id 服务端不认识。
+               典型是旅行者 10000005 —— 元数据里用的是基础形态的分组 id（830 / 832），
+               而养成计算器只认各元素形态的 id，于是整条请求直接 -500001。
+               去掉 skill_list 再试一次：角色本体、武器、元素宝石这些材料照样算得出来，
+               只是少算天赋书，总比整次同步失败强。 */
+
+            AvatarPromotionDelta stripped = CloneWithoutSkills(deltas[0]);
+            return await SendBatchComputeAsync(userAndUid, [stripped], syncInventory, token).ConfigureAwait(false);
         }
 
         await Task.Delay(300, token).ConfigureAwait(false);
@@ -86,15 +104,21 @@ public sealed partial class CalculateClient
         ImmutableArray<AvatarPromotionDelta> left = Slice(deltas, 0, leftCount);
         ImmutableArray<AvatarPromotionDelta> right = Slice(deltas, leftCount, deltas.Length - leftCount);
 
-        Response<BatchConsumption> leftResponse = await SendBatchComputeAsync(userAndUid, left, syncInventory, token).ConfigureAwait(false);
-        Response<BatchConsumption> rightResponse = await SendBatchComputeAsync(userAndUid, right, syncInventory, token).ConfigureAwait(false);
-
-        if (leftResponse.ReturnCode is 0 && rightResponse.ReturnCode is 0)
+        // 逐层递归二分，而不是只拆一层：服务端上限可能低到几条，
+        // 拆一层之后仍然可能失败，那样整次同步就白跑了。
+        Response<BatchConsumption> leftResponse = await ComputeChunkWithRetryAsync(userAndUid, left, syncInventory, token).ConfigureAwait(false);
+        if (leftResponse.ReturnCode is not 0)
         {
-            return MergeResponses([leftResponse, rightResponse]);
+            return leftResponse;
         }
 
-        return leftResponse.ReturnCode is not 0 ? leftResponse : rightResponse;
+        Response<BatchConsumption> rightResponse = await ComputeChunkWithRetryAsync(userAndUid, right, syncInventory, token).ConfigureAwait(false);
+        if (rightResponse.ReturnCode is not 0)
+        {
+            return rightResponse;
+        }
+
+        return MergeResponses([leftResponse, rightResponse]);
     }
 
     private async ValueTask<Response<BatchConsumption>> SendBatchComputeAsync(
@@ -106,24 +130,20 @@ public sealed partial class CalculateClient
         BatchConsumptionData data = new()
         {
             Items = deltas,
-            Lang = "zh-cn",
             Region = syncInventory ? userAndUid.Uid.Region : default!,
             Uid = syncInventory ? userAndUid.Uid.ToString() : default!,
         };
 
         IApiEndpoints apiEndpoints = apiEndpointsFactory.Create(userAndUid.IsOversea);
 
+        /* 请求形状与 Snap.Hutao.Remastered 保持一致：不额外塞 lang，也不自己补 x-rpc-* 头。
+           之前这里加过 x-rpc-page / x-rpc-cal_type / 自定义 device_id 等，并改用 act.mihoyo.com
+           作 Referer，反而让服务端按「网页会话」校验，同步一直失败。 */
         HttpRequestMessageBuilder builder = httpRequestMessageBuilderFactory.Create()
             .SetRequestUri(apiEndpoints.CalculateBatchCompute())
             .SetUserCookieAndFpHeader(userAndUid.User, CookieType.Cookie)
-            .SetReferer(userAndUid.IsOversea ? apiEndpoints.ActHoyolabReferer() : ChineseCalculatorReferer)
-            .SetHeader("x-rpc-device_id", HoyolabOptions.DeviceId36)
-            .SetHeader("x-rpc-platform", "4")
-            .SetHeader("x-rpc-lrsag", string.Empty)
-            .SetHeader("x-rpc-page", "__#")
-            .SetHeader("x-rpc-cal_type", "0")
-            .SetHeader("x-rpc-stat_platform", "PC")
-            .PostJson(data, Encoding.UTF8);
+            .SetReferer(userAndUid.IsOversea ? apiEndpoints.ActHoyolabReferer() : apiEndpoints.WebStaticReferer())
+            .PostJson(data);
 
         Response<BatchConsumption>? resp = await builder
             .SendAsync<Response<BatchConsumption>>(httpClient, token)
@@ -199,6 +219,24 @@ public sealed partial class CalculateClient
     private static int GetOwnedCount(Item item)
     {
         return (int)item.Num - item.LackNum;
+    }
+
+    /// <summary>
+    /// 复制一条 delta 但丢掉 skill_list，用于「服务端不认这组技能分组 id」时降级重试。
+    /// SkillList 保持 default，序列化时会因为 <c>WhenWritingDefault</c> 被整个跳过。
+    /// </summary>
+    private static AvatarPromotionDelta CloneWithoutSkills(AvatarPromotionDelta source)
+    {
+        return new()
+        {
+            AvatarId = source.AvatarId,
+            AvatarLevelCurrent = source.AvatarLevelCurrent,
+            AvatarLevelTarget = source.AvatarLevelTarget,
+            ElementAttrId = source.ElementAttrId,
+            AvatarPromoteLevel = source.AvatarPromoteLevel,
+            FromUserSync = source.FromUserSync,
+            Weapon = source.Weapon,
+        };
     }
 
     private static ImmutableArray<AvatarPromotionDelta> Slice(ImmutableArray<AvatarPromotionDelta> source, int start, int length)
@@ -411,9 +449,6 @@ public sealed partial class CalculateClient
     {
         [JsonPropertyName("items")]
         public required ImmutableArray<AvatarPromotionDelta> Items { get; init; }
-
-        [JsonPropertyName("lang")]
-        public string Lang { get; init; } = "zh-cn";
 
         [JsonPropertyName("region")]
         public required Region Region { get; init; }

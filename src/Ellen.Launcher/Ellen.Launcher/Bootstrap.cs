@@ -26,7 +26,7 @@ namespace Ellen.Launcher;
 [SuppressMessage("", "SH001")]
 public static partial class Bootstrap
 {
-    private const string LockName = "ELLEN_LAUNCHER_BOOTSTRAP_LOCK";
+    private static string LockName => $"ELLEN_LAUNCHER_BOOTSTRAP_LOCK.{InstanceScope.Suffix}";
 
     /// <summary>Toast helper 进程的启动标记；主进程与 helper 共用，改这里即可。</summary>
     public const string ToastHelperArgument = "--toast-helper";

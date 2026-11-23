@@ -636,7 +636,6 @@
                                 <MenuFlyoutItem
                                     Command="{Binding RefreshInventoryByCalculatorCommand}"
                                     Icon="{shuxm:FontIcon Glyph=&#xE8EF;}"
-                                    IsEnabled="False"
                                     Text="{shuxm:ResourceString Name=ViewPageCultivationRefreshInventoryByCalculator}"/>
                             </MenuFlyout>
                         </AppBarButton.Flyout>
@@ -743,6 +742,13 @@
                                         TokenItemTemplate="{StaticResource TokenTemplate}"
                                         Visibility="{Binding ElementName=MaterialListPivot, Path=SelectedItem.Tag, Converter={StaticResource MaterialListSelectedItemIsEntryViewConverter}}"/>
                                 </AppBarElementContainer>
+                                <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
+                                <AppBarToggleButton
+                                    Command="{Binding RefreshStatisticsItemsCommand}"
+                                    Icon="{shuxm:FontIcon Glyph=&#xE8D4;}"
+                                    IsChecked="{Binding AutoSynthesisPreview, Mode=TwoWay}"
+                                    Label="{shuxm:ResourceString Name=ViewPageCultivationMaterialListAutoSynthesisLabel}"
+                                    Visibility="{Binding ElementName=MaterialListPivot, Path=SelectedItem.Tag, Converter={StaticResource MaterialListSelectedItemIsStatisticsViewConverter}}"/>
                                 <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
                                 <AppBarToggleButton
                                     Command="{Binding RefreshStatisticsItemsCommand}"

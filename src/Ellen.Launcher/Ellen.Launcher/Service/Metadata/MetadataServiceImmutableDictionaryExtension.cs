@@ -230,9 +230,13 @@ public static class MetadataServiceImmutableDictionaryExtension
 
         public ValueTask<ImmutableDictionary<MaterialId, Combine>> GetResultMaterialIdToCombineMapAsync(CancellationToken token = default)
         {
-            return metadataService.FromCacheAsDictionaryAsync<MaterialId, Combine>(
+            // Combine.json 中同一结果可能同时存在 3→1 合成配方与异元素转化配方，
+            // 去重建字典时「后者覆盖前者」会让晶石的合成配方被转化配方覆盖，
+            // 导致养成统计里晶石既无法递归展开素材、也无法参与自动合成。
+            // 这里按结果预先筛选：优先保留单素材合成配方，无合成配方的结果沿用最后一条（与历史行为一致）。
+            return metadataService.FromCacheAsDictionaryAsync<Combine, MaterialId, Combine>(
                 MetadataFileStrategies.Combine,
-                c => c.Result.Id,
+                SelectPreferredCombinePerResult,
                 token);
         }
 
@@ -304,5 +308,29 @@ public static class MetadataServiceImmutableDictionaryExtension
             ArgumentNullException.ThrowIfNull(result);
             return result;
         }
+    }
+
+    private static IEnumerable<(MaterialId Key, Combine Value)> SelectPreferredCombinePerResult(ImmutableArray<Combine> array)
+    {
+        Dictionary<MaterialId, Combine> combines = [];
+        Dictionary<MaterialId, Combine> fallbacks = [];
+        foreach (Combine candidate in array)
+        {
+            if (candidate.RecipeType is RecipeType.RECIPE_TYPE_COMBINE && candidate.Materials.Length is 1)
+            {
+                combines.TryAdd(candidate.Result.Id, candidate);
+            }
+            else
+            {
+                fallbacks[candidate.Result.Id] = candidate;
+            }
+        }
+
+        foreach ((MaterialId id, Combine combine) in fallbacks)
+        {
+            combines.TryAdd(id, combine);
+        }
+
+        return combines.Select(pair => (pair.Key, pair.Value));
     }
 }

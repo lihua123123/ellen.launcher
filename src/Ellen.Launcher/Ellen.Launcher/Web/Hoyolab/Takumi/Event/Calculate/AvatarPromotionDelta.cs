@@ -14,22 +14,18 @@ public sealed partial class AvatarPromotionDelta : ObservableObject
 {
     [ObservableProperty]
     [JsonPropertyName("avatar_id")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public partial AvatarId AvatarId { get; set; }
 
     [ObservableProperty]
     [JsonPropertyName("avatar_level_current")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public partial uint AvatarLevelCurrent { get; set; }
 
     [ObservableProperty]
     [JsonPropertyName("avatar_level_target")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public partial uint AvatarLevelTarget { get; set; }
 
     [ObservableProperty]
     [JsonPropertyName("element_attr_id")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public partial ElementAttributeId ElementAttrId { get; set; }
 
     [ObservableProperty]
@@ -41,14 +37,17 @@ public sealed partial class AvatarPromotionDelta : ObservableObject
     [JsonPropertyName("weapon")]
     public partial PromotionDelta? Weapon { get; set; }
 
+    /* 服务端据此判断「这份 delta 来自玩家的真实账号」，只有 true 时才会按 uid + region
+       去读玩家的背包并回填 overall_consume 的 num / lack_num。
+       曾经把它设成 false 并加 WhenWritingDefault，字段根本不会出现在请求体里，
+       服务端于是按纯本地计算处理 —— 表现就是「同步成功但背包全是 0」。
+       与 Snap.Hutao.Remastered 保持一致：默认 true，且始终序列化。 */
     [ObservableProperty]
     [JsonPropertyName("from_user_sync")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public partial bool FromUserSync { get; set; }
+    public partial bool FromUserSync { get; set; } = true;
 
     [ObservableProperty]
     [JsonPropertyName("avatar_promote_level")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public partial uint AvatarPromoteLevel { get; set; }
 
     public IProperty<bool> IsViewUnloaded { get; } = Property.Create(false);
@@ -75,7 +74,6 @@ public sealed partial class AvatarPromotionDelta : ObservableObject
             AvatarId = avatar.Id,
             AvatarLevelCurrent = 1,
             AvatarLevelTarget = 90,
-            FromUserSync = false,
             SkillList = avatar.SkillDepot.CompositeSkillsNoInherents.SelectAsArray(static skill => new PromotionDelta
             {
                 Id = skill.GroupId,

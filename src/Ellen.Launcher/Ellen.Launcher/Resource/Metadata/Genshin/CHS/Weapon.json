@@ -46,7 +46,11 @@
         }
       ]
     },
-    "CultivationItems": []
+    "CultivationItems": [
+      114096,
+      112160,
+      112148
+    ]
   },
   {
     "Id": 14524,

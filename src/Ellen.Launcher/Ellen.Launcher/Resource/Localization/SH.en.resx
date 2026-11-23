@@ -2314,6 +2314,9 @@ Space Available: {2}</value>
   <data name="ViewPageCultivationMaterialList" xml:space="preserve">
     <value>Material Checklist</value>
   </data>
+  <data name="ViewPageCultivationMaterialListAutoSynthesisLabel" xml:space="preserve">
+    <value>Auto Synthesize</value>
+  </data>
   <data name="ViewPageCultivationMaterialListIncompleteFirstLabel" xml:space="preserve">
     <value>Uncollected First</value>
   </data>
@@ -2333,7 +2336,7 @@ Space Available: {2}</value>
     <value>Sync Inventory Items</value>
   </data>
   <data name="ViewPageCultivationRefreshInventoryByCalculator" xml:space="preserve">
-    <value>Sync by cultivating calculator (broken)</value>
+    <value>Sync by cultivating calculator</value>
   </data>
   <data name="ViewPageCultivationRefreshInventoryByEmbeddedYae" xml:space="preserve">
     <value>Sync by Embedded Yae</value>

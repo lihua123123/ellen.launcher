@@ -88,6 +88,9 @@ public sealed partial class CultivationViewModel : Abstraction.ViewModel
     public partial bool IncompleteFirst { get; set; }
 
     [ObservableProperty]
+    public partial bool AutoSynthesisPreview { get; set; }
+
+    [ObservableProperty]
     public partial ObservableCollection<StatisticsCultivateItem>? StatisticsItems { get; set; }
 
     [ObservableProperty]
@@ -119,6 +122,10 @@ public sealed partial class CultivationViewModel : Abstraction.ViewModel
         {
             await UpdateEntryCollectionAsync(Projects.CurrentItem).ConfigureAwait(false);
         }
+        else if (Projects.CurrentItem is not null && StatisticsItems is null)
+        {
+            await UpdateStatisticsItemsAsync().ConfigureAwait(false);
+        }
 
         await taskContext.SwitchToMainThreadAsync();
         SearchData = searchData;
@@ -131,6 +138,13 @@ public sealed partial class CultivationViewModel : Abstraction.ViewModel
         using (Projects?.SuppressChangeCurrentItem())
         {
             Projects = default;
+        }
+
+        if (AutoSynthesisPreview)
+        {
+            StatisticsItems = null;
+            ResinStatistics = null;
+            AutoSynthesisPreview = false;
         }
     }
 
@@ -639,6 +653,11 @@ public sealed partial class CultivationViewModel : Abstraction.ViewModel
         try
         {
             statistics = await cultivationService.GetStatisticsCultivateItemCollectionAsync(Projects.CurrentItem, metadataContext, token).ConfigureAwait(false);
+            if (AutoSynthesisPreview)
+            {
+                statistics.AutoSynthesize(metadataContext.ResultMaterialIdCombineMap);
+            }
+
             resinStatistics = await cultivationService.GetResinStatisticsAsync(statistics, token).ConfigureAwait(false);
         }
         catch (OperationCanceledException)

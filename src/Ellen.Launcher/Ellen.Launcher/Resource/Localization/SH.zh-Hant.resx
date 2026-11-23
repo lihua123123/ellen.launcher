@@ -2200,6 +2200,9 @@
   <data name="ViewPageCultivationMaterialList" xml:space="preserve">
     <value>材料清單</value>
   </data>
+  <data name="ViewPageCultivationMaterialListAutoSynthesisLabel" xml:space="preserve">
+    <value>自動合成</value>
+  </data>
   <data name="ViewPageCultivationMaterialListIncompleteFirstLabel" xml:space="preserve">
     <value>未集齊優先</value>
   </data>

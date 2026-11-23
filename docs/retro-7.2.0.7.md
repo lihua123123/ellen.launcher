@@ -124,6 +124,10 @@
 |---|---|
 | 版本 | `7.2.0.7` |
 | 安装包 | `Ellen.Launcher-7.2.0.7-Setup.exe` |
-| size | `<SIZE>` |
-| sha256 | `<SHA256>` |
-| R2 元数据版本 | `<R2VERSION>` |
+| size | `251,864,134` B |
+| sha256 | `37AD9016CC7F373BC5D1B5670E481245C9E4BCE7D9DE7CDE051FFE710312C4DA` |
+| GitHub Release | <https://github.com/lihua123123/ellen.launcher/releases/tag/v7.2.0.7> |
+| R2 元数据版本 | `20261123-215251`（manifest digest `0066dd1d8849…`，zip sha256 `f46fa8297e8d…`） |
+
+R2 侧复检：`releases/20261123-215251/data/launcher/launcher-metadata.zip` 里
+265 条树脂材料 **0 条白品质**，客户端下次同步即可拿到修复后的数据。

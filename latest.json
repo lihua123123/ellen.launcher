@@ -1,9 +1,9 @@
 {
-  "version": "7.2.0.6",
-  "publishedAt": "2026-11-23T04:08:49+08:00",
-  "pageUrl": "https://github.com/lihua123123/ellen.launcher/releases/tag/v7.2.0.6",
-  "downloadUrl": "https://github.com/lihua123123/ellen.launcher/releases/download/v7.2.0.6/Ellen.Launcher-7.2.0.6-Setup.exe",
-  "sha256": "A1816971133476591500E20C026B08F8D9A13F88BE7E3055EB2B2F489EA51B70",
-  "size": 251875059,
-  "notes": "修复实时便笺异常、主页路径入口与启动卡片信息、用户头像和账密登录；新增自定义材料计划（等级模板、元素种类、材料分类整理）；修复 XAML 与树脂统计崩溃；养成计算器同步背包接口已失效，入口标记为故障并禁用，请改用嵌入式 Yae 或背包存档同步。"
+  "version": "7.2.0.7",
+  "publishedAt": "2026-11-24T05:50:00+08:00",
+  "pageUrl": "https://github.com/lihua123123/ellen.launcher/releases/tag/v7.2.0.7",
+  "downloadUrl": "https://github.com/lihua123123/ellen.launcher/releases/download/v7.2.0.7/Ellen.Launcher-7.2.0.7-Setup.exe",
+  "sha256": "37AD9016CC7F373BC5D1B5670E481245C9E4BCE7D9DE7CDE051FFE710312C4DA",
+  "size": 251864134,
+  "notes": "修复「从养成计算器同步」：请求体补齐 from_user_sync 等契约字段（此前被 WhenWritingDefault 吞掉，导致同步成功但背包全是 0），并对服务端不认的技能分组 id 做递归二分 + 去掉 skill_list 降级重试，-500001 不再让整次同步失败；批次 30→50，持有量不再被低估。修复树脂估计：元数据 rankLevel 被错误映射成白品质，导致天赋本、武器本、世界 BOSS、周本统计全空。另含自动合成预览开关、晶石合成配方优先级、单实例锁按安装目录隔离。"
 }

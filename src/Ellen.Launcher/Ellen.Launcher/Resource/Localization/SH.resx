@@ -1020,6 +1020,12 @@
   <data name="ServiceInventoryCalculatorNoDeltas" xml:space="preserve">
     <value>没有获取到可用于同步的角色或武器，请刷新 Cookie 后重试</value>
   </data>
+  <data name="ServiceInventoryCalculatorMissingInventoryData" xml:space="preserve">
+    <value>养成计算器没有返回可用的账号计算结果，本次未更新库存。</value>
+  </data>
+  <data name="ServiceInventoryBackpackNoMaterials" xml:space="preserve">
+    <value>这个背包存档没有可用的材料记录，本次未修改库存。请选用同一角色的最新背包存档。</value>
+  </data>
     <data name="ServiceInventoryRefreshByEmbeddedYaeErrorMessage" xml:space="preserve">
     <value>请使用其他方法同步背包物品</value>
   </data>

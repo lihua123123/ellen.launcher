@@ -15,10 +15,7 @@ namespace Ellen.Launcher.Web.Hoyolab.Takumi.Event.Calculate;
 [HttpClient(HttpClientConfiguration.Default)]
 public sealed partial class CalculateClient
 {
-    /* 50 条一批是实测能通过的最大量级（响应约 4.8 MB）。
-       再往上单次响应会到十几 MB，没必要；分得太小又会低估「持有量」——
-       因为 overall_consume 的 num - lack_num 实际是 min(持有, 该批需求)。 */
-    private const int BatchComputeChunkSize = 50;
+    private const int BatchComputeRejected = -500001;
 
     private readonly IHttpRequestMessageBuilderFactory httpRequestMessageBuilderFactory;
     private readonly IApiEndpointsFactory apiEndpointsFactory;
@@ -36,89 +33,46 @@ public sealed partial class CalculateClient
 
     public async ValueTask<Response<BatchConsumption>> BatchComputeAsync(UserAndUid userAndUid, ImmutableArray<AvatarPromotionDelta> deltas, bool syncInventory = false, CancellationToken token = default)
     {
-        if (deltas.IsEmpty)
+        if (deltas.IsDefaultOrEmpty)
         {
             return new Response<BatchConsumption>(-1, SH.ServiceInventoryCalculatorNoDeltas, default);
         }
 
-        if (deltas.Length <= BatchComputeChunkSize)
-        {
-            return await SendBatchComputeAsync(userAndUid, deltas, syncInventory, token).ConfigureAwait(false);
-        }
-
-        List<Response<BatchConsumption>> responses = [];
-        for (int offset = 0; offset < deltas.Length; offset += BatchComputeChunkSize)
-        {
-            int count = Math.Min(BatchComputeChunkSize, deltas.Length - offset);
-            ImmutableArray<AvatarPromotionDelta> chunk = Slice(deltas, offset, count);
-
-            Response<BatchConsumption> response = await ComputeChunkWithRetryAsync(
-                userAndUid,
-                chunk,
-                syncInventory,
-                token).ConfigureAwait(false);
-
-            if (response.ReturnCode is not 0)
-            {
-                return response;
-            }
-
-            responses.Add(response);
-        }
-
-        return MergeResponses(responses);
-    }
-
-    private async ValueTask<Response<BatchConsumption>> ComputeChunkWithRetryAsync(
-        UserAndUid userAndUid,
-        ImmutableArray<AvatarPromotionDelta> deltas,
-        bool syncInventory,
-        CancellationToken token)
-    {
+        // 与 Snap.Hutao.Remastered 完全一致：一次发送完整 delta 数组，不拆批、不合并响应。
         Response<BatchConsumption> response = await SendBatchComputeAsync(userAndUid, deltas, syncInventory, token).ConfigureAwait(false);
-        if (response.ReturnCode is 0)
+        if (!syncInventory || response.ReturnCode != BatchComputeRejected)
         {
             return response;
         }
 
-        if (deltas.Length <= 1)
+        /* 7.2.0.7 的边界探针（174 条 delta）已经证明 -500001 不是网络、不是体积：
+           - 同一批 174 条「整体去掉 skill_list」返回 0，响应约 7.5 MB；
+           - 前缀 68 条（6.37 MB）本来就能过，所以上限与体积无关；
+           - 单条旅行者带 skill_list 返回 -500001，去掉后返回 0。
+           所以这里只做一次「整套省略 skill_list」的完整重试：
+           响应仍是整份账号结果，只是这一轮不含天赋书，绝不拆批、不做跨响应合并。 */
+        ImmutableArray<AvatarPromotionDelta> withoutSkills = deltas.SelectAsArray(CloneWithoutSkills);
+        Response<BatchConsumption> retry = await SendBatchComputeAsync(userAndUid, withoutSkills, true, token).ConfigureAwait(false);
+        if (retry.ReturnCode == 0 && retry.Data is not null)
         {
-            if (deltas.IsEmpty)
-            {
-                return response;
-            }
-
-            /* 单条仍然失败：几乎都是 skill_list 里的技能分组 id 服务端不认识。
-               典型是旅行者 10000005 —— 元数据里用的是基础形态的分组 id（830 / 832），
-               而养成计算器只认各元素形态的 id，于是整条请求直接 -500001。
-               去掉 skill_list 再试一次：角色本体、武器、元素宝石这些材料照样算得出来，
-               只是少算天赋书，总比整次同步失败强。 */
-
-            AvatarPromotionDelta stripped = CloneWithoutSkills(deltas[0]);
-            return await SendBatchComputeAsync(userAndUid, [stripped], syncInventory, token).ConfigureAwait(false);
+            return retry;
         }
 
-        await Task.Delay(300, token).ConfigureAwait(false);
+        return response;
+    }
 
-        int leftCount = deltas.Length / 2;
-        ImmutableArray<AvatarPromotionDelta> left = Slice(deltas, 0, leftCount);
-        ImmutableArray<AvatarPromotionDelta> right = Slice(deltas, leftCount, deltas.Length - leftCount);
-
-        // 逐层递归二分，而不是只拆一层：服务端上限可能低到几条，
-        // 拆一层之后仍然可能失败，那样整次同步就白跑了。
-        Response<BatchConsumption> leftResponse = await ComputeChunkWithRetryAsync(userAndUid, left, syncInventory, token).ConfigureAwait(false);
-        if (leftResponse.ReturnCode is not 0)
+    private static AvatarPromotionDelta CloneWithoutSkills(AvatarPromotionDelta source)
+    {
+        return new()
         {
-            return leftResponse;
-        }
-
-        Response<BatchConsumption> rightResponse = await ComputeChunkWithRetryAsync(userAndUid, right, syncInventory, token).ConfigureAwait(false);
-        if (rightResponse.ReturnCode is not 0)
-        {
-            return rightResponse;
-        }
-
-        return MergeResponses([leftResponse, rightResponse]);
+            AvatarId = source.AvatarId,
+            AvatarLevelCurrent = source.AvatarLevelCurrent,
+            AvatarLevelTarget = source.AvatarLevelTarget,
+            ElementAttrId = source.ElementAttrId,
+            AvatarPromoteLevel = source.AvatarPromoteLevel,
+            FromUserSync = source.FromUserSync,
+            Weapon = source.Weapon,
+        };
     }
 
     private async ValueTask<Response<BatchConsumption>> SendBatchComputeAsync(
@@ -150,104 +104,6 @@ public sealed partial class CalculateClient
             .ConfigureAwait(false);
 
         return Response.Response.DefaultIfNull(resp, nameof(BatchComputeAsync));
-    }
-
-    private static Response<BatchConsumption> MergeResponses(IEnumerable<Response<BatchConsumption>> responses)
-    {
-        List<Consumption> items = [];
-        Dictionary<uint, Item> overallConsume = [];
-        Dictionary<uint, Item> availableMaterial = [];
-        bool hasUserInfo = false;
-
-        foreach (Response<BatchConsumption> response in responses)
-        {
-            if (response.Data is not { } data)
-            {
-                continue;
-            }
-
-            hasUserInfo |= data.HasUserInfo;
-
-            if (!data.Items.IsDefault)
-            {
-                items.AddRange(data.Items);
-            }
-
-            MergeItems(overallConsume, data.OverallConsume);
-            MergeItems(availableMaterial, data.AvailableMaterial);
-        }
-
-        BatchConsumption merged = new()
-        {
-            HasUserInfo = hasUserInfo,
-        };
-
-        if (items.Count > 0)
-        {
-            merged.Items = [.. items];
-        }
-
-        if (availableMaterial.Count > 0)
-        {
-            merged.AvailableMaterial = [.. availableMaterial.Values];
-        }
-
-        if (overallConsume.Count > 0)
-        {
-            merged.OverallConsume = [.. overallConsume.Values];
-        }
-
-        return new Response<BatchConsumption>(0, "OK", merged);
-    }
-
-    private static void MergeItems(Dictionary<uint, Item> target, ImmutableArray<Item> source)
-    {
-        if (source.IsDefault)
-        {
-            return;
-        }
-
-        foreach (Item item in source)
-        {
-            if (!target.TryGetValue(item.Id, out Item? existing) || GetOwnedCount(item) > GetOwnedCount(existing))
-            {
-                target[item.Id] = item;
-            }
-        }
-    }
-
-    private static int GetOwnedCount(Item item)
-    {
-        return (int)item.Num - item.LackNum;
-    }
-
-    /// <summary>
-    /// 复制一条 delta 但丢掉 skill_list，用于「服务端不认这组技能分组 id」时降级重试。
-    /// SkillList 保持 default，序列化时会因为 <c>WhenWritingDefault</c> 被整个跳过。
-    /// </summary>
-    private static AvatarPromotionDelta CloneWithoutSkills(AvatarPromotionDelta source)
-    {
-        return new()
-        {
-            AvatarId = source.AvatarId,
-            AvatarLevelCurrent = source.AvatarLevelCurrent,
-            AvatarLevelTarget = source.AvatarLevelTarget,
-            ElementAttrId = source.ElementAttrId,
-            AvatarPromoteLevel = source.AvatarPromoteLevel,
-            FromUserSync = source.FromUserSync,
-            Weapon = source.Weapon,
-        };
-    }
-
-    private static ImmutableArray<AvatarPromotionDelta> Slice(ImmutableArray<AvatarPromotionDelta> source, int start, int length)
-    {
-        ImmutableArray<AvatarPromotionDelta>.Builder builder = ImmutableArray.CreateBuilder<AvatarPromotionDelta>(length);
-        for (int i = start; i < start + length; i++)
-        {
-            builder.Add(source[i]);
-        }
-
-        return builder.ToImmutable();
     }
 
     public async ValueTask<ImmutableArray<Avatar>> GetAvatarsAsync(UserAndUid userAndUid, CancellationToken token = default)
@@ -368,7 +224,7 @@ public sealed partial class CalculateClient
             return listWrapper.List;
         }
 
-        return [];
+        return default;
     }
 
     public async ValueTask<ImmutableArray<Weapon>> GetAllWeaponsAsync(UserAndUid userAndUid, CancellationToken token = default)
@@ -394,7 +250,7 @@ public sealed partial class CalculateClient
             return listWrapper.List;
         }
 
-        return [];
+        return default;
     }
 
     private class SyncAvatarFilter

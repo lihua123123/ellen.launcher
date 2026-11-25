@@ -3,6 +3,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Ellen.Launcher.Model.Entity;
+using Ellen.Launcher.Model.Entity.Database;
 using Ellen.Launcher.Service.Abstraction;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
@@ -30,6 +31,21 @@ public sealed partial class CultivationRepository : ICultivationRepository
     public ImmutableArray<CultivateItem> GetCultivateItemImmutableArrayByEntryId(Guid entryId)
     {
         return this.ImmutableArray<CultivateItem, CultivateItem>(query => query.Where(i => i.EntryId == entryId).OrderBy(i => i.ItemId));
+    }
+
+    public ImmutableArray<CultivateItem> GetCultivateItemImmutableArrayByProjectId(Guid projectId)
+    {
+        using IServiceScope scope = ServiceProvider.CreateScope();
+        AppDbContext appDbContext = scope.GetAppDbContext();
+
+        return
+        [
+            .. from item in appDbContext.Set<CultivateItem>().AsNoTracking()
+               join entry in appDbContext.Set<CultivateEntry>().AsNoTracking() on item.EntryId equals entry.InnerId
+               where entry.ProjectId == projectId
+               orderby item.EntryId, item.ItemId
+               select item,
+        ];
     }
 
     public void RemoveCultivateEntryById(Guid entryId)

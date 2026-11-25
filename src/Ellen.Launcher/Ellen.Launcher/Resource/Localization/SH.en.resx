@@ -1018,6 +1018,12 @@ Space Available: {2}</value>
   <data name="ServiceInventoryCalculatorNoDeltas" xml:space="preserve">
     <value>No characters or weapons available for calculator sync. Please refresh the cookie and retry.</value>
   </data>
+  <data name="ServiceInventoryCalculatorMissingInventoryData" xml:space="preserve">
+    <value>The calculator did not return a usable account calculation. Inventory was not updated.</value>
+  </data>
+  <data name="ServiceInventoryBackpackNoMaterials" xml:space="preserve">
+    <value>This backpack archive has no usable material records. Inventory was not changed; select a recent archive for the same game account.</value>
+  </data>
     <data name="ServiceInventoryRefreshByEmbeddedYaeErrorMessage" xml:space="preserve">
     <value>Please use other ways to sync the package items</value>
   </data>

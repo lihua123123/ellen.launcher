@@ -45,6 +45,11 @@ public sealed partial class CultivationViewModel : Abstraction.ViewModel
 {
     private readonly ExclusiveTokenProvider exclusiveTokenProvider = new();
 
+    /// <summary>统计重建的串行闸门，配合 <see cref="statisticsRefreshQueued"/> 做高频刷新合并。</summary>
+    private readonly SemaphoreSlim statisticsRefreshGate = new(1, 1);
+
+    private int statisticsRefreshQueued;
+
     private readonly IBackpackService backpackService;
     private readonly AvatarInfoRepositoryOperation avatarInfoRepositoryOperation;
     private readonly IContentDialogFactory contentDialogFactory;
@@ -98,6 +103,67 @@ public sealed partial class CultivationViewModel : Abstraction.ViewModel
 
     [ObservableProperty]
     public partial SearchData? SearchData { get; set; }
+
+    /// <summary>外层标签页索引：0 = 材料清单，1 = 背包物品。</summary>
+    [ObservableProperty]
+    public partial int SelectedTabIndex { get; set; }
+
+    /// <summary>材料清单内层标签页索引：0 = 养成条目，1 = 材料统计。</summary>
+    [ObservableProperty]
+    public partial int SelectedMaterialTabIndex { get; set; }
+
+    private const int TabMaterialList = 0;
+    private const int TabInventory = 1;
+    private const int MaterialTabEntry = 0;
+    private const int MaterialTabStatistics = 1;
+
+    /// <summary>统计集合与背包视图是否已过期。只有对应标签页可见时才会真正重建。</summary>
+    private bool statisticsDirty = true;
+
+    private bool inventoryDirty = true;
+
+    private bool IsStatisticsVisible => SelectedTabIndex is TabMaterialList && SelectedMaterialTabIndex is MaterialTabStatistics;
+
+    private bool IsInventoryVisible => SelectedTabIndex is TabInventory;
+
+    partial void OnSelectedTabIndexChanged(int value)
+    {
+        PublishVisibleTabAsync().SafeForget();
+    }
+
+    partial void OnSelectedMaterialTabIndexChanged(int value)
+    {
+        PublishVisibleTabAsync().SafeForget();
+    }
+
+    /// <summary>
+    /// 按需发布当前可见标签页的数据。
+    /// </summary>
+    /// <remarks>
+    /// 与背包页同一套做法：Pivot 会 measure 它持有的每一个 PivotItem，如果进页面就把
+    /// 养成条目、材料统计、背包物品三份数据同时发出去，三个列表会一起实例化一屏容器
+    /// 并同时发起图片加载。所以这里只构建当前可见的那一页，其余标记为过期，
+    /// 等用户真正切过去时再算。
+    /// </remarks>
+    private async ValueTask PublishVisibleTabAsync()
+    {
+        await taskContext.SwitchToMainThreadAsync();
+
+        if (IsInventoryVisible)
+        {
+            if (inventoryDirty)
+            {
+                await RefreshInventoryItemsCoreAsync().ConfigureAwait(false);
+            }
+
+            return;
+        }
+
+        if (IsStatisticsVisible && statisticsDirty)
+        {
+            await RefreshStatisticsItemsCoreAsync().ConfigureAwait(false);
+        }
+    }
 
     protected override async ValueTask<bool> LoadOverrideAsync(CancellationToken token)
     {
@@ -281,11 +347,11 @@ public sealed partial class CultivationViewModel : Abstraction.ViewModel
             IAdvancedCollectionView<CultivateEntryView> entriesView = entries.AsAdvancedCollectionView();
             CultivateEntries = entriesView;
 
-            await UpdateInventoryItemsAsync().ConfigureAwait(false);
+            // 条目变了，统计和背包都可能过期；只重建当前可见的那一页。
+            statisticsDirty = true;
+            inventoryDirty = true;
 
-            await taskContext.SwitchToMainThreadAsync();
-
-            await UpdateStatisticsItemsAsync().ConfigureAwait(false);
+            await PublishVisibleTabAsync().ConfigureAwait(false);
         }
         finally
         {
@@ -627,16 +693,54 @@ public sealed partial class CultivationViewModel : Abstraction.ViewModel
     [Command("RefreshStatisticsItemsCommand")]
     private async Task UpdateStatisticsItemsAsync()
     {
+        statisticsDirty = true;
+        await PublishVisibleTabAsync().ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// 重建统计集合（串行 + 合并）。
+    /// </summary>
+    /// <remarks>
+    /// 勾选完成状态、拖动库存数量框都会连续触发重建，而一次重建要重算 500 多条统计。
+    /// 这里保证同一时刻只跑一个重建，期间到来的请求只记一次、跑完再补一轮：
+    /// 既不会堆积上百个并发重建，最终结果也对应最后一次操作。
+    /// </remarks>
+    private async ValueTask RefreshStatisticsItemsCoreAsync()
+    {
+        Interlocked.Increment(ref statisticsRefreshQueued);
+        await statisticsRefreshGate.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            while (Interlocked.Exchange(ref statisticsRefreshQueued, 0) > 0)
+            {
+                await BuildAndPublishStatisticsAsync().ConfigureAwait(false);
+            }
+        }
+        finally
+        {
+            statisticsRefreshGate.Release();
+        }
+    }
+
+    private async ValueTask BuildAndPublishStatisticsAsync()
+    {
         SentrySdk.AddBreadcrumb(BreadcrumbFactory2.CreateUI("Refresh statistics items", "CultivationViewModel.Command"));
 
-        // https://github.com/DGP-Studio/Ellen.Launcher/issues/2044
-        // Force clear the list and bring view to the top to prevent UI dead loop
         await taskContext.SwitchToMainThreadAsync();
-        StatisticsItems = null;
-        ResinStatistics = null;
 
-        if (Projects?.CurrentItem is null)
+        // 离开统计页后不再白算；保留 dirty 标记，等用户切回来再算。
+        if (!IsStatisticsVisible)
         {
+            return;
+        }
+
+        ObservableCollection<StatisticsCultivateItem>? previous = StatisticsItems;
+
+        if (Projects?.CurrentItem is not { } project)
+        {
+            StatisticsItems = null;
+            ResinStatistics = null;
+            statisticsDirty = false;
             return;
         }
 
@@ -652,7 +756,7 @@ public sealed partial class CultivationViewModel : Abstraction.ViewModel
         ResinStatistics resinStatistics;
         try
         {
-            statistics = await cultivationService.GetStatisticsCultivateItemCollectionAsync(Projects.CurrentItem, metadataContext, token).ConfigureAwait(false);
+            statistics = await cultivationService.GetStatisticsCultivateItemCollectionAsync(project, metadataContext, token).ConfigureAwait(false);
             if (AutoSynthesisPreview)
             {
                 statistics.AutoSynthesize(metadataContext.ResultMaterialIdCombineMap);
@@ -671,24 +775,71 @@ public sealed partial class CultivationViewModel : Abstraction.ViewModel
         }
 
         await taskContext.SwitchToMainThreadAsync();
+
+        /* 内容与当前已发布的完全一致时直接跳过赋值。
+           重新赋 ItemsSource 会让列表把已实例化的卡片全部拆掉重建、滚动位置被拉回顶部，
+           而勾选一个完成状态其实并不会改变统计数字（Current 来自背包、Count 来自条目），
+           这条路径就是最常见的情况。 */
+        if (previous is not null && IsSameStatistics(previous, statistics))
+        {
+            statisticsDirty = false;
+            return;
+        }
+
         StatisticsItems = statistics.ToObservableCollection();
         ResinStatistics = resinStatistics;
+        statisticsDirty = false;
+    }
+
+    private static bool IsSameStatistics(ObservableCollection<StatisticsCultivateItem> previous, StatisticsCultivateItemCollection next)
+    {
+        int index = 0;
+        foreach (StatisticsCultivateItem item in next)
+        {
+            if (item.ExcludedFromPresentation)
+            {
+                continue;
+            }
+
+            if (index >= previous.Count)
+            {
+                return false;
+            }
+
+            StatisticsCultivateItem old = previous[index++];
+            if (!old.Inner.Id.Equals(item.Inner.Id) || old.Count != item.Count || old.Current != item.Current)
+            {
+                return false;
+            }
+        }
+
+        return index == previous.Count;
     }
 
     private async ValueTask UpdateInventoryItemsAsync()
     {
-        // https://github.com/DGP-Studio/Ellen.Launcher/issues/2044
-        // Force clear the list and bring view to the top to prevent UI dead loop
-        await taskContext.SwitchToMainThreadAsync();
-        InventoryItems = [];
+        inventoryDirty = true;
+        await PublishVisibleTabAsync().ConfigureAwait(false);
+    }
 
-        if (Projects?.CurrentItem is null || metadataContext is null)
+    private async ValueTask RefreshInventoryItemsCoreAsync()
+    {
+        if (Projects?.CurrentItem is not { } project || metadataContext is not { } context)
         {
+            await taskContext.SwitchToMainThreadAsync();
+            InventoryItems = [];
+            inventoryDirty = false;
             return;
         }
 
+        /* 这一步包含一次库存查询 + 对一万多个材料的枚举判定，原先整段跑在 UI 线程上，
+           切到背包页或刷新库存时会明显卡一下。视图对象是纯 CLR 对象，构造放后台即可。 */
+        await taskContext.SwitchToBackgroundAsync();
+        ImmutableArray<InventoryItemView> items = inventoryService.GetInventoryItemViews(context, project, SaveInventoryItemCommand);
+
         await taskContext.SwitchToMainThreadAsync();
-        InventoryItems = inventoryService.GetInventoryItemViews(metadataContext, Projects.CurrentItem, SaveInventoryItemCommand);
+        InventoryItems = items;
+        inventoryDirty = false;
     }
 
     [Command("ModifyEntryCommand")]

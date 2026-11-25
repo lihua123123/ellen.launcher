@@ -25,6 +25,13 @@ public interface ICultivationRepository : IRepository<CultivateEntryLevelInforma
 
     ImmutableArray<CultivateItem> GetCultivateItemImmutableArrayByEntryId(Guid entryId);
 
+    /// <summary>
+    /// 一次取回整个项目下所有条目的养成物品，按 EntryId 分组前使用。
+    /// 统计页原先对每个条目单独查一次库（条目上百个 = 上百次作用域 + DbContext），
+    /// 这里合并成一条 JOIN，避免勾选一次完成状态就重建上百个上下文。
+    /// </summary>
+    ImmutableArray<CultivateItem> GetCultivateItemImmutableArrayByProjectId(Guid projectId);
+
     ObservableCollection<CultivateProject> GetCultivateProjectCollection();
 
     CultivateProject? GetCultivateProjectById(Guid projectId);

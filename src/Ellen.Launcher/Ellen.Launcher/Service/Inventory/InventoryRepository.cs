@@ -2,6 +2,8 @@
 // Licensed under the MIT license.
 
 using Ellen.Launcher.Model.Entity;
+using Ellen.Launcher.Model.Entity.Database;
+using Microsoft.EntityFrameworkCore;
 using Ellen.Launcher.Service.Abstraction;
 using System.Collections.Immutable;
 
@@ -23,6 +25,52 @@ public sealed partial class InventoryRepository : IInventoryRepository
     public void AddInventoryItemRangeByProjectId(IEnumerable<InventoryItem> items)
     {
         this.AddRange(items);
+    }
+
+    public void UpsertInventoryItemRangeByProjectId(Guid projectId, IEnumerable<InventoryItem> items)
+    {
+        InventoryItem[] incomingItems = items
+            .GroupBy(static item => item.ItemId)
+            .Select(group => InventoryItem.From(projectId, group.Key, group.Max(static item => item.Count)))
+            .ToArray();
+
+        if (incomingItems.Length == 0)
+        {
+            return;
+        }
+
+        using IServiceScope scope = ServiceProvider.CreateScope();
+        AppDbContext appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        Dictionary<uint, InventoryItem> existingItems = appDbContext.InventoryItems
+            .AsTracking()
+            .Where(item => item.ProjectId == projectId)
+            .ToDictionary(item => item.ItemId);
+
+        foreach (InventoryItem incomingItem in incomingItems)
+        {
+            if (existingItems.TryGetValue(incomingItem.ItemId, out InventoryItem? existingItem))
+            {
+                existingItem.Count = incomingItem.Count;
+            }
+            else
+            {
+                appDbContext.InventoryItems.Add(incomingItem);
+            }
+        }
+
+        // Persist all returned material updates together. Items absent from the response remain untouched.
+        appDbContext.SaveChanges();
+    }
+
+    public void ReplaceInventoryItemRangeByProjectId(Guid projectId, IEnumerable<InventoryItem> items)
+    {
+        using IServiceScope scope = ServiceProvider.CreateScope();
+        AppDbContext appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction = appDbContext.Database.BeginTransaction();
+        appDbContext.InventoryItems.Where(item => item.ProjectId == projectId).ExecuteDelete();
+        appDbContext.InventoryItems.AddRange(items);
+        appDbContext.SaveChanges();
+        transaction.Commit();
     }
 
     public void UpdateInventoryItem(InventoryItem item)

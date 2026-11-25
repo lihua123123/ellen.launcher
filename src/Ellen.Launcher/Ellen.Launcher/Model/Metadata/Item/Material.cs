@@ -21,11 +21,27 @@ public sealed class Material : DisplayItem
         TypeDescription = "？？？",
     };
 
+    /* 元数据里的 Material 实例在一次会话内是不可变的，而这两个判定都会被
+       「遍历全部 10673 个材料」的库存枚举反复调用（IsInventoryItem 还带一次正则）。
+       缓存到实例上，让整轮枚举从上万次正则降到每个材料一次。 */
+    private bool? isInventoryItemCache;
+    private bool? isResinItemCache;
+
     public MaterialType MaterialType { get; init; }
 
     public string? EffectDescription { get; init; }
 
     public bool IsInventoryItem()
+    {
+        return isInventoryItemCache ??= ComputeIsInventoryItem();
+    }
+
+    public bool IsResinItem()
+    {
+        return isResinItemCache ??= ComputeIsResinItem();
+    }
+
+    private bool ComputeIsInventoryItem()
     {
         // 原质
         if (Id == 112001U)
@@ -59,7 +75,7 @@ public sealed class Material : DisplayItem
         return IntrinsicFrozen.MaterialTypeDescriptions.Contains(TypeDescription);
     }
 
-    public bool IsResinItem()
+    private bool ComputeIsResinItem()
     {
         if (Id == MaterialIds.Mora || Id == MaterialIds.WanderersAdvice || Id == MaterialIds.AdventurersExperience || Id == MaterialIds.HeroesWit)
         {

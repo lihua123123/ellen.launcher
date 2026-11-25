@@ -67,6 +67,28 @@ public class MaterialSynthesisPlannerTest
     }
 
     [TestMethod]
+    [DataRow(0U, 129U, 657U, 68U, 127U, 51U, 8450UL)]
+    [DataRow(38U, 175U, 687U, 125U, 126U, 51U, 9650UL)]
+    public void ChimeraPreviewUsesOnlySurplusAndDoesNotChangeTheInputStock(
+        uint high, uint middle, uint low, uint expectedHigh, uint expectedMiddle, uint expectedLow, ulong mora)
+    {
+        MaterialSynthesisStock[] raw = [new(112149, 10640, 51, low), new(112150, 10640, 126, middle), new(112151, 10640, 141, high)];
+        MaterialSynthesisPreview preview = MaterialSynthesisPlanner.CreatePreview(raw,
+        [
+            new(112150, 112149, 3, 1, 25, MaterialSynthesisCategory.CharacterAndWeaponEnhancement),
+            new(112151, 112150, 3, 1, 50, MaterialSynthesisCategory.CharacterAndWeaponEnhancement),
+        ]);
+
+        Assert.AreEqual(expectedLow, preview.CurrentCounts[112149]);
+        Assert.AreEqual(expectedMiddle, preview.CurrentCounts[112150]);
+        Assert.AreEqual(expectedHigh, preview.CurrentCounts[112151]);
+        Assert.AreEqual(mora, preview.MoraCost);
+        Assert.AreEqual(low, raw[0].CurrentCount);
+        Assert.AreEqual(middle, raw[1].CurrentCount);
+        Assert.AreEqual(high, raw[2].CurrentCount);
+    }
+
+    [TestMethod]
     public void HighTierStockIsNeverBrokenDownToFillLowerTierShortage()
     {
         MaterialSynthesisPreview preview = MaterialSynthesisPlanner.CreatePreview(

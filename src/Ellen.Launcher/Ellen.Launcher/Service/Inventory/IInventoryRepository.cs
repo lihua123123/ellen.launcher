@@ -11,6 +11,10 @@ public interface IInventoryRepository : IRepository<InventoryItem>
 {
     void AddInventoryItemRangeByProjectId(IEnumerable<InventoryItem> items);
 
+    void UpsertInventoryItemRangeByProjectId(Guid projectId, IEnumerable<InventoryItem> items);
+
+    void ReplaceInventoryItemRangeByProjectId(Guid projectId, IEnumerable<InventoryItem> items);
+
     void RemoveInventoryItemRangeByProjectId(Guid projectId);
 
     void UpdateInventoryItem(InventoryItem item);

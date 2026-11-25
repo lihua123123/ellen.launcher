@@ -1,9 +1,10 @@
 // Copyright (c) DGP Studio. All rights reserved.
 // Licensed under the MIT license.
 
-using Microsoft.Extensions.Caching.Memory;
 using Ellen.Launcher.Core.Diagnostics;
 using Ellen.Launcher.Model.Metadata.Abstraction;
+using Ellen.Launcher.Model.Metadata.Avatar;
+using Ellen.Launcher.Model.Primitive;
 using Ellen.Launcher.Service.Cultivation;
 using Ellen.Launcher.ViewModel.User;
 using Ellen.Launcher.Web.Hoyolab.Takumi.Event.Calculate;
@@ -20,38 +21,44 @@ public sealed partial class PromotionDeltaFactory
 {
     private readonly ILogger<PromotionDeltaFactory> logger;
     private readonly IServiceProvider serviceProvider;
-    private readonly IMemoryCache memoryCache;
 
     [GeneratedConstructor]
     public partial PromotionDeltaFactory(IServiceProvider serviceProvider);
 
     public async ValueTask<ImmutableArray<AvatarPromotionDelta>> GetAsync(ICultivationMetadataContext context, UserAndUid userAndUid)
     {
-        ImmutableArray<AvatarPromotionDelta> result = await memoryCache.GetOrCreateAsync($"{nameof(PromotionDeltaFactory)}.Cache", async entry =>
+        using IServiceScope scope = serviceProvider.CreateScope();
+        CalculateClient calculateClient = scope.ServiceProvider.GetRequiredService<CalculateClient>();
+        ImmutableArray<CalculableAvatar> avatars = await calculateClient.GetAllAvatarsAsync(userAndUid).ConfigureAwait(false);
+        if (avatars.IsDefault)
         {
-            ImmutableArray<CalculableAvatar> calculableAvatars;
-            ImmutableArray<CalculableWeapon> calculableWeapons;
-            using (IServiceScope scope = serviceProvider.CreateScope())
-            {
-                CalculateClient calculateClient = scope.ServiceProvider.GetRequiredService<CalculateClient>();
-                calculableAvatars = await calculateClient.GetAllAvatarsAsync(userAndUid).ConfigureAwait(false);
-                calculableWeapons = await calculateClient.GetAllWeaponsAsync(userAndUid).ConfigureAwait(false);
-            }
+            return default;
+        }
 
-            ImmutableArray<ICultivationItemsAccess> cultivationItemsEntryList = Create(context, calculableAvatars, calculableWeapons).Sort(CultivationItemsAccessComparer.Shared);
-            Dictionary<uint, ElementAttributeId> elementAttributes = [];
-            foreach (ref readonly CalculableAvatar avatar in calculableAvatars.AsSpan())
-            {
-                elementAttributes[avatar.Id] = avatar.ElementAttrId;
-            }
+        ImmutableArray<CalculableWeapon> weapons = await calculateClient.GetAllWeaponsAsync(userAndUid).ConfigureAwait(false);
+        if (weapons.IsDefault)
+        {
+            return default;
+        }
 
-            using (ValueStopwatch.MeasureExecution(logger))
-            {
-                return ToPromotionDeltaArray(cultivationItemsEntryList, elementAttributes);
-            }
-        }).ConfigureAwait(false);
+        // Do not cache an account- or metadata-dependent catalog for the entire process.
+        ImmutableArray<ICultivationItemsAccess> entries = Create(context, avatars, weapons).Sort(CultivationItemsAccessComparer.Shared);
+        ImmutableDictionary<uint, ElementAttributeId> elementAttrIds = CreateElementAttrIdMap(avatars);
+        using (ValueStopwatch.MeasureExecution(logger))
+        {
+            return ToPromotionDeltaArray(entries, elementAttrIds);
+        }
+    }
 
-        return result;
+    private static ImmutableDictionary<uint, ElementAttributeId> CreateElementAttrIdMap(ImmutableArray<CalculableAvatar> avatars)
+    {
+        ImmutableDictionary<uint, ElementAttributeId>.Builder builder = ImmutableDictionary.CreateBuilder<uint, ElementAttributeId>();
+        foreach (ref readonly CalculableAvatar avatar in avatars.AsSpan())
+        {
+            builder[avatar.Id] = avatar.ElementAttrId;
+        }
+
+        return builder.ToImmutable();
     }
 
     private static ImmutableArray<ICultivationItemsAccess> Create(ICultivationMetadataContext context, ImmutableArray<CalculableAvatar> avatars, ImmutableArray<CalculableWeapon> weapons)
@@ -76,9 +83,7 @@ public sealed partial class PromotionDeltaFactory
         return cultivationItems.ToImmutable();
     }
 
-    private static ImmutableArray<AvatarPromotionDelta> ToPromotionDeltaArray(
-        ImmutableArray<ICultivationItemsAccess> cultivationItems,
-        IReadOnlyDictionary<uint, ElementAttributeId> elementAttributes)
+    private static ImmutableArray<AvatarPromotionDelta> ToPromotionDeltaArray(ImmutableArray<ICultivationItemsAccess> cultivationItems, ImmutableDictionary<uint, ElementAttributeId> elementAttrIds)
     {
         List<AvatarPromotionDelta> deltas = [];
         int currentWeaponEmptyAvatarIndex = 0;
@@ -89,9 +94,22 @@ public sealed partial class PromotionDeltaFactory
             {
                 case MetadataAvatar avatar:
                     AvatarPromotionDelta avatarDelta = AvatarPromotionDelta.CreateForAvatarMaxConsumption(avatar);
-                    if (elementAttributes.TryGetValue(avatar.Id.Value, out ElementAttributeId elementAttrId))
+
+                    /* 官方计算器靠 element_attr_id 区分旅行者的元素形态：同一个 avatar_id 对应七种形态，
+                       缺这个字段时服务端无法定位技能分组。7.2.0.7 探针里「e1 + 去掉 skill_list」的单条旅行者
+                       返回 0，而只有 avatar_id 的条目返回 -500001。Remastered 不填该字段是因为它的元数据里
+                       没有旅行者，这条 delta 根本不会出现。 */
+                    if (elementAttrIds.TryGetValue(avatar.Id.Value, out ElementAttributeId elementAttrId))
                     {
                         avatarDelta.ElementAttrId = elementAttrId;
+                    }
+
+                    /* 本项目的元数据（ellen.wiki 产线）比 Remastered 多收了旅行者，且只带一种元素形态的技能分组
+                       （10000005 是 830 / 832 / 839）。计算器只认账号当前形态的分组，带上就整批 -500001。
+                       保留旅行者的等级、突破需求，只省略它的技能列表，代价是少算旅行者天赋书。 */
+                    if (AvatarIds.IsPlayer(avatar.Id))
+                    {
+                        avatarDelta.SkillList = default;
                     }
 
                     deltas.Add(avatarDelta);

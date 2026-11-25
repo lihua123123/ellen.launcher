@@ -67,13 +67,26 @@ public sealed partial class CultivationService : ICultivationService
 
             ImmutableArray<CultivateEntry> entries = cultivationRepository.GetCultivateEntryImmutableArrayIncludingLevelInformationByProjectId(cultivateProject.InnerId);
 
+            // 与统计集合同理：一次 JOIN 取回全部物品，避免每个条目各开一个作用域 + DbContext。
+            Dictionary<Guid, List<CultivateItem>> itemsByEntry = [];
+            foreach (CultivateItem cultivateItem in cultivationRepository.GetCultivateItemImmutableArrayByProjectId(cultivateProject.InnerId))
+            {
+                if (!itemsByEntry.TryGetValue(cultivateItem.EntryId, out List<CultivateItem>? bucket))
+                {
+                    bucket = [];
+                    itemsByEntry[cultivateItem.EntryId] = bucket;
+                }
+
+                bucket.Add(cultivateItem);
+            }
+
             List<CultivateEntryView> resultEntries = new(entries.Length);
             foreach (ref readonly CultivateEntry entry in entries.AsSpan())
             {
-                ImmutableArray<CultivateItem> items = cultivationRepository.GetCultivateItemImmutableArrayByEntryId(entry.InnerId);
-                ImmutableArray<CultivateItemView>.Builder entryItems = ImmutableArray.CreateBuilder<CultivateItemView>(items.Length);
+                List<CultivateItem> items = itemsByEntry.TryGetValue(entry.InnerId, out List<CultivateItem>? entryItemList) ? entryItemList : [];
+                ImmutableArray<CultivateItemView>.Builder entryItems = ImmutableArray.CreateBuilder<CultivateItemView>(items.Count);
 
-                foreach (ref readonly CultivateItem cultivateItem in items.AsSpan())
+                foreach (CultivateItem cultivateItem in items)
                 {
                     entryItems.Add(CultivateItemView.Create(cultivateItem, context.GetMaterial(cultivateItem.ItemId), cultivateProject.ServerTimeZoneOffset, allMaterialsOpenToday));
                 }
@@ -133,9 +146,29 @@ public sealed partial class CultivationService : ICultivationService
             Dictionary</* ItemId */ uint, StatisticsCultivateItem> resultItems = [];
             Guid projectId = cultivateProject.InnerId;
 
-            foreach (ref readonly CultivateEntry entry in cultivationRepository.GetCultivateEntryImmutableArrayByProjectId(projectId).AsSpan())
+            /* 一次 JOIN 取回本项目全部养成物品再按 EntryId 分桶。
+               原先对每个条目单独查库，条目上百个就是上百次 CreateScope + DbContext，
+               而统计集合在每次勾选完成状态、每次改库存后都会重建，这一项是页面卡顿的主要来源。 */
+            Dictionary<Guid, List<CultivateItem>> itemsByEntry = [];
+            foreach (CultivateItem item in cultivationRepository.GetCultivateItemImmutableArrayByProjectId(projectId))
             {
-                foreach (ref readonly CultivateItem item in cultivationRepository.GetCultivateItemImmutableArrayByEntryId(entry.InnerId).AsSpan())
+                if (!itemsByEntry.TryGetValue(item.EntryId, out List<CultivateItem>? items))
+                {
+                    items = [];
+                    itemsByEntry[item.EntryId] = items;
+                }
+
+                items.Add(item);
+            }
+
+            foreach (CultivateEntry entry in cultivationRepository.GetCultivateEntryImmutableArrayByProjectId(projectId))
+            {
+                if (!itemsByEntry.TryGetValue(entry.InnerId, out List<CultivateItem>? items))
+                {
+                    continue;
+                }
+
+                foreach (CultivateItem item in items)
                 {
                     ref StatisticsCultivateItem? existedItem = ref CollectionsMarshal.GetValueRefOrAddDefault(resultItems, item.ItemId, out _);
                     if (existedItem is null || existedItem.ExcludedFromPresentation)

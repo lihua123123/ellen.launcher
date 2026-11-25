@@ -1,9 +1,9 @@
 {
-  "version": "7.2.0.7",
-  "publishedAt": "2026-11-24T05:50:00+08:00",
-  "pageUrl": "https://github.com/lihua123123/ellen.launcher/releases/tag/v7.2.0.7",
-  "downloadUrl": "https://github.com/lihua123123/ellen.launcher/releases/download/v7.2.0.7/Ellen.Launcher-7.2.0.7-Setup.exe",
-  "sha256": "37AD9016CC7F373BC5D1B5670E481245C9E4BCE7D9DE7CDE051FFE710312C4DA",
-  "size": 251864134,
-  "notes": "修复「从养成计算器同步」：请求体补齐 from_user_sync 等契约字段（此前被 WhenWritingDefault 吞掉，导致同步成功但背包全是 0），并对服务端不认的技能分组 id 做递归二分 + 去掉 skill_list 降级重试，-500001 不再让整次同步失败；批次 30→50，持有量不再被低估。修复树脂估计：元数据 rankLevel 被错误映射成白品质，导致天赋本、武器本、世界 BOSS、周本统计全空。另含自动合成预览开关、晶石合成配方优先级、单实例锁按安装目录隔离。"
+  "version": "7.2.0.8",
+  "publishedAt": "2026-11-25T17:06:58+08:00",
+  "pageUrl": "https://github.com/lihua123123/ellen.launcher/releases/tag/v7.2.0.8",
+  "downloadUrl": "https://github.com/lihua123123/ellen.launcher/releases/download/v7.2.0.8/Ellen.Launcher-7.2.0.8-Setup.exe",
+  "sha256": "D375514DF768B621FF83D5904C3110A62270220AB206C293AA9BB96F71041183",
+  "size": 248655138,
+  "notes": "修复「从养成计算器同步」的库存数量：改用 available_material 反解真实持有量（原先把 num-lack_num 当成库存，175 会显示成 341），并按 3:1 合成链补算服务端不返回的稀缺材料，三阶嵌合材料实测还原为 38/175/687；旅行者按 element_attr_id 回填元素形态并省略 skill_list，恢复单次全量请求；库存同步改为逐材料 upsert，不再清空响应外的本地库存。养成计划页性能：数据库查询 61 次降到 3 次、材料统计列表换真虚拟化布局、页面启用导航缓存、条目卡固定高度、只构建当前可见标签页、勾选完成状态不再把列表拉回顶部。"
 }
